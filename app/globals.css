@@ -42,10 +42,7 @@
   --text-display-lg--line-height: 3.25rem;  /* 52 */
   --text-display-xl: 5rem;             /* 80 */
   --text-display-xl--line-height: 4.625rem; /* 74 */
-}
-
-@theme inline {
+  /* 폰트 설정 - pretendard */
   --font-sans: var(--font-pretendard);
-  --font-mono: var(--font-geist-mono);
 }
 
