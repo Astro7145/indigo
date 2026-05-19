@@ -56,7 +56,7 @@ npm run test:e2e    # E2E (Playwright)
     utils/            # 순수 유틸 함수
   ```
 
-  - 도메인은 실제 API 기준 `auth, goal, todo, note, user, notification, post, upload` 8개 (SSOT: Swagger). 대시보드는 별도 API 도메인이 아니라 `todo`·`goal`을 조합한 화면일 뿐이다. **도메인 무관 공용은 각 계층에서 `common`** (`components/common/`, `types/common.ts`)
+  - 도메인은 실제 API 기준 `auth, goal, todo, note, user, notification, post, upload` 8개 (SSOT: Swagger). **도메인 무관 공용은 각 계층에서 `common`** (`components/common/`, `types/common.ts`)
   - 한 도메인 작업은 `components/<domain>` · `hooks/<domain>.ts` · `api/<domain>.ts` · `types/<domain>.ts`에 걸쳐 있다. 스토어는 도메인별로 안 나누고 전역만 `stores/`에 둔다
   - 타인이 담당하는 도메인 파일은 합의 없이 수정하지 않는다 (R&R 영역 존중)
 
