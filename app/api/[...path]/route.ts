@@ -12,6 +12,11 @@ type Ctx = { params: Promise<{ path: string[] }> }
 
 async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const { path } = await ctx.params
+
+  if (!path?.length || path.some((s) => s === '' || s === '.' || s === '..')) {
+    return NextResponse.json({ message: 'Invalid path' }, { status: 400 })
+  }
+
   const joined = path.join('/')
   const search = req.nextUrl.search
   const { access, refresh } = parseAuthCookies(req)

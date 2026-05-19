@@ -10,6 +10,7 @@ import {
   passthrough,
   backendHttp,
   COOKIE,
+  assertSafePath,
 } from '@/src/server/backend'
 import { AxiosHeaders, type AxiosAdapter } from 'axios'
 
@@ -53,6 +54,11 @@ describe('externalBase', () => {
     delete process.env.BACKEND_API_BASE_URL
     expect(() => externalBase()).toThrow(/BACKEND_API_BASE_URL/)
   })
+  it('normalizes slashes (no double slash)', () => {
+    process.env.BACKEND_API_BASE_URL = 'https://api.test/'
+    process.env.BACKEND_TEAM_ID = '/indigo/'
+    expect(externalBase()).toBe('https://api.test/indigo')
+  })
 })
 
 describe('cookies', () => {
@@ -77,6 +83,19 @@ describe('cookies', () => {
   })
 })
 
+describe('assertSafePath', () => {
+  it('throws on .. / . / empty segment', () => {
+    expect(() => assertSafePath('a/../b')).toThrow(/Unsafe path/)
+    expect(() => assertSafePath('a//b')).toThrow(/Unsafe path/)
+    expect(() => assertSafePath('a/./b')).toThrow(/Unsafe path/)
+  })
+  it('allows normal domain paths', () => {
+    expect(() => assertSafePath('todos')).not.toThrow()
+    expect(() => assertSafePath('posts/2/comments/8/likes')).not.toThrow()
+    expect(() => assertSafePath('users/check-nickname')).not.toThrow()
+  })
+})
+
 describe('callExternal', () => {
   it('builds URL, method, Bearer and returns status+body', async () => {
     const calls = queueAdapter([{ status: 200, body: JSON.stringify({ ok: true }), contentType: 'application/json' }])
@@ -93,6 +112,11 @@ describe('callExternal', () => {
     await callExternal({ method: 'POST', path: 'auth/login', body: '{"x":1}', contentType: 'application/json' })
     expect(AxiosHeaders.from(calls[0].headers as never).has('Authorization')).toBe(false)
     expect(calls[0].data).toBe('{"x":1}')
+  })
+  it('rejects traversal path before any request', async () => {
+    const calls = queueAdapter([{ status: 200, body: '{}' }])
+    await expect(callExternal({ method: 'GET', path: '../secret' })).rejects.toThrow(/Unsafe path/)
+    expect(calls.length).toBe(0)
   })
 })
 

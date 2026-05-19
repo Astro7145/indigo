@@ -121,3 +121,10 @@ it('proxies an external 204 (DELETE) without throwing', async () => {
   const res = await DELETE(r('/api/todos/5', 'DELETE', `${COOKIE.ACCESS}=TK`), ctx(['todos', '5']))
   expect(res.status).toBe(204)
 })
+
+it('rejects path traversal with 400 and no external call', async () => {
+  const calls = queueAdapter([{ status: 200, body: '{}' }])
+  const res = await GET(r('/api/x', 'GET', `${COOKIE.ACCESS}=TK`), ctx(['..', 'goals']))
+  expect(res.status).toBe(400)
+  expect(calls.length).toBe(0)
+})

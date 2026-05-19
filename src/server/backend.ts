@@ -1,6 +1,13 @@
 import axios from 'axios'
 import { NextResponse, type NextRequest } from 'next/server'
 
+export class ApiPathError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ApiPathError'
+  }
+}
+
 export const COOKIE = {
   ACCESS: 'access_token',
   REFRESH: 'refresh_token',
@@ -23,7 +30,7 @@ export function externalBase(): string {
   const team = process.env.BACKEND_TEAM_ID
   if (!base) throw new Error('BACKEND_API_BASE_URL is not set')
   if (!team) throw new Error('BACKEND_TEAM_ID is not set')
-  return `${base}/${team}`
+  return `${base.replace(/\/+$/, '')}/${team.replace(/^\/+|\/+$/g, '')}`
 }
 
 function cookieOptions() {
@@ -70,6 +77,14 @@ export interface ExternalResult {
   contentType: string | null
 }
 
+/** 경로 세그먼트에 traversal/빈 세그먼트가 있으면 던진다 (teamId 경계 우회 방지). */
+export function assertSafePath(path: string): void {
+  const segs = path.split('/')
+  if (segs.some((s) => s === '' || s === '.' || s === '..')) {
+    throw new ApiPathError(`Unsafe path segment in "${path}"`)
+  }
+}
+
 export async function callExternal(opts: {
   method: string
   path: string
@@ -78,6 +93,7 @@ export async function callExternal(opts: {
   body?: string
   contentType?: string
 }): Promise<ExternalResult> {
+  assertSafePath(opts.path)
   const headers: Record<string, string> = {}
   if (opts.accessToken) headers.Authorization = `Bearer ${opts.accessToken}`
   if (opts.body !== undefined) {
