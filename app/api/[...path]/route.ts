@@ -20,7 +20,7 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
     return NextResponse.json({ message: 'Authentication required' }, { status: 401 })
   }
 
-  const hasBody = req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT'
+  const hasBody = req.method === 'POST' || req.method === 'PATCH'
   const body = hasBody ? await req.text() : undefined
   const contentType = req.headers.get('content-type') ?? undefined
 
@@ -44,6 +44,9 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
     return out
   }
 
+  // refresh가 성공하면 회전된 토큰은 유효하므로, 재시도가 또 401이어도
+  // 회전된 쿠키를 set하고 upstream 응답(401 포함)을 그대로 전달한다
+  // (다음 요청은 새 토큰을 사용; 여기서 추가 재시도/clear는 하지 않는다).
   const retry = await callExternal({
     method: req.method,
     path: joined,

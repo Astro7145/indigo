@@ -45,6 +45,7 @@ it('401 → refresh → retry with new token → success + rotated cookies', asy
   expect(res.status).toBe(200)
   expect(await res.json()).toEqual({ ok: true })
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('NA')
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('NR')
   expect(new Headers((spy.mock.calls[2][1] as RequestInit).headers).get('authorization')).toBe('Bearer NA')
 })
 
@@ -55,6 +56,35 @@ it('401 → refresh fails → clear cookies + 401', async () => {
   const res = await GET(r('/api/goals', 'GET', `${COOKIE.ACCESS}=OLD; ${COOKIE.REFRESH}=RFR`), ctx(['goals']))
   expect(res.status).toBe(401)
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('')
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
+})
+
+it('401 with access but no refresh cookie → clear + 401', async () => {
+  const spy = jest.spyOn(global, 'fetch')
+    .mockResolvedValueOnce(new Response('{}', { status: 401 }))
+  const res = await GET(r('/api/goals', 'GET', `${COOKIE.ACCESS}=OLD`), ctx(['goals']))
+  expect(res.status).toBe(401)
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('')
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
+  expect(spy).toHaveBeenCalledTimes(1) // no refresh attempt without a refresh cookie
+})
+
+it('refresh succeeds but retry still 401 → rotated cookies + 401 passthrough', async () => {
+  jest.spyOn(global, 'fetch')
+    .mockResolvedValueOnce(new Response('{}', { status: 401 }))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }), { status: 200 }))
+    .mockResolvedValueOnce(new Response(JSON.stringify({ message: 'still 401' }), { status: 401 }))
+  const res = await GET(r('/api/goals', 'GET', `${COOKIE.ACCESS}=OLD; ${COOKIE.REFRESH}=RFR`), ctx(['goals']))
+  expect(res.status).toBe(401)
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('NA')
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('NR')
+})
+
+it('PATCH forwards body and rotated path', async () => {
+  const spy = jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}', { status: 200 }))
+  await PATCH(r('/api/todos/5', 'PATCH', `${COOKIE.ACCESS}=TK`, '{"done":true}'), ctx(['todos', '5']))
+  expect(spy.mock.calls[0][0]).toBe('https://api.test/indigo/todos/5')
+  expect((spy.mock.calls[0][1] as RequestInit).body).toBe('{"done":true}')
 })
 
 it('POST forwards body and nested path', async () => {
