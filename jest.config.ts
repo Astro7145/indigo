@@ -14,6 +14,10 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   // Playwright(e2e/)는 별도 러너로 실행 — Jest 수집 대상에서 제외
   testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/e2e/'],
+  // tsconfig paths를 jest.mock() 호이스팅에서도 인식하도록 매핑
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1',
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
