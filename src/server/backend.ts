@@ -102,9 +102,12 @@ export async function callExternal(opts: {
 
 /** 외부 응답을 그대로(상태·바디·content-type) 클라이언트로 통과시킨다. */
 export function passthrough(r: ExternalResult): NextResponse {
-  return new NextResponse(r.body, {
+  // 204/205/304는 null-body 상태 — 빈 문자열이라도 body를 주면 Response 생성자가 throw한다.
+  const nullBody = r.status === 204 || r.status === 205 || r.status === 304
+  const body = nullBody || r.body === '' ? null : r.body
+  return new NextResponse(body, {
     status: r.status,
-    headers: r.contentType ? { 'content-type': r.contentType } : undefined,
+    headers: !nullBody && r.contentType ? { 'content-type': r.contentType } : undefined,
   })
 }
 

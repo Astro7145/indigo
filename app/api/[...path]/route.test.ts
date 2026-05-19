@@ -115,3 +115,9 @@ it('exports PATCH and DELETE handlers', () => {
   expect(typeof PATCH).toBe('function')
   expect(typeof DELETE).toBe('function')
 })
+
+it('proxies an external 204 (DELETE) without throwing', async () => {
+  queueAdapter([{ status: 204 }])
+  const res = await DELETE(r('/api/todos/5', 'DELETE', `${COOKIE.ACCESS}=TK`), ctx(['todos', '5']))
+  expect(res.status).toBe(204)
+})

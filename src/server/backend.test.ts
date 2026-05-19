@@ -7,6 +7,7 @@ import {
   clearAuthCookies,
   callExternal,
   refreshTokens,
+  passthrough,
   backendHttp,
   COOKIE,
 } from '@/src/server/backend'
@@ -104,5 +105,21 @@ describe('refreshTokens', () => {
   it('returns null on failure', async () => {
     queueAdapter([{ status: 401, body: '{}' }])
     expect(await refreshTokens('OLD')).toBeNull()
+  })
+})
+
+describe('passthrough', () => {
+  it('204 → NextResponse 204 with no body (no throw)', () => {
+    const res = passthrough({ status: 204, body: '', contentType: null })
+    expect(res.status).toBe(204)
+  })
+  it('200 → body + content-type preserved', async () => {
+    const res = passthrough({ status: 200, body: '{"a":1}', contentType: 'application/json' })
+    expect(res.status).toBe(200)
+    expect(res.headers.get('content-type')).toBe('application/json')
+    expect(await res.text()).toBe('{"a":1}')
+  })
+  it('304 → no body (no throw)', () => {
+    expect(passthrough({ status: 304, body: '', contentType: null }).status).toBe(304)
   })
 })
