@@ -12,8 +12,9 @@ beforeEach(() => {
 })
 
 it('getGoals GET /goals with params', async () => {
-  await getGoals({ cursor: 2, limit: 5 })
+  const r = await getGoals({ cursor: 2, limit: 5 })
   expect(mocked.get).toHaveBeenCalledWith('/goals', { params: { cursor: 2, limit: 5 } })
+  expect(r).toEqual({ goals: [], nextCursor: null, totalCount: 0 })
 })
 it('getGoal GET /goals/:id', async () => {
   await getGoal(7)
@@ -31,6 +32,7 @@ it('deleteGoal DELETE /goals/:id', async () => {
   await deleteGoal(7)
   expect(mocked.delete).toHaveBeenCalledWith('/goals/7')
 })
-it('goalKeys.detail', () => {
+it('goalKeys factory produces stable keys', () => {
+  expect(goalKeys.list({ limit: 5 })).toEqual(['goal', 'list', { limit: 5 }])
   expect(goalKeys.detail(7)).toEqual(['goal', 'detail', 7])
 })
