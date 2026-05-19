@@ -19,6 +19,7 @@ export class ApiError extends Error {
 
   constructor(init: ApiErrorInit) {
     super(init.message)
+    Object.setPrototypeOf(this, new.target.prototype)
     this.name = 'ApiError'
     this.status = init.status
     this.code = init.code
@@ -30,6 +31,7 @@ export class ApiError extends Error {
 export class NotImplementedError extends Error {
   constructor(message: string) {
     super(message)
+    Object.setPrototypeOf(this, new.target.prototype)
     this.name = 'NotImplementedError'
   }
 }

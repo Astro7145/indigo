@@ -17,5 +17,6 @@ describe('NotImplementedError', () => {
     const e = new NotImplementedError('refresh seam not wired')
     expect(e).toBeInstanceOf(Error)
     expect(e.name).toBe('NotImplementedError')
+    expect(e.message).toBe('refresh seam not wired')
   })
 })
