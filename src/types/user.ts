@@ -1,3 +1,6 @@
+import type { MessageResponse } from '@/src/types/common'
+export type { MessageResponse }
+
 export interface UserProfile {
   id: number
   teamId: string
@@ -20,8 +23,4 @@ export interface UpdateMeBody {
 export interface ChangePasswordBody {
   currentPassword: string
   newPassword: string
-}
-
-export interface MessageResponse {
-  message: string
 }

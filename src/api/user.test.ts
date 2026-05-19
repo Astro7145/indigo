@@ -13,8 +13,10 @@ beforeEach(() => {
 })
 
 it('checkNickname GET /users/check-nickname with name', async () => {
-  await checkNickname('foo')
+  mocked.get.mockResolvedValue({ data: { available: true } } as never)
+  const r = await checkNickname('foo')
   expect(mocked.get).toHaveBeenCalledWith('/users/check-nickname', { params: { name: 'foo' } })
+  expect(r).toEqual({ available: true })
 })
 it('getMe GET /users/me', async () => {
   await getMe()
@@ -32,6 +34,7 @@ it('changePassword PATCH /users/me/password', async () => {
   await changePassword({ currentPassword: 'a', newPassword: 'b' })
   expect(mocked.patch).toHaveBeenCalledWith('/users/me/password', { currentPassword: 'a', newPassword: 'b' })
 })
-it('userKeys.me', () => {
+it('userKeys factory produces stable keys', () => {
   expect(userKeys.me()).toEqual(['user', 'me'])
+  expect(userKeys.nickname('foo')).toEqual(['user', 'nickname', 'foo'])
 })

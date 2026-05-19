@@ -33,9 +33,8 @@ export interface RefreshResponse {
 
 export type LogoutBody = RefreshBody
 
-export interface LogoutResponse {
-  message: string
-}
+import type { MessageResponse } from '@/src/types/common'
+export type LogoutResponse = MessageResponse
 
 export type OAuthProvider = 'google' | 'kakao'
 

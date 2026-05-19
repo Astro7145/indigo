@@ -35,3 +35,8 @@ export class NotImplementedError extends Error {
     this.name = 'NotImplementedError'
   }
 }
+
+/** 단순 메시지 응답 (logout, 비밀번호 변경 등 본문이 메시지만 있는 엔드포인트). */
+export interface MessageResponse {
+  message: string
+}
