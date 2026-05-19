@@ -5,9 +5,7 @@ export interface AuthUser {
   image: string | null
 }
 
-export interface AuthTokens {
-  accessToken: string
-  refreshToken: string
+export interface LoginResult {
   user: AuthUser
 }
 
@@ -21,20 +19,6 @@ export interface LoginBody {
   email: string
   password: string
 }
-
-export interface RefreshBody {
-  refreshToken: string
-}
-
-export interface RefreshResponse {
-  accessToken: string
-  refreshToken: string | null
-}
-
-export type LogoutBody = RefreshBody
-
-import type { MessageResponse } from '@/src/types/common'
-export type LogoutResponse = MessageResponse
 
 export type OAuthProvider = 'google' | 'kakao'
 
