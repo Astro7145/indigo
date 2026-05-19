@@ -14,8 +14,9 @@ it('login POSTs /auth/login and returns { user }', async () => {
   expect(r).toEqual({ user: { id: 1, email: 'a@b.c', name: 'n', image: null } })
 })
 it('signup POSTs /auth/signup and returns { user }', async () => {
-  await signup({ email: 'a@b.c', name: 'n', password: 'pw' })
+  const r = await signup({ email: 'a@b.c', name: 'n', password: 'pw' })
   expect(mocked.post).toHaveBeenCalledWith('/auth/signup', { email: 'a@b.c', name: 'n', password: 'pw' })
+  expect(r).toEqual({ user: { id: 1, email: 'a@b.c', name: 'n', image: null } })
 })
 it('refresh POSTs /auth/refresh with no body and returns void', async () => {
   mocked.post.mockResolvedValue({ data: undefined } as never)
@@ -30,8 +31,9 @@ it('logout POSTs /auth/logout with no body and returns void', async () => {
   expect(r).toBeUndefined()
 })
 it('oauthLogin POSTs /oauth/:provider and returns { user }', async () => {
-  await oauthLogin('google', { token: 't' })
+  const r = await oauthLogin('google', { token: 't' })
   expect(mocked.post).toHaveBeenCalledWith('/oauth/google', { token: 't' })
+  expect(r).toEqual({ user: { id: 1, email: 'a@b.c', name: 'n', image: null } })
 })
 it('authKeys.all is stable', () => {
   expect(authKeys.all).toEqual(['auth'])
