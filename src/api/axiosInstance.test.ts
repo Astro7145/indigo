@@ -1,30 +1,16 @@
 import type { AxiosAdapter } from 'axios'
-
-function loadInstance() {
-  let mod: typeof import('@/src/api/axiosInstance')
-  jest.isolateModules(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    mod = require('@/src/api/axiosInstance')
-  })
-  // @ts-expect-error assigned in isolateModules
-  return mod.default
-}
-
-beforeEach(() => {
-  process.env.NEXT_PUBLIC_API_BASE_URL = '/api'
-})
+import instance from '@/src/api/axiosInstance'
 
 afterEach(() => {
-  process.env.NEXT_PUBLIC_API_BASE_URL = '/api'
+  // restore default adapter so per-test overrides don't leak
+  delete (instance.defaults as { adapter?: unknown }).adapter
 })
 
-it('throws at load when NEXT_PUBLIC_API_BASE_URL is missing', () => {
-  delete process.env.NEXT_PUBLIC_API_BASE_URL
-  expect(() => loadInstance()).toThrow(/NEXT_PUBLIC_API_BASE_URL/)
+it('uses the same-origin BFF proxy baseURL', () => {
+  expect(instance.defaults.baseURL).toBe('/api')
 })
 
 it('normalizes a 404 response into ApiError', async () => {
-  const instance = loadInstance()
   instance.defaults.adapter = (async (config) => {
     return Promise.reject({
       isAxiosError: true,
@@ -39,7 +25,6 @@ it('normalizes a 404 response into ApiError', async () => {
 })
 
 it('normalizes a network error (no response) into ApiError status 0', async () => {
-  const instance = loadInstance()
   instance.defaults.adapter = (async () => {
     return Promise.reject({ isAxiosError: true, message: 'Network Error' })
   }) as AxiosAdapter
