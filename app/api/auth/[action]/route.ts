@@ -6,7 +6,7 @@ import {
   refreshTokens,
   setAuthCookies,
   clearAuthCookies,
-} from '@/src/api/bff'
+} from '@/src/api/server/bff'
 
 type Ctx = { params: Promise<{ action: string }> }
 

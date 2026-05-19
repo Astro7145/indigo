@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server'
 import { POST } from '@/app/api/auth/[action]/route'
-import { COOKIE, backendHttp } from '@/src/api/bff'
+import { COOKIE, backendHttp } from '@/src/api/server/bff'
 import { type AxiosAdapter } from 'axios'
 
 beforeEach(() => {
