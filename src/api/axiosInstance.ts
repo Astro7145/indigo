@@ -62,8 +62,7 @@ instance.interceptors.response.use(
         // 시임 미연동(NotImplementedError 포함) 또는 refresh 실패 → 원래 401을 ApiError로 전파
         return Promise.reject(toApiError(error))
       }
-      config.__isRetry = true
-      return instance.request(config)
+      return instance.request({ ...config, __isRetry: true } as RetryableConfig)
     }
 
     return Promise.reject(toApiError(error))

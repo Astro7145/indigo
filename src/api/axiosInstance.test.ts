@@ -110,3 +110,18 @@ it('does not refresh when seam throws NotImplementedError; propagates 401 ApiErr
   expect(err.name).toBe('ApiError')
   expect(err.status).toBe(401)
 })
+
+it('does not retry a second time when the retry itself returns 401', async () => {
+  mockedSeam.refreshAccessToken.mockResolvedValue(undefined)
+  const instance = loadInstance()
+  instance.defaults.adapter = (async (config) => {
+    return Promise.reject({
+      isAxiosError: true, message: '401', config,
+      response: { data: { message: 'still unauthorized' }, status: 401, statusText: '', headers: {}, config },
+    })
+  }) as AxiosAdapter
+  const err = await instance.get('/secure').catch((e) => e)
+  expect(err.name).toBe('ApiError')
+  expect(err.status).toBe(401)
+  expect(mockedSeam.refreshAccessToken).toHaveBeenCalledTimes(1)
+})
