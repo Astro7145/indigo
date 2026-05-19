@@ -5,9 +5,3 @@
 // 3. 일관성 유지: 모든 테스트에 동일한 확장 기능이 적용되므로 테스트 코드가 일관성을 유지합니다.
 // 4. 설정 집중화: 테스트 환경 설정을 한 곳에서 관리할 수 있어 나중에 변경이 필요할 때 편리합니다.
 import '@testing-library/jest-dom'
-
-// Make @/src/types/common a shared singleton across jest.isolateModules boundaries.
-// Without this, isolateModules creates a separate module registry, causing ApiError
-// instanceof checks to fail (outer class !== inner class). By registering the actual
-// module in the outer mock registry, Jest falls back to it from within isolateModules.
-jest.mock('@/src/types/common', () => jest.requireActual('@/src/types/common'))

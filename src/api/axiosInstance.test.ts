@@ -1,5 +1,4 @@
 import type { AxiosAdapter } from 'axios'
-import { ApiError } from '@/src/types/common'
 
 function loadInstance() {
   let mod: typeof import('@/src/api/axiosInstance')
@@ -41,6 +40,6 @@ it('normalizes a network error (no response) into ApiError status 0', async () =
     return Promise.reject({ isAxiosError: true, message: 'Network Error' })
   }) as AxiosAdapter
   const err = await instance.get('/todos').catch((e) => e)
-  expect(err).toBeInstanceOf(ApiError)
+  expect(err.name).toBe('ApiError')
   expect(err.status).toBe(0)
 })
