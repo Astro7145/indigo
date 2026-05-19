@@ -1,15 +1,15 @@
 import { SVGProps } from 'react'
 import { cn } from '@/src/utils/cn'
 
-interface IcFlag02Props extends SVGProps<SVGSVGElement> {
+interface IcFlagOutlineProps extends SVGProps<SVGSVGElement> {
   size?: 'large' | 'small'
 }
 
-export function IcFlag02({
+export function IcFlagOutline({
   size = 'large',
   className,
   ...rest
-}: IcFlag02Props) {
+}: IcFlagOutlineProps) {
   if (size === 'large') {
     return (
       <svg

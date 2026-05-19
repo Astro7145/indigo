@@ -1,15 +1,15 @@
 import { SVGProps } from 'react'
 import { cn } from '@/src/utils/cn'
 
-interface IcFlag01Props extends SVGProps<SVGSVGElement> {
+interface IcFlagFillProps extends SVGProps<SVGSVGElement> {
   state?: 'default' | 'active'
 }
 
-export function IcFlag01({
+export function IcFlagFill({
   state = 'default',
   className,
   ...rest
-}: IcFlag01Props) {
+}: IcFlagFillProps) {
   const variants: Record<'default' | 'active', string> = {
     default: 'size-6 text-slate-300',
     active: 'size-6 text-indigo-600',
