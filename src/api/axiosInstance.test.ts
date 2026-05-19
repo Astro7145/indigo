@@ -50,6 +50,17 @@ it('omits Authorization when seam returns null', async () => {
   expect(seen).toBeUndefined()
 })
 
+it('removes a pre-existing Authorization header when seam returns null', async () => {
+  const instance = loadInstance()
+  let seen: unknown = 'unset'
+  instance.defaults.adapter = (async (config) => {
+    seen = config.headers?.Authorization
+    return { data: {}, status: 200, statusText: 'OK', headers: {}, config }
+  }) as AxiosAdapter
+  await instance.get('/todos', { headers: { Authorization: 'Bearer stale-token' } })
+  expect(seen).toBeUndefined()
+})
+
 it('normalizes a 404 response into ApiError', async () => {
   const instance = loadInstance()
   instance.defaults.adapter = (async (config) => {

@@ -24,6 +24,10 @@ instance.interceptors.request.use(async (config) => {
   const token = await getAccessToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
+  } else {
+    // getAccessToken()을 인증의 단일 출처로 강제: 토큰이 없으면
+    // (재시도 config 스프레드 등으로) 남아 있을 수 있는 만료 토큰 헤더를 제거한다.
+    config.headers.delete('Authorization')
   }
   return config
 })
