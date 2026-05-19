@@ -77,7 +77,6 @@ npm run test:e2e    # E2E (Playwright)
 
 - API 명세(Swagger): https://slid-to-do-api.vercel.app/docs
 - 도메인별 API 함수·쿼리 키는 `src/api/<domain>.ts`, 이를 TanStack Query로 감싼 커스텀 훅은 `src/hooks/<domain>.ts`에 둔다(둘 다 도메인당 단일 파일). 컴포넌트는 `fetch`/`axios`/`useQuery`를 직접 호출하지 않고 **커스텀 훅만** 사용한다 (HTTP 클라이언트 단일 인스턴스는 `src/api/axiosInstance.ts`)
-- 클라이언트는 BFF 동일 오리진 프록시 `/api`를 사용한다 (`src/api/axiosInstance.ts`에 상수로 고정 — 환경별로 변하지 않으므로 하드코딩이 정책). 외부 백엔드 주소·teamId는 **서버 전용** env(`BACKEND_API_BASE_URL`/`BACKEND_TEAM_ID`, `NEXT_PUBLIC_` 접두어 금지)로만 주입하며 클라이언트 번들에 노출하지 않는다
 - 환경 변수
   - 실제 값은 `.env.local`에 두며 **커밋하지 않는다** (`.gitignore` 확인)
   - 키 목록은 `.env.example`에 빈 값으로 커밋해 팀이 공유
