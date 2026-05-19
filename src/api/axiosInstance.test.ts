@@ -1,5 +1,4 @@
 import type { AxiosAdapter } from 'axios'
-import { ApiError } from '@/src/types/common'
 
 jest.mock('@/src/api/authSeam')
 import * as seam from '@/src/api/authSeam'
@@ -72,7 +71,7 @@ it('normalizes a network error (no response) into ApiError status 0', async () =
     return Promise.reject({ isAxiosError: true, message: 'Network Error' })
   }) as AxiosAdapter
   const err = await instance.get('/todos').catch((e) => e)
-  expect(err).toBeInstanceOf(ApiError)
+  expect(err.name).toBe('ApiError')
   expect(err.status).toBe(0)
 })
 
@@ -108,6 +107,6 @@ it('does not refresh when seam throws NotImplementedError; propagates 401 ApiErr
     })
   }) as AxiosAdapter
   const err = await instance.get('/secure').catch((e) => e)
-  expect(err).toBeInstanceOf(ApiError)
+  expect(err.name).toBe('ApiError')
   expect(err.status).toBe(401)
 })

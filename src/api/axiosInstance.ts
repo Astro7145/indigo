@@ -4,7 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 import { getAccessToken, refreshAccessToken } from '@/src/api/authSeam'
-import { ApiError, NotImplementedError } from '@/src/types/common'
+import { ApiError } from '@/src/types/common'
 
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 if (!baseURL) {
@@ -58,8 +58,8 @@ instance.interceptors.response.use(
       }
       try {
         await refreshPromise
-      } catch (refreshError) {
-        void (refreshError instanceof NotImplementedError)
+      } catch {
+        // 시임 미연동(NotImplementedError 포함) 또는 refresh 실패 → 원래 401을 ApiError로 전파
         return Promise.reject(toApiError(error))
       }
       config.__isRetry = true
