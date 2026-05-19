@@ -8,7 +8,11 @@
 //    호출 시그니처는 변경하지 않는다.
 import { NotImplementedError } from '@/src/types/common'
 
-/** 현재 액세스 토큰을 반환. 미연동 상태에서는 항상 null (헤더 미부착, 정상 동작). */
+/**
+ * 현재 액세스 토큰을 반환. 미연동 상태에서는 항상 null.
+ * null은 에러가 아니라 "Authorization 헤더를 생략한다"는 의도된 계약이다 —
+ * axiosInstance 요청 인터셉터가 이 계약에 의존하므로 호출자는 null을 실패로 다루지 않는다.
+ */
 export async function getAccessToken(): Promise<string | null> {
   return null
 }
