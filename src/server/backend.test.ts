@@ -8,7 +8,7 @@ import {
   callExternal,
   refreshTokens,
   COOKIE,
-} from '@/src/server/slidtodo'
+} from '@/src/server/backend'
 
 beforeEach(() => {
   process.env.BACKEND_API_BASE_URL = 'https://api.test'

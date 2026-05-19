@@ -2,7 +2,7 @@
 import { NextRequest } from 'next/server'
 import { POST as authPost } from '@/app/api/auth/[action]/route'
 import { GET as proxyGet } from '@/app/api/[...path]/route'
-import { COOKIE } from '@/src/server/slidtodo'
+import { COOKIE } from '@/src/server/backend'
 
 const EMAIL = process.env.BACKEND_TEST_EMAIL
 const PASSWORD = process.env.BACKEND_TEST_PASSWORD

@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server'
 import { POST } from '@/app/api/auth/[action]/route'
-import { COOKIE } from '@/src/server/slidtodo'
+import { COOKIE } from '@/src/server/backend'
 
 beforeEach(() => {
   process.env.BACKEND_API_BASE_URL = 'https://api.test'

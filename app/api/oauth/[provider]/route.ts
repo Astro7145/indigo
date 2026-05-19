@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { callExternal, passthrough, setAuthCookies } from '@/src/server/slidtodo'
+import { callExternal, passthrough, setAuthCookies } from '@/src/server/backend'
 
 type Ctx = { params: Promise<{ provider: string }> }
 

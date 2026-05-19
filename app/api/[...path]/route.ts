@@ -6,7 +6,7 @@ import {
   setAuthCookies,
   clearAuthCookies,
   passthrough,
-} from '@/src/server/slidtodo'
+} from '@/src/server/backend'
 
 type Ctx = { params: Promise<{ path: string[] }> }
 
