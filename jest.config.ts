@@ -12,6 +12,8 @@ const config: Config = {
   testEnvironment: 'jsdom',
   // 테스트 전에 실행할 설정 파일을 지정
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  // Playwright(e2e/)는 별도 러너로 실행 — Jest 수집 대상에서 제외
+  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/e2e/'],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

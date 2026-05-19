@@ -7,7 +7,7 @@
 **INdigo** — 할일·목표·노트·소통 게시판을 관리하는 생산성 서비스.
 
 - 4인 팀 프로젝트
-- 기획·디자인은 **이미 확정**되어 있음. 단일 출처(SSOT)는 Notion(기획) + Figma(디자인)
+- 기획·디자인은 **이미 확정**되어 있음. 단일 출처(SSOT): 기획·작업 단위는 **GitHub Issues**, 디자인은 **Figma**
 - 레포지토리: https://github.com/Astro7145/indigo
 
 ## 기술 스택
@@ -17,6 +17,7 @@
 - **Next.js 16** (App Router)
 - **Tailwind CSS v4** — `shadcn` 등 컴포넌트 라이브러리 **사용 안 함**, 직접 구현
 - **TanStack Query** — 서버 상태
+- **axios** — HTTP 클라이언트 (`src/api/axiosInstance.ts` 단일 인스턴스)
 - **Zustand** — 클라이언트 전역 상태
 - **react-hook-form** — 폼
 - **테스트**: Jest / React Testing Library (단위·통합), Playwright (E2E)
@@ -100,12 +101,34 @@ npm run lint     # ESLint
 - 서버 데이터·폼 상태는 넣지 않는다 (각각 Query·react-hook-form 담당)
 - 스토어는 `src/stores/`에 전역 단위로만 둔다 (도메인별로 나누지 않음)
 
+## 이슈 기반 작업 흐름
+
+모든 작업은 **착수 전 GitHub 이슈**가 있어야 한다. 이슈가 그 작업의 단일 출처(SSOT)다.
+
+**진입 경로**
+
+- **기존 이슈**: 사용자가 이슈 링크/번호를 제공하면 `gh issue view <번호>`로 본문을 읽고, 그 이슈를 명세로 삼아 구현한다. 추측 금지 — 불명확하면 사용자에게 질문한다
+- **신규 작업**: 이슈가 없으면 **먼저 `superpowers:brainstorming`으로 요구사항을 정리**한다. 사용자가 설계를 승인하면, 그 결과를 알맞은 이슈 템플릿에 채워 Claude가 `gh issue create`로 등록한 뒤 그 이슈로 구현한다
+
+**brainstorming 연계** — 이 프로젝트에서는 brainstorming의 산출물을 `docs/superpowers/specs/`가 아니라 **GitHub 이슈 본문**으로 쓴다. 승인된 설계 → 이슈 생성 → (필요 시 `writing-plans`) → 구현 순서를 따른다
+
+**템플릿 매핑** (`.github/ISSUE_TEMPLATE/`)
+
+- `feat` → `feature_request.md`
+- `fix` → `bug_report.md`
+- `chore` → `chore-request.md`
+
+**연결**
+
+- 브랜치·커밋·PR은 해당 이슈를 참조한다 (PR 템플릿 `## 관련 이슈`에 링크, 커밋/PR 본문에 `#<번호>`)
+- 이슈 → `feature/*` 브랜치 → `dev` 대상 PR → 머지 시 이슈 종료
+
 ## Git 규칙
 
 **브랜치**
 
 - `main`: 출시 가능 상태 / `dev`: 다음 배포 개발 코드 (PR의 기본 머지 대상)
-- 보조: `feature/*` `bugfix/*` `hotfix/*` `release/*` `docs/*` `refactor/*`
+- 보조: `feature/*` `bugfix/*`
 - 모든 브랜치 이름은 **kebab-case**, 3~5 단어 이내 (예: `feature/user-authentication`)
 
 **작업 흐름**
@@ -140,5 +163,5 @@ npm run lint     # ESLint
   먼저 호출하세요: `brainstorming` → `writing-plans` → `test-driven-development` →
   `verification-before-completion` 등
 - **기능 명세(예: `TODO_01_01`, `LOGIN_01_03`)는 이 문서에 포함하지 않습니다.**
-  작업 시 사용자가 해당 명세를 컨텍스트로 제공하며, 원본 출처는 Notion(SSOT)입니다.
-  명세가 필요하면 추측하지 말고 사용자에게 요청하세요.
+  원본 출처는 **해당 GitHub 이슈**입니다. 사용자가 이슈 링크/번호를 제공하며,
+  없으면 `brainstorming`으로 이슈부터 생성합니다. 추측하지 말고 사용자에게 요청하세요.
