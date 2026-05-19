@@ -22,7 +22,7 @@ export interface Todo {
   dueDate: string | null
   createdAt: string
   updatedAt: string
-  goal: TodoGoalRef
+  goal: TodoGoalRef | null
   noteIds: number[]
   tags: TodoTag[]
   isFavorite: boolean
@@ -70,7 +70,7 @@ export interface FavoriteTodo {
     id: number
     title: string
     done: boolean
-    goal: TodoGoalRef
+    goal: TodoGoalRef | null
     noteIds: number[]
   }
 }

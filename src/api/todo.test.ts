@@ -1,6 +1,6 @@
 jest.mock('@/src/api/axiosInstance')
 import instance from '@/src/api/axiosInstance'
-import { getTodos, createTodo, patchTodo, deleteTodo, addTodoFavorite, todoKeys } from '@/src/api/todo'
+import { getTodos, createTodo, patchTodo, deleteTodo, addTodoFavorite, getTodo, removeTodoFavorite, getFavoriteTodos, todoKeys } from '@/src/api/todo'
 
 const mocked = instance as jest.Mocked<typeof instance>
 
@@ -38,7 +38,23 @@ it('addTodoFavorite POSTs favorites subpath', async () => {
   expect(mocked.post).toHaveBeenCalledWith('/todos/5/favorites')
 })
 
+it('getTodo calls GET /todos/:id', async () => {
+  await getTodo(5)
+  expect(mocked.get).toHaveBeenCalledWith('/todos/5')
+})
+
+it('removeTodoFavorite DELETEs favorites subpath', async () => {
+  await removeTodoFavorite(5)
+  expect(mocked.delete).toHaveBeenCalledWith('/todos/5/favorites')
+})
+
+it('getFavoriteTodos GETs /todos/favorites with params', async () => {
+  await getFavoriteTodos({ cursor: 3, limit: 15 })
+  expect(mocked.get).toHaveBeenCalledWith('/todos/favorites', { params: { cursor: 3, limit: 15 } })
+})
+
 it('todoKeys factory produces stable keys', () => {
   expect(todoKeys.list({ done: 'true' })).toEqual(['todo', 'list', { done: 'true' }])
   expect(todoKeys.detail(5)).toEqual(['todo', 'detail', 5])
+  expect(todoKeys.favorites({ limit: 10 })).toEqual(['todo', 'favorites', { limit: 10 }])
 })
