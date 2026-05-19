@@ -43,7 +43,7 @@ npm run test:e2e    # E2E (Playwright)
   src/
     components/
       common/        # 도메인 무관 공용 UI (Button, Modal ...)
-      <domain>/      # 도메인 전용 컴포넌트 (auth, todo, goal, dashboard, note, post ...)
+      <domain>/      # 도메인 전용 컴포넌트 (auth, goal, todo, note, user, notification, post, upload)
     hooks/
       <domain>.ts    # 도메인별 커스텀 훅 (도메인당 단일 파일)
     api/
@@ -56,7 +56,7 @@ npm run test:e2e    # E2E (Playwright)
     utils/            # 순수 유틸 함수
   ```
 
-  - 도메인은 `auth, todo, goal, dashboard, note, post ...`. **도메인 무관 공용은 각 계층에서 `common`** (`components/common/`, `types/common.ts`)
+  - 도메인은 실제 API 기준 `auth, goal, todo, note, user, notification, post, upload` 8개 (SSOT: Swagger). **도메인 무관 공용은 각 계층에서 `common`** (`components/common/`, `types/common.ts`)
   - 한 도메인 작업은 `components/<domain>` · `hooks/<domain>.ts` · `api/<domain>.ts` · `types/<domain>.ts`에 걸쳐 있다. 스토어는 도메인별로 안 나누고 전역만 `stores/`에 둔다
   - 타인이 담당하는 도메인 파일은 합의 없이 수정하지 않는다 (R&R 영역 존중)
 
@@ -77,9 +77,8 @@ npm run test:e2e    # E2E (Playwright)
 
 - API 명세(Swagger): https://slid-to-do-api.vercel.app/docs
 - 도메인별 API 함수·쿼리 키는 `src/api/<domain>.ts`, 이를 TanStack Query로 감싼 커스텀 훅은 `src/hooks/<domain>.ts`에 둔다(둘 다 도메인당 단일 파일). 컴포넌트는 `fetch`/`axios`/`useQuery`를 직접 호출하지 않고 **커스텀 훅만** 사용한다 (HTTP 클라이언트 단일 인스턴스는 `src/api/axiosInstance.ts`)
-- API base URL은 `process.env.NEXT_PUBLIC_API_BASE_URL`로 주입. 하드코딩 금지
 - 환경 변수
-  - 실제 값은 `.env.local`에 두며 **커밋하지 않는다** (`.gitignore` 확인)
+  - 실제 값은 `.env`에 두며 **커밋하지 않는다** (`.gitignore`가 `.env*` 무시, `!.env.example`만 예외)
   - 키 목록은 `.env.example`에 빈 값으로 커밋해 팀이 공유
   - 브라우저에 노출되는 변수만 `NEXT_PUBLIC_` 접두어 사용
 - **인증 토큰**: Next.js 서버(Route Handler/Server Action)를 통해 **HttpOnly 쿠키**로 저장한다.
