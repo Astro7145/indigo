@@ -8,10 +8,10 @@ export const COOKIE = {
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 14 // 14d
 
 export function externalBase(): string {
-  const base = process.env.SLIDTODO_API_BASE_URL
-  const team = process.env.SLIDTODO_TEAM_ID
-  if (!base) throw new Error('SLIDTODO_API_BASE_URL is not set')
-  if (!team) throw new Error('SLIDTODO_TEAM_ID is not set')
+  const base = process.env.BACKEND_API_BASE_URL
+  const team = process.env.BACKEND_TEAM_ID
+  if (!base) throw new Error('BACKEND_API_BASE_URL is not set')
+  if (!team) throw new Error('BACKEND_TEAM_ID is not set')
   return `${base}/${team}`
 }
 

@@ -4,13 +4,13 @@ import { POST as authPost } from '@/app/api/auth/[action]/route'
 import { GET as proxyGet } from '@/app/api/[...path]/route'
 import { COOKIE } from '@/src/server/slidtodo'
 
-const EMAIL = process.env.SLIDTODO_TEST_EMAIL
-const PASSWORD = process.env.SLIDTODO_TEST_PASSWORD
+const EMAIL = process.env.BACKEND_TEST_EMAIL
+const PASSWORD = process.env.BACKEND_TEST_PASSWORD
 const d = EMAIL && PASSWORD ? describe : describe.skip
 
 beforeAll(() => {
-  process.env.SLIDTODO_API_BASE_URL ||= 'https://slid-to-do-api.vercel.app'
-  process.env.SLIDTODO_TEAM_ID ||= 'indigo'
+  process.env.BACKEND_API_BASE_URL ||= 'https://slid-to-do-api.vercel.app'
+  process.env.BACKEND_TEAM_ID ||= 'indigo'
 })
 
 function cookieHeaderFrom(res: import('next/server').NextResponse): string {

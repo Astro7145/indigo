@@ -4,8 +4,8 @@ import { GET, POST, PATCH, DELETE } from '@/app/api/[...path]/route'
 import { COOKIE } from '@/src/server/slidtodo'
 
 beforeEach(() => {
-  process.env.SLIDTODO_API_BASE_URL = 'https://api.test'
-  process.env.SLIDTODO_TEAM_ID = 'indigo'
+  process.env.BACKEND_API_BASE_URL = 'https://api.test'
+  process.env.BACKEND_TEAM_ID = 'indigo'
   jest.restoreAllMocks()
 })
 

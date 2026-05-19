@@ -11,8 +11,8 @@ import {
 } from '@/src/server/slidtodo'
 
 beforeEach(() => {
-  process.env.SLIDTODO_API_BASE_URL = 'https://api.test'
-  process.env.SLIDTODO_TEAM_ID = 'indigo'
+  process.env.BACKEND_API_BASE_URL = 'https://api.test'
+  process.env.BACKEND_TEAM_ID = 'indigo'
   jest.restoreAllMocks()
 })
 
@@ -21,12 +21,12 @@ describe('externalBase', () => {
     expect(externalBase()).toBe('https://api.test/indigo')
   })
   it('throws when env missing', () => {
-    delete process.env.SLIDTODO_TEAM_ID
-    expect(() => externalBase()).toThrow(/SLIDTODO_TEAM_ID/)
+    delete process.env.BACKEND_TEAM_ID
+    expect(() => externalBase()).toThrow(/BACKEND_TEAM_ID/)
   })
-  it('throws when SLIDTODO_API_BASE_URL missing', () => {
-    delete process.env.SLIDTODO_API_BASE_URL
-    expect(() => externalBase()).toThrow(/SLIDTODO_API_BASE_URL/)
+  it('throws when BACKEND_API_BASE_URL missing', () => {
+    delete process.env.BACKEND_API_BASE_URL
+    expect(() => externalBase()).toThrow(/BACKEND_API_BASE_URL/)
   })
 })
 
