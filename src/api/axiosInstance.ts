@@ -9,7 +9,7 @@ import { ApiError } from '@/src/types/common'
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL
 if (!baseURL) {
   throw new Error(
-    'NEXT_PUBLIC_API_BASE_URL is not set. It must include the teamId (e.g. https://slid-to-do-api.vercel.app/<teamId>).',
+    'NEXT_PUBLIC_API_BASE_URL is not set. Use the same-origin BFF proxy path "/api".',
   )
 }
 
