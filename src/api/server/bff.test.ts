@@ -71,6 +71,9 @@ describe('cookies', () => {
     setAuthCookies(res, { accessToken: 'AA', refreshToken: 'RR' })
     expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('AA')
     expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('RR')
+    // access는 세션 스코프(maxAge 없음), refresh는 7일(실제 토큰 TTL에 정렬)
+    expect(res.cookies.get(COOKIE.ACCESS)?.maxAge).toBeUndefined()
+    expect(res.cookies.get(COOKIE.REFRESH)?.maxAge).toBe(60 * 60 * 24 * 7)
   })
   it('clearAuthCookies expires both', () => {
     const res = NextResponse.json(null)

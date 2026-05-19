@@ -17,7 +17,7 @@ export const COOKIE = {
   REFRESH: 'refresh_token',
 } as const
 
-const REFRESH_MAX_AGE = 60 * 60 * 24 * 14 // 14d
+const REFRESH_MAX_AGE = 60 * 60 * 24 * 7 // 7d — SlidTodo refresh 토큰 실제 TTL(관측 ≈7일)에 정렬
 
 // 외부 백엔드 호출 전용 axios 인스턴스 (클라이언트 axiosInstance와 분리:
 // 그건 /api·ApiError 정규화용). validateStatus:()=>true → 4xx/5xx도 throw 없이
