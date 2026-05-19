@@ -4,8 +4,8 @@ import type {
   CheckNicknameResponse,
   UpdateMeBody,
   ChangePasswordBody,
-  MessageResponse,
 } from '@/src/types/user'
+import type { MessageResponse } from '@/src/types/common'
 
 export const userKeys = {
   all: ['user'] as const,

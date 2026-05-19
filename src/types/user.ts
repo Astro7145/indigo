@@ -1,6 +1,3 @@
-import type { MessageResponse } from '@/src/types/common'
-export type { MessageResponse }
-
 export interface UserProfile {
   id: number
   teamId: string

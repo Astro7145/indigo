@@ -1,6 +1,6 @@
 jest.mock('@/src/api/axiosInstance')
 import instance from '@/src/api/axiosInstance'
-import { signup, login, refresh, logout, oauthLogin } from '@/src/api/auth'
+import { signup, login, refresh, logout, oauthLogin, authKeys } from '@/src/api/auth'
 
 const mocked = instance as jest.Mocked<typeof instance>
 beforeEach(() => {
@@ -27,4 +27,7 @@ it('logout POSTs /auth/logout', async () => {
 it('oauthLogin POSTs /oauth/:provider', async () => {
   await oauthLogin('google', { token: 't' })
   expect(mocked.post).toHaveBeenCalledWith('/oauth/google', { token: 't' })
+})
+it('authKeys.all is stable', () => {
+  expect(authKeys.all).toEqual(['auth'])
 })
