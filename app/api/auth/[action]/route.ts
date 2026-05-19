@@ -28,10 +28,14 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
       contentType: 'application/json',
     })
     if (r.status < 200 || r.status >= 300) return passthrough(r)
-    const data = JSON.parse(r.body) as {
-      accessToken: string
-      refreshToken: string
-      user: unknown
+    let data: { accessToken: string; refreshToken: string; user: unknown }
+    try {
+      data = JSON.parse(r.body)
+    } catch {
+      return NextResponse.json(
+        { message: 'Upstream returned invalid response' },
+        { status: 502 },
+      )
     }
     const res = NextResponse.json({ user: data.user }, { status: 200 })
     setAuthCookies(res, { accessToken: data.accessToken, refreshToken: data.refreshToken })
@@ -59,6 +63,8 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
         path: 'auth/logout',
         body: JSON.stringify({ refreshToken: refresh }),
         contentType: 'application/json',
+      }).catch(() => {
+        // best-effort: upstream/network failure must not block cookie clearing
       })
     }
     const out = new NextResponse(null, { status: 204 })

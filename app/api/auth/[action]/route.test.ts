@@ -39,6 +39,46 @@ it('login: passes external error through', async () => {
   expect(res.cookies.get(COOKIE.ACCESS)).toBeUndefined()
 })
 
+it('signup: sets cookies and returns { user }', async () => {
+  jest.spyOn(global, 'fetch').mockResolvedValue(
+    new Response(JSON.stringify({ accessToken: 'AA', refreshToken: 'RR', user: { id: 2, email: 's@b.c', name: 's', image: null } }), { status: 201 }),
+  )
+  const res = await POST(req('signup', { email: 's@b.c', name: 's', password: 'pw' }), ctx('signup'))
+  expect(res.status).toBe(200)
+  expect(await res.json()).toEqual({ user: { id: 2, email: 's@b.c', name: 's', image: null } })
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('AA')
+})
+
+it('login: malformed 2xx body → 502', async () => {
+  jest.spyOn(global, 'fetch').mockResolvedValue(new Response('<html>not json</html>', { status: 200 }))
+  const res = await POST(req('login', { email: 'a@b.c', password: 'pw' }), ctx('login'))
+  expect(res.status).toBe(502)
+})
+
+it('login error passthrough keeps content-type', async () => {
+  jest.spyOn(global, 'fetch').mockResolvedValue(
+    new Response(JSON.stringify({ message: 'nope' }), { status: 401, headers: { 'content-type': 'application/json' } }),
+  )
+  const res = await POST(req('login', { email: 'x', password: 'y' }), ctx('login'))
+  expect(res.status).toBe(401)
+  expect(res.headers.get('content-type')).toBe('application/json')
+})
+
+it('logout without refresh cookie → 204 + cleared, no upstream call', async () => {
+  const spy = jest.spyOn(global, 'fetch')
+  const res = await POST(req('logout'), ctx('logout'))
+  expect(res.status).toBe(204)
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('')
+  expect(spy).not.toHaveBeenCalled()
+})
+
+it('logout still clears cookies when upstream call rejects', async () => {
+  jest.spyOn(global, 'fetch').mockRejectedValue(new Error('network down'))
+  const res = await POST(req('logout', undefined, `${COOKIE.REFRESH}=OLD`), ctx('logout'))
+  expect(res.status).toBe(204)
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
+})
+
 it('refresh: rotates cookies, 204', async () => {
   jest.spyOn(global, 'fetch').mockResolvedValue(
     new Response(JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }), { status: 200 }),
