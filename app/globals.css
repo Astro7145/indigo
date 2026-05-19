@@ -17,6 +17,9 @@
   --color-indigo-900: #161b4b;
 
   /* ---- Color: slate ---- */
+  /* Reset Tailwind's built-in slate scale so only brand values exist */
+  --color-slate-*: initial;
+
   --color-slate-50: #fafafa;
   --color-slate-100: #f2f2f2;
   --color-slate-200: #dddddd;
