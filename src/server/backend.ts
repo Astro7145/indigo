@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const COOKIE = {
@@ -6,6 +7,16 @@ export const COOKIE = {
 } as const
 
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 14 // 14d
+
+// 외부 백엔드 호출 전용 axios 인스턴스 (클라이언트 axiosInstance와 분리:
+// 그건 /api·ApiError 정규화용). validateStatus:()=>true → 4xx/5xx도 throw 없이
+// 그대로 프록시. responseType/transformResponse → 본문을 원문 문자열로 유지
+// (라우트가 직접 JSON.parse). NextResponse 쪽은 변경 없음.
+export const backendHttp = axios.create({
+  validateStatus: () => true,
+  responseType: 'text',
+  transformResponse: [(d) => d],
+})
 
 export function externalBase(): string {
   const base = process.env.BACKEND_API_BASE_URL
@@ -74,15 +85,18 @@ export async function callExternal(opts: {
   }
   // opts.path must NOT start with '/' (joined as `${base}/${path}`); search includes leading '?'
   const url = `${externalBase()}/${opts.path}${opts.search ?? ''}`
-  const r = await fetch(url, {
+  const res = await backendHttp.request({
+    url,
     method: opts.method,
     headers,
-    body: opts.body,
+    data: opts.body,
   })
+  const body = typeof res.data === 'string' ? res.data : JSON.stringify(res.data ?? '')
+  const ct = res.headers['content-type']
   return {
-    status: r.status,
-    body: await r.text(),
-    contentType: r.headers.get('content-type'),
+    status: res.status,
+    body,
+    contentType: typeof ct === 'string' ? ct : null,
   }
 }
 

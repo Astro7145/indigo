@@ -7,8 +7,32 @@ import {
   clearAuthCookies,
   callExternal,
   refreshTokens,
+  backendHttp,
   COOKIE,
 } from '@/src/server/backend'
+import { AxiosHeaders, type AxiosAdapter } from 'axios'
+
+type MockResp = { status: number; body?: string; contentType?: string }
+function queueAdapter(responses: MockResp[]) {
+  const calls: Parameters<AxiosAdapter>[0][] = []
+  let i = 0
+  backendHttp.defaults.adapter = (async (config) => {
+    calls.push(config)
+    const r = responses[Math.min(i, responses.length - 1)]
+    i += 1
+    return {
+      data: r.body ?? '',
+      status: r.status,
+      statusText: '',
+      headers: r.contentType ? { 'content-type': r.contentType } : {},
+      config,
+    }
+  }) as AxiosAdapter
+  return calls
+}
+afterEach(() => {
+  delete (backendHttp.defaults as { adapter?: unknown }).adapter
+})
 
 beforeEach(() => {
   process.env.BACKEND_API_BASE_URL = 'https://api.test'
@@ -54,37 +78,31 @@ describe('cookies', () => {
 
 describe('callExternal', () => {
   it('builds URL, method, Bearer and returns status+body', async () => {
-    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'content-type': 'application/json' } }),
-    )
+    const calls = queueAdapter([{ status: 200, body: JSON.stringify({ ok: true }), contentType: 'application/json' }])
     const r = await callExternal({ method: 'GET', path: 'goals', search: '?limit=1', accessToken: 'TK' })
-    const [url, init] = spy.mock.calls[0]
-    expect(url).toBe('https://api.test/indigo/goals?limit=1')
-    expect((init as RequestInit).method).toBe('GET')
-    expect(new Headers((init as RequestInit).headers).get('authorization')).toBe('Bearer TK')
+    expect(calls[0].url).toBe('https://api.test/indigo/goals?limit=1')
+    expect(String(calls[0].method).toUpperCase()).toBe('GET')
+    expect(AxiosHeaders.from(calls[0].headers as never).get('Authorization')).toBe('Bearer TK')
     expect(r.status).toBe(200)
     expect(JSON.parse(r.body)).toEqual({ ok: true })
+    expect(r.contentType).toBe('application/json')
   })
-  it('omits Authorization when no token', async () => {
-    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}', { status: 200 }))
+  it('omits Authorization when no token; forwards body', async () => {
+    const calls = queueAdapter([{ status: 200, body: '{}' }])
     await callExternal({ method: 'POST', path: 'auth/login', body: '{"x":1}', contentType: 'application/json' })
-    const init = spy.mock.calls[0][1] as RequestInit
-    expect(new Headers(init.headers).has('authorization')).toBe(false)
-    expect(init.body).toBe('{"x":1}')
+    expect(AxiosHeaders.from(calls[0].headers as never).has('Authorization')).toBe(false)
+    expect(calls[0].data).toBe('{"x":1}')
   })
 })
 
 describe('refreshTokens', () => {
-  it('returns rotated tokens on success', async () => {
-    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }), { status: 200 }),
-    )
+  it('returns rotated tokens on success and sends the refresh token', async () => {
+    const calls = queueAdapter([{ status: 200, body: JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }) }])
     expect(await refreshTokens('OLD')).toEqual({ accessToken: 'NA', refreshToken: 'NR' })
-    const body = JSON.parse((spy.mock.calls[0][1] as RequestInit).body as string)
-    expect(body).toEqual({ refreshToken: 'OLD' })
+    expect(JSON.parse(calls[0].data as string)).toEqual({ refreshToken: 'OLD' })
   })
   it('returns null on failure', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}', { status: 401 }))
+    queueAdapter([{ status: 401, body: '{}' }])
     expect(await refreshTokens('OLD')).toBeNull()
   })
 })
