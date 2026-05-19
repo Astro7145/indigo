@@ -15,7 +15,7 @@ export interface Note {
   userId: number
   todoId: number
   title: string
-  content: unknown | null
+  content?: unknown | null
   linkUrl: string | null
   createdAt: string
   updatedAt: string
