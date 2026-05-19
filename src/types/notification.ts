@@ -4,7 +4,7 @@ export interface Notification {
   userId: number
   type: string
   message: string
-  data: unknown | null
+  data?: unknown
   isRead: boolean
   resourceId: number | null
   createdAt: string
