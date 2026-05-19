@@ -14,6 +14,10 @@ beforeEach(() => {
   process.env.NEXT_PUBLIC_API_BASE_URL = '/api'
 })
 
+afterEach(() => {
+  process.env.NEXT_PUBLIC_API_BASE_URL = '/api'
+})
+
 it('throws at load when NEXT_PUBLIC_API_BASE_URL is missing', () => {
   delete process.env.NEXT_PUBLIC_API_BASE_URL
   expect(() => loadInstance()).toThrow(/NEXT_PUBLIC_API_BASE_URL/)
