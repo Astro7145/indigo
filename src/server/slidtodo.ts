@@ -1,4 +1,4 @@
-import type { NextRequest, NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export const COOKIE = {
   ACCESS: 'access_token',
@@ -84,6 +84,14 @@ export async function callExternal(opts: {
     body: await r.text(),
     contentType: r.headers.get('content-type'),
   }
+}
+
+/** 외부 응답을 그대로(상태·바디·content-type) 클라이언트로 통과시킨다. */
+export function passthrough(r: ExternalResult): NextResponse {
+  return new NextResponse(r.body, {
+    status: r.status,
+    headers: r.contentType ? { 'content-type': r.contentType } : undefined,
+  })
 }
 
 export async function refreshTokens(

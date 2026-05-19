@@ -27,6 +27,7 @@ it('oauth: exchanges, sets cookies, returns { user }', async () => {
   expect(res.status).toBe(200)
   expect(await res.json()).toEqual({ user: { id: 9, email: 'g@b.c', name: 'G', image: null } })
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('AA')
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('RR')
 })
 
 it('oauth: passes external error through', async () => {

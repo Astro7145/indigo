@@ -2,19 +2,13 @@ import { NextResponse, type NextRequest } from 'next/server'
 import {
   callExternal,
   parseAuthCookies,
+  passthrough,
   refreshTokens,
   setAuthCookies,
   clearAuthCookies,
 } from '@/src/server/slidtodo'
 
 type Ctx = { params: Promise<{ action: string }> }
-
-function passthrough(r: { status: number; body: string; contentType: string | null }) {
-  return new NextResponse(r.body, {
-    status: r.status,
-    headers: r.contentType ? { 'content-type': r.contentType } : undefined,
-  })
-}
 
 export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const { action } = await ctx.params
@@ -28,7 +22,7 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
       contentType: 'application/json',
     })
     if (r.status < 200 || r.status >= 300) return passthrough(r)
-    let data: { accessToken: string; refreshToken: string; user: unknown }
+    let data: { accessToken: string; refreshToken?: string; user: unknown }
     try {
       data = JSON.parse(r.body)
     } catch {
