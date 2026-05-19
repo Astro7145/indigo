@@ -16,6 +16,21 @@
   --color-indigo-800: #464590;
   --color-indigo-900: #161b4b;
 
+  /* ---- Color: slate ---- */
+  --color-slate-50: #fafafa;
+  --color-slate-100: #f2f2f2;
+  --color-slate-200: #dddddd;
+  --color-slate-300: #cccccc;
+  --color-slate-400: #a4a4a4;
+  --color-slate-500: #737373;
+  --color-slate-600: #535353;
+  --color-slate-700: #333333;
+  --color-slate-800: #262626;
+  --color-slate-900: #121212;
+
+  /* ---- Color: destructive ---- */
+  --color-destructive: #ef4444;
+
   /* Alpha variants (base color at reduced opacity) */
   --color-indigo-alpha-20: #8e86d933; /* indigo-600 @ 20% */
   --color-indigo-alpha-30: #4645904d; /* indigo-800 @ 30% */
@@ -42,6 +57,4 @@
   --text-display-lg--line-height: 3.25rem; /* 52 */
   --text-display-xl: 5rem; /* 80 */
   --text-display-xl--line-height: 4.625rem; /* 74 */
-  /* 폰트 설정 - pretendard */
-  --font-sans: var(--font-pretendard);
 }
