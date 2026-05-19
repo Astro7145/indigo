@@ -22,34 +22,89 @@ function cookieHeaderFrom(res: import('next/server').NextResponse): string {
 d('BFF live (real SlidTodo API, teamId from env)', () => {
   jest.setTimeout(30000)
 
-  it('login → cookies set, no tokens in body; proxied GET works; logout clears', async () => {
-    const loginReq = new NextRequest('http://localhost/api/auth/login', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
-    })
-    const loginRes = await authPost(loginReq, { params: Promise.resolve({ action: 'login' }) })
+  it('login sets cookies and strips tokens; proxied GET works', async () => {
+    const loginRes = await authPost(
+      new NextRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
+      }),
+      { params: Promise.resolve({ action: 'login' }) },
+    )
     expect(loginRes.status).toBe(200)
-    const loginBody = await loginRes.json()
-    expect(loginBody.user).toBeDefined()
-    expect(loginBody.accessToken).toBeUndefined()
+    const body = await loginRes.json()
+    expect(body.user).toBeDefined()
+    expect(body.accessToken).toBeUndefined()
     expect(loginRes.cookies.get(COOKIE.ACCESS)?.value).toBeTruthy()
+    expect(loginRes.cookies.get(COOKIE.REFRESH)?.value).toBeTruthy()
 
-    const cookie = cookieHeaderFrom(loginRes)
-
-    const meReq = new NextRequest('http://localhost/api/users/me', {
-      method: 'GET',
-      headers: { cookie },
-    })
-    const meRes = await proxyGet(meReq, { params: Promise.resolve({ path: ['users', 'me'] }) })
+    const meRes = await proxyGet(
+      new NextRequest('http://localhost/api/users/me', {
+        method: 'GET',
+        headers: { cookie: cookieHeaderFrom(loginRes) },
+      }),
+      { params: Promise.resolve({ path: ['users', 'me'] }) },
+    )
     expect(meRes.status).toBe(200)
+  })
 
-    const logoutReq = new NextRequest('http://localhost/api/auth/logout', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', cookie },
-    })
-    const logoutRes = await authPost(logoutReq, { params: Promise.resolve({ action: 'logout' }) })
+  it('refresh rotates cookies and the rotated cookies still authorize', async () => {
+    const loginRes = await authPost(
+      new NextRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
+      }),
+      { params: Promise.resolve({ action: 'login' }) },
+    )
+    const refreshRes = await authPost(
+      new NextRequest('http://localhost/api/auth/refresh', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: cookieHeaderFrom(loginRes) },
+      }),
+      { params: Promise.resolve({ action: 'refresh' }) },
+    )
+    expect(refreshRes.status).toBe(204)
+    expect(refreshRes.cookies.get(COOKIE.ACCESS)?.value).toBeTruthy()
+
+    const meRes = await proxyGet(
+      new NextRequest('http://localhost/api/users/me', {
+        method: 'GET',
+        headers: { cookie: cookieHeaderFrom(refreshRes) },
+      }),
+      { params: Promise.resolve({ path: ['users', 'me'] }) },
+    )
+    expect(meRes.status).toBe(200)
+  })
+
+  it('logout clears cookies; subsequent proxied GET is 401', async () => {
+    const loginRes = await authPost(
+      new NextRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
+      }),
+      { params: Promise.resolve({ action: 'login' }) },
+    )
+    const cookie = cookieHeaderFrom(loginRes)
+    const logoutRes = await authPost(
+      new NextRequest('http://localhost/api/auth/logout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie },
+      }),
+      { params: Promise.resolve({ action: 'logout' }) },
+    )
     expect(logoutRes.status).toBe(204)
     expect(logoutRes.cookies.get(COOKIE.ACCESS)?.value).toBe('')
+
+    // cookies cleared by logout response → simulate the now-empty cookie jar
+    const afterRes = await proxyGet(
+      new NextRequest('http://localhost/api/users/me', {
+        method: 'GET',
+        headers: { cookie: `${COOKIE.ACCESS}=; ${COOKIE.REFRESH}=` },
+      }),
+      { params: Promise.resolve({ path: ['users', 'me'] }) },
+    )
+    expect(afterRes.status).toBe(401)
   })
 })

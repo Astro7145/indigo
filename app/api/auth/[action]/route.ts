@@ -31,6 +31,7 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
         { status: 502 },
       )
     }
+    // login·signup 모두 200으로 정규화 (upstream signup은 201을 반환)
     const res = NextResponse.json({ user: data.user }, { status: 200 })
     setAuthCookies(res, { accessToken: data.accessToken, refreshToken: data.refreshToken })
     return res

@@ -20,6 +20,7 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
     return NextResponse.json({ message: 'Authentication required' }, { status: 401 })
   }
 
+  // DELETE/GET body is intentionally not forwarded (all SlidTodo DELETE/GET endpoints are body-less)
   const hasBody = req.method === 'POST' || req.method === 'PATCH'
   const body = hasBody ? await req.text() : undefined
   const contentType = req.headers.get('content-type') ?? undefined

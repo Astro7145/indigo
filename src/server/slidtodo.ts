@@ -72,7 +72,7 @@ export async function callExternal(opts: {
   if (opts.body !== undefined) {
     headers['Content-Type'] = opts.contentType ?? 'application/json'
   }
-  // opts.search must include the leading '?' (or be empty/undefined)
+  // opts.path must NOT start with '/' (joined as `${base}/${path}`); search includes leading '?'
   const url = `${externalBase()}/${opts.path}${opts.search ?? ''}`
   const r = await fetch(url, {
     method: opts.method,
