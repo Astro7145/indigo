@@ -33,6 +33,8 @@ export function parseAuthCookies(req: ReqLike): { access?: string; refresh?: str
   }
 }
 
+// access 쿠키는 의도적으로 세션 스코프(maxAge 없음) — 탭 종료 시 만료된다.
+// catch-all 핸들러는 401 시 refresh 쿠키로 silent refresh를 시도해야 한다.
 export function setAuthCookies(
   res: NextResponse,
   tokens: { accessToken: string; refreshToken?: string | null },
@@ -70,6 +72,7 @@ export async function callExternal(opts: {
   if (opts.body !== undefined) {
     headers['Content-Type'] = opts.contentType ?? 'application/json'
   }
+  // opts.search must include the leading '?' (or be empty/undefined)
   const url = `${externalBase()}/${opts.path}${opts.search ?? ''}`
   const r = await fetch(url, {
     method: opts.method,

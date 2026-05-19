@@ -24,6 +24,10 @@ describe('externalBase', () => {
     delete process.env.SLIDTODO_TEAM_ID
     expect(() => externalBase()).toThrow(/SLIDTODO_TEAM_ID/)
   })
+  it('throws when SLIDTODO_API_BASE_URL missing', () => {
+    delete process.env.SLIDTODO_API_BASE_URL
+    expect(() => externalBase()).toThrow(/SLIDTODO_API_BASE_URL/)
+  })
 })
 
 describe('cookies', () => {
@@ -43,6 +47,8 @@ describe('cookies', () => {
     clearAuthCookies(res)
     expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('')
     expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
+    expect(res.cookies.get(COOKIE.ACCESS)?.maxAge).toBe(0)
+    expect(res.cookies.get(COOKIE.REFRESH)?.maxAge).toBe(0)
   })
 })
 
@@ -70,10 +76,12 @@ describe('callExternal', () => {
 
 describe('refreshTokens', () => {
   it('returns rotated tokens on success', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(
+    const spy = jest.spyOn(global, 'fetch').mockResolvedValue(
       new Response(JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }), { status: 200 }),
     )
     expect(await refreshTokens('OLD')).toEqual({ accessToken: 'NA', refreshToken: 'NR' })
+    const body = JSON.parse((spy.mock.calls[0][1] as RequestInit).body as string)
+    expect(body).toEqual({ refreshToken: 'OLD' })
   })
   it('returns null on failure', async () => {
     jest.spyOn(global, 'fetch').mockResolvedValue(new Response('{}', { status: 401 }))
