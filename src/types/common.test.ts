@@ -1,4 +1,4 @@
-import { ApiError, NotImplementedError } from '@/src/types/common'
+import { ApiError } from '@/src/types/common'
 
 describe('ApiError', () => {
   it('carries status, code, message, details and is an Error', () => {
@@ -9,14 +9,5 @@ describe('ApiError', () => {
     expect(e.code).toBe('NOT_FOUND')
     expect(e.message).toBe('nope')
     expect(e.details).toEqual({ a: 1 })
-  })
-})
-
-describe('NotImplementedError', () => {
-  it('is identifiable by name', () => {
-    const e = new NotImplementedError('refresh seam not wired')
-    expect(e).toBeInstanceOf(Error)
-    expect(e.name).toBe('NotImplementedError')
-    expect(e.message).toBe('refresh seam not wired')
   })
 })

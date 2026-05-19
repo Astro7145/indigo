@@ -27,15 +27,6 @@ export class ApiError extends Error {
   }
 }
 
-/** authSeam이 아직 BFF에 연결되지 않았음을 나타낸다. axiosInstance가 이 에러를 만나면 refresh를 시도하지 않는다. */
-export class NotImplementedError extends Error {
-  constructor(message: string) {
-    super(message)
-    Object.setPrototypeOf(this, new.target.prototype)
-    this.name = 'NotImplementedError'
-  }
-}
-
 /** 단순 메시지 응답 (logout, 비밀번호 변경 등 본문이 메시지만 있는 엔드포인트). */
 export interface MessageResponse {
   message: string
