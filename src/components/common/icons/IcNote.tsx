@@ -5,11 +5,7 @@ interface IcNoteProps extends SVGProps<SVGSVGElement> {
   state?: 'default' | 'active'
 }
 
-export function IcNote({
-  state = 'default',
-  className,
-  ...rest
-}: IcNoteProps) {
+export function IcNote({ state = 'default', className, ...rest }: IcNoteProps) {
   if (state === 'default') {
     return (
       <svg

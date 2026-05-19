@@ -5,11 +5,7 @@ interface IcLinkProps extends SVGProps<SVGSVGElement> {
   state?: 'default' | 'active'
 }
 
-export function IcLink({
-  state = 'default',
-  className,
-  ...rest
-}: IcLinkProps) {
+export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
   if (state === 'default') {
     return (
       <svg
