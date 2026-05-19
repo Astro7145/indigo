@@ -118,6 +118,23 @@ describe('callExternal', () => {
     await expect(callExternal({ method: 'GET', path: '../secret' })).rejects.toThrow(/Unsafe path/)
     expect(calls.length).toBe(0)
   })
+  it("nullish response body normalizes to empty string (not '\"\"')", async () => {
+    backendHttp.defaults.adapter = (async (config) => ({
+      data: undefined, status: 200, statusText: '', headers: {}, config,
+    })) as import('axios').AxiosAdapter
+    const r = await callExternal({ method: 'GET', path: 'x' })
+    expect(r.body).toBe('')
+  })
+  it('prepends ? when search lacks it', async () => {
+    const calls = queueAdapter([{ status: 200, body: '{}' }])
+    await callExternal({ method: 'GET', path: 'todos', search: 'limit=1' })
+    expect(calls[0].url).toBe('https://api.test/indigo/todos?limit=1')
+  })
+  it('keeps search as-is when ? already present', async () => {
+    const calls = queueAdapter([{ status: 200, body: '{}' }])
+    await callExternal({ method: 'GET', path: 'todos', search: '?limit=2' })
+    expect(calls[0].url).toBe('https://api.test/indigo/todos?limit=2')
+  })
 })
 
 describe('refreshTokens', () => {

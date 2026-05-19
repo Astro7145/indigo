@@ -6,6 +6,7 @@ import {
   setAuthCookies,
   clearAuthCookies,
   passthrough,
+  type HttpMethod,
 } from '@/src/api/server/bff'
 
 type Ctx = { params: Promise<{ path: string[] }> }
@@ -31,7 +32,7 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const contentType = req.headers.get('content-type') ?? undefined
 
   const first = await callExternal({
-    method: req.method,
+    method: req.method as HttpMethod,
     path: joined,
     search,
     accessToken: access,
@@ -54,7 +55,7 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   // 회전된 쿠키를 set하고 upstream 응답(401 포함)을 그대로 전달한다
   // (다음 요청은 새 토큰을 사용; 여기서 추가 재시도/clear는 하지 않는다).
   const retry = await callExternal({
-    method: req.method,
+    method: req.method as HttpMethod,
     path: joined,
     search,
     accessToken: tokens.accessToken,

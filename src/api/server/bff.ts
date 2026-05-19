@@ -3,6 +3,8 @@
 import axios from 'axios'
 import { NextResponse, type NextRequest } from 'next/server'
 
+export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT'
+
 export class ApiPathError extends Error {
   constructor(message: string) {
     super(message)
@@ -88,7 +90,7 @@ export function assertSafePath(path: string): void {
 }
 
 export async function callExternal(opts: {
-  method: string
+  method: HttpMethod
   path: string
   search?: string
   accessToken?: string
@@ -101,15 +103,16 @@ export async function callExternal(opts: {
   if (opts.body !== undefined) {
     headers['Content-Type'] = opts.contentType ?? 'application/json'
   }
-  // opts.path must NOT start with '/' (joined as `${base}/${path}`); search includes leading '?'
-  const url = `${externalBase()}/${opts.path}${opts.search ?? ''}`
+  // opts.path must NOT start with '/' (joined as `${base}/${path}`)
+  const search = opts.search ? (opts.search.startsWith('?') ? opts.search : `?${opts.search}`) : ''
+  const url = `${externalBase()}/${opts.path}${search}`
   const res = await backendHttp.request({
     url,
     method: opts.method,
     headers,
     data: opts.body,
   })
-  const body = typeof res.data === 'string' ? res.data : JSON.stringify(res.data ?? '')
+  const body = (res.data ?? '') as string
   const ct = res.headers['content-type']
   return {
     status: res.status,
