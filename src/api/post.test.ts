@@ -16,8 +16,9 @@ beforeEach(() => {
 })
 
 it('getPosts GET /posts with params', async () => {
-  await getPosts({ type: 'best', search: 'q' })
+  const r = await getPosts({ type: 'best', search: 'q' })
   expect(mocked.get).toHaveBeenCalledWith('/posts', { params: { type: 'best', search: 'q' } })
+  expect(r).toEqual({ posts: [], nextCursor: null, totalCount: 0 })
 })
 it('getPost GET /posts/:id', async () => {
   await getPost(2)
@@ -59,6 +60,8 @@ it('unlikeComment DELETE likes subpath', async () => {
   await unlikeComment(2, 8)
   expect(mocked.delete).toHaveBeenCalledWith('/posts/2/comments/8/likes')
 })
-it('postKeys.comments', () => {
+it('postKeys factory produces stable keys', () => {
+  expect(postKeys.list({ type: 'best' })).toEqual(['post', 'list', { type: 'best' }])
+  expect(postKeys.detail(2)).toEqual(['post', 'detail', 2])
   expect(postKeys.comments(2, { parentId: '5' })).toEqual(['post', 'detail', 2, 'comments', { parentId: '5' }])
 })
