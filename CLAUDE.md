@@ -25,13 +25,14 @@
 ## 명령어
 
 ```bash
-npm run dev      # 개발 서버 (http://localhost:3000)
-npm run build    # 프로덕션 빌드
-npm run start    # 프로덕션 서버
-npm run lint     # ESLint
+npm run dev         # 개발 서버 (http://localhost:3000)
+npm run build       # 프로덕션 빌드
+npm run start       # 프로덕션 서버
+npm run lint        # ESLint
+npm test            # 단위·통합 (Jest)
+npm run test:watch  # Jest watch 모드
+npm run test:e2e    # E2E (Playwright)
 ```
-
-포맷팅은 Prettier가 담당합니다.
 
 ## 디렉터리 & 경로 별칭
 
@@ -67,16 +68,15 @@ npm run lint     # ESLint
 
 - TypeScript `strict` 준수. `any` 지양, 타입 우선
 - Next.js App Router 패턴 준수 (Server/Client Component 구분, `"use client"` 최소화)
-- 포맷은 `.prettierrc` 기준: 작은따옴표 · 세미콜론 없음 · 2칸 들여쓰기 ·
-  `printWidth` 80 · `trailingComma: all` · `arrowParens: always` · LF
+- 포맷은 Prettier가 담당하며 규칙의 SSOT는 `.prettierrc` (수동 나열 금지, `npm run lint`로 검증).
+  Tailwind 클래스는 `prettier-plugin-tailwindcss`가 자동 정렬
 - **색상·타이포는 하드코딩 금지.** `app/globals.css`의 디자인 토큰(Tailwind v4 `@theme`)에
   정의된 브랜드 `indigo` 스케일과 `text-*` 토큰을 Tailwind 유틸리티로 사용
-- 서버 상태는 TanStack Query, 전역 클라이언트 상태는 Zustand, 폼은 react-hook-form 사용
 
 ## API & 환경 변수
 
-- HTTP 클라이언트는 `src/api/axiosInstance.ts`에 단일 인스턴스로 둔다 (baseURL·인터셉터·에러 핸들링 공통화)
-- 도메인별 API 호출 함수·쿼리 키는 `src/api/<domain>.ts`에 두고, 이를 TanStack Query로 감싼 커스텀 훅을 `src/hooks/<domain>.ts`에 둔다(둘 다 도메인당 단일 파일). 컴포넌트는 `fetch`/`axios`/`useQuery`를 직접 호출하지 않고 **커스텀 훅만** 사용한다
+- API 명세(Swagger): https://slid-to-do-api.vercel.app/docs
+- 도메인별 API 함수·쿼리 키는 `src/api/<domain>.ts`, 이를 TanStack Query로 감싼 커스텀 훅은 `src/hooks/<domain>.ts`에 둔다(둘 다 도메인당 단일 파일). 컴포넌트는 `fetch`/`axios`/`useQuery`를 직접 호출하지 않고 **커스텀 훅만** 사용한다 (HTTP 클라이언트 단일 인스턴스는 `src/api/axiosInstance.ts`)
 - API base URL은 `process.env.NEXT_PUBLIC_API_BASE_URL`로 주입. 하드코딩 금지
 - 환경 변수
   - 실제 값은 `.env.local`에 두며 **커밋하지 않는다** (`.gitignore` 확인)
@@ -104,13 +104,15 @@ npm run lint     # ESLint
 ## 이슈 기반 작업 흐름
 
 모든 작업은 **착수 전 GitHub 이슈**가 있어야 한다. 이슈가 그 작업의 단일 출처(SSOT)다.
+기능 명세(예: `TODO_01_01`, `LOGIN_01_03`)는 이 문서가 아니라 **이슈 본문**에 둔다 —
+불명확하면 추측하지 말고 사용자에게 요청한다.
 
 **진입 경로**
 
 - **기존 이슈**: 사용자가 이슈 링크/번호를 제공하면 `gh issue view <번호>`로 본문을 읽고, 그 이슈를 명세로 삼아 구현한다. 추측 금지 — 불명확하면 사용자에게 질문한다
 - **신규 작업**: 이슈가 없으면 **먼저 `superpowers:brainstorming`으로 요구사항을 정리**한다. 사용자가 설계를 승인하면, 그 결과를 알맞은 이슈 템플릿에 채워 Claude가 `gh issue create`로 등록한 뒤 그 이슈로 구현한다
 
-**brainstorming 연계** — 이 프로젝트에서는 brainstorming의 산출물을 `docs/superpowers/specs/`가 아니라 **GitHub 이슈 본문**으로 쓴다. 승인된 설계 → 이슈 생성 → (필요 시 `writing-plans`) → 구현 순서를 따른다
+**brainstorming 연계** — 승인된 설계는 별도 spec 문서가 아니라 **GitHub 이슈 본문**으로 남긴다. 설계 승인 → 이슈 생성 → (필요 시 `writing-plans`) → 구현 순서.
 
 **템플릿 매핑** (`.github/ISSUE_TEMPLATE/`)
 
@@ -128,12 +130,14 @@ npm run lint     # ESLint
 **브랜치**
 
 - `main`: 출시 가능 상태 / `dev`: 다음 배포 개발 코드 (PR의 기본 머지 대상)
-- 보조: `feature/*` `bugfix/*`
-- 모든 브랜치 이름은 **kebab-case**, 3~5 단어 이내 (예: `feature/user-authentication`)
+- 보조: `feature/*` `fix/*` (브랜치 타입은 커밋 타입과 일치시킨다)
+- 보조 브랜치는 **`<타입>/<이슈번호>-<기능명>`** 형식 (예: `feature/42-user-authentication`)
+  - `<이슈번호>`: 착수한 GitHub 이슈 번호 (이슈 없이 작업 시작 금지)
+  - `<기능명>`: **kebab-case**, 3~5 단어 이내
 
 **작업 흐름**
 
-- 기능 단위로 `feature/*` 브랜치를 `dev`에서 분기해 작업
+- 이슈 단위로 `feature/<이슈번호>-<기능명>` 브랜치를 `dev`에서 분기해 작업
 - 작업 후 `origin`에 푸시하고, **`dev` 브랜치를 대상으로 PR** 생성
 - `dev` → `main` 머지는 배포 시점에만 수행
 - `main`/`dev`에 직접 푸시 금지. 모든 변경은 PR을 거침
@@ -161,7 +165,4 @@ npm run lint     # ESLint
 
 - **superpowers 플러그인(스킬)을 적극 사용합니다.** 기능 구현·버그 수정·계획 수립 전 관련 스킬을
   먼저 호출하세요: `brainstorming` → `writing-plans` → `test-driven-development` →
-  `verification-before-completion` 등
-- **기능 명세(예: `TODO_01_01`, `LOGIN_01_03`)는 이 문서에 포함하지 않습니다.**
-  원본 출처는 **해당 GitHub 이슈**입니다. 사용자가 이슈 링크/번호를 제공하며,
-  없으면 `brainstorming`으로 이슈부터 생성합니다. 추측하지 말고 사용자에게 요청하세요.
+  `verification-before-completion` 등 (이슈 생성·구현 진입은 `## 이슈 기반 작업 흐름` 참조)
