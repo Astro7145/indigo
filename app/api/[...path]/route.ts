@@ -6,7 +6,7 @@ import {
   setAuthCookies,
   clearAuthCookies,
   passthrough,
-} from '@/src/server/backend'
+} from '@/src/api/bff'
 
 type Ctx = { params: Promise<{ path: string[] }> }
 

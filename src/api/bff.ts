@@ -1,3 +1,5 @@
+// SERVER-ONLY: BFF 코어 (next/server·process.env.BACKEND_*·외부 axios).
+// 클라이언트 코드에서 import 금지 — 서버 라우트 핸들러 전용.
 import axios from 'axios'
 import { NextResponse, type NextRequest } from 'next/server'
 

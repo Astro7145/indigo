@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { callExternal, passthrough, setAuthCookies } from '@/src/server/backend'
+import { callExternal, passthrough, setAuthCookies } from '@/src/api/bff'
 
 type Ctx = { params: Promise<{ provider: string }> }
 

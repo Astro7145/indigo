@@ -11,7 +11,7 @@ import {
   backendHttp,
   COOKIE,
   assertSafePath,
-} from '@/src/server/backend'
+} from '@/src/api/bff'
 import { AxiosHeaders, type AxiosAdapter } from 'axios'
 
 type MockResp = { status: number; body?: string; contentType?: string }
