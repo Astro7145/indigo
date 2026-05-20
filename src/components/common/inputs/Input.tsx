@@ -4,7 +4,7 @@ import { cn } from '@/src/utils/cn'
 import { cva } from 'class-variance-authority'
 
 const inputContainerVariants = cva(
-  'flex items-center gap-x-2 rounded-sm border bg-white has-focus:border-indigo-500 cursor-text p-3 sm:p-4',
+  'flex items-center gap-x-2 rounded-sm border bg-white focus-within:border-indigo-500 cursor-text p-3 sm:p-4',
   {
     variants: {
       variant: {
