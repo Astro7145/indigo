@@ -70,9 +70,11 @@ export function useComments(
   params: CommentListParams = {},
 ) {
   return useQuery<CommentListResponse, ApiError>({
-    queryKey: postKeys.comments(postId ?? -1, params),
-    queryFn: () => getComments(postId as number, params),
-    enabled: postId != null,
+    queryKey:
+      postId == null
+        ? [...postKeys.details(), 'pending', 'comments', params]
+        : postKeys.comments(postId, params),
+    queryFn: postId == null ? skipToken : () => getComments(postId, params),
   })
 }
 
@@ -81,15 +83,20 @@ export function useInfiniteComments(
   params: Omit<CommentListParams, 'cursor'> = {},
 ) {
   return useInfiniteQuery<CommentListResponse, ApiError>({
-    queryKey: [...postKeys.comments(postId ?? -1, params), 'infinite'],
-    queryFn: ({ pageParam }) =>
-      getComments(postId as number, {
-        ...params,
-        cursor: pageParam as string | undefined,
-      }),
+    queryKey:
+      postId == null
+        ? [...postKeys.details(), 'pending', 'comments', params, 'infinite']
+        : [...postKeys.comments(postId, params), 'infinite'],
+    queryFn:
+      postId == null
+        ? skipToken
+        : ({ pageParam }) =>
+            getComments(postId, {
+              ...params,
+              cursor: pageParam as string | undefined,
+            }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
-    enabled: postId != null,
   })
 }
 

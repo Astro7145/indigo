@@ -78,6 +78,16 @@ it('useInfinitePostList passes string cursor on first page', async () => {
   expect(result.current.hasNextPage).toBe(true)
 })
 
+it('useComments is disabled when postId is undefined', () => {
+  renderHookWithClient(() => useComments(undefined))
+  expect(mocked.getComments).not.toHaveBeenCalled()
+})
+
+it('useInfiniteComments is disabled when postId is undefined', () => {
+  renderHookWithClient(() => useInfiniteComments(undefined))
+  expect(mocked.getComments).not.toHaveBeenCalled()
+})
+
 it('useComments calls getComments with postId and params', async () => {
   mocked.getComments.mockResolvedValue({
     comments: [],
