@@ -7,8 +7,23 @@ import { cn } from '@/src/utils/cn'
  */
 export type ChipsType = 'todo' | 'done'
 
+interface ChipsProps {
+  type?: ChipsType
+  className?: string
+}
+
+const typeStyles: Record<ChipsType, string> = {
+  todo: 'bg-indigo-300 text-indigo-700',
+  done: 'bg-slate-300 text-white',
+}
+
+const typeLabels: Record<ChipsType, string> = {
+  todo: 'TO DO',
+  done: 'DONE',
+}
+
 /**
- * Chips 컴포넌트 props
+ * 할일 상태 표시 칩스. 클릭 불가 표시 전용 컴포넌트
  *
  * @param type      칩스 타입. `"todo"` | `"done"`. 기본값 `"todo"`
  * @param className 추가 Tailwind 클래스
@@ -17,26 +32,6 @@ export type ChipsType = 'todo' | 'done'
  * <Chips type="todo" />  // → "TO DO"
  * <Chips type="done" />  // → "DONE"
  */
-interface ChipsProps {
-  type?: ChipsType
-  className?: string
-}
-
-/**
- * type별 배경·텍스트 클래스
- * ⚠️ done 배경 #BBBBBB는 디자인 토큰 미등록 — globals.css 추가 검토 필요
- */
-const typeStyles: Record<ChipsType, string> = {
-  todo: 'bg-indigo-300 text-indigo-700',
-  done: 'bg-[#BBBBBB] text-white',
-}
-
-const typeLabels: Record<ChipsType, string> = {
-  todo: 'TO DO',
-  done: 'DONE',
-}
-
-/** 할일 상태 표시 칩스. 클릭 불가 표시 전용 컴포넌트 */
 export default function Chips({ type = 'todo', className }: ChipsProps) {
   return (
     <span

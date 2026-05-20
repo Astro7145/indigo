@@ -2,8 +2,15 @@ import { cn } from '@/src/utils/cn'
 
 export type CategoryTabLabel = '전체' | 'To Do' | 'Done'
 
+interface CategoryTabProps {
+  label: CategoryTabLabel
+  isActive?: boolean
+  onClick: () => void
+  className?: string
+}
+
 /**
- * CategoryTab 컴포넌트 props
+ * 할일 상태 필터 탭. 전체/To Do/Done 세 탭을 나란히 사용
  *
  * @param label     탭 텍스트. `"전체"` | `"To Do"` | `"Done"`
  * @param isActive  활성 상태. 기본값 `false`
@@ -15,14 +22,6 @@ export type CategoryTabLabel = '전체' | 'To Do' | 'Done'
  * <CategoryTab label="To Do" onClick={() => setFilter('todo')} />
  * <CategoryTab label="Done" onClick={() => setFilter('done')} />
  */
-interface CategoryTabProps {
-  label: CategoryTabLabel
-  isActive?: boolean
-  onClick: () => void
-  className?: string
-}
-
-/** 할일 상태 필터 탭. 전체/To Do/Done 세 탭을 나란히 사용 */
 export default function CategoryTab({
   label,
   isActive = false,

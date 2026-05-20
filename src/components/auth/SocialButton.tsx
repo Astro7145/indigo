@@ -5,20 +5,6 @@ import { cn } from '@/src/utils/cn'
 /** 소셜 로그인 제공자 */
 export type SocialProvider = 'google' | 'kakao'
 
-/**
- * SocialButton 컴포넌트 props
- *
- * @param provider  소셜 로그인 제공자. `"google"` | `"kakao"`
- * @param onClick   로그인/회원가입 핸들러
- * @param className 추가 Tailwind 클래스
- *
- * @example
- * // 회원가입·로그인 하단 소셜 버튼 목록
- * <div className="flex gap-4">
- *   <SocialButton provider="google" onClick={handleGoogleLogin} />
- *   <SocialButton provider="kakao" onClick={handleKakaoLogin} />
- * </div>
- */
 interface SocialButtonProps {
   provider: SocialProvider
   onClick: () => void
@@ -34,7 +20,19 @@ const providerStyles: Record<SocialProvider, string> = {
   kakao: 'bg-[#FFEE01]',
 }
 
-/** 회원가입·로그인 하단 소셜 로그인 버튼. 크기 고정(56px) */
+/**
+ * 회원가입·로그인 하단 소셜 로그인 버튼. 크기 고정(56px)
+ *
+ * @param provider  소셜 로그인 제공자. `"google"` | `"kakao"`
+ * @param onClick   로그인/회원가입 핸들러
+ * @param className 추가 Tailwind 클래스
+ *
+ * @example
+ * <div className="flex gap-4">
+ *   <SocialButton provider="google" onClick={handleGoogleLogin} />
+ *   <SocialButton provider="kakao" onClick={handleKakaoLogin} />
+ * </div>
+ */
 export default function SocialButton({ provider, onClick, className }: SocialButtonProps) {
   return (
     <button

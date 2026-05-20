@@ -5,22 +5,6 @@ import { cn } from '@/src/utils/cn'
 
 export type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'purple'
 
-/**
- * Badge 컴포넌트 props
- *
- * @param color     뱃지 색상. 기본값 `"gray"`
- * @param children  뱃지 텍스트
- * @param onDelete  전달하면 X 버튼 렌더링 + 클릭 시 호출. 없으면 표시 전용
- * @param className 추가 Tailwind 클래스
- *
- * @example
- * // 표시 전용
- * <Badge color="purple">디자인</Badge>
- *
- * @example
- * // 삭제 가능
- * <Badge color="green" onDelete={() => handleDelete(id)}>완료</Badge>
- */
 interface BadgeProps {
   color?: BadgeColor
   children: ReactNode
@@ -37,7 +21,22 @@ const colorStyles: Record<BadgeColor, string> = {
   purple: 'bg-badge-purple-bg border-badge-purple-border text-badge-purple-text',
 }
 
-/** 표시 전용 또는 삭제 가능한 태그 뱃지 */
+/**
+ * 표시 전용 또는 삭제 가능한 태그 뱃지
+ *
+ * @param color     뱃지 색상. 기본값 `"gray"`
+ * @param children  뱃지 텍스트
+ * @param onDelete  전달하면 X 버튼 렌더링 + 클릭 시 호출. 없으면 표시 전용
+ * @param className 추가 Tailwind 클래스
+ *
+ * @example
+ * // 표시 전용
+ * <Badge color="purple">디자인</Badge>
+ *
+ * @example
+ * // 삭제 가능
+ * <Badge color="green" onDelete={() => handleDelete(id)}>완료</Badge>
+ */
 export default function Badge({
   color = 'gray',
   children,

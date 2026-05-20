@@ -12,50 +12,6 @@ import { cn } from '@/src/utils/cn'
 export type ButtonVariant = 'primary' | 'secondary' | 'tertiary'
 export type ButtonSize = 'large' | 'medium' | 'small'
 
-/**
- * Button 공통 컴포넌트 props
- *
- * `ButtonHTMLAttributes<HTMLButtonElement>`를 확장하므로 `onClick`, `type`,
- * `form` 등 HTML 기본 button 속성을 그대로 전달할 수 있음.
- *
- * @param variant      버튼 계층 스타일. 기본값 `"primary"`
- * @param size         버튼 크기(높이·폰트만 고정, 너비는 콘텐츠에 맞게 자동). 기본값 `"large"`
- * @param startIcon    버튼 텍스트 앞 아이콘(ReactNode).
- *                     전달하지 않으면 아이콘 영역 자체가 렌더링되지 않음
- * @param hover        `true`이면 CSS hover 효과를 적용.
- *                     기본값 `false` (hover 미적용). 명시적으로 켜야 할 때만 전달
- * @param disabled     HTML button `disabled`와 동일하게 동작.
- *                     `variant="disabled"` 방식이 아닌 별도 prop으로 처리함
- * @param className    추가 Tailwind 클래스. `cn()`으로 병합되므로 기본 스타일 오버라이드 가능
- * @param children     버튼 텍스트 또는 콘텐츠
- *
- * @example
- * // 기본 (primary / large)
- * <Button onClick={handleSave}>저장하기</Button>
- *
- * @example
- * // secondary + 아이콘
- * <Button variant="secondary" size="medium" startIcon={<PlusIcon />}>
- *   할일 추가
- * </Button>
- *
- * @example
- * // tertiary + disabled
- * <Button variant="tertiary" size="small" disabled>취소</Button>
- *
- * @example
- * // hover 활성화
- * <Button variant="primary" hover onClick={handleClick}>버튼</Button>
- *
- * @example
- * // className으로 너비 오버라이드
- * <Button className="w-full">전체 너비 버튼</Button>
- *
- * @example
- * // 폼 제출 버튼 (기본값은 "button"이므로 submit은 명시 필요)
- * <Button type="submit">저장</Button>
- */
-
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
@@ -97,7 +53,32 @@ const variantDisabledClasses: Record<ButtonVariant, string> = {
     'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-[#BBBBBB]',
 }
 
-/** 프로젝트 공통 Button 컴포넌트 */
+/**
+ * 프로젝트 공통 Button 컴포넌트
+ *
+ * `ButtonHTMLAttributes<HTMLButtonElement>`를 확장하므로 `onClick`, `type`,
+ * `form` 등 HTML 기본 button 속성을 그대로 전달할 수 있음.
+ *
+ * @param variant   버튼 계층 스타일. 기본값 `"primary"`
+ * @param size      버튼 크기(높이·폰트만 고정, 너비는 콘텐츠에 맞게 자동). 기본값 `"large"`
+ * @param startIcon 버튼 텍스트 앞 아이콘(ReactNode). 전달하지 않으면 렌더링되지 않음
+ * @param hover     `true`이면 CSS hover 효과를 적용. 기본값 `false`
+ * @param disabled  HTML button `disabled`와 동일하게 동작
+ * @param className 추가 Tailwind 클래스. `cn()`으로 병합되므로 기본 스타일 오버라이드 가능
+ * @param children  버튼 텍스트 또는 콘텐츠
+ *
+ * @example
+ * <Button onClick={handleSave}>저장하기</Button>
+ *
+ * @example
+ * <Button variant="secondary" size="medium" startIcon={<PlusIcon />}>할일 추가</Button>
+ *
+ * @example
+ * <Button variant="tertiary" size="small" disabled>취소</Button>
+ *
+ * @example
+ * <Button type="submit">저장</Button>
+ */
 export default function Button({
   variant = 'primary',
   size = 'large',
