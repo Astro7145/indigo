@@ -1,4 +1,11 @@
-jest.mock('@/src/api/user')
+jest.mock('@/src/api/user', () => ({
+  ...jest.requireActual('@/src/api/user'),
+  checkNickname: jest.fn(),
+  getMe: jest.fn(),
+  patchMe: jest.fn(),
+  deleteMe: jest.fn(),
+  changePassword: jest.fn(),
+}))
 import * as userApi from '@/src/api/user'
 import { waitFor } from '@testing-library/react'
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils'
