@@ -58,7 +58,7 @@ export default function Badge({
           type="button"
           onClick={onDelete}
           aria-label="태그 삭제"
-          className="flex cursor-pointer items-center justify-center rounded-full p-[2px]"
+          className="flex cursor-pointer items-center justify-center rounded-full"
         >
           <IcBadgeClose color={color} />
         </button>

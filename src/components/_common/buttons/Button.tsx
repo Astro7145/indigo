@@ -77,6 +77,7 @@ const variantDisabledClasses: Record<ButtonVariant, string> = {
  * <Button variant="tertiary" size="small" disabled>취소</Button>
  *
  * @example
+ * // 기본값 "button". 폼 제출 시 명시 필요
  * <Button type="submit">저장</Button>
  */
 export default function Button({
@@ -85,12 +86,14 @@ export default function Button({
   startIcon,
   hover = false,
   disabled,
+  type = 'button',
   className,
   children,
   ...props
 }: ButtonProps) {
   return (
     <button
+      type={type}
       disabled={disabled}
       className={cn(
         'inline-flex cursor-pointer items-center justify-center gap-1 rounded px-[18px] font-semibold tracking-[-0.03em] transition-colors select-none',
