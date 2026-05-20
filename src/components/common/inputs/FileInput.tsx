@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import { IcDelete, IcUpload } from '../icons'
 
 const inputContainerVariants = cva(
-  'flex items-center gap-x-2 rounded-sm border bg-white has-focus:outline-indigo-500 p-3 sm:p-4',
+  'flex items-center gap-x-2 rounded-sm border bg-white has-focus:outline-indigo-500 p-3 sm:p-4 focus-within:outline-2',
   {
     variants: {
       variant: {
@@ -42,6 +42,7 @@ export default function FileInput({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const [file, setFile] = useState<File | null>(null)
+  const [statusMessage, setStatusMessage] = useState('')
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.currentTarget.files?.[0]
@@ -49,11 +50,13 @@ export default function FileInput({
     // 이 경우 기존 선택 파일을 유지하기 위해 early return
     if (!selectedFile) return
     setFile(selectedFile)
+    setStatusMessage(`${selectedFile.name} 선택됨`)
     onFileChange?.(selectedFile)
   }
 
   const handleRemoveFile = () => {
     setFile(null)
+    setStatusMessage('파일이 삭제되었습니다')
     onFileChange?.(null)
 
     if (inputRef.current) {
@@ -63,6 +66,9 @@ export default function FileInput({
 
   return (
     <label className={cn(inputContainerVariants({ variant }))}>
+      <span aria-live="polite" className="sr-only">
+        {statusMessage}
+      </span>
       <IcUpload />
       <span className={cn(textVariants({ selected: !!file }))}>
         {file ? file.name : '파일을 선택해주세요'}
@@ -70,13 +76,13 @@ export default function FileInput({
       <input
         ref={inputRef}
         type="file"
-        className="hidden"
-        {...props}
+        className="sr-only"
         onChange={handleFileChange}
+        {...props}
       />
       {file && (
         <button
-          type="button"
+          aria-label="파일 삭제"
           onClick={handleRemoveFile}
           className="cursor-pointer"
         >

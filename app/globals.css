@@ -82,3 +82,11 @@
   --color-badge-purple-border: #e9d7fe;
   --color-badge-purple-text: #6941c6;
 }
+
+/* 전역 스타일 설정 */
+@layer base {
+  * {
+    --tw-ring-color: var(--color-indigo-500);
+    outline-color: var(--color-indigo-500);
+  }
+}

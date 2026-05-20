@@ -41,7 +41,7 @@ it('초기 렌더 시 파일 input이 존재한다', () => {
 it('이미지 선택 시 미리보기 img를 렌더링한다', () => {
   const { container } = render(<ImageInput />)
   selectImage(container.querySelector('input[type="file"]')!)
-  expect(screen.getByRole('img', { name: 'Selected Image' })).toBeInTheDocument()
+  expect(screen.getByRole('img', { name: '선택된 이미지: photo.png' })).toBeInTheDocument()
 })
 
 it('이미지 선택 시 onFileChange가 파일과 함께 호출된다', () => {

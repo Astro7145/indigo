@@ -2,7 +2,6 @@
 
 import { cn } from '@/src/utils/cn'
 import { cva } from 'class-variance-authority'
-import { useRef } from 'react'
 
 const inputContainerVariants = cva(
   'flex items-center gap-x-2 rounded-sm border bg-white has-focus:border-indigo-500 cursor-text p-3 sm:p-4',
@@ -32,20 +31,15 @@ export default function Input({
   iconRight,
   ...props
 }: InputProps) {
-  const inputRef = useRef<HTMLInputElement>(null)
-
   return (
-    <span
-      className={cn(inputContainerVariants({ variant }), className)}
-      onClick={() => inputRef.current?.focus()}
-    >
+    <label className={cn(inputContainerVariants({ variant }), className)}>
       <input
-        ref={inputRef}
         type="text"
+        aria-invalid={variant === 'error' ? true : undefined}
         className="text-sm font-normal text-slate-700 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-slate-500 sm:text-base sm:placeholder:text-base"
         {...props}
       />
       {iconRight}
-    </span>
+    </label>
   )
 }

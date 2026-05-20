@@ -19,7 +19,9 @@ export default function PasswordInput({ ...props }: PasswordInputProps) {
     <Input
       type={hide ? 'password' : 'text'}
       className={cn(emailInputVariants())}
-      iconRight={<EyeButton onClick={() => setHide((prev) => !prev)} />}
+      iconRight={
+        <EyeButton hide={hide} onClick={() => setHide((prev) => !prev)} />
+      }
       {...props}
     />
   )

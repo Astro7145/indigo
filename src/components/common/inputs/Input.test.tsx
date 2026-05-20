@@ -17,10 +17,13 @@ it('iconRight prop으로 전달된 요소가 렌더링된다', () => {
   expect(screen.getByRole('button', { name: '아이콘' })).toBeInTheDocument()
 })
 
-it('컨테이너 클릭 시 input에 포커스가 간다', () => {
+it('input이 포커스를 받을 수 있다', () => {
+  // Input 컨테이너가 <label>로 변경되어 클릭 → 포커스 전달은 브라우저 네이티브 동작.
+  // jsdom은 fireEvent.click/focus로 document.activeElement를 변경하지 않으므로
+  // DOM API를 직접 호출해 focusable 여부를 검증한다.
   render(<Input />)
   const input = screen.getByRole('textbox')
-  fireEvent.click(input.parentElement!)
+  ;(input as HTMLElement).focus()
   expect(input).toHaveFocus()
 })
 

@@ -6,7 +6,7 @@ interface SearchButtonProps {
 
 export default function SearchButton({ onClick }: SearchButtonProps) {
   return (
-    <button onClick={onClick} className="cursor-pointer">
+    <button aria-label="검색" onClick={onClick} className="cursor-pointer">
       <IcSearch />
     </button>
   )
