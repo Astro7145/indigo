@@ -13,8 +13,8 @@ export function IcChevron({
   const rotate: Record<'left' | 'right' | 'up' | 'down', string> = {
     left: '',
     right: 'rotate-180',
-    up: '-rotate-90',
-    down: 'rotate-90',
+    up: 'rotate-90',
+    down: '-rotate-90',
   }
 
   return (
