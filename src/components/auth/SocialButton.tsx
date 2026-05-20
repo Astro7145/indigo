@@ -1,8 +1,6 @@
+import { IcGoogle } from '@/src/components/common/icons/IcGoogle'
+import { IcKakao } from '@/src/components/common/icons/IcKakao'
 import { cn } from '@/src/utils/cn'
-
-// TODO: icons 공통 머지 후 주석 해제
-// import { IcGoogle } from '@/src/components/_common/icons/IcGoogle'
-// import { IcKakao } from '@/src/components/_common/icons/IcKakao'
 
 /** 소셜 로그인 제공자 */
 export type SocialProvider = 'google' | 'kakao'
@@ -49,9 +47,8 @@ export default function SocialButton({ provider, onClick, className }: SocialBut
         className,
       )}
     >
-      {/* TODO: icons 공통 머지 후 아래 주석 해제 */}
-      {/* {provider === 'google' && <IcGoogle className="size-6" />} */}
-      {/* {provider === 'kakao' && <IcKakao className="size-6" />} */}
+      {provider === 'google' && <IcGoogle />}
+      {provider === 'kakao' && <IcKakao />}
     </button>
   )
 }

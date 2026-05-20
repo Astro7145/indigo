@@ -1,3 +1,4 @@
+import { IcChevron } from '@/src/components/common/icons/IcChevron'
 import { cn } from '@/src/utils/cn'
 /**
  * ReadMoreButton 컴포넌트 props
@@ -40,12 +41,12 @@ export default function ReadMoreButton({
         className,
       )}
     >
-      {/* TODO: icons 공통 머지 후 <IcChevronDown className="size-6" /> 로 교체 */}
+      <IcChevron direction="down" />
 
       {/* ── 양방향 토글이 필요한 경우 아래 주석 해제 ── */}
       {/* {isOpen
-        ? <IcChevronUp className="size-6" />
-        : <IcChevronDown className="size-6" />
+        ? <IcChevron direction="up" />
+        : <IcChevron direction="down" />
       } */}
     </button>
   )

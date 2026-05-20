@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 
+import { IcBadgeClose } from '@/src/components/common/icons/IcBadgeClose'
 import { cn } from '@/src/utils/cn'
 
 export type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'purple'
@@ -60,8 +61,7 @@ export default function Badge({
           aria-label="태그 삭제"
           className="flex cursor-pointer items-center justify-center rounded-full p-[2px]"
         >
-          {/* TODO: icons 공통 머지 후 <IcXClose className="size-3" /> 로 교체 */}
-          ×
+          <IcBadgeClose color={color} />
         </button>
       )}
     </span>
