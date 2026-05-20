@@ -82,6 +82,7 @@ export default function FileInput({
       />
       {file && (
         <button
+          type="button"
           aria-label="파일 삭제"
           onClick={handleRemoveFile}
           className="cursor-pointer"
