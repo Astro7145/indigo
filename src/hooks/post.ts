@@ -62,12 +62,12 @@ export function usePost(id: number | undefined) {
   })
 }
 
-export function useComments(postId: number, params: CommentListParams = {}) {
+export function useComments(postId: number | undefined, params: CommentListParams = {}) {
   return useQuery<CommentListResponse, ApiError>({
-    queryKey: postKeys.comments(postId, params),
-    queryFn: () => getComments(postId, params),
-  })
-}
+    queryKey: postKeys.comments(postId ?? -1, params),
+    queryFn: () => getComments(postId as number, params),
+    enabled: postId != null,
+  })}
 
 export function useInfiniteComments(
   postId: number,
