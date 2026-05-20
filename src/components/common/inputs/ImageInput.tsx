@@ -44,8 +44,8 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
           <Image
             src={URL.createObjectURL(file)}
             alt={`선택된 이미지: ${file.name}`}
-            layout="fill"
-            objectFit="cover"
+            fill
+            className="object-cover"
           />
           <span className="absolute top-2.5 right-2.5">
             <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
