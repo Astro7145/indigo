@@ -60,4 +60,25 @@
   --text-display-lg--line-height: 3.25rem; /* 52 */
   --text-display-xl: 5rem; /* 80 */
   --text-display-xl--line-height: 4.625rem; /* 74 */
+
+  /* ---- Color: badge ---- */
+  --color-badge-gray-bg: #fafafa;
+  --color-badge-gray-border: #e9eaeb;
+  --color-badge-gray-text: #414651;
+
+  --color-badge-green-bg: #ecfdf3;
+  --color-badge-green-border: #abefc6;
+  --color-badge-green-text: #067647;
+
+  --color-badge-yellow-bg: #fffaeb;
+  --color-badge-yellow-border: #fedf89;
+  --color-badge-yellow-text: #b54708;
+
+  --color-badge-red-bg: #fef3f2;
+  --color-badge-red-border: #fecdca;
+  --color-badge-red-text: #b42318;
+
+  --color-badge-purple-bg: #f9f5ff;
+  --color-badge-purple-border: #e9d7fe;
+  --color-badge-purple-text: #6941c6;
 }
