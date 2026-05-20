@@ -54,7 +54,8 @@ export default function FileInput({
     onFileChange?.(selectedFile)
   }
 
-  const handleRemoveFile = () => {
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.preventDefault()
     setFile(null)
     setStatusMessage('파일이 삭제되었습니다')
     onFileChange?.(null)
