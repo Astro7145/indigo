@@ -1,4 +1,8 @@
-jest.mock('@/src/api/upload')
+jest.mock('@/src/api/upload', () => ({
+  ...jest.requireActual('@/src/api/upload'),
+  createImageUploadUrl: jest.fn(),
+  createFileUploadUrl: jest.fn(),
+}))
 import * as uploadApi from '@/src/api/upload'
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils'
 import { useCreateImageUploadUrl, useCreateFileUploadUrl } from '@/src/hooks/upload'
