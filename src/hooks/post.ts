@@ -70,17 +70,17 @@ export function useComments(postId: number | undefined, params: CommentListParam
   })}
 
 export function useInfiniteComments(
-  postId: number,
+  postId: number | undefined,
   params: Omit<CommentListParams, 'cursor'> = {},
 ) {
   return useInfiniteQuery<CommentListResponse, ApiError>({
-    queryKey: [...postKeys.comments(postId, params), 'infinite'],
+    queryKey: [...postKeys.comments(postId ?? -1, params), 'infinite'],
     queryFn: ({ pageParam }) =>
-      getComments(postId, { ...params, cursor: pageParam as string | undefined }),
+      getComments(postId as number, { ...params, cursor: pageParam as string | undefined }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
-  })
-}
+    enabled: postId != null,
+  })}
 
 export function useCreatePost() {
   const qc = useQueryClient()
