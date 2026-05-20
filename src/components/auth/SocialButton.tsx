@@ -7,7 +7,7 @@ export type SocialProvider = 'google' | 'kakao'
 
 interface SocialButtonProps {
   provider: SocialProvider
-  onClick: () => void
+  onClick?: () => void
   className?: string
 }
 

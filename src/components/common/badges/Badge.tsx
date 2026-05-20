@@ -46,7 +46,7 @@ export default function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-[2px] rounded-full border py-[3px] text-xs font-medium',
+        'inline-flex items-center gap-[2px] rounded-full border py-[3px] text-xs font-medium select-none',
         onDelete ? 'pr-[3px] pl-[8px]' : 'px-[8px]',
         colorStyles[color],
         className,

@@ -38,19 +38,15 @@ const variantBaseClasses: Record<ButtonVariant, string> = {
 const variantHoverClasses: Record<ButtonVariant, string> = {
   primary: 'hover:bg-indigo-700',
   secondary: 'hover:border-indigo-600',
-  tertiary: 'hover:border-[#BBBBBB] hover:text-slate-600',
+  tertiary: 'hover:border-slate-400 hover:text-slate-600',
 }
 
-/**
- * variant별 disabled 클래스
- * ⚠️ #BBBBBB는 디자인 토큰 미등록 — globals.css 추가 검토 필요
- */
 const variantDisabledClasses: Record<ButtonVariant, string> = {
-  primary: 'disabled:cursor-not-allowed disabled:bg-[#BBBBBB]',
+  primary: 'disabled:cursor-not-allowed disabled:bg-slate-400',
   secondary:
-    'disabled:cursor-not-allowed disabled:border-[#BBBBBB] disabled:text-[#BBBBBB]',
+    'disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400',
   tertiary:
-    'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-[#BBBBBB]',
+    'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400',
 }
 
 /**

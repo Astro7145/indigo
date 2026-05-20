@@ -5,7 +5,7 @@ export type CategoryTabLabel = '전체' | 'To Do' | 'Done'
 interface CategoryTabProps {
   label: CategoryTabLabel
   isActive?: boolean
-  onClick: () => void
+  onClick?: () => void
   className?: string
 }
 

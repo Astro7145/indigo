@@ -4,7 +4,7 @@ import { cn } from '@/src/utils/cn'
 type DeleteButtonSize = 'large' | 'small'
 
 interface DeleteButtonProps {
-  onClick: () => void
+  onClick?: () => void
   size?: DeleteButtonSize
   className?: string
 }
