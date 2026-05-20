@@ -44,7 +44,10 @@ export default function FileInput({
   const [file, setFile] = useState<File | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.currentTarget.files?.[0] || null
+    const selectedFile = e.currentTarget.files?.[0]
+    // 파일 탐색기 취소 시 일부 브라우저가 빈 FileList로 change 이벤트를 발생시킴
+    // 이 경우 기존 선택 파일을 유지하기 위해 early return
+    if (!selectedFile) return
     setFile(selectedFile)
     onFileChange?.(selectedFile)
   }
@@ -72,7 +75,11 @@ export default function FileInput({
         onChange={handleFileChange}
       />
       {file && (
-        <button type="button" onClick={handleRemoveFile}>
+        <button
+          type="button"
+          onClick={handleRemoveFile}
+          className="cursor-pointer"
+        >
           <IcDelete />
         </button>
       )}

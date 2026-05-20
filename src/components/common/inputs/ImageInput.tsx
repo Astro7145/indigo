@@ -2,7 +2,8 @@
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { IcDelete, IcUpload } from '../icons'
+import { IcUpload } from '../icons'
+import DeleteButton from '../buttons/DeleteButton'
 
 interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onFileChange?: (file: File | null) => void
@@ -37,12 +38,9 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
           layout="fill"
           objectFit="cover"
         />
-        <button
-          onClick={handleRemoveFile}
-          className="absolute top-2.5 right-2.5 cursor-pointer rounded-full border border-slate-300 bg-white"
-        >
-          <IcDelete />
-        </button>
+        <span className="absolute top-2.5 right-2.5">
+          <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
+        </span>
       </div>
     )
   }

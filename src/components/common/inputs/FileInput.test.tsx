@@ -12,6 +12,11 @@ const selectFile = (input: Element, file: File) => {
   fireEvent.change(input)
 }
 
+const cancelFileDialog = (input: Element) => {
+  Object.defineProperty(input, 'files', { value: [], configurable: true })
+  fireEvent.change(input)
+}
+
 it('초기 렌더 시 "파일을 선택해주세요" 텍스트를 표시한다', () => {
   render(<FileInput />)
   expect(screen.getByText('파일을 선택해주세요')).toBeInTheDocument()
@@ -55,4 +60,21 @@ it('삭제 버튼 클릭 시 onFileChange(null)이 호출된다', () => {
   selectFile(container.querySelector('input[type="file"]')!, new File([''], 'test.txt'))
   fireEvent.click(screen.getByRole('button'))
   expect(onFileChange).toHaveBeenLastCalledWith(null)
+})
+
+it('파일 선택 후 탐색기를 취소하면 기존 파일이 유지된다', () => {
+  const { container } = render(<FileInput />)
+  const input = container.querySelector('input[type="file"]')!
+  selectFile(input, new File([''], 'test.txt'))
+  cancelFileDialog(input)
+  expect(screen.getByText('test.txt')).toBeInTheDocument()
+})
+
+it('파일 선택 후 탐색기를 취소하면 onFileChange가 추가로 호출되지 않는다', () => {
+  const onFileChange = jest.fn()
+  const { container } = render(<FileInput onFileChange={onFileChange} />)
+  const input = container.querySelector('input[type="file"]')!
+  selectFile(input, new File([''], 'test.txt'))
+  cancelFileDialog(input)
+  expect(onFileChange).toHaveBeenCalledTimes(1)
 })
