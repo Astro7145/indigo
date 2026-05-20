@@ -1,4 +1,11 @@
-jest.mock('@/src/api/auth')
+jest.mock('@/src/api/auth', () => ({
+  ...jest.requireActual('@/src/api/auth'),
+  signup: jest.fn(),
+  login: jest.fn(),
+  refresh: jest.fn(),
+  logout: jest.fn(),
+  oauthLogin: jest.fn(),
+}))
 import * as authApi from '@/src/api/auth'
 import { userKeys } from '@/src/api/user'
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils'
