@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { IcUpload } from '../icons'
 import DeleteButton from '../buttons/DeleteButton'
@@ -12,7 +12,10 @@ interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 // file과 blob URL을 항상 함께 업데이트하므로 하나의 타입으로 묶는다
 type FileWithUrl = { file: File; url: string }
 
-export default function ImageInput({ onFileChange }: ImageInputProps) {
+export default function ImageInput({
+  onFileChange,
+  ...props
+}: ImageInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   // 이전 blob URL을 revokeObjectURL로 해제하기 위한 참조
   // 렌더를 유발할 필요가 없으므로 ref로 충분하다
@@ -51,6 +54,12 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
     }
   }
 
+  useEffect(() => {
+    return () => {
+      if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current)
+    }
+  }, [])
+
   return (
     <>
       <span aria-live="polite" className="sr-only">
@@ -65,7 +74,10 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
             className="object-cover"
           />
           <span className="absolute top-2.5 right-2.5">
-            <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
+            <DeleteButton
+              className="cursor-pointer"
+              onClick={handleRemoveFile}
+            />
           </span>
         </div>
       ) : (
@@ -80,6 +92,7 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
             accept="image/*"
             className="sr-only"
             onChange={handleFileChange}
+            {...props}
           />
         </label>
       )}

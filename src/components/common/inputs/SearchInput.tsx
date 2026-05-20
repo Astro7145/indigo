@@ -3,11 +3,11 @@
 import Input from './Input'
 import SearchButton from './inputButtons/SearchButton'
 
-interface SearchInputProps {
+interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onSearch?: () => void
 }
 
-export default function SearchInput({ onSearch }: SearchInputProps) {
+export default function SearchInput({ onSearch, ...props }: SearchInputProps) {
   const handleEnterSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') onSearch?.()
   }
@@ -24,6 +24,7 @@ export default function SearchInput({ onSearch }: SearchInputProps) {
         aria-label="할 일 검색"
         onKeyUp={handleEnterSearch}
         iconRight={<SearchButton onClick={handleSearch} />}
+        {...props}
       />
     </search>
   )
