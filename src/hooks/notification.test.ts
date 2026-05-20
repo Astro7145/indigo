@@ -1,4 +1,11 @@
-jest.mock('@/src/api/notification')
+jest.mock('@/src/api/notification', () => ({
+  ...jest.requireActual('@/src/api/notification'),
+  getNotifications: jest.fn(),
+  readAllNotifications: jest.fn(),
+  deleteAllNotifications: jest.fn(),
+  patchNotification: jest.fn(),
+  deleteNotification: jest.fn(),
+}))
 import * as notiApi from '@/src/api/notification'
 import { waitFor, act } from '@testing-library/react'
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils'
