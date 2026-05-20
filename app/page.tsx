@@ -1,10 +1,10 @@
 'use client'
 
-import PasswordInput from '@/src/components/_common/inputs/PasswordInput'
-import Input from '@/src/components/_common/inputs/Input'
-import FileInput from '@/src/components/_common/inputs/FileInput'
-import ImageInput from '@/src/components/_common/inputs/ImageInput'
-import SearchInput from '@/src/components/_common/inputs/SearchInput'
+import PasswordInput from '@/src/components/common/inputs/PasswordInput'
+import Input from '@/src/components/common/inputs/Input'
+import FileInput from '@/src/components/common/inputs/FileInput'
+import ImageInput from '@/src/components/common/inputs/ImageInput'
+import SearchInput from '@/src/components/common/inputs/SearchInput'
 
 export default function Home() {
   return (

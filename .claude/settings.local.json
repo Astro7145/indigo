@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:\\\\Users\\\\noel7\\\\Documents\\\\Github\\\\indigo\" status)",
+      "Bash(git -C \"C:\\\\Users\\\\noel7\\\\Documents\\\\Github\\\\indigo\" diff HEAD)",
+      "Bash(git -C \"C:\\\\Users\\\\noel7\\\\Documents\\\\Github\\\\indigo\" log --oneline origin/feature/25-toast-component..HEAD)",
+      "PowerShell(Get-Command gh -ErrorAction SilentlyContinue; \\(Get-Command gh -ErrorAction SilentlyContinue\\).Source)",
+      "PowerShell(if \\(-not $?\\) { \"gh not found in PATH\" })",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:LOCALAPPDATA\\\\Programs\\\\GitHub CLI\\\\gh.exe\" -ErrorAction SilentlyContinue)",
+      "Bash(npm list *)"
+    ]
+  }
+}

@@ -2,9 +2,8 @@
 
 import { cn } from '@/src/utils/cn'
 import { cva } from 'class-variance-authority'
-import FileIcon from '../icons/FileIcon'
 import { useRef, useState } from 'react'
-import CloseIcon from '../icons/CloseIcon'
+import { IcDelete, IcUpload } from '../icons'
 
 const inputContainerVariants = cva(
   'flex items-center gap-x-2 rounded-sm border bg-white has-focus:outline-indigo-500 p-3 sm:p-4',
@@ -61,7 +60,7 @@ export default function FileInput({
 
   return (
     <label className={cn(inputContainerVariants({ variant }))}>
-      <FileIcon />
+      <IcUpload />
       <span className={cn(textVariants({ selected: !!file }))}>
         {file ? file.name : '파일을 선택해주세요'}
       </span>
@@ -74,7 +73,7 @@ export default function FileInput({
       />
       {file && (
         <button type="button" onClick={handleRemoveFile}>
-          <CloseIcon />
+          <IcDelete />
         </button>
       )}
     </label>

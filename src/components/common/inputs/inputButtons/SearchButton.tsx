@@ -1,4 +1,4 @@
-import SearchIcon from '../../icons/SearchIcon'
+import { IcSearch } from '../../icons'
 
 interface SearchButtonProps {
   onClick?: () => void
@@ -7,7 +7,7 @@ interface SearchButtonProps {
 export default function SearchButton({ onClick }: SearchButtonProps) {
   return (
     <button onClick={onClick} className="cursor-pointer">
-      <SearchIcon />
+      <IcSearch />
     </button>
   )
 }

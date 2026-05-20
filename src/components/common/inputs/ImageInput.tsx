@@ -1,9 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import FileIcon from '../icons/FileIcon'
 import Image from 'next/image'
-import CloseIcon from '../icons/CloseIcon'
+import { IcDelete, IcUpload } from '../icons'
 
 interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onFileChange?: (file: File | null) => void
@@ -42,7 +41,7 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
           onClick={handleRemoveFile}
           className="absolute top-2.5 right-2.5 cursor-pointer rounded-full border border-slate-300 bg-white"
         >
-          <CloseIcon />
+          <IcDelete />
         </button>
       </div>
     )
@@ -51,7 +50,7 @@ export default function ImageInput({ onFileChange }: ImageInputProps) {
   return (
     <label>
       <div className="flex flex-col items-center justify-center gap-y-0.5 rounded-sm border-2 border-dashed border-slate-300 p-3">
-        <FileIcon />
+        <IcUpload />
         <span className="text-base font-medium text-slate-500">
           이미지 첨부
         </span>

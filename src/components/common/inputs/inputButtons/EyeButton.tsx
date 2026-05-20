@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import EyeIcon from '../../icons/EyeIcon'
+import { IcEye, IcEyeOff } from '../../icons'
 
 interface EyeButtonProps {
   onClick?: () => void
@@ -20,7 +20,7 @@ export default function EyeButton({ onClick }: EyeButtonProps) {
 
   return (
     <button onClick={handleToggle} className="cursor-pointer">
-      <EyeIcon hide={hide} />
+      {hide ? <IcEyeOff /> : <IcEye />}
     </button>
   )
 }
