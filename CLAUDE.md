@@ -20,6 +20,7 @@
 - **axios** — HTTP 클라이언트 (`src/api/axiosInstance.ts` 단일 인스턴스)
 - **Zustand** — 클라이언트 전역 상태
 - **react-hook-form** — 폼
+- **Framer Motion** — 애니메이션 라이브러리
 - **테스트**: Jest / React Testing Library (단위·통합), Playwright (E2E)
 
 ## 명령어
