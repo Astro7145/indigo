@@ -45,7 +45,8 @@ export function useDeleteMe() {
   const qc = useQueryClient()
   return useMutation<void, ApiError, void>({
     mutationFn: () => deleteMe(),
-    onSuccess: () => {
+    // 탈퇴 요청이 실패해도 클라이언트 캐시는 비우는 게 안전 (계정 잔재 데이터 노출 방지).
+    onSettled: () => {
       qc.clear()
     },
   })

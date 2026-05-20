@@ -128,6 +128,8 @@ export function useDeletePost() {
     onSuccess: (_, postId) => {
       qc.invalidateQueries({ queryKey: postKeys.lists() })
       qc.removeQueries({ queryKey: postKeys.detail(postId) })
+      // 게시글 삭제 후 그 게시글의 댓글 캐시는 무의미하므로 함께 제거.
+      qc.removeQueries({ queryKey: commentsPrefix(postId) })
     },
   })
 }
@@ -138,6 +140,8 @@ export function useCreateComment(postId: number) {
     mutationFn: (body) => createComment(postId, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
+      // Post.commentCount 동기화.
+      qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
     },
   })
 }
@@ -162,6 +166,8 @@ export function useDeleteComment(postId: number) {
     mutationFn: (commentId) => deleteComment(postId, commentId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
+      // Post.commentCount 동기화.
+      qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
     },
   })
 }

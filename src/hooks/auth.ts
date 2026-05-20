@@ -32,7 +32,11 @@ export function useLogin() {
 
 export function useOauthLogin() {
   const qc = useQueryClient()
-  return useMutation<LoginResult, ApiError, { provider: OAuthProvider; body: OAuthBody }>({
+  return useMutation<
+    LoginResult,
+    ApiError,
+    { provider: OAuthProvider; body: OAuthBody }
+  >({
     mutationFn: ({ provider, body }) => oauthLogin(provider, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: userKeys.me() })
@@ -44,7 +48,8 @@ export function useLogout() {
   const qc = useQueryClient()
   return useMutation<void, ApiError, void>({
     mutationFn: () => logout(),
-    onSuccess: () => {
+    // 토큰 만료 등으로 서버 호출이 실패해도 클라이언트 세션은 종료해야 하므로 onSettled.
+    onSettled: () => {
       qc.clear()
     },
   })

@@ -93,6 +93,8 @@ export function useUpdateTodo() {
     onSuccess: (_, { todoId }) => {
       qc.invalidateQueries({ queryKey: todoKeys.lists() })
       qc.invalidateQueries({ queryKey: todoKeys.detail(todoId) })
+      // FavoriteTodo.todo가 title/done을 품으므로 favorites 변형도 동기화.
+      qc.invalidateQueries({ queryKey: favoritesPrefix })
     },
   })
 }
@@ -104,6 +106,8 @@ export function useDeleteTodo() {
     onSuccess: (_, todoId) => {
       qc.invalidateQueries({ queryKey: todoKeys.lists() })
       qc.removeQueries({ queryKey: todoKeys.detail(todoId) })
+      // 삭제된 todo가 favorites 목록에 남지 않도록 함께 무효화.
+      qc.invalidateQueries({ queryKey: favoritesPrefix })
     },
   })
 }
