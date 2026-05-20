@@ -23,12 +23,12 @@ export function useMe() {
 }
 
 export function useCheckNickname(name: string) {
+  const trimmedName = name.trim()
   return useQuery<CheckNicknameResponse, ApiError>({
-    queryKey: userKeys.nickname(name),
-    queryFn: () => checkNickname(name),
-    enabled: name.trim().length >= 1,
-  })
-}
+    queryKey: userKeys.nickname(trimmedName),
+    queryFn: () => checkNickname(trimmedName),
+    enabled: trimmedName.length >= 1,
+  })}
 
 export function useUpdateMe() {
   const qc = useQueryClient()
