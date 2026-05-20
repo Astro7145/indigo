@@ -3,6 +3,7 @@ import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
+  skipToken,
 } from '@tanstack/react-query'
 import {
   postKeys,
@@ -34,7 +35,7 @@ import type {
 import type { ApiError } from '@/src/types/common'
 
 // 한 게시글의 모든 comments 캐시(filter 변형 포함)를 한 번에 무효화하기 위한 prefix
-const commentsPrefix = (postId: number) =>
+export const commentsPrefix = (postId: number) =>
   [...postKeys.detail(postId), 'comments'] as const
 
 export function usePostList(params: PostListParams = {}) {
@@ -58,9 +59,9 @@ export function useInfinitePostList(
 
 export function usePost(id: number | undefined) {
   return useQuery<Post, ApiError>({
-    queryKey: postKeys.detail(id ?? -1),
-    queryFn: () => getPost(id as number),
-    enabled: id != null,
+    queryKey:
+      id == null ? [...postKeys.details(), 'pending'] : postKeys.detail(id),
+    queryFn: id == null ? skipToken : () => getPost(id),
   })
 }
 

@@ -3,6 +3,7 @@ import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
+  skipToken,
 } from '@tanstack/react-query'
 import {
   noteKeys,
@@ -28,7 +29,9 @@ export function useNoteList(params: NoteListParams = {}) {
   })
 }
 
-export function useInfiniteNoteList(params: Omit<NoteListParams, 'cursor'> = {}) {
+export function useInfiniteNoteList(
+  params: Omit<NoteListParams, 'cursor'> = {},
+) {
   return useInfiniteQuery<NoteListResponse, ApiError>({
     queryKey: [...noteKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
@@ -40,9 +43,9 @@ export function useInfiniteNoteList(params: Omit<NoteListParams, 'cursor'> = {})
 
 export function useNote(id: number | undefined) {
   return useQuery<Note, ApiError>({
-    queryKey: noteKeys.detail(id ?? -1),
-    queryFn: () => getNote(id as number),
-    enabled: id != null,
+    queryKey:
+      id == null ? [...noteKeys.details(), 'pending'] : noteKeys.detail(id),
+    queryFn: id == null ? skipToken : () => getNote(id),
   })
 }
 

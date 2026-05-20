@@ -23,17 +23,21 @@ import {
   useDeleteTodo,
   useAddTodoFavorite,
   useRemoveTodoFavorite,
+  favoritesPrefix,
 } from '@/src/hooks/todo'
 
 const mocked = todoApi as jest.Mocked<typeof todoApi>
-const favoritesPrefix = [...todoApi.todoKeys.all, 'favorites']
 
 beforeEach(() => {
   jest.resetAllMocks()
 })
 
 it('useTodoList calls getTodos with params', async () => {
-  mocked.getTodos.mockResolvedValue({ todos: [], nextCursor: null, totalCount: 0 } as never)
+  mocked.getTodos.mockResolvedValue({
+    todos: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
   const { result } = renderHookWithClient(() => useTodoList({ done: 'true' }))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getTodos).toHaveBeenCalledWith({ done: 'true' })
@@ -52,25 +56,49 @@ it('useTodo calls getTodo when id is provided', async () => {
 })
 
 it('useInfiniteTodoList passes cursor on first page', async () => {
-  mocked.getTodos.mockResolvedValueOnce({ todos: [], nextCursor: 8, totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfiniteTodoList({ limit: 5 }))
+  mocked.getTodos.mockResolvedValueOnce({
+    todos: [],
+    nextCursor: 8,
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfiniteTodoList({ limit: 5 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getTodos).toHaveBeenLastCalledWith({ limit: 5, cursor: undefined })
+  expect(mocked.getTodos).toHaveBeenLastCalledWith({
+    limit: 5,
+    cursor: undefined,
+  })
   expect(result.current.hasNextPage).toBe(true)
 })
 
 it('useFavoriteTodoList calls getFavoriteTodos with params', async () => {
-  mocked.getFavoriteTodos.mockResolvedValue({ favorites: [], nextCursor: null, totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useFavoriteTodoList({ limit: 10 }))
+  mocked.getFavoriteTodos.mockResolvedValue({
+    favorites: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useFavoriteTodoList({ limit: 10 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getFavoriteTodos).toHaveBeenCalledWith({ limit: 10 })
 })
 
 it('useInfiniteFavoriteTodoList passes cursor on first page', async () => {
-  mocked.getFavoriteTodos.mockResolvedValueOnce({ favorites: [], nextCursor: 2, totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfiniteFavoriteTodoList({ limit: 5 }))
+  mocked.getFavoriteTodos.mockResolvedValueOnce({
+    favorites: [],
+    nextCursor: 2,
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfiniteFavoriteTodoList({ limit: 5 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getFavoriteTodos).toHaveBeenLastCalledWith({ limit: 5, cursor: undefined })
+  expect(mocked.getFavoriteTodos).toHaveBeenLastCalledWith({
+    limit: 5,
+    cursor: undefined,
+  })
 })
 
 it('useCreateTodo invalidates lists on success', async () => {

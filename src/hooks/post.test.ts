@@ -29,19 +29,21 @@ import {
   useDeleteComment,
   useLikeComment,
   useUnlikeComment,
+  commentsPrefix,
 } from '@/src/hooks/post'
 
 const mocked = postApi as jest.Mocked<typeof postApi>
-
-const commentsPrefix = (postId: number) =>
-  [...postApi.postKeys.detail(postId), 'comments']
 
 beforeEach(() => {
   jest.resetAllMocks()
 })
 
 it('usePostList calls getPosts with params', async () => {
-  mocked.getPosts.mockResolvedValue({ posts: [], nextCursor: null, totalCount: 0 } as never)
+  mocked.getPosts.mockResolvedValue({
+    posts: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
   const { result } = renderHookWithClient(() => usePostList({ type: 'best' }))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getPosts).toHaveBeenCalledWith({ type: 'best' })
@@ -60,25 +62,47 @@ it('usePost calls getPost when id is provided', async () => {
 })
 
 it('useInfinitePostList passes string cursor on first page', async () => {
-  mocked.getPosts.mockResolvedValueOnce({ posts: [], nextCursor: 'next-token', totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfinitePostList({ limit: 5 }))
+  mocked.getPosts.mockResolvedValueOnce({
+    posts: [],
+    nextCursor: 'next-token',
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfinitePostList({ limit: 5 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getPosts).toHaveBeenLastCalledWith({ limit: 5, cursor: undefined })
+  expect(mocked.getPosts).toHaveBeenLastCalledWith({
+    limit: 5,
+    cursor: undefined,
+  })
   expect(result.current.hasNextPage).toBe(true)
 })
 
 it('useComments calls getComments with postId and params', async () => {
-  mocked.getComments.mockResolvedValue({ comments: [], nextCursor: null, totalCount: 0 } as never)
+  mocked.getComments.mockResolvedValue({
+    comments: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
   const { result } = renderHookWithClient(() => useComments(5, { limit: 10 }))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getComments).toHaveBeenCalledWith(5, { limit: 10 })
 })
 
 it('useInfiniteComments passes cursor on first page', async () => {
-  mocked.getComments.mockResolvedValueOnce({ comments: [], nextCursor: 'c1', totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfiniteComments(5, { limit: 10 }))
+  mocked.getComments.mockResolvedValueOnce({
+    comments: [],
+    nextCursor: 'c1',
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfiniteComments(5, { limit: 10 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getComments).toHaveBeenLastCalledWith(5, { limit: 10, cursor: undefined })
+  expect(mocked.getComments).toHaveBeenLastCalledWith(5, {
+    limit: 10,
+    cursor: undefined,
+  })
 })
 
 it('useCreatePost invalidates lists on success', async () => {
@@ -148,7 +172,10 @@ it('useLikeComment(postId) calls likeComment and invalidates comments prefix', a
 })
 
 it('useUnlikeComment(postId) calls unlikeComment and invalidates comments prefix', async () => {
-  mocked.unlikeComment.mockResolvedValue({ isLiked: false, likeCount: 0 } as never)
+  mocked.unlikeComment.mockResolvedValue({
+    isLiked: false,
+    likeCount: 0,
+  } as never)
   const { result, client } = renderHookWithClient(() => useUnlikeComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
   await result.current.mutateAsync(9)

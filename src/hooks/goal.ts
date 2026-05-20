@@ -3,6 +3,7 @@ import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
+  skipToken,
 } from '@tanstack/react-query'
 import {
   goalKeys,
@@ -40,9 +41,9 @@ export function useInfiniteGoalList(params: Omit<CursorParams, 'cursor'> = {}) {
 
 export function useGoal(id: number | undefined) {
   return useQuery<GoalDetail, ApiError>({
-    queryKey: goalKeys.detail(id ?? -1),
-    queryFn: () => getGoal(id as number),
-    enabled: id != null,
+    queryKey:
+      id == null ? [...goalKeys.details(), 'pending'] : goalKeys.detail(id),
+    queryFn: id == null ? skipToken : () => getGoal(id),
   })
 }
 

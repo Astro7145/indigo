@@ -3,6 +3,7 @@ import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
+  skipToken,
 } from '@tanstack/react-query'
 import {
   todoKeys,
@@ -27,7 +28,7 @@ import type {
 import type { CursorParams, ApiError } from '@/src/types/common'
 
 // favorites filter 변형까지 한 번에 invalidate 하기 위한 prefix
-const favoritesPrefix = [...todoKeys.all, 'favorites'] as const
+export const favoritesPrefix = [...todoKeys.all, 'favorites'] as const
 
 export function useTodoList(params: TodoListParams = {}) {
   return useQuery<TodoListResponse, ApiError>({
@@ -36,7 +37,9 @@ export function useTodoList(params: TodoListParams = {}) {
   })
 }
 
-export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {}) {
+export function useInfiniteTodoList(
+  params: Omit<TodoListParams, 'cursor'> = {},
+) {
   return useInfiniteQuery<TodoListResponse, ApiError>({
     queryKey: [...todoKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
@@ -48,9 +51,9 @@ export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {})
 
 export function useTodo(id: number | undefined) {
   return useQuery<Todo, ApiError>({
-    queryKey: todoKeys.detail(id ?? -1),
-    queryFn: () => getTodo(id as number),
-    enabled: id != null,
+    queryKey:
+      id == null ? [...todoKeys.details(), 'pending'] : todoKeys.detail(id),
+    queryFn: id == null ? skipToken : () => getTodo(id),
   })
 }
 
@@ -61,7 +64,9 @@ export function useFavoriteTodoList(params: CursorParams = {}) {
   })
 }
 
-export function useInfiniteFavoriteTodoList(params: Omit<CursorParams, 'cursor'> = {}) {
+export function useInfiniteFavoriteTodoList(
+  params: Omit<CursorParams, 'cursor'> = {},
+) {
   return useInfiniteQuery<FavoriteTodoListResponse, ApiError>({
     queryKey: [...todoKeys.favorites(params), 'infinite'],
     queryFn: ({ pageParam }) =>
