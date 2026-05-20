@@ -128,9 +128,9 @@ export function useDeletePost() {
     mutationFn: (id) => deletePost(id),
     onSuccess: (_, postId) => {
       qc.invalidateQueries({ queryKey: postKeys.lists() })
+      // detail 제거 시 그 하위 comments 캐시(`[...detail(postId), 'comments', ...]`)도
+      // prefix 매칭으로 함께 제거된다.
       qc.removeQueries({ queryKey: postKeys.detail(postId) })
-      // 게시글 삭제 후 그 게시글의 댓글 캐시는 무의미하므로 함께 제거.
-      qc.removeQueries({ queryKey: commentsPrefix(postId) })
     },
   })
 }
@@ -140,8 +140,8 @@ export function useCreateComment(postId: number) {
   return useMutation<Comment, ApiError, CreateCommentBody>({
     mutationFn: (body) => createComment(postId, body),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
       // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
+      // detail 무효화는 그 하위 comments 캐시도 prefix 매칭으로 함께 잡는다.
       qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
       qc.invalidateQueries({ queryKey: postKeys.lists() })
     },
@@ -167,8 +167,8 @@ export function useDeleteComment(postId: number) {
   return useMutation<void, ApiError, number>({
     mutationFn: (commentId) => deleteComment(postId, commentId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
       // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
+      // detail 무효화는 그 하위 comments 캐시도 prefix 매칭으로 함께 잡는다.
       qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
       qc.invalidateQueries({ queryKey: postKeys.lists() })
     },

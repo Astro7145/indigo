@@ -135,7 +135,7 @@ it('useUpdatePost invalidates lists and writes detail cache on success', async (
   expect(setData).toHaveBeenCalledWith(postApi.postKeys.detail(5), { id: 5 })
 })
 
-it('useDeletePost invalidates lists and removes detail + comments on success', async () => {
+it('useDeletePost invalidates lists and removes detail on success', async () => {
   mocked.deletePost.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeletePost())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -143,17 +143,17 @@ it('useDeletePost invalidates lists and removes detail + comments on success', a
   await result.current.mutateAsync(5)
   expect(mocked.deletePost).toHaveBeenCalledWith(5)
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
+  // detail 제거가 commentsPrefix(prefix 하위)도 함께 잡으므로 별도 검증 불필요.
   expect(rm).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
-  expect(rm).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useCreateComment(postId) invalidates comments prefix + post detail + lists', async () => {
+it('useCreateComment(postId) invalidates post detail (covers comments) + lists', async () => {
   mocked.createComment.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreateComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
   await result.current.mutateAsync({ content: 'hi' })
   expect(mocked.createComment).toHaveBeenCalledWith(5, { content: 'hi' })
-  expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
+  // detail 무효화가 commentsPrefix(prefix 하위)도 함께 잡으므로 별도 검증 불필요.
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
@@ -167,13 +167,13 @@ it('useUpdateComment(postId) calls patchComment and invalidates comments prefix'
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useDeleteComment(postId) invalidates comments prefix + post detail + lists', async () => {
+it('useDeleteComment(postId) invalidates post detail (covers comments) + lists', async () => {
   mocked.deleteComment.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
   await result.current.mutateAsync(9)
   expect(mocked.deleteComment).toHaveBeenCalledWith(5, 9)
-  expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
+  // detail 무효화가 commentsPrefix(prefix 하위)도 함께 잡으므로 별도 검증 불필요.
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
