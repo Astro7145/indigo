@@ -140,8 +140,9 @@ export function useCreateComment(postId: number) {
     mutationFn: (body) => createComment(postId, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
-      // Post.commentCount 동기화.
+      // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
       qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
+      qc.invalidateQueries({ queryKey: postKeys.lists() })
     },
   })
 }
@@ -166,8 +167,9 @@ export function useDeleteComment(postId: number) {
     mutationFn: (commentId) => deleteComment(postId, commentId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
-      // Post.commentCount 동기화.
+      // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
       qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
+      qc.invalidateQueries({ queryKey: postKeys.lists() })
     },
   })
 }

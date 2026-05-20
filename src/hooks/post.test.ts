@@ -146,7 +146,7 @@ it('useDeletePost invalidates lists and removes detail + comments on success', a
   expect(rm).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useCreateComment(postId) calls createComment and invalidates comments prefix + post detail', async () => {
+it('useCreateComment(postId) invalidates comments prefix + post detail + lists', async () => {
   mocked.createComment.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreateComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -154,6 +154,7 @@ it('useCreateComment(postId) calls createComment and invalidates comments prefix
   expect(mocked.createComment).toHaveBeenCalledWith(5, { content: 'hi' })
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
+  expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
 it('useUpdateComment(postId) calls patchComment and invalidates comments prefix', async () => {
@@ -165,7 +166,7 @@ it('useUpdateComment(postId) calls patchComment and invalidates comments prefix'
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useDeleteComment(postId) calls deleteComment and invalidates comments prefix + post detail', async () => {
+it('useDeleteComment(postId) invalidates comments prefix + post detail + lists', async () => {
   mocked.deleteComment.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -173,6 +174,7 @@ it('useDeleteComment(postId) calls deleteComment and invalidates comments prefix
   expect(mocked.deleteComment).toHaveBeenCalledWith(5, 9)
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
+  expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
 it('useLikeComment(postId) calls likeComment and invalidates comments prefix', async () => {
