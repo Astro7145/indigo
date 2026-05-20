@@ -30,7 +30,7 @@ export function useGoalList(params: CursorParams = {}) {
 
 export function useInfiniteGoalList(params: Omit<CursorParams, 'cursor'> = {}) {
   return useInfiniteQuery<GoalListResponse, ApiError>({
-    queryKey: goalKeys.list(params),
+    queryKey: [...goalKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
       getGoals({ ...params, cursor: pageParam as number | undefined }),
     initialPageParam: undefined as number | undefined,

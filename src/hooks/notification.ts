@@ -28,7 +28,7 @@ export function useNotificationList(params: CursorParams = {}) {
 
 export function useInfiniteNotificationList(params: Omit<CursorParams, 'cursor'> = {}) {
   return useInfiniteQuery<NotificationListResponse, ApiError>({
-    queryKey: notificationKeys.list(params),
+    queryKey: [...notificationKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
       getNotifications({ ...params, cursor: pageParam as number | undefined }),
     initialPageParam: undefined as number | undefined,
