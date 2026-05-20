@@ -12,9 +12,10 @@ jest.mock('@/src/components/common/icons', () => ({
   IcDelete: () => <svg data-testid="ic-delete" />,
 }))
 
-// jsdom은 URL.createObjectURL을 구현하지 않으므로 mock 처리
+// jsdom은 URL.createObjectURL / revokeObjectURL을 구현하지 않으므로 mock 처리
 beforeEach(() => {
   global.URL.createObjectURL = jest.fn(() => 'blob:mock-url')
+  global.URL.revokeObjectURL = jest.fn()
 })
 
 afterEach(() => {
