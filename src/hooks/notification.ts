@@ -26,7 +26,9 @@ export function useNotificationList(params: CursorParams = {}) {
   })
 }
 
-export function useInfiniteNotificationList(params: Omit<CursorParams, 'cursor'> = {}) {
+export function useInfiniteNotificationList(
+  params: Omit<CursorParams, 'cursor'> = {},
+) {
   return useInfiniteQuery<NotificationListResponse, ApiError>({
     queryKey: [...notificationKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
@@ -63,7 +65,8 @@ export function useUpdateNotification() {
     ApiError,
     { notificationId: number; body: UpdateNotificationBody }
   >({
-    mutationFn: ({ notificationId, body }) => patchNotification(notificationId, body),
+    mutationFn: ({ notificationId, body }) =>
+      patchNotification(notificationId, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: notificationKeys.lists() })
     },

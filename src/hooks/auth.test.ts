@@ -24,11 +24,17 @@ beforeEach(() => {
 })
 
 it('useSignup calls signup and invalidates userKeys.me', async () => {
-  mocked.signup.mockResolvedValue({ user: { id: 1, email: 'a', name: 'n', image: null } } as never)
+  mocked.signup.mockResolvedValue({
+    user: { id: 1, email: 'a', name: 'n', image: null },
+  } as never)
   const { result, client } = renderHookWithClient(() => useSignup())
   const inv = jest.spyOn(client, 'invalidateQueries')
   await result.current.mutateAsync({ email: 'a', name: 'n', password: 'p' })
-  expect(mocked.signup).toHaveBeenCalledWith({ email: 'a', name: 'n', password: 'p' })
+  expect(mocked.signup).toHaveBeenCalledWith({
+    email: 'a',
+    name: 'n',
+    password: 'p',
+  })
   expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() })
 })
 

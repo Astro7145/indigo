@@ -25,7 +25,11 @@ beforeEach(() => {
 })
 
 it('useGoalList calls getGoals with params', async () => {
-  mocked.getGoals.mockResolvedValue({ goals: [], nextCursor: null, totalCount: 0 } as never)
+  mocked.getGoals.mockResolvedValue({
+    goals: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
   const { result } = renderHookWithClient(() => useGoalList({ limit: 10 }))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getGoals).toHaveBeenCalledWith({ limit: 10 })
@@ -44,10 +48,19 @@ it('useGoal calls getGoal when id is provided', async () => {
 })
 
 it('useInfiniteGoalList paginates with nextCursor', async () => {
-  mocked.getGoals.mockResolvedValueOnce({ goals: [], nextCursor: 9, totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfiniteGoalList({ limit: 5 }))
+  mocked.getGoals.mockResolvedValueOnce({
+    goals: [],
+    nextCursor: 9,
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfiniteGoalList({ limit: 5 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getGoals).toHaveBeenLastCalledWith({ limit: 5, cursor: undefined })
+  expect(mocked.getGoals).toHaveBeenLastCalledWith({
+    limit: 5,
+    cursor: undefined,
+  })
   expect(result.current.hasNextPage).toBe(true)
 })
 

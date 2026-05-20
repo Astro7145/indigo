@@ -5,7 +5,10 @@ jest.mock('@/src/api/upload', () => ({
 }))
 import * as uploadApi from '@/src/api/upload'
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils'
-import { useCreateImageUploadUrl, useCreateFileUploadUrl } from '@/src/hooks/upload'
+import {
+  useCreateImageUploadUrl,
+  useCreateFileUploadUrl,
+} from '@/src/hooks/upload'
 
 const mocked = uploadApi as jest.Mocked<typeof uploadApi>
 
@@ -14,15 +17,23 @@ beforeEach(() => {
 })
 
 it('useCreateImageUploadUrl calls createImageUploadUrl with body', async () => {
-  mocked.createImageUploadUrl.mockResolvedValue({ uploadUrl: 'u', url: 'f' } as never)
+  mocked.createImageUploadUrl.mockResolvedValue({
+    uploadUrl: 'u',
+    url: 'f',
+  } as never)
   const { result } = renderHookWithClient(() => useCreateImageUploadUrl())
   const res = await result.current.mutateAsync({ fileName: 'a.png' })
-  expect(mocked.createImageUploadUrl).toHaveBeenCalledWith({ fileName: 'a.png' })
+  expect(mocked.createImageUploadUrl).toHaveBeenCalledWith({
+    fileName: 'a.png',
+  })
   expect(res).toEqual({ uploadUrl: 'u', url: 'f' })
 })
 
 it('useCreateFileUploadUrl calls createFileUploadUrl with body', async () => {
-  mocked.createFileUploadUrl.mockResolvedValue({ uploadUrl: 'u', url: 'f' } as never)
+  mocked.createFileUploadUrl.mockResolvedValue({
+    uploadUrl: 'u',
+    url: 'f',
+  } as never)
   const { result } = renderHookWithClient(() => useCreateFileUploadUrl())
   await result.current.mutateAsync({ fileName: 'a.pdf' })
   expect(mocked.createFileUploadUrl).toHaveBeenCalledWith({ fileName: 'a.pdf' })
