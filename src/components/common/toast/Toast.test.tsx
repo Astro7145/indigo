@@ -1,21 +1,22 @@
 import { act, render, screen } from '@testing-library/react'
+import type { ComponentProps, ReactNode } from 'react'
 
-import Toast from '@/src/components/_common/toast/Toast'
+import Toast from '@/src/components/common/toast/Toast'
 import { useToastStore } from '@/src/stores/toast'
 
 // AnimatePresence가 exit 애니메이션 동안 DOM을 유지하면 즉시 제거를 검증할 수 없으므로
 // 테스트에서는 애니메이션 없이 children을 그대로 렌더링하도록 mock
-jest.mock('motion/react', () => {
-  const React = require('react')
-  return {
-    AnimatePresence: ({ children }: { children: React.ReactNode }) =>
-      React.createElement(React.Fragment, null, children),
-    motion: {
-      div: ({ children, initial, animate, exit, transition, ...rest }: React.ComponentProps<'div'> & Record<string, unknown>) =>
-        React.createElement('div', rest, children),
-    },
-  }
-})
+jest.mock('motion/react', () => ({
+  AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
+  motion: {
+    div: ({
+      children,
+      ...rest
+    }: ComponentProps<'div'> & Record<string, unknown>) => (
+      <div {...(rest as ComponentProps<'div'>)}>{children as ReactNode}</div>
+    ),
+  },
+}))
 
 beforeEach(() => {
   useToastStore.setState({ isOpen: false, message: '' })

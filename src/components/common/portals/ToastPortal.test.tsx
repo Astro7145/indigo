@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 
-import ToastPortal from '@/src/components/_common/portals/ToastPortal'
+import ToastPortal from '@/src/components/common/portals/ToastPortal'
 
 it('#toast-portal이 없으면 아무것도 렌더링하지 않는다', () => {
   render(

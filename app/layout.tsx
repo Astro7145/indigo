@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
-import Toast from '@/src/components/_common/toast/Toast'
+import Toast from '@/src/components/common/toast/Toast'
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
