@@ -44,7 +44,9 @@ export function usePostList(params: PostListParams = {}) {
   })
 }
 
-export function useInfinitePostList(params: Omit<PostListParams, 'cursor'> = {}) {
+export function useInfinitePostList(
+  params: Omit<PostListParams, 'cursor'> = {},
+) {
   return useInfiniteQuery<PostListResponse, ApiError>({
     queryKey: [...postKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
@@ -62,12 +64,16 @@ export function usePost(id: number | undefined) {
   })
 }
 
-export function useComments(postId: number | undefined, params: CommentListParams = {}) {
+export function useComments(
+  postId: number | undefined,
+  params: CommentListParams = {},
+) {
   return useQuery<CommentListResponse, ApiError>({
     queryKey: postKeys.comments(postId ?? -1, params),
     queryFn: () => getComments(postId as number, params),
     enabled: postId != null,
-  })}
+  })
+}
 
 export function useInfiniteComments(
   postId: number | undefined,
@@ -76,11 +82,15 @@ export function useInfiniteComments(
   return useInfiniteQuery<CommentListResponse, ApiError>({
     queryKey: [...postKeys.comments(postId ?? -1, params), 'infinite'],
     queryFn: ({ pageParam }) =>
-      getComments(postId as number, { ...params, cursor: pageParam as string | undefined }),
+      getComments(postId as number, {
+        ...params,
+        cursor: pageParam as string | undefined,
+      }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     enabled: postId != null,
-  })}
+  })
+}
 
 export function useCreatePost() {
   const qc = useQueryClient()
@@ -126,7 +136,11 @@ export function useCreateComment(postId: number) {
 
 export function useUpdateComment(postId: number) {
   const qc = useQueryClient()
-  return useMutation<Comment, ApiError, { commentId: number; body: UpdateCommentBody }>({
+  return useMutation<
+    Comment,
+    ApiError,
+    { commentId: number; body: UpdateCommentBody }
+  >({
     mutationFn: ({ commentId, body }) => patchComment(postId, commentId, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: commentsPrefix(postId) })

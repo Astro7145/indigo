@@ -28,7 +28,8 @@ export function useCheckNickname(name: string) {
     queryKey: userKeys.nickname(trimmedName),
     queryFn: () => checkNickname(trimmedName),
     enabled: trimmedName.length >= 1,
-  })}
+  })
+}
 
 export function useUpdateMe() {
   const qc = useQueryClient()
