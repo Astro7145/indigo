@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import { IcDelete, IcUpload } from '../icons'
 
 const inputContainerVariants = cva(
-  'flex items-center gap-x-2 rounded-sm border bg-white has-focus:outline-indigo-500 p-3 sm:p-4 focus-within:outline-2',
+  'flex items-center gap-x-2 rounded-sm border bg-white focus-within:outline-indigo-500 p-3 sm:p-4 focus-within:outline-2',
   {
     variants: {
       variant: {
