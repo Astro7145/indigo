@@ -16,7 +16,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
   startIcon?: ReactNode
-  /** true이면 hover 스타일 적용. 기본값 false */
+  /** false이면 hover 스타일 비활성화. 기본값 true */
   hover?: boolean
 }
 
@@ -62,7 +62,7 @@ const variantDisabledClasses: Record<ButtonVariant, string> = {
  * @param variant   버튼 계층 스타일. 기본값 `"primary"`
  * @param size      버튼 크기(높이·폰트만 고정, 너비는 콘텐츠에 맞게 자동). 기본값 `"large"`
  * @param startIcon 버튼 텍스트 앞 아이콘(ReactNode). 전달하지 않으면 렌더링되지 않음
- * @param hover     `true`이면 CSS hover 효과를 적용. 기본값 `false`
+ * @param hover     `false`이면 CSS hover 효과를 비활성화. 기본값 `true`
  * @param disabled  HTML button `disabled`와 동일하게 동작
  * @param className 추가 Tailwind 클래스. `cn()`으로 병합되므로 기본 스타일 오버라이드 가능
  * @param children  버튼 텍스트 또는 콘텐츠
@@ -84,7 +84,7 @@ export default function Button({
   variant = 'primary',
   size = 'large',
   startIcon,
-  hover = false,
+  hover = true,
   disabled,
   type = 'button',
   className,
