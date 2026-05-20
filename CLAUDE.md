@@ -82,7 +82,7 @@ npm run test:e2e    # E2E (Playwright)
   - 키 목록은 `.env.example`에 빈 값으로 커밋해 팀이 공유
   - 브라우저에 노출되는 변수만 `NEXT_PUBLIC_` 접두어 사용
 - **인증 토큰**: Next.js 서버(Route Handler/Server Action)를 통해 **HttpOnly 쿠키**로 저장한다.
-  토큰을 클라이언트 JS(localStorage·Zustand 등)에 보관 금지. _(아직 미구현 — 구현 시 이 방식 준수)_
+  토큰을 클라이언트 JS(localStorage·Zustand 등)에 보관 금지.
 
 ## 상태 관리
 
