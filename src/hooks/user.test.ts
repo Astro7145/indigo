@@ -29,6 +29,11 @@ it('useCheckNickname is disabled when name is empty', () => {
   expect(mocked.checkNickname).not.toHaveBeenCalled()
 })
 
+it('useCheckNickname is disabled when name is whitespace-only', () => {
+  renderHookWithClient(() => useCheckNickname('   '))
+  expect(mocked.checkNickname).not.toHaveBeenCalled()
+})
+
 it('useCheckNickname calls checkNickname when name is provided', async () => {
   mocked.checkNickname.mockResolvedValue({ available: true } as never)
   const { result } = renderHookWithClient(() => useCheckNickname('foo'))

@@ -26,7 +26,7 @@ export function useCheckNickname(name: string) {
   return useQuery<CheckNicknameResponse, ApiError>({
     queryKey: userKeys.nickname(name),
     queryFn: () => checkNickname(name),
-    enabled: name.length >= 1,
+    enabled: name.trim().length >= 1,
   })
 }
 
