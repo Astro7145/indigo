@@ -35,8 +35,9 @@ export function useUpdateMe() {
   const qc = useQueryClient()
   return useMutation<UserProfile, ApiError, UpdateMeBody>({
     mutationFn: (body) => patchMe(body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: userKeys.me() })
+    // PATCH 응답이 GET과 동일한 UserProfile이므로 me 캐시 직접 갱신 (refetch 불필요).
+    onSuccess: (data) => {
+      qc.setQueryData(userKeys.me(), data)
     },
   })
 }

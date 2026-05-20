@@ -114,9 +114,10 @@ export function useUpdatePost() {
   const qc = useQueryClient()
   return useMutation<Post, ApiError, { postId: number; body: UpdatePostBody }>({
     mutationFn: ({ postId, body }) => patchPost(postId, body),
-    onSuccess: (_, { postId }) => {
+    onSuccess: (data, { postId }) => {
       qc.invalidateQueries({ queryKey: postKeys.lists() })
-      qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
+      // PATCH 응답 shape가 GET 응답과 동일하므로 detail 캐시 직접 갱신 (refetch 1회 절감).
+      qc.setQueryData(postKeys.detail(postId), data)
     },
   })
 }

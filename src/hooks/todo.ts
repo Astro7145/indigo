@@ -90,9 +90,10 @@ export function useUpdateTodo() {
   const qc = useQueryClient()
   return useMutation<Todo, ApiError, { todoId: number; body: UpdateTodoBody }>({
     mutationFn: ({ todoId, body }) => patchTodo(todoId, body),
-    onSuccess: (_, { todoId }) => {
+    onSuccess: (data, { todoId }) => {
       qc.invalidateQueries({ queryKey: todoKeys.lists() })
-      qc.invalidateQueries({ queryKey: todoKeys.detail(todoId) })
+      // PATCH 응답 shape가 GET 응답과 동일하므로 detail 캐시 직접 갱신.
+      qc.setQueryData(todoKeys.detail(todoId), data)
       // FavoriteTodo.todo가 title/done을 품으므로 favorites 변형도 동기화.
       qc.invalidateQueries({ queryKey: favoritesPrefix })
     },

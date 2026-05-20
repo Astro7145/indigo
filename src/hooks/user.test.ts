@@ -48,13 +48,18 @@ it('useCheckNickname calls checkNickname when name is provided', async () => {
   expect(mocked.checkNickname).toHaveBeenCalledWith('foo')
 })
 
-it('useUpdateMe invalidates userKeys.me on success', async () => {
+it('useUpdateMe writes me cache without invalidating', async () => {
   mocked.patchMe.mockResolvedValue({ id: 1, name: 'n' } as never)
   const { result, client } = renderHookWithClient(() => useUpdateMe())
   const inv = jest.spyOn(client, 'invalidateQueries')
+  const setData = jest.spyOn(client, 'setQueryData')
   await result.current.mutateAsync({ name: 'n' })
   expect(mocked.patchMe).toHaveBeenCalledWith({ name: 'n' })
-  expect(inv).toHaveBeenCalledWith({ queryKey: userApi.userKeys.me() })
+  expect(setData).toHaveBeenCalledWith(userApi.userKeys.me(), {
+    id: 1,
+    name: 'n',
+  })
+  expect(inv).not.toHaveBeenCalled()
 })
 
 it('useDeleteMe clears the cache on success', async () => {
@@ -72,7 +77,10 @@ it('useChangePassword calls changePassword and does not touch cache', async () =
   const inv = jest.spyOn(client, 'invalidateQueries')
   const clear = jest.spyOn(client, 'clear')
   await result.current.mutateAsync({ currentPassword: 'a', newPassword: 'b' })
-  expect(mocked.changePassword).toHaveBeenCalledWith({ currentPassword: 'a', newPassword: 'b' })
+  expect(mocked.changePassword).toHaveBeenCalledWith({
+    currentPassword: 'a',
+    newPassword: 'b',
+  })
   expect(inv).not.toHaveBeenCalled()
   expect(clear).not.toHaveBeenCalled()
 })

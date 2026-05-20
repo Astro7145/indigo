@@ -124,14 +124,15 @@ it('useCreatePost invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
-it('useUpdatePost invalidates lists and detail on success', async () => {
+it('useUpdatePost invalidates lists and writes detail cache on success', async () => {
   mocked.patchPost.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdatePost())
   const inv = jest.spyOn(client, 'invalidateQueries')
+  const setData = jest.spyOn(client, 'setQueryData')
   await result.current.mutateAsync({ postId: 5, body: { title: 'x' } })
   expect(mocked.patchPost).toHaveBeenCalledWith(5, { title: 'x' })
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
-  expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
+  expect(setData).toHaveBeenCalledWith(postApi.postKeys.detail(5), { id: 5 })
 })
 
 it('useDeletePost invalidates lists and removes detail + comments on success', async () => {

@@ -25,7 +25,11 @@ beforeEach(() => {
 })
 
 it('useNoteList calls getNotes with params', async () => {
-  mocked.getNotes.mockResolvedValue({ notes: [], nextCursor: null, totalCount: 0 } as never)
+  mocked.getNotes.mockResolvedValue({
+    notes: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never)
   const { result } = renderHookWithClient(() => useNoteList({ todoId: 3 }))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getNotes).toHaveBeenCalledWith({ todoId: 3 })
@@ -44,11 +48,19 @@ it('useNote calls getNote when id is provided', async () => {
 })
 
 it('useInfiniteNoteList passes cursor on first page', async () => {
-  mocked.getNotes
-    .mockResolvedValueOnce({ notes: [], nextCursor: 4, totalCount: 0 } as never)
-  const { result } = renderHookWithClient(() => useInfiniteNoteList({ todoId: 3 }))
+  mocked.getNotes.mockResolvedValueOnce({
+    notes: [],
+    nextCursor: 4,
+    totalCount: 0,
+  } as never)
+  const { result } = renderHookWithClient(() =>
+    useInfiniteNoteList({ todoId: 3 }),
+  )
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(mocked.getNotes).toHaveBeenLastCalledWith({ todoId: 3, cursor: undefined })
+  expect(mocked.getNotes).toHaveBeenLastCalledWith({
+    todoId: 3,
+    cursor: undefined,
+  })
   expect(result.current.hasNextPage).toBe(true)
 })
 
@@ -61,14 +73,15 @@ it('useCreateNote invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.lists() })
 })
 
-it('useUpdateNote invalidates lists and detail on success', async () => {
+it('useUpdateNote invalidates lists and writes detail cache on success', async () => {
   mocked.patchNote.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdateNote())
   const inv = jest.spyOn(client, 'invalidateQueries')
+  const setData = jest.spyOn(client, 'setQueryData')
   await result.current.mutateAsync({ noteId: 5, body: { title: 'x' } })
   expect(mocked.patchNote).toHaveBeenCalledWith(5, { title: 'x' })
   expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.lists() })
-  expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.detail(5) })
+  expect(setData).toHaveBeenCalledWith(noteApi.noteKeys.detail(5), { id: 5 })
 })
 
 it('useDeleteNote invalidates lists and removes detail on success', async () => {

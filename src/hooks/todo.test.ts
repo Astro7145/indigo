@@ -110,15 +110,16 @@ it('useCreateTodo invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() })
 })
 
-it('useUpdateTodo invalidates lists + detail + favorites on success', async () => {
+it('useUpdateTodo invalidates lists + favorites and writes detail cache on success', async () => {
   mocked.patchTodo.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdateTodo())
   const inv = jest.spyOn(client, 'invalidateQueries')
+  const setData = jest.spyOn(client, 'setQueryData')
   await result.current.mutateAsync({ todoId: 5, body: { done: true } })
   expect(mocked.patchTodo).toHaveBeenCalledWith(5, { done: true })
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() })
-  expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.detail(5) })
   expect(inv).toHaveBeenCalledWith({ queryKey: favoritesPrefix })
+  expect(setData).toHaveBeenCalledWith(todoApi.todoKeys.detail(5), { id: 5 })
 })
 
 it('useDeleteTodo invalidates lists + favorites and removes detail on success', async () => {

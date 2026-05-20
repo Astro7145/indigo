@@ -63,9 +63,10 @@ export function useUpdateNote() {
   const qc = useQueryClient()
   return useMutation<Note, ApiError, { noteId: number; body: UpdateNoteBody }>({
     mutationFn: ({ noteId, body }) => patchNote(noteId, body),
-    onSuccess: (_, { noteId }) => {
+    onSuccess: (data, { noteId }) => {
       qc.invalidateQueries({ queryKey: noteKeys.lists() })
-      qc.invalidateQueries({ queryKey: noteKeys.detail(noteId) })
+      // PATCH 응답 shape가 GET 응답과 동일하므로 detail 캐시 직접 갱신 (refetch 1회 절감).
+      qc.setQueryData(noteKeys.detail(noteId), data)
     },
   })
 }
