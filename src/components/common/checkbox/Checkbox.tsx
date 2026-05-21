@@ -25,7 +25,7 @@ const iconByVariant = {
 
 /** 두 아이콘 공통 — 포커스 링/disabled 시각 처리. peer(input)의 직접 형제여야 modifier가 동작 */
 const ICON_BASE =
-  'shrink-0 rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:opacity-50'
+  'shrink-0 rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 peer-disabled:opacity-50'
 
 /**
  * 공통 Checkbox — 시각적으로 숨긴 native `<input type="checkbox">` 위에
