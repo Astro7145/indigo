@@ -15,6 +15,7 @@ export function IcCheckboxPrimary({
       <svg
         viewBox="0 0 18 18"
         fill="none"
+        style={{ overflow: 'visible' }}
         className={cn('size-[18px]', className)}
         {...rest}
       >
@@ -35,6 +36,7 @@ export function IcCheckboxPrimary({
     <svg
       viewBox="0 0 18 18"
       fill="none"
+      style={{ overflow: 'visible' }}
       className={cn('size-[18px]', className)}
       {...rest}
     >
