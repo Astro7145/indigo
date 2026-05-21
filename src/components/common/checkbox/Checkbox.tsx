@@ -78,7 +78,7 @@ export default function Checkbox({
         className={cn(ICON_BASE, 'hidden peer-checked:block')}
       />
       {children && (
-        <span className="text-sm text-slate-700 peer-disabled:text-slate-400">
+        <span className="text-sm peer-disabled:text-slate-400">
           {children}
         </span>
       )}
