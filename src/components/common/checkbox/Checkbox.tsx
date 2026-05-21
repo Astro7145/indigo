@@ -55,7 +55,7 @@ export default function Checkbox({
     <label
       style={style}
       className={cn(
-        'inline-flex items-center gap-2 text-slate-700 select-none',
+        'inline-flex items-center gap-2 text-sm text-slate-700 select-none',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
         className,
       )}
@@ -78,7 +78,7 @@ export default function Checkbox({
         className={cn(ICON_BASE, 'hidden peer-checked:block')}
       />
       {children && (
-        <span className="text-sm peer-disabled:text-slate-400">{children}</span>
+        <span className="peer-disabled:text-slate-400">{children}</span>
       )}
     </label>
   )
