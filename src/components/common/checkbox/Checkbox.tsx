@@ -44,6 +44,7 @@ const ICON_BASE =
 export default function Checkbox({
   variant = 'primary',
   className,
+  style,
   children,
   disabled,
   ref,
@@ -52,6 +53,7 @@ export default function Checkbox({
   const Icon = iconByVariant[variant]
   return (
     <label
+      style={style}
       className={cn(
         'inline-flex items-center gap-2 select-none',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
@@ -65,8 +67,13 @@ export default function Checkbox({
         className="peer sr-only"
         {...rest}
       />
-      <Icon state="default" className={cn(ICON_BASE, 'peer-checked:hidden')} />
       <Icon
+        aria-hidden="true"
+        state="default"
+        className={cn(ICON_BASE, 'peer-checked:hidden')}
+      />
+      <Icon
+        aria-hidden="true"
         state="active"
         className={cn(ICON_BASE, 'hidden peer-checked:block')}
       />

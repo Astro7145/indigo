@@ -58,3 +58,17 @@ it('forwards ref to the underlying input (react-hook-form compat)', () => {
   expect(ref.current).toBe(screen.getByRole('checkbox'))
   expect(ref.current?.tagName).toBe('INPUT')
 })
+
+it('applies the style prop to the label wrapper, not the hidden input', () => {
+  render(<Checkbox aria-label="동의" style={{ marginTop: 10 }} />)
+  const input = screen.getByRole('checkbox')
+  expect(input.closest('label')).toHaveStyle({ marginTop: '10px' })
+  expect(input).not.toHaveStyle({ marginTop: '10px' })
+})
+
+it('marks the decorative icons aria-hidden', () => {
+  const { container } = render(<Checkbox aria-label="동의" />)
+  const svgs = container.querySelectorAll('svg')
+  expect(svgs).toHaveLength(2)
+  svgs.forEach((svg) => expect(svg).toHaveAttribute('aria-hidden', 'true'))
+})
