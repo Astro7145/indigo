@@ -28,11 +28,15 @@ export function useNotificationList(params: CursorParams = {}) {
 
 export function useInfiniteNotificationList(
   params: Omit<CursorParams, 'cursor'> = {},
+  overrideQueryFn?: (params: CursorParams) => Promise<NotificationListResponse>,
 ) {
   return useInfiniteQuery<NotificationListResponse, ApiError>({
     queryKey: [...notificationKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) =>
-      getNotifications({ ...params, cursor: pageParam as number | undefined }),
+      (overrideQueryFn ?? getNotifications)({
+        ...params,
+        cursor: pageParam as number | undefined,
+      }),
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   })
