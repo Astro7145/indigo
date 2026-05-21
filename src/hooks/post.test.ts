@@ -38,7 +38,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('usePostList calls getPosts with params', async () => {
+it('usePostList는 params와 함께 getPosts를 호출한다', async () => {
   mocked.getPosts.mockResolvedValue({
     posts: [],
     nextCursor: null,
@@ -49,19 +49,19 @@ it('usePostList calls getPosts with params', async () => {
   expect(mocked.getPosts).toHaveBeenCalledWith({ type: 'best' })
 })
 
-it('usePost is disabled when id is undefined', () => {
+it('usePost는 id가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => usePost(undefined))
   expect(mocked.getPost).not.toHaveBeenCalled()
 })
 
-it('usePost calls getPost when id is provided', async () => {
+it('usePost는 id가 주어지면 getPost를 호출한다', async () => {
   mocked.getPost.mockResolvedValue({ id: 5 } as never)
   const { result } = renderHookWithClient(() => usePost(5))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getPost).toHaveBeenCalledWith(5)
 })
 
-it('useInfinitePostList passes string cursor on first page', async () => {
+it('useInfinitePostList는 첫 페이지에서 문자열 cursor를 전달한다', async () => {
   mocked.getPosts.mockResolvedValueOnce({
     posts: [],
     nextCursor: 'next-token',
@@ -78,17 +78,17 @@ it('useInfinitePostList passes string cursor on first page', async () => {
   expect(result.current.hasNextPage).toBe(true)
 })
 
-it('useComments is disabled when postId is undefined', () => {
+it('useComments는 postId가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => useComments(undefined))
   expect(mocked.getComments).not.toHaveBeenCalled()
 })
 
-it('useInfiniteComments is disabled when postId is undefined', () => {
+it('useInfiniteComments는 postId가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => useInfiniteComments(undefined))
   expect(mocked.getComments).not.toHaveBeenCalled()
 })
 
-it('useComments calls getComments with postId and params', async () => {
+it('useComments는 postId와 params로 getComments를 호출한다', async () => {
   mocked.getComments.mockResolvedValue({
     comments: [],
     nextCursor: null,
@@ -99,7 +99,7 @@ it('useComments calls getComments with postId and params', async () => {
   expect(mocked.getComments).toHaveBeenCalledWith(5, { limit: 10 })
 })
 
-it('useInfiniteComments passes cursor on first page', async () => {
+it('useInfiniteComments는 첫 페이지에서 cursor를 전달한다', async () => {
   mocked.getComments.mockResolvedValueOnce({
     comments: [],
     nextCursor: 'c1',
@@ -115,7 +115,7 @@ it('useInfiniteComments passes cursor on first page', async () => {
   })
 })
 
-it('useCreatePost invalidates lists on success', async () => {
+it('useCreatePost는 성공 시 목록을 무효화한다', async () => {
   mocked.createPost.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreatePost())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -124,7 +124,7 @@ it('useCreatePost invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
-it('useUpdatePost invalidates lists and writes detail cache on success', async () => {
+it('useUpdatePost는 성공 시 목록을 무효화하고 상세 캐시에 기록한다', async () => {
   mocked.patchPost.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdatePost())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -135,7 +135,7 @@ it('useUpdatePost invalidates lists and writes detail cache on success', async (
   expect(setData).toHaveBeenCalledWith(postApi.postKeys.detail(5), { id: 5 })
 })
 
-it('useDeletePost invalidates lists and removes detail on success', async () => {
+it('useDeletePost는 성공 시 목록을 무효화하고 상세 캐시를 제거한다', async () => {
   mocked.deletePost.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeletePost())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -147,7 +147,7 @@ it('useDeletePost invalidates lists and removes detail on success', async () => 
   expect(rm).toHaveBeenCalledWith({ queryKey: postApi.postKeys.detail(5) })
 })
 
-it('useCreateComment(postId) invalidates post detail (covers comments) + lists', async () => {
+it('useCreateComment(postId)는 게시글 상세(댓글 포함)와 목록을 무효화한다', async () => {
   mocked.createComment.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreateComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -158,7 +158,7 @@ it('useCreateComment(postId) invalidates post detail (covers comments) + lists',
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
-it('useUpdateComment(postId) calls patchComment and invalidates comments prefix', async () => {
+it('useUpdateComment(postId)는 patchComment를 호출하고 comments prefix를 무효화한다', async () => {
   mocked.patchComment.mockResolvedValue({ id: 9 } as never)
   const { result, client } = renderHookWithClient(() => useUpdateComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -167,7 +167,7 @@ it('useUpdateComment(postId) calls patchComment and invalidates comments prefix'
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useDeleteComment(postId) invalidates post detail (covers comments) + lists', async () => {
+it('useDeleteComment(postId)는 게시글 상세(댓글 포함)와 목록을 무효화한다', async () => {
   mocked.deleteComment.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -178,7 +178,7 @@ it('useDeleteComment(postId) invalidates post detail (covers comments) + lists',
   expect(inv).toHaveBeenCalledWith({ queryKey: postApi.postKeys.lists() })
 })
 
-it('useLikeComment(postId) calls likeComment and invalidates comments prefix', async () => {
+it('useLikeComment(postId)는 likeComment를 호출하고 comments prefix를 무효화한다', async () => {
   mocked.likeComment.mockResolvedValue({ isLiked: true, likeCount: 1 } as never)
   const { result, client } = renderHookWithClient(() => useLikeComment(5))
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -187,7 +187,7 @@ it('useLikeComment(postId) calls likeComment and invalidates comments prefix', a
   expect(inv).toHaveBeenCalledWith({ queryKey: commentsPrefix(5) })
 })
 
-it('useUnlikeComment(postId) calls unlikeComment and invalidates comments prefix', async () => {
+it('useUnlikeComment(postId)는 unlikeComment를 호출하고 comments prefix를 무효화한다', async () => {
   mocked.unlikeComment.mockResolvedValue({
     isLiked: false,
     likeCount: 0,

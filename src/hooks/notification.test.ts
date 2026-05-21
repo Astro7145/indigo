@@ -24,7 +24,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useNotificationList calls getNotifications with params', async () => {
+it('useNotificationList는 params와 함께 getNotifications를 호출한다', async () => {
   mocked.getNotifications.mockResolvedValue({
     notifications: [],
     nextCursor: null,
@@ -37,7 +37,7 @@ it('useNotificationList calls getNotifications with params', async () => {
   expect(mocked.getNotifications).toHaveBeenCalledWith({ limit: 10 })
 })
 
-it('useInfiniteNotificationList paginates with nextCursor', async () => {
+it('useInfiniteNotificationList는 nextCursor로 페이지네이션한다', async () => {
   mocked.getNotifications
     .mockResolvedValueOnce({
       notifications: [],
@@ -69,7 +69,7 @@ it('useInfiniteNotificationList paginates with nextCursor', async () => {
   expect(result.current.hasNextPage).toBe(false)
 })
 
-it('useReadAllNotifications invalidates lists', async () => {
+it('useReadAllNotifications는 목록을 무효화한다', async () => {
   mocked.readAllNotifications.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() =>
     useReadAllNotifications(),
@@ -82,7 +82,7 @@ it('useReadAllNotifications invalidates lists', async () => {
   })
 })
 
-it('useDeleteAllNotifications invalidates lists', async () => {
+it('useDeleteAllNotifications는 목록을 무효화한다', async () => {
   mocked.deleteAllNotifications.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() =>
     useDeleteAllNotifications(),
@@ -94,7 +94,7 @@ it('useDeleteAllNotifications invalidates lists', async () => {
   })
 })
 
-it('useUpdateNotification calls patchNotification with id and body', async () => {
+it('useUpdateNotification은 id와 body로 patchNotification을 호출한다', async () => {
   mocked.patchNotification.mockResolvedValue({ id: 5, isRead: true } as never)
   const { result, client } = renderHookWithClient(() => useUpdateNotification())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -108,7 +108,7 @@ it('useUpdateNotification calls patchNotification with id and body', async () =>
   })
 })
 
-it('useDeleteNotification calls deleteNotification with id', async () => {
+it('useDeleteNotification은 id로 deleteNotification을 호출한다', async () => {
   mocked.deleteNotification.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteNotification())
   const inv = jest.spyOn(client, 'invalidateQueries')

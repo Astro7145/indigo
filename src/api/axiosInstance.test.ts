@@ -6,11 +6,11 @@ afterEach(() => {
   delete (instance.defaults as { adapter?: unknown }).adapter
 })
 
-it('uses the same-origin BFF proxy baseURL', () => {
+it('same-origin BFF 프록시 baseURL을 사용한다', () => {
   expect(instance.defaults.baseURL).toBe('/api')
 })
 
-it('normalizes a 404 response into ApiError', async () => {
+it('404 응답을 ApiError로 정규화한다', async () => {
   instance.defaults.adapter = (async (config) => {
     return Promise.reject({
       isAxiosError: true,
@@ -24,7 +24,7 @@ it('normalizes a 404 response into ApiError', async () => {
   })
 })
 
-it('normalizes a network error (no response) into ApiError status 0', async () => {
+it('네트워크 에러(응답 없음)를 status 0인 ApiError로 정규화한다', async () => {
   instance.defaults.adapter = (async () => {
     return Promise.reject({ isAxiosError: true, message: 'Network Error' })
   }) as AxiosAdapter

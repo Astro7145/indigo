@@ -11,28 +11,28 @@ beforeEach(() => {
   mocked.delete.mockResolvedValue({ data: undefined } as never)
 })
 
-it('getGoals GET /goals with params', async () => {
+it('getGoals는 params와 함께 GET /goals를 호출한다', async () => {
   const r = await getGoals({ cursor: 2, limit: 5 })
   expect(mocked.get).toHaveBeenCalledWith('/goals', { params: { cursor: 2, limit: 5 } })
   expect(r).toEqual({ goals: [], nextCursor: null, totalCount: 0 })
 })
-it('getGoal GET /goals/:id', async () => {
+it('getGoal는 GET /goals/:id를 호출한다', async () => {
   await getGoal(7)
   expect(mocked.get).toHaveBeenCalledWith('/goals/7')
 })
-it('createGoal POST /goals', async () => {
+it('createGoal는 /goals로 POST한다', async () => {
   await createGoal({ title: 't' })
   expect(mocked.post).toHaveBeenCalledWith('/goals', { title: 't' })
 })
-it('patchGoal PATCH /goals/:id', async () => {
+it('patchGoal는 /goals/:id로 PATCH한다', async () => {
   await patchGoal(7, { title: 'u' })
   expect(mocked.patch).toHaveBeenCalledWith('/goals/7', { title: 'u' })
 })
-it('deleteGoal DELETE /goals/:id', async () => {
+it('deleteGoal는 /goals/:id로 DELETE한다', async () => {
   await deleteGoal(7)
   expect(mocked.delete).toHaveBeenCalledWith('/goals/7')
 })
-it('goalKeys factory produces stable keys', () => {
+it('goalKeys 팩토리는 안정적인 키를 생성한다', () => {
   expect(goalKeys.list({ limit: 5 })).toEqual(['goal', 'list', { limit: 5 }])
   expect(goalKeys.detail(7)).toEqual(['goal', 'detail', 7])
 })

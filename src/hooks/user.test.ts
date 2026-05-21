@@ -23,7 +23,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useMe fetches profile', async () => {
+it('useMe는 프로필을 조회한다', async () => {
   mocked.getMe.mockResolvedValue({ id: 1, email: 'a' } as never)
   const { result } = renderHookWithClient(() => useMe())
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
@@ -31,24 +31,24 @@ it('useMe fetches profile', async () => {
   expect(result.current.data).toEqual({ id: 1, email: 'a' })
 })
 
-it('useCheckNickname is disabled when name is empty', () => {
+it('useCheckNickname은 name이 비어있으면 비활성화된다', () => {
   renderHookWithClient(() => useCheckNickname(''))
   expect(mocked.checkNickname).not.toHaveBeenCalled()
 })
 
-it('useCheckNickname is disabled when name is whitespace-only', () => {
+it('useCheckNickname은 name이 공백뿐이면 비활성화된다', () => {
   renderHookWithClient(() => useCheckNickname('   '))
   expect(mocked.checkNickname).not.toHaveBeenCalled()
 })
 
-it('useCheckNickname calls checkNickname when name is provided', async () => {
+it('useCheckNickname은 name이 주어지면 checkNickname을 호출한다', async () => {
   mocked.checkNickname.mockResolvedValue({ available: true } as never)
   const { result } = renderHookWithClient(() => useCheckNickname('foo'))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.checkNickname).toHaveBeenCalledWith('foo')
 })
 
-it('useUpdateMe writes me cache without invalidating', async () => {
+it('useUpdateMe는 무효화 없이 me 캐시에 기록한다', async () => {
   mocked.patchMe.mockResolvedValue({ id: 1, name: 'n' } as never)
   const { result, client } = renderHookWithClient(() => useUpdateMe())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -62,7 +62,7 @@ it('useUpdateMe writes me cache without invalidating', async () => {
   expect(inv).not.toHaveBeenCalled()
 })
 
-it('useDeleteMe clears the cache on success', async () => {
+it('useDeleteMe는 성공 시 캐시를 비운다', async () => {
   mocked.deleteMe.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteMe())
   const clear = jest.spyOn(client, 'clear')
@@ -71,7 +71,7 @@ it('useDeleteMe clears the cache on success', async () => {
   expect(clear).toHaveBeenCalled()
 })
 
-it('useChangePassword calls changePassword and does not touch cache', async () => {
+it('useChangePassword는 changePassword를 호출하고 캐시를 건드리지 않는다', async () => {
   mocked.changePassword.mockResolvedValue({ message: 'ok' } as never)
   const { result, client } = renderHookWithClient(() => useChangePassword())
   const inv = jest.spyOn(client, 'invalidateQueries')

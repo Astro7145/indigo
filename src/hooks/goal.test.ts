@@ -24,7 +24,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useGoalList calls getGoals with params', async () => {
+it('useGoalList는 params와 함께 getGoals를 호출한다', async () => {
   mocked.getGoals.mockResolvedValue({
     goals: [],
     nextCursor: null,
@@ -35,19 +35,19 @@ it('useGoalList calls getGoals with params', async () => {
   expect(mocked.getGoals).toHaveBeenCalledWith({ limit: 10 })
 })
 
-it('useGoal is disabled when id is undefined', () => {
+it('useGoal은 id가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => useGoal(undefined))
   expect(mocked.getGoal).not.toHaveBeenCalled()
 })
 
-it('useGoal calls getGoal when id is provided', async () => {
+it('useGoal은 id가 주어지면 getGoal을 호출한다', async () => {
   mocked.getGoal.mockResolvedValue({ id: 5, title: 't', todos: [] } as never)
   const { result } = renderHookWithClient(() => useGoal(5))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getGoal).toHaveBeenCalledWith(5)
 })
 
-it('useInfiniteGoalList paginates with nextCursor', async () => {
+it('useInfiniteGoalList는 nextCursor로 페이지네이션한다', async () => {
   mocked.getGoals.mockResolvedValueOnce({
     goals: [],
     nextCursor: 9,
@@ -64,7 +64,7 @@ it('useInfiniteGoalList paginates with nextCursor', async () => {
   expect(result.current.hasNextPage).toBe(true)
 })
 
-it('useCreateGoal invalidates lists on success', async () => {
+it('useCreateGoal은 성공 시 목록을 무효화한다', async () => {
   mocked.createGoal.mockResolvedValue({ id: 1, title: 'x' } as never)
   const { result, client } = renderHookWithClient(() => useCreateGoal())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -73,7 +73,7 @@ it('useCreateGoal invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: goalApi.goalKeys.lists() })
 })
 
-it('useUpdateGoal invalidates lists and detail on success', async () => {
+it('useUpdateGoal은 성공 시 목록과 상세를 무효화한다', async () => {
   mocked.patchGoal.mockResolvedValue({ id: 5, title: 'x' } as never)
   const { result, client } = renderHookWithClient(() => useUpdateGoal())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -83,7 +83,7 @@ it('useUpdateGoal invalidates lists and detail on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: goalApi.goalKeys.detail(5) })
 })
 
-it('useDeleteGoal invalidates lists and removes detail on success', async () => {
+it('useDeleteGoal은 성공 시 목록을 무효화하고 상세 캐시를 제거한다', async () => {
   mocked.deleteGoal.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteGoal())
   const inv = jest.spyOn(client, 'invalidateQueries')

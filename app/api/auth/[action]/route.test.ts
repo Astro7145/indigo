@@ -38,7 +38,7 @@ function req(action: string, body?: unknown, cookie?: string) {
 }
 const ctx = (action: string) => ({ params: Promise.resolve({ action }) })
 
-it('login: sets cookies, strips tokens, returns { user }', async () => {
+it('login: 쿠키를 설정하고 토큰을 제거한 뒤 { user }를 반환한다', async () => {
   queueAdapter([{ status: 200, body: JSON.stringify({ accessToken: 'AA', refreshToken: 'RR', user: { id: 1, email: 'a@b.c', name: 'n', image: null } }) }])
   const res = await POST(req('login', { email: 'a@b.c', password: 'pw' }), ctx('login'))
   expect(res.status).toBe(200)
@@ -47,7 +47,7 @@ it('login: sets cookies, strips tokens, returns { user }', async () => {
   expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('RR')
 })
 
-it('login: passes external error through', async () => {
+it('login: 외부 에러를 그대로 전달한다', async () => {
   queueAdapter([{ status: 401, body: JSON.stringify({ message: 'Invalid email or password' }) }])
   const res = await POST(req('login', { email: 'x', password: 'y' }), ctx('login'))
   expect(res.status).toBe(401)
@@ -55,7 +55,7 @@ it('login: passes external error through', async () => {
   expect(res.cookies.get(COOKIE.ACCESS)).toBeUndefined()
 })
 
-it('signup: sets cookies and returns { user }', async () => {
+it('signup: 쿠키를 설정하고 { user }를 반환한다', async () => {
   queueAdapter([{ status: 201, body: JSON.stringify({ accessToken: 'AA', refreshToken: 'RR', user: { id: 2, email: 's@b.c', name: 's', image: null } }) }])
   const res = await POST(req('signup', { email: 's@b.c', name: 's', password: 'pw' }), ctx('signup'))
   expect(res.status).toBe(200)
@@ -63,20 +63,20 @@ it('signup: sets cookies and returns { user }', async () => {
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('AA')
 })
 
-it('login: malformed 2xx body → 502', async () => {
+it('login: 잘못된 형식의 2xx 본문 → 502', async () => {
   queueAdapter([{ status: 200, body: '<html>not json</html>' }])
   const res = await POST(req('login', { email: 'a@b.c', password: 'pw' }), ctx('login'))
   expect(res.status).toBe(502)
 })
 
-it('login error passthrough keeps content-type', async () => {
+it('login 에러 전달 시 content-type을 유지한다', async () => {
   queueAdapter([{ status: 401, body: JSON.stringify({ message: 'nope' }), contentType: 'application/json' }])
   const res = await POST(req('login', { email: 'x', password: 'y' }), ctx('login'))
   expect(res.status).toBe(401)
   expect(res.headers.get('content-type')).toBe('application/json')
 })
 
-it('logout without refresh cookie → 204 + cleared, no upstream call', async () => {
+it('refresh 쿠키 없는 logout → 204 + 쿠키 삭제, 상위 호출 없음', async () => {
   const calls = queueAdapter([{ status: 200, body: '{}' }])
   const res = await POST(req('logout'), ctx('logout'))
   expect(res.status).toBe(204)
@@ -84,34 +84,34 @@ it('logout without refresh cookie → 204 + cleared, no upstream call', async ()
   expect(calls.length).toBe(0)
 })
 
-it('logout still clears cookies when upstream call rejects', async () => {
+it('상위 호출이 실패해도 logout은 쿠키를 삭제한다', async () => {
   rejectingAdapter(new Error('network down'))
   const res = await POST(req('logout', undefined, `${COOKIE.REFRESH}=OLD`), ctx('logout'))
   expect(res.status).toBe(204)
   expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
 })
 
-it('refresh: rotates cookies, 204', async () => {
+it('refresh: 쿠키를 갱신하고 204를 반환한다', async () => {
   queueAdapter([{ status: 200, body: JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }) }])
   const res = await POST(req('refresh', undefined, `${COOKIE.REFRESH}=OLD`), ctx('refresh'))
   expect(res.status).toBe(204)
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('NA')
 })
 
-it('refresh: no refresh cookie → 401 + cleared', async () => {
+it('refresh: refresh 쿠키 없음 → 401 + 쿠키 삭제', async () => {
   const res = await POST(req('refresh'), ctx('refresh'))
   expect(res.status).toBe(401)
   expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('')
 })
 
-it('logout: clears cookies, 204 (best effort)', async () => {
+it('logout: 쿠키를 삭제하고 204를 반환한다 (best effort)', async () => {
   queueAdapter([{ status: 200, body: '{}' }])
   const res = await POST(req('logout', undefined, `${COOKIE.REFRESH}=OLD`), ctx('logout'))
   expect(res.status).toBe(204)
   expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('')
 })
 
-it('unknown action → 404', async () => {
+it('알 수 없는 action → 404', async () => {
   const res = await POST(req('bogus'), ctx('bogus'))
   expect(res.status).toBe(404)
 })

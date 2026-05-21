@@ -33,7 +33,7 @@ function req(provider: string, body: unknown) {
   })
 }
 
-it('oauth: exchanges, sets cookies, returns { user }', async () => {
+it('oauth: 토큰을 교환하고 쿠키를 설정한 뒤 { user }를 반환한다', async () => {
   const calls = queueAdapter([{ status: 200, body: JSON.stringify({ accessToken: 'AA', refreshToken: 'RR', user: { id: 9, email: 'g@b.c', name: 'G', image: null } }) }])
   const res = await POST(req('google', { token: 'gtok' }), ctx('google'))
   expect(calls[0].url).toBe('https://api.test/indigo/oauth/google')
@@ -43,14 +43,14 @@ it('oauth: exchanges, sets cookies, returns { user }', async () => {
   expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('RR')
 })
 
-it('oauth: passes external error through', async () => {
+it('oauth: 외부 에러를 그대로 전달한다', async () => {
   queueAdapter([{ status: 401, body: JSON.stringify({ message: 'bad token' }) }])
   const res = await POST(req('kakao', { token: 'x' }), ctx('kakao'))
   expect(res.status).toBe(401)
   expect(res.cookies.get(COOKIE.ACCESS)).toBeUndefined()
 })
 
-it('oauth: malformed 2xx body → 502', async () => {
+it('oauth: 잘못된 형식의 2xx 본문 → 502', async () => {
   queueAdapter([{ status: 200, body: '<html>nope</html>' }])
   const res = await POST(req('google', { token: 'gtok' }), ctx('google'))
   expect(res.status).toBe(502)
