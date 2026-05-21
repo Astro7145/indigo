@@ -23,12 +23,6 @@ const iconByVariant = {
   white: IcCheckboxWhite,
 } as const
 
-/** variant별 라벨 텍스트 색 — white는 어두운/컬러 배경 가독성 위해 밝게 */
-const labelClassByVariant: Record<CheckboxVariant, string> = {
-  primary: 'text-slate-700 peer-disabled:text-slate-400',
-  white: 'text-white peer-disabled:text-white/60',
-}
-
 /** 두 아이콘 공통 — 포커스 링/disabled 시각 처리. peer(input)의 직접 형제여야 modifier가 동작 */
 const ICON_BASE =
   'shrink-0 rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-1 peer-disabled:opacity-50'
@@ -84,7 +78,7 @@ export default function Checkbox({
         className={cn(ICON_BASE, 'hidden peer-checked:block')}
       />
       {children != null && (
-        <span className={cn('text-sm', labelClassByVariant[variant])}>
+        <span className="text-sm text-slate-700 peer-disabled:text-slate-400">
           {children}
         </span>
       )}
