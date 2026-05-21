@@ -75,7 +75,7 @@ it('marks the decorative icons aria-hidden', () => {
 
 it('uses the default slate label text for both variants (색은 소비 측이 선택)', () => {
   const { rerender } = render(<Checkbox>primary 라벨</Checkbox>)
-  expect(screen.getByText('primary 라벨').className).toMatch(/text-slate-700/)
+  expect(screen.getByText('primary 라벨').closest('label')?.className).toMatch(/text-slate-700/)
   rerender(<Checkbox variant="white">white 라벨</Checkbox>)
-  expect(screen.getByText('white 라벨').className).toMatch(/text-slate-700/)
+  expect(screen.getByText('white 라벨').closest('label')?.className).toMatch(/text-slate-700/)
 })
