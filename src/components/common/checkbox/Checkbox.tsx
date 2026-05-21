@@ -8,7 +8,7 @@ export type CheckboxVariant = 'primary' | 'white'
 
 export interface CheckboxProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'size'
+  'size' | 'type'
 > {
   /** 아이콘 스타일. 기본 'primary'. 밝은/컬러 배경 위에는 'white' */
   variant?: CheckboxVariant
@@ -22,6 +22,12 @@ const iconByVariant = {
   primary: IcCheckboxPrimary,
   white: IcCheckboxWhite,
 } as const
+
+/** variant별 라벨 텍스트 색 — white는 어두운/컬러 배경 가독성 위해 밝게 */
+const labelClassByVariant: Record<CheckboxVariant, string> = {
+  primary: 'text-slate-700 peer-disabled:text-slate-400',
+  white: 'text-white peer-disabled:text-white/60',
+}
 
 /** 두 아이콘 공통 — 포커스 링/disabled 시각 처리. peer(input)의 직접 형제여야 modifier가 동작 */
 const ICON_BASE =
@@ -62,10 +68,10 @@ export default function Checkbox({
     >
       <input
         ref={ref}
-        type="checkbox"
         disabled={disabled}
         className="peer sr-only"
         {...rest}
+        type="checkbox"
       />
       <Icon
         aria-hidden="true"
@@ -78,7 +84,7 @@ export default function Checkbox({
         className={cn(ICON_BASE, 'hidden peer-checked:block')}
       />
       {children != null && (
-        <span className="text-sm text-slate-700 peer-disabled:text-slate-400">
+        <span className={cn('text-sm', labelClassByVariant[variant])}>
           {children}
         </span>
       )}

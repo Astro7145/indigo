@@ -72,3 +72,10 @@ it('marks the decorative icons aria-hidden', () => {
   expect(svgs).toHaveLength(2)
   svgs.forEach((svg) => expect(svg).toHaveAttribute('aria-hidden', 'true'))
 })
+
+it('uses light label text for the white variant (dark/colored bg 대응)', () => {
+  const { rerender } = render(<Checkbox>primary 라벨</Checkbox>)
+  expect(screen.getByText('primary 라벨').className).toMatch(/text-slate-700/)
+  rerender(<Checkbox variant="white">white 라벨</Checkbox>)
+  expect(screen.getByText('white 라벨').className).toMatch(/text-white/)
+})
