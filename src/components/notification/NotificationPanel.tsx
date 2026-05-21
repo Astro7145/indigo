@@ -1,24 +1,16 @@
-'use client'
+'use client';
 
-import type {
-  Notification,
-  NotificationListResponse,
-} from '@/src/types/notification'
-import type { CursorParams } from '@/src/types/common'
-import {
-  useInfiniteNotificationList,
-  useReadAllNotifications,
-  useUpdateNotification,
-} from '@/src/hooks/notification'
-import NotificationItem from './NotificationItem'
+import type { Notification, NotificationListResponse } from '@/src/types/notification';
+import type { CursorParams } from '@/src/types/common';
+import { useInfiniteNotificationList, useReadAllNotifications, useUpdateNotification } from '@/src/hooks/notification';
+import NotificationItem from './NotificationItem';
 
 /** data 필드에서 댓글 서브텍스트를 안전하게 추출합니다. */
 function extractSubtext(notification: Notification): string | undefined {
-  if (!notification.data || typeof notification.data !== 'object')
-    return undefined
-  const data = notification.data as Record<string, unknown>
-  const candidate = data.comment ?? data.content ?? data.body
-  return typeof candidate === 'string' ? candidate : undefined
+  if (!notification.data || typeof notification.data !== 'object') return undefined;
+  const data = notification.data as Record<string, unknown>;
+  const candidate = data.comment ?? data.content ?? data.body;
+  return typeof candidate === 'string' ? candidate : undefined;
 }
 
 type NotificationPanelProps = {
@@ -27,8 +19,8 @@ type NotificationPanelProps = {
    * 기본값은 실제 API(`getNotifications`).
    * 개발용 미리보기에서 mock 데이터를 주입할 때 사용합니다.
    */
-  queryFn?: (params: CursorParams) => Promise<NotificationListResponse>
-}
+  queryFn?: (params: CursorParams) => Promise<NotificationListResponse>;
+};
 
 /**
  * 알림 드롭다운 패널.
@@ -38,30 +30,27 @@ type NotificationPanelProps = {
  *
  * 알림이 없을 때는 빈 상태 메시지를 표시합니다.
  */
-export default function NotificationPanel({
-  queryFn,
-}: NotificationPanelProps = {}) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteNotificationList({ limit: 5 }, queryFn)
+export default function NotificationPanel({ queryFn }: NotificationPanelProps = {}) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteNotificationList({ limit: 5 }, queryFn);
 
-  const { mutate: readAll, isPending: isReadingAll } = useReadAllNotifications()
-  const { mutate: updateNotification } = useUpdateNotification()
+  const { mutate: readAll, isPending: isReadingAll } = useReadAllNotifications();
+  const { mutate: updateNotification } = useUpdateNotification();
 
-  const notifications = data?.pages.flatMap((page) => page.notifications) ?? []
-  const hasNotifications = notifications.length > 0
-  const hasUnread = notifications.some((n) => !n.isRead)
+  const notifications = data?.pages.flatMap((page) => page.notifications) ?? [];
+  const hasNotifications = notifications.length > 0;
+  const hasUnread = notifications.some((n) => !n.isRead);
 
   function handleItemClick(notification: Notification) {
     if (!notification.isRead) {
       updateNotification({
         notificationId: notification.id,
         body: { isRead: true },
-      })
+      });
     }
   }
 
   function handleReadAll() {
-    if (hasUnread && !isReadingAll) readAll()
+    if (hasUnread && !isReadingAll) readAll();
   }
 
   return (
@@ -71,9 +60,7 @@ export default function NotificationPanel({
     >
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between px-2">
-        <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700">
-          알림
-        </h2>
+        <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700">알림</h2>
         <button
           type="button"
           onClick={handleReadAll}
@@ -124,5 +111,5 @@ export default function NotificationPanel({
         </div>
       )}
     </section>
-  )
+  );
 }

@@ -1,15 +1,15 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
-import { IcBadgeClose } from '@/src/components/common/icons/IcBadgeClose'
-import { cn } from '@/src/utils/cn'
+import { IcBadgeClose } from '@/src/components/common/icons/IcBadgeClose';
+import { cn } from '@/src/utils/cn';
 
-export type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'purple'
+export type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'purple';
 
 interface BadgeProps {
-  color?: BadgeColor
-  children: ReactNode
-  onDelete?: () => void
-  className?: string
+  color?: BadgeColor;
+  children: ReactNode;
+  onDelete?: () => void;
+  className?: string;
 }
 
 /** color별 배경·테두리·텍스트 클래스 */
@@ -19,7 +19,7 @@ const colorStyles: Record<BadgeColor, string> = {
   yellow: 'bg-badge-yellow-bg border-badge-yellow-border text-badge-yellow-text',
   red: 'bg-badge-red-bg border-badge-red-border text-badge-red-text',
   purple: 'bg-badge-purple-bg border-badge-purple-border text-badge-purple-text',
-}
+};
 
 /**
  * 표시 전용 또는 삭제 가능한 태그 뱃지
@@ -37,12 +37,7 @@ const colorStyles: Record<BadgeColor, string> = {
  * // 삭제 가능
  * <Badge color="green" onDelete={() => handleDelete(id)}>완료</Badge>
  */
-export default function Badge({
-  color = 'gray',
-  children,
-  onDelete,
-  className,
-}: BadgeProps) {
+export default function Badge({ color = 'gray', children, onDelete, className }: BadgeProps) {
   return (
     <span
       className={cn(
@@ -64,5 +59,5 @@ export default function Badge({
         </button>
       )}
     </span>
-  )
+  );
 }

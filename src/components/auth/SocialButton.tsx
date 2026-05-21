@@ -1,14 +1,14 @@
-import { IcGoogle } from '@/src/components/common/icons/IcGoogle'
-import { IcKakao } from '@/src/components/common/icons/IcKakao'
-import { cn } from '@/src/utils/cn'
+import { IcGoogle } from '@/src/components/common/icons/IcGoogle';
+import { IcKakao } from '@/src/components/common/icons/IcKakao';
+import { cn } from '@/src/utils/cn';
 
 /** 소셜 로그인 제공자 */
-export type SocialProvider = 'google' | 'kakao'
+export type SocialProvider = 'google' | 'kakao';
 
 interface SocialButtonProps {
-  provider: SocialProvider
-  onClick?: () => void
-  className?: string
+  provider: SocialProvider;
+  onClick?: () => void;
+  className?: string;
 }
 
 /**
@@ -18,7 +18,7 @@ interface SocialButtonProps {
 const providerStyles: Record<SocialProvider, string> = {
   google: 'bg-white border border-slate-200',
   kakao: 'bg-[#FFEE01]',
-}
+};
 
 /**
  * 회원가입·로그인 하단 소셜 로그인 버튼. 크기 고정(56px)
@@ -48,5 +48,5 @@ export default function SocialButton({ provider, onClick, className }: SocialBut
       {provider === 'google' && <IcGoogle />}
       {provider === 'kakao' && <IcKakao />}
     </button>
-  )
+  );
 }

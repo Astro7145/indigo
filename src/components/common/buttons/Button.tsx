@@ -1,6 +1,6 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
-import { cn } from '@/src/utils/cn'
+import { cn } from '@/src/utils/cn';
 
 /**
  * 버튼 시각적 스타일 계층
@@ -9,15 +9,15 @@ import { cn } from '@/src/utils/cn'
  * - `secondary`: 테두리 indigo 버튼. 주요 액션의 보조 옵션에 사용
  * - `tertiary` : 테두리 회색 버튼. 낮은 우선순위 액션(취소, 닫기 등)에 사용
  */
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary'
-export type ButtonSize = 'large' | 'medium' | 'small'
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
+export type ButtonSize = 'large' | 'medium' | 'small';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant
-  size?: ButtonSize
-  startIcon?: ReactNode
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  startIcon?: ReactNode;
   /** false이면 hover 스타일 비활성화. 기본값 true */
-  hover?: boolean
+  hover?: boolean;
 }
 
 /** size별 padding·font 클래스. 너비는 고정하지 않으며 className으로 지정 */
@@ -25,29 +25,27 @@ const sizeClasses: Record<ButtonSize, string> = {
   large: 'py-[13px] text-lg',
   medium: 'py-[11px] text-base',
   small: 'py-[9px] text-sm',
-}
+};
 
 /** variant별 기본(default) 클래스. primary는 secondary·tertiary와 높이 맞춤을 위해 투명 border 포함 */
 const variantBaseClasses: Record<ButtonVariant, string> = {
   primary: 'border border-transparent bg-indigo-600 text-white',
   secondary: 'border border-indigo-500 bg-transparent text-indigo-600',
   tertiary: 'border border-slate-300 bg-transparent text-slate-500',
-}
+};
 
 /** variant별 hover 클래스. hover={true}일 때만 적용 */
 const variantHoverClasses: Record<ButtonVariant, string> = {
   primary: 'hover:bg-indigo-700',
   secondary: 'hover:border-indigo-600',
   tertiary: 'hover:border-slate-400 hover:text-slate-600',
-}
+};
 
 const variantDisabledClasses: Record<ButtonVariant, string> = {
   primary: 'disabled:cursor-not-allowed disabled:bg-slate-400',
-  secondary:
-    'disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400',
-  tertiary:
-    'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400',
-}
+  secondary: 'disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400',
+  tertiary: 'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400',
+};
 
 /**
  * 프로젝트 공통 Button 컴포넌트
@@ -104,5 +102,5 @@ export default function Button({
       {startIcon && <span className="shrink-0">{startIcon}</span>}
       {children}
     </button>
-  )
+  );
 }

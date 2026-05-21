@@ -1,10 +1,9 @@
 ---
 name: Chore request
 about: Other changes that don't modify the codes.
-title: "[CHORE] "
+title: '[CHORE] '
 labels: ''
 assignees: ''
-
 ---
 
 **어떤 작업인가요?**

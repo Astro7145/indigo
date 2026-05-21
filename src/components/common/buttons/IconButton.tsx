@@ -1,12 +1,12 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react'
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 
-import { cn } from '@/src/utils/cn'
+import { cn } from '@/src/utils/cn';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  'aria-label': string
-  children: ReactNode
+  'aria-label': string;
+  children: ReactNode;
   /** false이면 hover 스타일 비활성화. 기본값 true */
-  hover?: boolean
+  hover?: boolean;
 }
 
 /**
@@ -52,7 +52,7 @@ export default function IconButton({
       type="button"
       aria-label={ariaLabel}
       className={cn(
-        'inline-flex cursor-pointer select-none items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex cursor-pointer items-center justify-center rounded transition-colors select-none disabled:cursor-not-allowed disabled:opacity-50',
         hover && 'enabled:hover:bg-slate-100',
         className,
       )}
@@ -60,5 +60,5 @@ export default function IconButton({
     >
       {children}
     </button>
-  )
+  );
 }
