@@ -1,7 +1,7 @@
 import { ApiError } from '@/src/types/common'
 
 describe('ApiError', () => {
-  it('carries status, code, message, details and is an Error', () => {
+  it('status, code, message, details를 가지며 Error 인스턴스이다', () => {
     const e = new ApiError({ status: 404, code: 'NOT_FOUND', message: 'nope', details: { a: 1 } })
     expect(e).toBeInstanceOf(Error)
     expect(e.name).toBe('ApiError')

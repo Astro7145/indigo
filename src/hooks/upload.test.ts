@@ -16,7 +16,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useCreateImageUploadUrl calls createImageUploadUrl with body', async () => {
+it('useCreateImageUploadUrl는 body와 함께 createImageUploadUrl을 호출한다', async () => {
   mocked.createImageUploadUrl.mockResolvedValue({
     uploadUrl: 'u',
     url: 'f',
@@ -29,7 +29,7 @@ it('useCreateImageUploadUrl calls createImageUploadUrl with body', async () => {
   expect(res).toEqual({ uploadUrl: 'u', url: 'f' })
 })
 
-it('useCreateFileUploadUrl calls createFileUploadUrl with body', async () => {
+it('useCreateFileUploadUrl는 body와 함께 createFileUploadUrl을 호출한다', async () => {
   mocked.createFileUploadUrl.mockResolvedValue({
     uploadUrl: 'u',
     url: 'f',

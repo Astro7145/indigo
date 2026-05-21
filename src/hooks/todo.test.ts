@@ -32,7 +32,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useTodoList calls getTodos with params', async () => {
+it('useTodoList는 params와 함께 getTodos를 호출한다', async () => {
   mocked.getTodos.mockResolvedValue({
     todos: [],
     nextCursor: null,
@@ -43,19 +43,19 @@ it('useTodoList calls getTodos with params', async () => {
   expect(mocked.getTodos).toHaveBeenCalledWith({ done: 'true' })
 })
 
-it('useTodo is disabled when id is undefined', () => {
+it('useTodo는 id가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => useTodo(undefined))
   expect(mocked.getTodo).not.toHaveBeenCalled()
 })
 
-it('useTodo calls getTodo when id is provided', async () => {
+it('useTodo는 id가 주어지면 getTodo를 호출한다', async () => {
   mocked.getTodo.mockResolvedValue({ id: 5 } as never)
   const { result } = renderHookWithClient(() => useTodo(5))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getTodo).toHaveBeenCalledWith(5)
 })
 
-it('useInfiniteTodoList passes cursor on first page', async () => {
+it('useInfiniteTodoList는 첫 페이지에서 cursor를 전달한다', async () => {
   mocked.getTodos.mockResolvedValueOnce({
     todos: [],
     nextCursor: 8,
@@ -72,7 +72,7 @@ it('useInfiniteTodoList passes cursor on first page', async () => {
   expect(result.current.hasNextPage).toBe(true)
 })
 
-it('useFavoriteTodoList calls getFavoriteTodos with params', async () => {
+it('useFavoriteTodoList는 params와 함께 getFavoriteTodos를 호출한다', async () => {
   mocked.getFavoriteTodos.mockResolvedValue({
     favorites: [],
     nextCursor: null,
@@ -85,7 +85,7 @@ it('useFavoriteTodoList calls getFavoriteTodos with params', async () => {
   expect(mocked.getFavoriteTodos).toHaveBeenCalledWith({ limit: 10 })
 })
 
-it('useInfiniteFavoriteTodoList passes cursor on first page', async () => {
+it('useInfiniteFavoriteTodoList는 첫 페이지에서 cursor를 전달한다', async () => {
   mocked.getFavoriteTodos.mockResolvedValueOnce({
     favorites: [],
     nextCursor: 2,
@@ -101,7 +101,7 @@ it('useInfiniteFavoriteTodoList passes cursor on first page', async () => {
   })
 })
 
-it('useCreateTodo invalidates lists on success', async () => {
+it('useCreateTodo는 성공 시 목록을 무효화한다', async () => {
   mocked.createTodo.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreateTodo())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -110,7 +110,7 @@ it('useCreateTodo invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() })
 })
 
-it('useUpdateTodo invalidates lists + favorites and writes detail cache on success', async () => {
+it('useUpdateTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세 캐시에 기록한다', async () => {
   mocked.patchTodo.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdateTodo())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -122,7 +122,7 @@ it('useUpdateTodo invalidates lists + favorites and writes detail cache on succe
   expect(setData).toHaveBeenCalledWith(todoApi.todoKeys.detail(5), { id: 5 })
 })
 
-it('useDeleteTodo invalidates lists + favorites and removes detail on success', async () => {
+it('useDeleteTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세 캐시를 제거한다', async () => {
   mocked.deleteTodo.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteTodo())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -134,7 +134,7 @@ it('useDeleteTodo invalidates lists + favorites and removes detail on success', 
   expect(inv).toHaveBeenCalledWith({ queryKey: favoritesPrefix })
 })
 
-it('useAddTodoFavorite invalidates lists + favorites + detail on success', async () => {
+it('useAddTodoFavorite는 성공 시 목록과 즐겨찾기와 상세를 무효화한다', async () => {
   mocked.addTodoFavorite.mockResolvedValue({ id: 1, todoId: 5 } as never)
   const { result, client } = renderHookWithClient(() => useAddTodoFavorite())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -145,7 +145,7 @@ it('useAddTodoFavorite invalidates lists + favorites + detail on success', async
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.detail(5) })
 })
 
-it('useRemoveTodoFavorite invalidates lists + favorites + detail on success', async () => {
+it('useRemoveTodoFavorite는 성공 시 목록과 즐겨찾기와 상세를 무효화한다', async () => {
   mocked.removeTodoFavorite.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useRemoveTodoFavorite())
   const inv = jest.spyOn(client, 'invalidateQueries')

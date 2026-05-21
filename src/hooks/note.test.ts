@@ -24,7 +24,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useNoteList calls getNotes with params', async () => {
+it('useNoteList는 params와 함께 getNotes를 호출한다', async () => {
   mocked.getNotes.mockResolvedValue({
     notes: [],
     nextCursor: null,
@@ -35,19 +35,19 @@ it('useNoteList calls getNotes with params', async () => {
   expect(mocked.getNotes).toHaveBeenCalledWith({ todoId: 3 })
 })
 
-it('useNote is disabled when id is undefined', () => {
+it('useNote는 id가 undefined이면 비활성화된다', () => {
   renderHookWithClient(() => useNote(undefined))
   expect(mocked.getNote).not.toHaveBeenCalled()
 })
 
-it('useNote calls getNote when id is provided', async () => {
+it('useNote는 id가 주어지면 getNote를 호출한다', async () => {
   mocked.getNote.mockResolvedValue({ id: 5, title: 't' } as never)
   const { result } = renderHookWithClient(() => useNote(5))
   await waitFor(() => expect(result.current.isSuccess).toBe(true))
   expect(mocked.getNote).toHaveBeenCalledWith(5)
 })
 
-it('useInfiniteNoteList passes cursor on first page', async () => {
+it('useInfiniteNoteList는 첫 페이지에서 cursor를 전달한다', async () => {
   mocked.getNotes.mockResolvedValueOnce({
     notes: [],
     nextCursor: 4,
@@ -64,7 +64,7 @@ it('useInfiniteNoteList passes cursor on first page', async () => {
   expect(result.current.hasNextPage).toBe(true)
 })
 
-it('useCreateNote invalidates lists on success', async () => {
+it('useCreateNote는 성공 시 목록을 무효화한다', async () => {
   mocked.createNote.mockResolvedValue({ id: 1 } as never)
   const { result, client } = renderHookWithClient(() => useCreateNote())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -73,7 +73,7 @@ it('useCreateNote invalidates lists on success', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.lists() })
 })
 
-it('useUpdateNote invalidates lists and writes detail cache on success', async () => {
+it('useUpdateNote는 성공 시 목록을 무효화하고 상세 캐시에 기록한다', async () => {
   mocked.patchNote.mockResolvedValue({ id: 5 } as never)
   const { result, client } = renderHookWithClient(() => useUpdateNote())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -84,7 +84,7 @@ it('useUpdateNote invalidates lists and writes detail cache on success', async (
   expect(setData).toHaveBeenCalledWith(noteApi.noteKeys.detail(5), { id: 5 })
 })
 
-it('useDeleteNote invalidates lists and removes detail on success', async () => {
+it('useDeleteNote는 성공 시 목록을 무효화하고 상세 캐시를 제거한다', async () => {
   mocked.deleteNote.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useDeleteNote())
   const inv = jest.spyOn(client, 'invalidateQueries')
