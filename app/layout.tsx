@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Toast from '@/src/components/common/toast/Toast'
+import Providers from './providers'
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -22,8 +23,10 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.className} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Toast />
-        {children}
+        <Providers>
+          <Toast />
+          {children}
+        </Providers>
       </body>
     </html>
   )
