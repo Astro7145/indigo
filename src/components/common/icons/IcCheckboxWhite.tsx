@@ -15,6 +15,7 @@ export function IcCheckboxWhite({
       <svg
         viewBox="0 0 18 18"
         fill="none"
+        style={{ overflow: 'visible' }}
         className={cn('size-[18px] text-indigo-200', className)}
         {...rest}
       >
@@ -27,6 +28,7 @@ export function IcCheckboxWhite({
     <svg
       viewBox="0 0 18 18"
       fill="none"
+      style={{ overflow: 'visible' }}
       className={cn('size-[18px]', className)}
       {...rest}
     >

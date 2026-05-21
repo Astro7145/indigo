@@ -73,6 +73,7 @@ npm run test:e2e    # E2E (Playwright)
   Tailwind 클래스는 `prettier-plugin-tailwindcss`가 자동 정렬
 - **색상·타이포는 하드코딩 금지.** `app/globals.css`의 디자인 토큰(Tailwind v4 `@theme`)에
   정의된 브랜드 `indigo` 스케일과 `text-*` 토큰을 Tailwind 유틸리티로 사용
+- 테스트는 `test`가 아닌 **`it`**으로 작성하고, 설명 문구는 **한글**로 간략히
 
 ## API & 환경 변수
 
