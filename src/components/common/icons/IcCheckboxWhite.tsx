@@ -1,15 +1,11 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcCheckboxWhiteProps extends SVGProps<SVGSVGElement> {
-  state?: 'default' | 'active'
+  state?: 'default' | 'active';
 }
 
-export function IcCheckboxWhite({
-  state = 'default',
-  className,
-  ...rest
-}: IcCheckboxWhiteProps) {
+export function IcCheckboxWhite({ state = 'default', className, ...rest }: IcCheckboxWhiteProps) {
   if (state === 'default') {
     return (
       <svg
@@ -21,7 +17,7 @@ export function IcCheckboxWhite({
       >
         <rect width="18" height="18" rx="2" fill="currentColor" />
       </svg>
-    )
+    );
   }
 
   return (
@@ -40,5 +36,5 @@ export function IcCheckboxWhite({
         strokeLinecap="round"
       />
     </svg>
-  )
+  );
 }

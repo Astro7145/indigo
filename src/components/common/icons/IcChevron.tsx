@@ -1,21 +1,17 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcChevronProps extends SVGProps<SVGSVGElement> {
-  direction?: 'left' | 'right' | 'up' | 'down'
+  direction?: 'left' | 'right' | 'up' | 'down';
 }
 
-export function IcChevron({
-  direction = 'left',
-  className,
-  ...rest
-}: IcChevronProps) {
+export function IcChevron({ direction = 'left', className, ...rest }: IcChevronProps) {
   const rotate: Record<'left' | 'right' | 'up' | 'down', string> = {
     left: '',
     right: 'rotate-180',
     up: 'rotate-90',
     down: '-rotate-90',
-  }
+  };
 
   return (
     <svg
@@ -32,5 +28,5 @@ export function IcChevron({
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }

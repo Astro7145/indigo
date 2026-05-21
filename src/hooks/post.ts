@@ -1,10 +1,4 @@
-import {
-  useQuery,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-  skipToken,
-} from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
 import {
   postKeys,
   getPosts,
@@ -18,7 +12,7 @@ import {
   deleteComment,
   likeComment,
   unlikeComment,
-} from '@/src/api/post'
+} from '@/src/api/post';
 import type {
   Post,
   PostListParams,
@@ -31,57 +25,44 @@ import type {
   CreateCommentBody,
   UpdateCommentBody,
   CommentLikeResponse,
-} from '@/src/types/post'
-import type { ApiError } from '@/src/types/common'
+} from '@/src/types/post';
+import type { ApiError } from '@/src/types/common';
 
 // 한 게시글의 모든 comments 캐시(filter 변형 포함)를 한 번에 무효화하기 위한 prefix
-export const commentsPrefix = (postId: number) =>
-  [...postKeys.detail(postId), 'comments'] as const
+export const commentsPrefix = (postId: number) => [...postKeys.detail(postId), 'comments'] as const;
 
 export function usePostList(params: PostListParams = {}) {
   return useQuery<PostListResponse, ApiError>({
     queryKey: postKeys.list(params),
     queryFn: () => getPosts(params),
-  })
+  });
 }
 
-export function useInfinitePostList(
-  params: Omit<PostListParams, 'cursor'> = {},
-) {
+export function useInfinitePostList(params: Omit<PostListParams, 'cursor'> = {}) {
   return useInfiniteQuery<PostListResponse, ApiError>({
     queryKey: [...postKeys.list(params), 'infinite'],
-    queryFn: ({ pageParam }) =>
-      getPosts({ ...params, cursor: pageParam as string | undefined }),
+    queryFn: ({ pageParam }) => getPosts({ ...params, cursor: pageParam as string | undefined }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
-  })
+  });
 }
 
 export function usePost(id: number | undefined) {
   return useQuery<Post, ApiError>({
-    queryKey:
-      id == null ? [...postKeys.details(), 'pending'] : postKeys.detail(id),
+    queryKey: id == null ? [...postKeys.details(), 'pending'] : postKeys.detail(id),
     queryFn: id == null ? skipToken : () => getPost(id),
-  })
+  });
 }
 
-export function useComments(
-  postId: number | undefined,
-  params: CommentListParams = {},
-) {
+export function useComments(postId: number | undefined, params: CommentListParams = {}) {
   return useQuery<CommentListResponse, ApiError>({
     queryKey:
-      postId == null
-        ? [...postKeys.details(), 'pending', 'comments', params]
-        : postKeys.comments(postId, params),
+      postId == null ? [...postKeys.details(), 'pending', 'comments', params] : postKeys.comments(postId, params),
     queryFn: postId == null ? skipToken : () => getComments(postId, params),
-  })
+  });
 }
 
-export function useInfiniteComments(
-  postId: number | undefined,
-  params: Omit<CommentListParams, 'cursor'> = {},
-) {
+export function useInfiniteComments(postId: number | undefined, params: Omit<CommentListParams, 'cursor'> = {}) {
   return useInfiniteQuery<CommentListResponse, ApiError>({
     queryKey:
       postId == null
@@ -97,100 +78,96 @@ export function useInfiniteComments(
             }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
-  })
+  });
 }
 
 export function useCreatePost() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<Post, ApiError, CreatePostBody>({
     mutationFn: (body) => createPost(body),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: postKeys.lists() })
+      qc.invalidateQueries({ queryKey: postKeys.lists() });
     },
-  })
+  });
 }
 
 export function useUpdatePost() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<Post, ApiError, { postId: number; body: UpdatePostBody }>({
     mutationFn: ({ postId, body }) => patchPost(postId, body),
     onSuccess: (data, { postId }) => {
-      qc.invalidateQueries({ queryKey: postKeys.lists() })
+      qc.invalidateQueries({ queryKey: postKeys.lists() });
       // PATCH 응답 shape가 GET 응답과 동일하므로 detail 캐시 직접 갱신 (refetch 1회 절감).
-      qc.setQueryData(postKeys.detail(postId), data)
+      qc.setQueryData(postKeys.detail(postId), data);
     },
-  })
+  });
 }
 
 export function useDeletePost() {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<void, ApiError, number>({
     mutationFn: (id) => deletePost(id),
     onSuccess: (_, postId) => {
-      qc.invalidateQueries({ queryKey: postKeys.lists() })
+      qc.invalidateQueries({ queryKey: postKeys.lists() });
       // detail 제거 시 그 하위 comments 캐시(`[...detail(postId), 'comments', ...]`)도
       // prefix 매칭으로 함께 제거된다.
-      qc.removeQueries({ queryKey: postKeys.detail(postId) })
+      qc.removeQueries({ queryKey: postKeys.detail(postId) });
     },
-  })
+  });
 }
 
 export function useCreateComment(postId: number) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<Comment, ApiError, CreateCommentBody>({
     mutationFn: (body) => createComment(postId, body),
     onSuccess: () => {
       // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
       // detail 무효화는 그 하위 comments 캐시도 prefix 매칭으로 함께 잡는다.
-      qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
-      qc.invalidateQueries({ queryKey: postKeys.lists() })
+      qc.invalidateQueries({ queryKey: postKeys.detail(postId) });
+      qc.invalidateQueries({ queryKey: postKeys.lists() });
     },
-  })
+  });
 }
 
 export function useUpdateComment(postId: number) {
-  const qc = useQueryClient()
-  return useMutation<
-    Comment,
-    ApiError,
-    { commentId: number; body: UpdateCommentBody }
-  >({
+  const qc = useQueryClient();
+  return useMutation<Comment, ApiError, { commentId: number; body: UpdateCommentBody }>({
     mutationFn: ({ commentId, body }) => patchComment(postId, commentId, body),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
+      qc.invalidateQueries({ queryKey: commentsPrefix(postId) });
     },
-  })
+  });
 }
 
 export function useDeleteComment(postId: number) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<void, ApiError, number>({
     mutationFn: (commentId) => deleteComment(postId, commentId),
     onSuccess: () => {
       // Post.commentCount는 상세 + 목록 카드 양쪽에 나타나므로 둘 다 동기화.
       // detail 무효화는 그 하위 comments 캐시도 prefix 매칭으로 함께 잡는다.
-      qc.invalidateQueries({ queryKey: postKeys.detail(postId) })
-      qc.invalidateQueries({ queryKey: postKeys.lists() })
+      qc.invalidateQueries({ queryKey: postKeys.detail(postId) });
+      qc.invalidateQueries({ queryKey: postKeys.lists() });
     },
-  })
+  });
 }
 
 export function useLikeComment(postId: number) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<CommentLikeResponse, ApiError, number>({
     mutationFn: (commentId) => likeComment(postId, commentId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
+      qc.invalidateQueries({ queryKey: commentsPrefix(postId) });
     },
-  })
+  });
 }
 
 export function useUnlikeComment(postId: number) {
-  const qc = useQueryClient()
+  const qc = useQueryClient();
   return useMutation<CommentLikeResponse, ApiError, number>({
     mutationFn: (commentId) => unlikeComment(postId, commentId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentsPrefix(postId) })
+      qc.invalidateQueries({ queryKey: commentsPrefix(postId) });
     },
-  })
+  });
 }

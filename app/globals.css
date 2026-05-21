@@ -90,3 +90,27 @@
     outline-color: var(--color-indigo-500);
   }
 }
+
+/* 커스텀 스크롤바 유틸리티 */
+@layer utilities {
+  .scrollbar-slate {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-slate-200) transparent;
+
+    /* Chrome / Safari / Edge */
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-button {
+      display: none;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-slate-200);
+      border-radius: 10px;
+    }
+  }
+}

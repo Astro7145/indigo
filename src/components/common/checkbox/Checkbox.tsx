@@ -1,31 +1,28 @@
-import { InputHTMLAttributes, ReactNode, Ref } from 'react'
+import { InputHTMLAttributes, ReactNode, Ref } from 'react';
 
-import { IcCheckboxPrimary } from '@/src/components/common/icons/IcCheckboxPrimary'
-import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite'
-import { cn } from '@/src/utils/cn'
+import { IcCheckboxPrimary } from '@/src/components/common/icons/IcCheckboxPrimary';
+import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite';
+import { cn } from '@/src/utils/cn';
 
-export type CheckboxVariant = 'primary' | 'white'
+export type CheckboxVariant = 'primary' | 'white';
 
-export interface CheckboxProps extends Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  'size' | 'type'
-> {
+export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
   /** 아이콘 스타일. 기본 'primary'. 밝은/컬러 배경 위에는 'white' */
-  variant?: CheckboxVariant
+  variant?: CheckboxVariant;
   /** React 19 ref-as-prop — native input에 부착 (react-hook-form register 호환) */
-  ref?: Ref<HTMLInputElement>
+  ref?: Ref<HTMLInputElement>;
   /** 체크박스 옆 라벨 */
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 const iconByVariant = {
   primary: IcCheckboxPrimary,
   white: IcCheckboxWhite,
-} as const
+} as const;
 
 /** 두 아이콘 공통 — 포커스 링/disabled 시각 처리. peer(input)의 직접 형제여야 modifier가 동작 */
 const ICON_BASE =
-  'shrink-0 rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 peer-disabled:opacity-50'
+  'shrink-0 rounded-sm peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-focus-visible:ring-offset-2 peer-disabled:opacity-50';
 
 /**
  * 공통 Checkbox — 시각적으로 숨긴 native `<input type="checkbox">` 위에
@@ -50,7 +47,7 @@ export default function Checkbox({
   ref,
   ...rest
 }: CheckboxProps) {
-  const Icon = iconByVariant[variant]
+  const Icon = iconByVariant[variant];
   return (
     <label
       style={style}
@@ -60,26 +57,10 @@ export default function Checkbox({
         className,
       )}
     >
-      <input
-        ref={ref}
-        disabled={disabled}
-        className="peer sr-only"
-        {...rest}
-        type="checkbox"
-      />
-      <Icon
-        aria-hidden="true"
-        state="default"
-        className={cn(ICON_BASE, 'peer-checked:hidden')}
-      />
-      <Icon
-        aria-hidden="true"
-        state="active"
-        className={cn(ICON_BASE, 'hidden peer-checked:block')}
-      />
-      {children && (
-        <span className="peer-disabled:text-slate-400">{children}</span>
-      )}
+      <input ref={ref} disabled={disabled} className="peer sr-only" {...rest} type="checkbox" />
+      <Icon aria-hidden="true" state="default" className={cn(ICON_BASE, 'peer-checked:hidden')} />
+      <Icon aria-hidden="true" state="active" className={cn(ICON_BASE, 'hidden peer-checked:block')} />
+      {children && <span className="peer-disabled:text-slate-400">{children}</span>}
     </label>
-  )
+  );
 }

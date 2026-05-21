@@ -1,10 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: "[FEAT] "
+title: '[FEAT] '
 labels: 'enhancement'
 assignees: ''
-
 ---
 
 **추가할 기능이 무엇인가요?**

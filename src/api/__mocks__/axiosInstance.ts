@@ -7,7 +7,7 @@ const instance = {
   delete: jest.fn(),
   put: jest.fn(),
   request: jest.fn(),
-}
+};
 
-export { instance }
-export default instance
+export { instance };
+export default instance;

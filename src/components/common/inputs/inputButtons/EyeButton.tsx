@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { IcEye, IcEyeOff } from '../../icons'
+import { IcEye, IcEyeOff } from '../../icons';
 
 interface EyeButtonProps {
-  hide: boolean
-  onClick?: () => void
+  hide: boolean;
+  onClick?: () => void;
 }
 
 export default function EyeButton({ hide, onClick }: EyeButtonProps) {
@@ -17,5 +17,5 @@ export default function EyeButton({ hide, onClick }: EyeButtonProps) {
     >
       {hide ? <IcEyeOff /> : <IcEye />}
     </button>
-  )
+  );
 }

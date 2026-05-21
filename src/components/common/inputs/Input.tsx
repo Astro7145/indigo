@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { cn } from '@/src/utils/cn'
-import { cva } from 'class-variance-authority'
+import { cn } from '@/src/utils/cn';
+import { cva } from 'class-variance-authority';
 
 const inputContainerVariants = cva(
   'flex items-center gap-x-2 rounded-sm border bg-white focus-within:border-indigo-500 cursor-text p-3 sm:p-4',
@@ -17,20 +17,15 @@ const inputContainerVariants = cva(
       variant: 'default',
     },
   },
-)
+);
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  className?: string
-  variant?: 'default' | 'error' | 'typing'
-  iconRight?: React.ReactNode
+  className?: string;
+  variant?: 'default' | 'error' | 'typing';
+  iconRight?: React.ReactNode;
 }
 
-export default function Input({
-  className,
-  variant,
-  iconRight,
-  ...props
-}: InputProps) {
+export default function Input({ className, variant, iconRight, ...props }: InputProps) {
   return (
     <label className={cn(inputContainerVariants({ variant }), className)}>
       <input
@@ -41,5 +36,5 @@ export default function Input({
       />
       {iconRight}
     </label>
-  )
+  );
 }

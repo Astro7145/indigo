@@ -1,7 +1,7 @@
-import { IcSearch } from '../../icons'
+import { IcSearch } from '../../icons';
 
 interface SearchButtonProps {
-  onClick?: () => void
+  onClick?: () => void;
 }
 
 export default function SearchButton({ onClick }: SearchButtonProps) {
@@ -9,5 +9,5 @@ export default function SearchButton({ onClick }: SearchButtonProps) {
     <button aria-label="검색" onClick={onClick} className="cursor-pointer">
       <IcSearch />
     </button>
-  )
+  );
 }
