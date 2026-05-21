@@ -52,8 +52,8 @@ export default function IconButton({
       type="button"
       aria-label={ariaLabel}
       className={cn(
-        'inline-flex cursor-pointer items-center justify-center',
-        hover && 'rounded transition-colors hover:bg-slate-100',
+        'inline-flex cursor-pointer select-none items-center justify-center rounded transition-colors disabled:cursor-not-allowed disabled:opacity-50',
+        hover && 'enabled:hover:bg-slate-100',
         className,
       )}
       {...props}
