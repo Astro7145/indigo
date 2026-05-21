@@ -23,7 +23,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-it('useSignup calls signup and invalidates userKeys.me', async () => {
+it('useSignup은 signup을 호출하고 userKeys.me를 무효화한다', async () => {
   mocked.signup.mockResolvedValue({
     user: { id: 1, email: 'a', name: 'n', image: null },
   } as never)
@@ -38,7 +38,7 @@ it('useSignup calls signup and invalidates userKeys.me', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() })
 })
 
-it('useLogin calls login and invalidates userKeys.me', async () => {
+it('useLogin은 login을 호출하고 userKeys.me를 무효화한다', async () => {
   mocked.login.mockResolvedValue({ user: { id: 1 } } as never)
   const { result, client } = renderHookWithClient(() => useLogin())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -47,7 +47,7 @@ it('useLogin calls login and invalidates userKeys.me', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() })
 })
 
-it('useOauthLogin calls oauthLogin with provider and body', async () => {
+it('useOauthLogin은 provider와 body로 oauthLogin을 호출한다', async () => {
   mocked.oauthLogin.mockResolvedValue({ user: { id: 1 } } as never)
   const { result, client } = renderHookWithClient(() => useOauthLogin())
   const inv = jest.spyOn(client, 'invalidateQueries')
@@ -56,7 +56,7 @@ it('useOauthLogin calls oauthLogin with provider and body', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() })
 })
 
-it('useLogout calls logout and clears the query cache', async () => {
+it('useLogout은 logout을 호출하고 쿼리 캐시를 비운다', async () => {
   mocked.logout.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useLogout())
   const clear = jest.spyOn(client, 'clear')
@@ -65,7 +65,7 @@ it('useLogout calls logout and clears the query cache', async () => {
   expect(clear).toHaveBeenCalled()
 })
 
-it('useRefresh calls refresh and does not touch cache', async () => {
+it('useRefresh는 refresh를 호출하고 캐시를 건드리지 않는다', async () => {
   mocked.refresh.mockResolvedValue(undefined as never)
   const { result, client } = renderHookWithClient(() => useRefresh())
   const inv = jest.spyOn(client, 'invalidateQueries')

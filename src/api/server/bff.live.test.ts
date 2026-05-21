@@ -22,7 +22,7 @@ function cookieHeaderFrom(res: import('next/server').NextResponse): string {
 d('BFF live (real SlidTodo API, teamId from env)', () => {
   jest.setTimeout(30000)
 
-  it('login sets cookies and strips tokens; proxied GET works', async () => {
+  it('login은 쿠키를 설정하고 토큰을 제거하며, 프록시된 GET이 동작한다', async () => {
     const loginRes = await authPost(
       new NextRequest('http://localhost/api/auth/login', {
         method: 'POST',
@@ -54,7 +54,7 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
   // 결정적인 단위 테스트(backend.test.ts, auth/[action] route.test.ts, [...path] 401→retry)로
   // 이미 검증된다. 라이브는 결정적인 login·프록시·logout만 실API로 확인한다.
 
-  it('logout clears cookies; subsequent proxied GET is 401', async () => {
+  it('logout은 쿠키를 삭제하고, 이후 프록시된 GET은 401이다', async () => {
     const loginRes = await authPost(
       new NextRequest('http://localhost/api/auth/login', {
         method: 'POST',

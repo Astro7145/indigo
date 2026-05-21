@@ -8,12 +8,12 @@ beforeEach(() => {
   mocked.post.mockResolvedValue({ data: { uploadUrl: 'u', url: 'v' } } as never)
 })
 
-it('createImageUploadUrl POST /images', async () => {
+it('createImageUploadUrl은 /images로 POST한다', async () => {
   const r = await createImageUploadUrl({ fileName: 'a.png' })
   expect(mocked.post).toHaveBeenCalledWith('/images', { fileName: 'a.png' })
   expect(r).toEqual({ uploadUrl: 'u', url: 'v' })
 })
-it('createFileUploadUrl POST /files', async () => {
+it('createFileUploadUrl은 /files로 POST한다', async () => {
   await createFileUploadUrl({ fileName: 'r.pdf' })
   expect(mocked.post).toHaveBeenCalledWith('/files', { fileName: 'r.pdf' })
 })
