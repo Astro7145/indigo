@@ -1,69 +1,56 @@
-import { ReactNode } from 'react'
+import { ReactNode } from 'react';
 
-import { cn } from '@/src/utils/cn'
-import { IcTextAlignCenter } from '@/src/components/common/icons/IcTextAlignCenter'
-import { IcTextAlignLeft } from '@/src/components/common/icons/IcTextAlignLeft'
-import { IcTextAlignRight } from '@/src/components/common/icons/IcTextAlignRight'
-import { IcTextBold } from '@/src/components/common/icons/IcTextBold'
-import { IcTextDotPoints } from '@/src/components/common/icons/IcTextDotPoints'
-import { IcTextInsertImage } from '@/src/components/common/icons/IcTextInsertImage'
-import { IcTextItalic } from '@/src/components/common/icons/IcTextItalic'
-import { IcTextLink } from '@/src/components/common/icons/IcTextLink'
-import { IcTextUnderline } from '@/src/components/common/icons/IcTextUnderline'
+import IconButton from '@/src/components/common/buttons/IconButton';
+import { cn } from '@/src/utils/cn';
+import { IcTextAlignCenter } from '@/src/components/common/icons/IcTextAlignCenter';
+import { IcTextAlignLeft } from '@/src/components/common/icons/IcTextAlignLeft';
+import { IcTextAlignRight } from '@/src/components/common/icons/IcTextAlignRight';
+import { IcTextBold } from '@/src/components/common/icons/IcTextBold';
+import { IcTextDotPoints } from '@/src/components/common/icons/IcTextDotPoints';
+import { IcTextInsertImage } from '@/src/components/common/icons/IcTextInsertImage';
+import { IcTextItalic } from '@/src/components/common/icons/IcTextItalic';
+import { IcTextLink } from '@/src/components/common/icons/IcTextLink';
+import { IcTextUnderline } from '@/src/components/common/icons/IcTextUnderline';
 
 export interface EditorToolbarState {
-  isBold?: boolean
-  isItalic?: boolean
-  isUnderline?: boolean
-  isAlignLeft?: boolean
-  isAlignCenter?: boolean
-  isAlignRight?: boolean
-  isBulletList?: boolean
-  isImage?: boolean
-  isLink?: boolean
+  isBold?: boolean;
+  isItalic?: boolean;
+  isUnderline?: boolean;
+  isAlignLeft?: boolean;
+  isAlignCenter?: boolean;
+  isAlignRight?: boolean;
+  isBulletList?: boolean;
+  isLink?: boolean;
 }
 
 interface EditorToolbarProps {
-  state?: EditorToolbarState
-  showImage?: boolean
-  onBold?: () => void
-  onItalic?: () => void
-  onUnderline?: () => void
-  onAlignLeft?: () => void
-  onAlignCenter?: () => void
-  onAlignRight?: () => void
-  onBulletList?: () => void
-  onImageUpload?: () => void
-  onLink?: () => void
-  className?: string
+  state?: EditorToolbarState;
+  showImage?: boolean;
+  onBold?: () => void;
+  onItalic?: () => void;
+  onUnderline?: () => void;
+  onAlignLeft?: () => void;
+  onAlignCenter?: () => void;
+  onAlignRight?: () => void;
+  onBulletList?: () => void;
+  onImageUpload?: () => void;
+  onLink?: () => void;
+  className?: string;
 }
 
 interface ToolbarButtonProps {
-  onClick?: () => void
-  title: string
-  isActive?: boolean
-  children: ReactNode
+  onClick?: () => void;
+  title: string;
+  isActive?: boolean;
+  children: ReactNode;
 }
 
-function ToolbarButton({
-  onClick,
-  title,
-  isActive = false,
-  children,
-}: ToolbarButtonProps) {
+function ToolbarButton({ onClick, title, isActive = false, children }: ToolbarButtonProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={cn(
-        'flex items-center justify-center rounded transition-colors',
-        !isActive && 'hover:bg-slate-100',
-      )}
-    >
+    <IconButton aria-label={title} title={title} hover={!isActive} onClick={onClick}>
       {children}
-    </button>
-  )
+    </IconButton>
+  );
 }
 
 /**
@@ -97,64 +84,35 @@ export default function EditorToolbar({
   className,
 }: EditorToolbarProps) {
   return (
-    <div
-      className={cn(
-        'flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5',
-        className,
-      )}
-    >
+    <div className={cn('flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5', className)}>
       <ToolbarButton onClick={onBold} title="굵게" isActive={state.isBold}>
         <IcTextBold state={state.isBold ? 'active' : 'default'} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={onItalic}
-        title="기울임"
-        isActive={state.isItalic}
-      >
+      <ToolbarButton onClick={onItalic} title="기울임" isActive={state.isItalic}>
         <IcTextItalic state={state.isItalic ? 'active' : 'default'} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={onUnderline}
-        title="밑줄"
-        isActive={state.isUnderline}
-      >
+      <ToolbarButton onClick={onUnderline} title="밑줄" isActive={state.isUnderline}>
         <IcTextUnderline state={state.isUnderline ? 'active' : 'default'} />
       </ToolbarButton>
 
       <div className="mx-1 h-5 w-px bg-slate-200" />
 
-      <ToolbarButton
-        onClick={onAlignLeft}
-        title="왼쪽 정렬"
-        isActive={state.isAlignLeft}
-      >
+      <ToolbarButton onClick={onAlignLeft} title="왼쪽 정렬" isActive={state.isAlignLeft}>
         <IcTextAlignLeft state={state.isAlignLeft ? 'active' : 'default'} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={onAlignCenter}
-        title="가운데 정렬"
-        isActive={state.isAlignCenter}
-      >
+      <ToolbarButton onClick={onAlignCenter} title="가운데 정렬" isActive={state.isAlignCenter}>
         <IcTextAlignCenter state={state.isAlignCenter ? 'active' : 'default'} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={onAlignRight}
-        title="오른쪽 정렬"
-        isActive={state.isAlignRight}
-      >
+      <ToolbarButton onClick={onAlignRight} title="오른쪽 정렬" isActive={state.isAlignRight}>
         <IcTextAlignRight state={state.isAlignRight ? 'active' : 'default'} />
       </ToolbarButton>
-      <ToolbarButton
-        onClick={onBulletList}
-        title="목록"
-        isActive={state.isBulletList}
-      >
+      <ToolbarButton onClick={onBulletList} title="목록" isActive={state.isBulletList}>
         <IcTextDotPoints state={state.isBulletList ? 'active' : 'default'} />
       </ToolbarButton>
 
       {showImage && (
-        <ToolbarButton onClick={onImageUpload} title="이미지 삽입" isActive={state.isImage}>
-          <IcTextInsertImage state={state.isImage ? 'active' : 'default'} />
+        <ToolbarButton onClick={onImageUpload} title="이미지 삽입">
+          <IcTextInsertImage />
         </ToolbarButton>
       )}
 
@@ -162,5 +120,5 @@ export default function EditorToolbar({
         <IcTextLink state={state.isLink ? 'active' : 'default'} />
       </ToolbarButton>
     </div>
-  )
+  );
 }
