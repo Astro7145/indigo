@@ -25,7 +25,6 @@ export interface EditorToolbarState {
 
 interface EditorToolbarProps {
   state?: EditorToolbarState;
-  showImage?: boolean;
   onBold?: () => void;
   onItalic?: () => void;
   onUnderline?: () => void;
@@ -57,7 +56,6 @@ function ToolbarButton({ onClick, title, isActive = false, children }: ToolbarBu
  * 에디터 서식 툴바.
  *
  * @param state         각 버튼의 활성 상태
- * @param showImage     이미지 삽입 버튼 표시 여부. 기본값 `false`
  * @param onBold        굵게 핸들러
  * @param onItalic      기울임 핸들러
  * @param onUnderline   밑줄 핸들러
@@ -71,7 +69,6 @@ function ToolbarButton({ onClick, title, isActive = false, children }: ToolbarBu
  */
 export default function EditorToolbar({
   state = {},
-  showImage = false,
   onBold,
   onItalic,
   onUnderline,
@@ -110,11 +107,9 @@ export default function EditorToolbar({
         <IcTextDotPoints state={state.isBulletList ? 'active' : 'default'} />
       </ToolbarButton>
 
-      {showImage && (
-        <ToolbarButton onClick={onImageUpload} title="이미지 삽입">
-          <IcTextInsertImage />
-        </ToolbarButton>
-      )}
+      <ToolbarButton onClick={onImageUpload} title="이미지 삽입">
+        <IcTextInsertImage />
+      </ToolbarButton>
 
       <ToolbarButton onClick={onLink} title="링크 삽입" isActive={state.isLink}>
         <IcTextLink state={state.isLink ? 'active' : 'default'} />
