@@ -73,6 +73,61 @@ npm run test:e2e    # E2E (Playwright)
   Tailwind 클래스는 `prettier-plugin-tailwindcss`가 자동 정렬
 - **색상·타이포는 하드코딩 금지.** `app/globals.css`의 디자인 토큰(Tailwind v4 `@theme`)에
   정의된 브랜드 `indigo` 스케일과 `text-*` 토큰을 Tailwind 유틸리티로 사용
+- 테스트는 `test`가 아닌 **`it`**으로 작성하고, 설명 문구는 **한글**로 간략히
+
+## 코드 작성 행동 원칙 (Karpathy)
+
+LLM 코딩의 흔한 실수를 줄이기 위한 행동 가이드. 사소한 작업에는 판단에 맡기되, 기본적으로 속도보다 신중함에 무게를 둔다.
+
+### 1. Think Before Coding — 추측·혼란 숨김 금지, 트레이드오프 표면화
+
+구현 전:
+- 가정을 명시한다. 불확실하면 묻는다.
+- 해석이 여러 갈래면 임의로 고르지 말고 제시한다.
+- 더 단순한 방법이 있으면 말한다. 필요하면 반대 의견을 낸다.
+- 불명확하면 멈춘다. 무엇이 헷갈리는지 짚고 묻는다.
+
+### 2. Simplicity First — 문제를 푸는 최소 코드, 추측성 구현 금지
+
+- 요청 범위를 넘는 기능 금지.
+- 단발성 코드에 추상화 금지.
+- 요청하지 않은 "유연성"·"설정 가능성" 금지.
+- 일어나지 않을 시나리오의 에러 처리 금지.
+- 200줄을 짰는데 50줄로 가능하면 다시 쓴다.
+
+스스로 묻는다: "시니어 엔지니어가 이걸 과하다고 할까?" 그렇다면 단순화한다.
+
+### 3. Surgical Changes — 꼭 필요한 곳만 건드리고, 내가 만든 흔적만 치운다
+
+기존 코드 편집 시:
+- 인접 코드·주석·포맷을 멋대로 "개선"하지 않는다.
+- 망가지지 않은 걸 리팩토링하지 않는다.
+- 내 취향과 달라도 기존 스타일을 따른다.
+- 관련 없는 데드 코드를 발견하면 삭제하지 말고 언급만 한다.
+
+내 변경이 고아(orphan)를 만들면:
+- 내 변경으로 안 쓰이게 된 import/변수/함수는 제거한다.
+- 기존부터 있던 데드 코드는 요청 없이 제거하지 않는다.
+
+기준: 바뀐 모든 줄은 사용자 요청으로 직접 추적돼야 한다.
+
+### 4. Goal-Driven Execution — 성공 기준을 정하고, 검증될 때까지 반복
+
+작업을 검증 가능한 목표로 변환:
+- "검증 추가" → "잘못된 입력에 대한 테스트를 쓰고, 통과시킨다"
+- "버그 수정" → "버그를 재현하는 테스트를 쓰고, 통과시킨다"
+- "X 리팩토링" → "전후로 테스트가 통과하는지 보장한다"
+
+여러 단계 작업은 간단한 계획을 먼저 말한다:
+```
+1. [단계] → 검증: [확인]
+2. [단계] → 검증: [확인]
+3. [단계] → 검증: [확인]
+```
+
+강한 성공 기준은 독립적으로 루프를 돌게 한다. 약한 기준("동작하게 해줘")은 끊임없는 재확인을 부른다.
+
+> 이 원칙들이 작동하고 있다는 신호: diff에 불필요한 변경이 줄고, 과한 구현으로 인한 재작성이 줄고, 명확화 질문이 실수 후가 아니라 구현 전에 나온다.
 
 ## API & 환경 변수
 
@@ -85,21 +140,13 @@ npm run test:e2e    # E2E (Playwright)
 - **인증 토큰**: Next.js 서버(Route Handler/Server Action)를 통해 **HttpOnly 쿠키**로 저장한다.
   토큰을 클라이언트 JS(localStorage·Zustand 등)에 보관 금지.
 
-## 상태 관리
+## 상태 관리 (원칙)
 
-**TanStack Query — 서버 상태**
+> 구현 패턴·쿼리 키 팩토리·커스텀 훅 작성법·무한 스크롤 등 상세는 **`state-management` 스킬**을 로드해 참고한다.
 
-- 서버에서 오는 모든 데이터는 Query로 관리한다 (서버 데이터를 Zustand/`useState`에 복사 금지)
-- **모든 query/mutation은 커스텀 훅으로 감싸** `hooks/<domain>.ts`에 두고(예: `useTodoList`, `useCreateTodo`), 컴포넌트는 그 훅만 사용한다
-- 쿼리 키는 도메인별 키 팩토리로 관리 (예: `todoKeys.list(filters)`), 문자열 직접 작성 지양
-- 변경(mutation) 성공 후 관련 키를 `invalidateQueries`로 무효화
-- 무한 스크롤(전체 할일·게시판 등)은 `useInfiniteQuery` 사용
+**TanStack Query — 서버 상태**: 서버에서 오는 모든 데이터는 Query로 관리한다 (Zustand/`useState`에 복사 금지). 모든 query/mutation은 커스텀 훅으로 감싸 `hooks/<domain>.ts`에 두고 컴포넌트는 그 훅만 사용한다.
 
-**Zustand — 클라이언트 상태**
-
-- UI/세션성 전역 상태만 담는다 (모달 open, 사이드바, 테마, 토스트 등)
-- 서버 데이터·폼 상태는 넣지 않는다 (각각 Query·react-hook-form 담당)
-- 스토어는 `src/stores/`에 전역 단위로만 둔다 (도메인별로 나누지 않음)
+**Zustand — 클라이언트 상태**: UI/세션성 전역 상태만 담는다 (모달 open, 사이드바, 테마, 토스트 등). 서버 데이터·폼 상태는 넣지 않는다 (각각 Query·react-hook-form 담당). 스토어는 `src/stores/`에 전역 단위로만 둔다.
 
 ## 이슈 기반 작업 흐름
 
@@ -125,44 +172,25 @@ npm run test:e2e    # E2E (Playwright)
 - 브랜치·커밋·PR은 해당 이슈를 참조한다 (PR 템플릿 `## 관련 이슈`에 링크, 커밋/PR 본문에 `#<번호>`)
 - 이슈 → `feature/*` 브랜치 → `dev` 대상 PR → 머지 시 이슈 종료
 
-## Git 규칙
+## Git 규칙 (핵심)
 
-**브랜치**
+> 브랜치 네이밍 형식·커밋 타입 목록·PR 작성 형식 등 상세는 **`git-workflow` 스킬**을 로드해 참고한다.
 
-- `main`: 출시 가능 상태 / `dev`: 다음 배포 개발 코드 (PR의 기본 머지 대상)
-- 보조: `feature/*` `fix/*` (브랜치 타입은 커밋 타입과 일치시킨다)
-- 보조 브랜치는 **`<타입>/<이슈번호>-<기능명>`** 형식 (예: `feature/42-user-authentication`)
-  - `<이슈번호>`: 착수한 GitHub 이슈 번호 (이슈 없이 작업 시작 금지)
-  - `<기능명>`: **kebab-case**, 3~5 단어 이내
+- `main`(출시 가능) / `dev`(PR 기본 머지 대상). `main`/`dev`에 **직접 푸시 금지**, 모든 변경은 PR을 거친다
+- 보조 브랜치는 `<타입>/<이슈번호>-<기능명>` (예: `feature/42-user-authentication`). 이슈 없이 작업 시작 금지
+- 커밋 타입: `feat` `fix` `docs` `style` `refactor` `test` `chore` `perf` `ci` `build` `revert`. 본문은 영어, 명령형 현재 시제
+- PR 제목 접두어 `[FEAT]` `[FIX]` 등, 본문은 `.github/pull_request_template.md`에 따라 한글
 
-**작업 흐름**
+## Figma 연동
 
-- 이슈 단위로 `feature/<이슈번호>-<기능명>` 브랜치를 `dev`에서 분기해 작업
-- 작업 후 `origin`에 푸시하고, **`dev` 브랜치를 대상으로 PR** 생성
-- `dev` → `main` 머지는 배포 시점에만 수행
-- `main`/`dev`에 직접 푸시 금지. 모든 변경은 PR을 거침
+> fileKey·MCP 호출 절차·디자인 토큰 매핑 등 상세는 **`figma-integration` 스킬**을 로드해 참고한다.
 
-**커밋 메시지**
-
-- 타입: `feat` `fix` `docs` `style` `refactor` `test` `chore` `perf` `ci` `build` `revert`
-- 본문은 영어로 무엇을·왜를 간략히. 명령형 현재 시제, 첫 글자 소문자, 끝에 마침표 없음
-
-**PR**
-
-- 제목 접두어 `[FEAT]` `[FIX]` 등 + 핵심 내용 (예: `[FEAT] 소셜 로그인 구현`)
-- 본문은 `.github/pull_request_template.md` 템플릿을 따라 한글로 작성.
-
-## Figma 연동 (MCP)
-
-디자인 참조·구현 시 Figma MCP를 사용합니다.
-
-- fileKey: `4nokcUJykpeU7rSg5wILTN` (파일: _INsighty-SlidTodo_)
-- 작업할 화면의 Figma 링크는 사용자가 제공
-- `use_figma` 호출 전에는 반드시 `/figma-use` 스킬을, 다이어그램은 `/figma-generate-diagram`
-  스킬을 먼저 로드할 것
+디자인 참조·구현 시 Figma MCP를 사용한다. 작업할 화면의 Figma 링크는 사용자가 제공하며, `use_figma` 호출 전에는 반드시 `/figma-use` 스킬을, 다이어그램은 `/figma-generate-diagram` 스킬을 먼저 로드한다.
 
 ## 작업 방식
 
 - **superpowers 플러그인(스킬)을 적극 사용합니다.** 기능 구현·버그 수정·계획 수립 전 관련 스킬을
   먼저 호출하세요: `brainstorming` → `writing-plans` → `test-driven-development` →
   `verification-before-completion` 등 (이슈 생성·구현 진입은 `## 이슈 기반 작업 흐름` 참조)
+- **프로젝트 로컬 스킬**도 함께 사용합니다: 커밋·PR 작업은 `git-workflow`, Figma 작업은
+  `figma-integration`, 데이터 페칭·상태 코드는 `state-management` 스킬을 먼저 로드하세요.

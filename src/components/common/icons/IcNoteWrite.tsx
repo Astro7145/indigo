@@ -1,14 +1,9 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 export function IcNoteWrite({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6', className)} {...rest}>
       <circle cx="12" cy="12" r="12" fill="var(--color-white)" />
       <g clipPath="url(#clip0_21209_59681)">
         <path
@@ -24,14 +19,9 @@ export function IcNoteWrite({ className, ...rest }: SVGProps<SVGSVGElement>) {
       </g>
       <defs>
         <clipPath id="clip0_21209_59681">
-          <rect
-            width="11.9897"
-            height="11.9897"
-            fill="var(--color-white)"
-            transform="translate(6.03271 6.00977)"
-          />
+          <rect width="11.9897" height="11.9897" fill="var(--color-white)" transform="translate(6.03271 6.00977)" />
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }

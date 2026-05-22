@@ -1,20 +1,17 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcCheckboxPrimaryProps extends SVGProps<SVGSVGElement> {
-  state?: 'default' | 'active'
+  state?: 'default' | 'active';
 }
 
-export function IcCheckboxPrimary({
-  state = 'default',
-  className,
-  ...rest
-}: IcCheckboxPrimaryProps) {
+export function IcCheckboxPrimary({ state = 'default', className, ...rest }: IcCheckboxPrimaryProps) {
   if (state === 'default') {
     return (
       <svg
         viewBox="0 0 18 18"
         fill="none"
+        style={{ overflow: 'visible' }}
         className={cn('size-[18px]', className)}
         {...rest}
       >
@@ -28,13 +25,14 @@ export function IcCheckboxPrimary({
           stroke="var(--color-slate-300)"
         />
       </svg>
-    )
+    );
   }
 
   return (
     <svg
       viewBox="0 0 18 18"
       fill="none"
+      style={{ overflow: 'visible' }}
       className={cn('size-[18px]', className)}
       {...rest}
     >
@@ -46,5 +44,5 @@ export function IcCheckboxPrimary({
         strokeLinecap="round"
       />
     </svg>
-  )
+  );
 }

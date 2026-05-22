@@ -53,4 +53,4 @@ node_modules/
 docs/superpowers/
 
 # claude code 로컬 파일
-.claude
+.claude/settings.local.json

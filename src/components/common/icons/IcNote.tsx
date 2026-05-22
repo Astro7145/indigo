@@ -1,37 +1,18 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcNoteProps extends SVGProps<SVGSVGElement> {
-  state?: 'default' | 'active'
+  state?: 'default' | 'active';
 }
 
 export function IcNote({ state = 'default', className, ...rest }: IcNoteProps) {
-  const circleFill =
-    state === 'default' ? 'var(--color-white)' : 'var(--color-indigo-700)'
-  const circleFillOpacity = state === 'default' ? '0.4' : '0.2'
+  const circleFill = state === 'default' ? 'var(--color-white)' : 'var(--color-indigo-700)';
+  const circleFillOpacity = state === 'default' ? '0.4' : '0.2';
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6', className)}
-      {...rest}
-    >
-      <circle
-        cx="12"
-        cy="12"
-        r="12"
-        fill={circleFill}
-        fillOpacity={circleFillOpacity}
-      />
-      <rect
-        x="7.5"
-        y="6.90039"
-        width="9"
-        height="10.3846"
-        rx="1.38462"
-        fill="var(--color-indigo-700)"
-      />
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6', className)} {...rest}>
+      <circle cx="12" cy="12" r="12" fill={circleFill} fillOpacity={circleFillOpacity} />
+      <rect x="7.5" y="6.90039" width="9" height="10.3846" rx="1.38462" fill="var(--color-indigo-700)" />
       <path
         d="M9.57715 10.0156H14.4233"
         stroke="var(--color-indigo-200)"
@@ -51,5 +32,5 @@ export function IcNote({ state = 'default', className, ...rest }: IcNoteProps) {
         strokeLinecap="round"
       />
     </svg>
-  )
+  );
 }
