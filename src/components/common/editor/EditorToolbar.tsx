@@ -1,5 +1,3 @@
-import { ReactNode } from 'react';
-
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { cn } from '@/src/utils/cn';
 import { IcTextAlignCenter } from '@/src/components/common/icons/IcTextAlignCenter';
@@ -37,36 +35,6 @@ interface EditorToolbarProps {
   className?: string;
 }
 
-interface ToolbarButtonProps {
-  onClick?: () => void;
-  title: string;
-  isActive?: boolean;
-  children: ReactNode;
-}
-
-function ToolbarButton({ onClick, title, isActive = false, children }: ToolbarButtonProps) {
-  return (
-    <IconButton aria-label={title} title={title} hover={!isActive} onClick={onClick}>
-      {children}
-    </IconButton>
-  );
-}
-
-/**
- * 에디터 서식 툴바.
- *
- * @param state         각 버튼의 활성 상태
- * @param onBold        굵게 핸들러
- * @param onItalic      기울임 핸들러
- * @param onUnderline   밑줄 핸들러
- * @param onAlignLeft   왼쪽 정렬 핸들러
- * @param onAlignCenter 가운데 정렬 핸들러
- * @param onAlignRight  오른쪽 정렬 핸들러
- * @param onBulletList  목록 핸들러
- * @param onImageUpload 이미지 삽입 핸들러
- * @param onLink        링크 삽입 핸들러
- * @param className     추가 Tailwind 클래스
- */
 export default function EditorToolbar({
   state = {},
   onBold,
@@ -82,38 +50,38 @@ export default function EditorToolbar({
 }: EditorToolbarProps) {
   return (
     <div className={cn('flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5', className)}>
-      <ToolbarButton onClick={onBold} title="굵게" isActive={state.isBold}>
+      <IconButton aria-label="굵게" title="굵게" hover={!state.isBold} onClick={onBold}>
         <IcTextBold state={state.isBold ? 'active' : 'default'} />
-      </ToolbarButton>
-      <ToolbarButton onClick={onItalic} title="기울임" isActive={state.isItalic}>
+      </IconButton>
+      <IconButton aria-label="기울임" title="기울임" hover={!state.isItalic} onClick={onItalic}>
         <IcTextItalic state={state.isItalic ? 'active' : 'default'} />
-      </ToolbarButton>
-      <ToolbarButton onClick={onUnderline} title="밑줄" isActive={state.isUnderline}>
+      </IconButton>
+      <IconButton aria-label="밑줄" title="밑줄" hover={!state.isUnderline} onClick={onUnderline}>
         <IcTextUnderline state={state.isUnderline ? 'active' : 'default'} />
-      </ToolbarButton>
+      </IconButton>
 
       <div className="mx-1 h-5 w-px bg-slate-200" />
 
-      <ToolbarButton onClick={onAlignLeft} title="왼쪽 정렬" isActive={state.isAlignLeft}>
+      <IconButton aria-label="왼쪽 정렬" title="왼쪽 정렬" hover={!state.isAlignLeft} onClick={onAlignLeft}>
         <IcTextAlignLeft state={state.isAlignLeft ? 'active' : 'default'} />
-      </ToolbarButton>
-      <ToolbarButton onClick={onAlignCenter} title="가운데 정렬" isActive={state.isAlignCenter}>
+      </IconButton>
+      <IconButton aria-label="가운데 정렬" title="가운데 정렬" hover={!state.isAlignCenter} onClick={onAlignCenter}>
         <IcTextAlignCenter state={state.isAlignCenter ? 'active' : 'default'} />
-      </ToolbarButton>
-      <ToolbarButton onClick={onAlignRight} title="오른쪽 정렬" isActive={state.isAlignRight}>
+      </IconButton>
+      <IconButton aria-label="오른쪽 정렬" title="오른쪽 정렬" hover={!state.isAlignRight} onClick={onAlignRight}>
         <IcTextAlignRight state={state.isAlignRight ? 'active' : 'default'} />
-      </ToolbarButton>
-      <ToolbarButton onClick={onBulletList} title="목록" isActive={state.isBulletList}>
+      </IconButton>
+      <IconButton aria-label="목록" title="목록" hover={!state.isBulletList} onClick={onBulletList}>
         <IcTextDotPoints state={state.isBulletList ? 'active' : 'default'} />
-      </ToolbarButton>
+      </IconButton>
 
-      <ToolbarButton onClick={onImageUpload} title="이미지 삽입">
+      <IconButton aria-label="이미지 삽입" title="이미지 삽입" onClick={onImageUpload}>
         <IcTextInsertImage />
-      </ToolbarButton>
+      </IconButton>
 
-      <ToolbarButton onClick={onLink} title="링크 삽입" isActive={state.isLink}>
+      <IconButton aria-label="링크 삽입" title="링크 삽입" hover={!state.isLink} onClick={onLink}>
         <IcTextLink state={state.isLink ? 'active' : 'default'} />
-      </ToolbarButton>
+      </IconButton>
     </div>
   );
 }
