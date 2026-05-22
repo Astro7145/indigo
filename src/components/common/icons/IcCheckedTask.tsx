@@ -7,7 +7,7 @@ export function IcCheckedTask({ className, ...rest }: SVGProps<SVGSVGElement>) {
   const id = useId()
 
   return (
-    <svg viewBox="0 0 180 180" fill="none" className={cn('size-45', className)} {...rest}>
+    <svg viewBox="0 0 180 180" fill="none" className={cn('size-[180px]', className)} {...rest}>
       <rect width="180" height="180" rx="90" fill="var(--color-indigo-200)" />
       <rect x="52" y="51.4712" width="76.4762" height="87.9476" rx="7.64763" fill={`url(#${id})`} />
       <rect x="59.6475" y="59.1191" width="61.181" height="72.6524" rx="3.82381" fill="var(--color-white)" />

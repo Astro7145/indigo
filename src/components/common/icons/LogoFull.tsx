@@ -1,9 +1,12 @@
-import { SVGProps } from 'react';
+'use client';
+
+import { SVGProps, useId } from 'react';
 import { cn } from '@/src/utils/cn';
 
 export function LogoFull({ className, ...rest }: SVGProps<SVGSVGElement>) {
-  const g1 = 'logo-full-g1';
-  const g2 = 'logo-full-g2';
+  const id = useId();
+  const g1 = id + '-g1';
+  const g2 = id + '-g2';
 
   return (
     <svg viewBox="0 0 276 52" fill="none" className={cn('w-[276px]', className)} {...rest}>

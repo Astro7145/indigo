@@ -1,7 +1,10 @@
-import { SVGProps } from 'react';
+'use client';
+
+import { SVGProps, useId } from 'react';
 import { cn } from '@/src/utils/cn';
 
 export function IcProfileBlue({ className, ...rest }: SVGProps<SVGSVGElement>) {
+  const id = useId();
   return (
     <svg viewBox="0 0 39 39" fill="none" className={cn('size-[39px]', className)} {...rest}>
       <circle cx="19.5001" cy="19.5001" r="19.5001" fill="#8C9EFF" />
@@ -16,7 +19,7 @@ export function IcProfileBlue({ className, ...rest }: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
       />
       <ellipse cx="20.0303" cy="28.5188" rx="11.4563" ry="2.19376" fill="#95D3D0" />
-      <g filter="url(#filter0_i_21209_64486)">
+      <g filter={`url(#${id})`}>
         <path
           d="M31.945 21.3464C31.5872 27.5439 26.0845 28.8921 19.2038 28.8921C12.3231 28.8921 6.48077 27.2478 6.48077 21.3464C6.48077 13.5411 12.8657 9.01875 19.7464 9.01875C28.0806 9.01875 32.2341 16.3396 31.945 21.3464Z"
           fill="#536DFE"
@@ -29,7 +32,7 @@ export function IcProfileBlue({ className, ...rest }: SVGProps<SVGSVGElement>) {
       <circle cx="19.6433" cy="25.4694" r="1.01878" fill="#78431D" />
       <defs>
         <filter
-          id="filter0_i_21209_64486"
+          id={id}
           x="6.48077"
           y="9.01875"
           width="25.4783"

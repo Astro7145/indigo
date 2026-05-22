@@ -2,15 +2,15 @@ import { SVGProps } from 'react'
 import { cn } from '@/src/utils/cn'
 
 interface IcProgressProps extends SVGProps<SVGSVGElement> {
-  small?: boolean
+  size?: 'sm' | 'lg'
 }
 
-export function IcProgress({ small, className, ...rest }: IcProgressProps) {
+export function IcProgress({ size = 'lg', className, ...rest }: IcProgressProps) {
   return (
     <svg
       viewBox="0 0 40 40"
       fill="none"
-      className={cn(small ? 'size-8' : 'size-10', className)}
+      className={cn(size === 'sm' ? 'size-8' : 'size-10', className)}
       {...rest}
     >
       <rect width="40" height="40" rx="4" fill="var(--color-indigo-400)" />

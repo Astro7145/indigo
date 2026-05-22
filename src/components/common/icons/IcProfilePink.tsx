@@ -1,7 +1,10 @@
-import { SVGProps } from 'react';
+'use client';
+
+import { SVGProps, useId } from 'react';
 import { cn } from '@/src/utils/cn';
 
 export function IcProfilePink({ className, ...rest }: SVGProps<SVGSVGElement>) {
+  const id = useId();
   return (
     <svg viewBox="0 0 39 39" fill="none" className={cn('size-[39px]', className)} {...rest}>
       <circle cx="19.5" cy="19.5" r="19.5" fill="#FFE3E3" />
@@ -16,7 +19,7 @@ export function IcProfilePink({ className, ...rest }: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
       />
       <ellipse cx="20.0302" cy="28.5186" rx="11.4562" ry="2.19375" fill="#F1BEBE" />
-      <g filter="url(#filter0_i_21209_64463)">
+      <g filter={`url(#${id})`}>
         <path
           d="M31.9448 21.3462C31.587 27.5437 26.0843 28.8919 19.2037 28.8919C12.3231 28.8919 6.48072 27.2476 6.48072 21.3462C6.48072 13.541 12.8656 9.01869 19.7462 9.01869C28.0804 9.01869 32.2339 16.3395 31.9448 21.3462Z"
           fill="#FF9494"
@@ -51,7 +54,7 @@ export function IcProfilePink({ className, ...rest }: SVGProps<SVGSVGElement>) {
       />
       <defs>
         <filter
-          id="filter0_i_21209_64463"
+          id={id}
           x="6.48072"
           y="9.01869"
           width="25.4782"
