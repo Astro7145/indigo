@@ -10,7 +10,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
-    "test:changed": "jest --onlyChanged",
+    "test:changed": "jest --onlyChanged --passWithNoTests",
     "prepare": "husky"
   },
   "dependencies": {
