@@ -4,7 +4,7 @@ import { IcEye, IcEyeOff } from '../../icons';
 
 interface EyeButtonProps {
   hide: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
 export default function EyeButton({ hide, onClick }: EyeButtonProps) {
