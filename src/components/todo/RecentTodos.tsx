@@ -1,6 +1,6 @@
 'use client';
 
-import TodoList from '@/src/components/common/TodoList/TodoList';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';

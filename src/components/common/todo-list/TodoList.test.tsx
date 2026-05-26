@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import TodoList from '@/src/components/common/TodoList/TodoList';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 
 it('title을 렌더한다', () => {
   render(<TodoList title="자바스크립트 듣기" />);
