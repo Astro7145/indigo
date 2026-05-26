@@ -14,7 +14,15 @@ export default function PasswordInput({ ...props }: PasswordInputProps) {
   return (
     <Input
       type={hide ? 'password' : 'text'}
-      iconRight={<EyeButton hide={hide} onClick={() => setHide((prev) => !prev)} />}
+      iconRight={
+        <EyeButton
+          hide={hide}
+          onClick={(e) => {
+            e.preventDefault();
+            setHide((prev) => !prev);
+          }}
+        />
+      }
       {...props}
     />
   );

@@ -31,7 +31,7 @@ export default function Input({ className, variant, iconRight, ...props }: Input
       <input
         type="text"
         aria-invalid={variant === 'error' ? true : undefined}
-        className="text-sm font-normal text-slate-700 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-slate-500 sm:text-base sm:placeholder:text-base"
+        className="flex-1 text-sm font-normal text-slate-700 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-slate-500 sm:text-base sm:placeholder:text-base"
         {...props}
       />
       {iconRight}

@@ -9,6 +9,16 @@ const eslintConfig = defineConfig([
   // Reports Prettier formatting diffs as lint errors and turns off
   // ESLint rules that conflict with Prettier (must come after the configs above).
   prettierRecommended,
+  {
+    rules: {
+      'prettier/prettier': [
+        'error',
+        {
+          endOfLine: 'auto',
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
