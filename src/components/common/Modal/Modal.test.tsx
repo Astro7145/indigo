@@ -141,3 +141,50 @@ it('열리면 body 스크롤을 잠그고 닫히면 해제한다', () => {
   );
   expect(document.body.style.overflow).toBe('');
 });
+
+it('열릴 때 모달 내부 첫 포커서블로 포커스를 이동한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <button data-testid="inside">내부</button>
+    </Modal>,
+  );
+  expect(screen.getByTestId('inside')).toHaveFocus();
+});
+
+it('닫힐 때 트리거 요소로 포커스를 복귀시킨다', () => {
+  function Harness({ open }: { open: boolean }) {
+    return (
+      <>
+        <button data-testid="trigger">열기</button>
+        <Modal open={open} onClose={() => {}}>
+          <button data-testid="inside">내부</button>
+        </Modal>
+      </>
+    );
+  }
+  const { rerender } = render(<Harness open={false} />);
+  const trigger = screen.getByTestId('trigger');
+  trigger.focus();
+  expect(trigger).toHaveFocus();
+  rerender(<Harness open />);
+  expect(screen.getByTestId('inside')).toHaveFocus();
+  rerender(<Harness open={false} />);
+  expect(trigger).toHaveFocus();
+});
+
+it('Tab 포커스가 모달 내부를 벗어나지 않고 순환한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <button data-testid="first">first</button>
+      <button data-testid="last">last</button>
+    </Modal>,
+  );
+  const first = screen.getByTestId('first');
+  const last = screen.getByTestId('last');
+  last.focus();
+  fireEvent.keyDown(last, { key: 'Tab' });
+  expect(first).toHaveFocus();
+  first.focus();
+  fireEvent.keyDown(first, { key: 'Tab', shiftKey: true });
+  expect(last).toHaveFocus();
+});
