@@ -1,8 +1,19 @@
 'use client';
 
-import { createContext, useEffect, useRef, useState, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  use,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type MouseEventHandler,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { createPortal } from 'react-dom';
 
+import Button, { type ButtonProps } from '@/src/components/common/buttons/Button';
 import { cn } from '@/src/utils/cn';
 
 type ModalSize = 'large' | 'small';
@@ -137,3 +148,65 @@ export default function Modal({
     document.body,
   );
 }
+
+function useModalContext() {
+  const ctx = use(ModalContext);
+  if (!ctx) {
+    throw new Error('Modal 서브컴포넌트는 <Modal> 내부에서만 사용할 수 있습니다.');
+  }
+  return ctx;
+}
+
+interface ModalActionsProps {
+  children: ReactNode;
+  className?: string;
+}
+
+function ModalActions({ children, className }: ModalActionsProps) {
+  const { size } = useModalContext();
+  return (
+    <div className={cn('flex w-full items-center [&>*]:flex-1', size === 'large' ? 'gap-3' : 'gap-2', className)}>
+      {children}
+    </div>
+  );
+}
+
+type ModalCancelProps = Omit<ButtonProps, 'variant' | 'size'>;
+
+function ModalCancel({ onClick, ...props }: ModalCancelProps) {
+  const { size, close } = useModalContext();
+  return <Button variant="tertiary" size={size} onClick={onClick ?? close} {...props} />;
+}
+
+type ModalConfirmProps = Omit<ButtonProps, 'variant' | 'size' | 'onClick'> & {
+  onClick: MouseEventHandler<HTMLButtonElement>;
+};
+
+function ModalConfirm(props: ModalConfirmProps) {
+  const { size } = useModalContext();
+  return <Button variant="primary" size={size} {...props} />;
+}
+
+interface ModalTitleProps {
+  children: ReactNode;
+  className?: string;
+}
+
+function ModalTitle({ children, className }: ModalTitleProps) {
+  const { size, setTitleId } = useModalContext();
+  const id = useId();
+  useEffect(() => {
+    setTitleId(id);
+    return () => setTitleId(undefined);
+  }, [id, setTitleId]);
+  return (
+    <h2 id={id} className={cn('font-semibold text-slate-800', size === 'large' ? 'text-xl' : 'text-sm', className)}>
+      {children}
+    </h2>
+  );
+}
+
+Modal.Actions = ModalActions;
+Modal.Cancel = ModalCancel;
+Modal.Confirm = ModalConfirm;
+Modal.Title = ModalTitle;

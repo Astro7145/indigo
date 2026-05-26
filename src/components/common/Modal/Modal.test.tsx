@@ -188,3 +188,60 @@ it('Tab 포커스가 모달 내부를 벗어나지 않고 순환한다', () => {
   fireEvent.keyDown(first, { key: 'Tab', shiftKey: true });
   expect(last).toHaveFocus();
 });
+
+it('Modal.Actions는 자식을 렌더링한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <Modal.Actions>
+        <button>버튼A</button>
+      </Modal.Actions>
+    </Modal>,
+  );
+  expect(screen.getByRole('button', { name: '버튼A' })).toBeInTheDocument();
+});
+
+it('Modal.Cancel은 onClick이 없으면 close(onClose)를 호출한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open onClose={onClose}>
+      <Modal.Cancel>취소</Modal.Cancel>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: '취소' }));
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+it('Modal.Cancel은 onClick이 있으면 그 핸들러를 호출하고 자동으로 닫지 않는다', () => {
+  const onClose = jest.fn();
+  const onClick = jest.fn();
+  render(
+    <Modal open onClose={onClose}>
+      <Modal.Cancel onClick={onClick}>취소</Modal.Cancel>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: '취소' }));
+  expect(onClick).toHaveBeenCalledTimes(1);
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+it('Modal.Confirm은 onClick을 호출한다', () => {
+  const onClick = jest.fn();
+  render(
+    <Modal open onClose={() => {}}>
+      <Modal.Confirm onClick={onClick}>확인</Modal.Confirm>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: '확인' }));
+  expect(onClick).toHaveBeenCalledTimes(1);
+});
+
+it('Modal.Title은 제목을 렌더링하고 컨테이너 aria-labelledby로 연결한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <Modal.Title>정말 삭제하시겠어요?</Modal.Title>
+    </Modal>,
+  );
+  const dialog = screen.getByRole('dialog');
+  const title = screen.getByRole('heading', { name: '정말 삭제하시겠어요?' });
+  expect(dialog).toHaveAttribute('aria-labelledby', title.id);
+});
