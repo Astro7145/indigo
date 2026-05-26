@@ -4,7 +4,8 @@ import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
 import TodoRow from '@/src/components/todo/TodoRow';
-import { useTodoList, useUpdateTodo, useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/todo';
+import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { cn } from '@/src/utils/cn';
 
 export type RecentTodosSize = 'default' | 'small';
