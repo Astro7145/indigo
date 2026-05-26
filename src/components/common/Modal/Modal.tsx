@@ -52,6 +52,15 @@ export default function Modal({
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [open, closeOnEsc, onClose]);
 
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   if (typeof window === 'undefined' || !open) return null;
 
   return createPortal(

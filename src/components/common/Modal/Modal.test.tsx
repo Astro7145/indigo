@@ -126,3 +126,18 @@ it('closeOnBackdropClick=false이면 백드롭 클릭을 무시한다', () => {
   fireEvent.click(screen.getByTestId('modal-backdrop'));
   expect(onClose).not.toHaveBeenCalled();
 });
+
+it('열리면 body 스크롤을 잠그고 닫히면 해제한다', () => {
+  const { rerender } = render(
+    <Modal open onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  expect(document.body.style.overflow).toBe('hidden');
+  rerender(
+    <Modal open={false} onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  expect(document.body.style.overflow).toBe('');
+});
