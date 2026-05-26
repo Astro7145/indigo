@@ -1,18 +1,13 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcProgressProps extends SVGProps<SVGSVGElement> {
-  size?: 'sm' | 'lg'
+  size?: 'sm' | 'lg';
 }
 
 export function IcProgress({ size = 'lg', className, ...rest }: IcProgressProps) {
   return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      className={cn(size === 'sm' ? 'size-8' : 'size-10', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 40 40" fill="none" className={cn(size === 'sm' ? 'size-8' : 'size-10', className)} {...rest}>
       <rect width="40" height="40" rx="4" fill="var(--color-indigo-400)" />
       <svg x="8.75" y="8.75" width="24" height="24" viewBox="0 0 20 20">
         <path
@@ -29,5 +24,5 @@ export function IcProgress({ size = 'lg', className, ...rest }: IcProgressProps)
         />
       </svg>
     </svg>
-  )
+  );
 }

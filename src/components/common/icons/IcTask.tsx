@@ -1,22 +1,17 @@
-'use client'
+'use client';
 
-import { SVGProps, useId } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps, useId } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcTaskProps extends SVGProps<SVGSVGElement> {
-  small?: boolean
+  small?: boolean;
 }
 
 export function IcTask({ small, className, ...rest }: IcTaskProps) {
-  const id = useId()
+  const id = useId();
 
   return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      className={cn(small ? 'size-8' : 'size-10', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 40 40" fill="none" className={cn(small ? 'size-8' : 'size-10', className)} {...rest}>
       <rect width="40" height="40" rx="4" fill="var(--color-indigo-400)" />
       <svg x="10" y="6.25" width="20" height="26" viewBox="0 0 16 21">
         <rect y="2.3999" width="16" height="18.4" rx="0.4" fill={`url(#${id})`} />
@@ -35,5 +30,5 @@ export function IcTask({ small, className, ...rest }: IcTaskProps) {
         </linearGradient>
       </defs>
     </svg>
-  )
+  );
 }
