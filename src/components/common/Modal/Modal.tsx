@@ -14,6 +14,7 @@ import {
 import { createPortal } from 'react-dom';
 
 import Button, { type ButtonProps } from '@/src/components/common/buttons/Button';
+import { IcDelete } from '@/src/components/common/icons';
 import { cn } from '@/src/utils/cn';
 
 type ModalSize = 'large' | 'small';
@@ -32,6 +33,7 @@ interface ModalProps {
   size?: ModalSize;
   closeOnBackdropClick?: boolean;
   closeOnEsc?: boolean;
+  showCloseButton?: boolean;
   className?: string;
   children: ReactNode;
   ref?: Ref<HTMLDivElement>;
@@ -48,6 +50,7 @@ export default function Modal({
   size = 'large',
   closeOnBackdropClick = true,
   closeOnEsc = true,
+  showCloseButton = false,
   className,
   children,
   ref,
@@ -136,11 +139,21 @@ export default function Modal({
           aria-labelledby={titleId}
           tabIndex={-1}
           className={cn(
-            'flex max-w-[calc(100vw-2rem)] flex-col rounded bg-white shadow-xl',
+            'relative flex max-w-[calc(100vw-2rem)] flex-col rounded bg-white shadow-xl',
             sizeContainerClasses[size],
             className,
           )}
         >
+          {showCloseButton && (
+            <button
+              type="button"
+              aria-label="닫기"
+              onClick={onClose}
+              className="group absolute top-6 right-6 cursor-pointer"
+            >
+              <IcDelete className="size-6 text-slate-400 transition-colors group-hover:text-slate-600" />
+            </button>
+          )}
           {children}
         </div>
       </div>

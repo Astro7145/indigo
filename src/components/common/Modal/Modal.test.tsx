@@ -245,3 +245,23 @@ it('Modal.Title은 제목을 렌더링하고 컨테이너 aria-labelledby로 연
   const title = screen.getByRole('heading', { name: '정말 삭제하시겠어요?' });
   expect(dialog).toHaveAttribute('aria-labelledby', title.id);
 });
+
+it('showCloseButton이 true이면 닫기 버튼을 렌더링하고 클릭 시 onClose를 호출한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open showCloseButton onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: '닫기' }));
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+it('showCloseButton 기본값(false)이면 닫기 버튼이 없다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  expect(screen.queryByRole('button', { name: '닫기' })).not.toBeInTheDocument();
+});
