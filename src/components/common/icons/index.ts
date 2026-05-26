@@ -1,6 +1,7 @@
 export { IcBadgeClose } from './IcBadgeClose'
 export { IcBell } from './IcBell'
 export { IcCalendar } from './IcCalendar'
+export { IcCalendarOutline } from './IcCalendarOutline'
 export { IcCheck } from './IcCheck'
 export { IcCheckboxPrimary } from './IcCheckboxPrimary'
 export { IcCheckboxWhite } from './IcCheckboxWhite'
