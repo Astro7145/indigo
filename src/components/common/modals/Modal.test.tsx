@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import Modal from '@/src/components/common/Modal/Modal';
+import Modal from '@/src/components/common/modals/Modal';
 
 it('open이 true이면 children을 렌더링한다', () => {
   render(
