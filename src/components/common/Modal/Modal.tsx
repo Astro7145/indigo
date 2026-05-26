@@ -14,6 +14,7 @@ import {
 import { createPortal } from 'react-dom';
 
 import Button, { type ButtonProps } from '@/src/components/common/buttons/Button';
+import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons';
 import { cn } from '@/src/utils/cn';
 
@@ -147,17 +148,9 @@ export default function Modal({
           {children}
           {/* 닫기 버튼은 DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
           {showCloseButton && (
-            <button
-              type="button"
-              aria-label="닫기"
-              onClick={onClose}
-              className="group absolute top-6 right-6 cursor-pointer"
-            >
-              <IcDelete
-                aria-hidden="true"
-                className="size-6 text-slate-400 transition-colors group-hover:text-slate-600"
-              />
-            </button>
+            <IconButton aria-label="닫기" onClick={onClose} className="absolute top-6 right-6">
+              <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
+            </IconButton>
           )}
         </div>
       </div>
