@@ -12,7 +12,7 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
   const { gridProps, headerProps, weekDays, weeksInMonth } = useCalendarGrid(props, state);
 
   return (
-    <table {...gridProps} className="table-fixed w-[280px] border-separate [border-spacing:0_4px]">
+    <table {...gridProps} className="w-[280px] table-fixed border-separate [border-spacing:0_4px]">
       <thead {...headerProps}>
         <tr>
           {weekDays.map((day, index) => (
