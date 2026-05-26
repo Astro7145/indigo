@@ -52,3 +52,20 @@ it('열린 상태에서 트리거 재클릭 시 팝업이 닫힌다', async () =
   await user.click(trigger);
   expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();
 });
+
+it('취소 클릭 시 팝업이 닫힌다', async () => {
+  const user = userEvent.setup();
+  render(<DatePicker value={null} />);
+  await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
+  await user.click(screen.getByRole('button', { name: '취소' }));
+  expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();
+});
+
+it('취소 클릭 시 onChange가 호출되지 않는다', async () => {
+  const user = userEvent.setup();
+  const onChange = jest.fn();
+  render(<DatePicker value={null} onChange={onChange} />);
+  await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
+  await user.click(screen.getByRole('button', { name: '취소' }));
+  expect(onChange).not.toHaveBeenCalled();
+});
