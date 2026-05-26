@@ -59,14 +59,14 @@ export default function NoteCard({ noteId, onClick, onMore, className }: NoteCar
 
   if (isLoading || !note) {
     return (
-      <Card size="small" className={cn(rootClass, className)}>
+      <Card className={cn(rootClass, className)}>
         <p className="text-sm text-slate-400">{isError ? '불러오지 못했어요' : '불러오는 중…'}</p>
       </Card>
     );
   }
 
   return (
-    <Card size="small" className={cn(rootClass, className)} onClick={onClick}>
+    <Card className={cn(rootClass, className)} onClick={onClick}>
       <div className="flex items-center justify-between">
         <div className={cn('flex items-center', headerGapClass)}>
           <IcSpringNote aria-hidden className={iconBoxClass} />

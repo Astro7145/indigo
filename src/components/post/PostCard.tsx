@@ -26,14 +26,14 @@ export default function PostCard({ postId, onClick, className }: PostCardProps) 
 
   if (isLoading || !post) {
     return (
-      <Card size="small" className={cn(rootClass, className)}>
+      <Card className={cn(rootClass, className)}>
         <p className="text-sm text-slate-400">{isError ? '불러오지 못했어요' : '불러오는 중…'}</p>
       </Card>
     );
   }
 
   return (
-    <Card size="small" className={cn(rootClass, className)} onClick={onClick}>
+    <Card className={cn(rootClass, className)} onClick={onClick}>
       <h3 className="text-xl font-semibold text-slate-900">{post.title}</h3>
       {post.image && (
         <div className="relative size-[100px] overflow-hidden rounded border border-slate-200">

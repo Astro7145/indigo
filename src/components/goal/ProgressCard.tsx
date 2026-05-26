@@ -172,7 +172,6 @@ function ProgressCardView({
         - lg+:             h-64, 도넛 inside (flex)
       */}
       <Card
-        size="large"
         className={cn(
           'relative h-[187px] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,

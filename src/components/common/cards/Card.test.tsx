@@ -3,26 +3,17 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import Card from '@/src/components/common/cards/Card';
 
-it('children과 기본(large) 패딩 클래스를 렌더한다', () => {
+it('children과 기본 패딩(p-4) 클래스를 렌더한다', () => {
   render(<Card data-testid="card">hello</Card>);
   const el = screen.getByTestId('card');
   expect(el).toHaveTextContent('hello');
-  expect(el).toHaveClass('p-8');
+  expect(el).toHaveClass('p-4');
   expect(el).toHaveClass('bg-white');
   expect(el).toHaveClass('rounded');
   expect(el).toHaveClass('shadow-md');
 });
 
-it('size="small"이면 더 작은 패딩을 쓴다', () => {
-  render(
-    <Card size="small" data-testid="card">
-      x
-    </Card>,
-  );
-  expect(screen.getByTestId('card')).toHaveClass('p-4');
-});
-
-it('className을 cn으로 병합한다 (override 허용)', () => {
+it('className을 cn으로 병합한다 (패딩 override 허용)', () => {
   render(
     <Card className="w-[384px] p-12" data-testid="card">
       x
@@ -30,7 +21,7 @@ it('className을 cn으로 병합한다 (override 허용)', () => {
   );
   const el = screen.getByTestId('card');
   expect(el).toHaveClass('p-12');
-  expect(el).not.toHaveClass('p-8');
+  expect(el).not.toHaveClass('p-4');
   expect(el).toHaveClass('w-[384px]');
 });
 
