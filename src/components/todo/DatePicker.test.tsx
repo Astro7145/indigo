@@ -26,17 +26,17 @@ jest.mock('@/src/components/todo/BottomSheet', () => ({
   default: () => null,
 }));
 
-it('value가 null이면 "날짜를 선택해주세요"를 표시한다', () => {
+it('날짜를 선택하지 않은 상태에서는 안내 문구가 표시된다', () => {
   render(<DatePicker value={null} />);
   expect(screen.getByText('날짜를 선택해주세요')).toBeInTheDocument();
 });
 
-it('value가 있으면 포맷된 날짜를 표시한다', () => {
+it('날짜가 선택되어 있으면 해당 날짜가 표시된다', () => {
   render(<DatePicker value={new CalendarDate(2024, 5, 15)} />);
   expect(screen.getByText('2024. 05. 15')).toBeInTheDocument();
 });
 
-it('트리거 클릭 시 취소·확인 버튼이 노출된다', async () => {
+it('날짜 선택 버튼을 누르면 캘린더 팝업이 열린다', async () => {
   const user = userEvent.setup();
   render(<DatePicker value={null} />);
   await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
@@ -44,7 +44,7 @@ it('트리거 클릭 시 취소·확인 버튼이 노출된다', async () => {
   expect(screen.getByRole('button', { name: '확인' })).toBeInTheDocument();
 });
 
-it('열린 상태에서 트리거 재클릭 시 팝업이 닫힌다', async () => {
+it('팝업이 열린 상태에서 날짜 선택 버튼을 다시 누르면 팝업이 닫힌다', async () => {
   const user = userEvent.setup();
   render(<DatePicker value={null} />);
   const trigger = screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement;
@@ -53,7 +53,7 @@ it('열린 상태에서 트리거 재클릭 시 팝업이 닫힌다', async () =
   expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();
 });
 
-it('취소 클릭 시 팝업이 닫힌다', async () => {
+it('취소 버튼을 누르면 팝업이 닫힌다', async () => {
   const user = userEvent.setup();
   render(<DatePicker value={null} />);
   await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
@@ -61,11 +61,29 @@ it('취소 클릭 시 팝업이 닫힌다', async () => {
   expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();
 });
 
-it('취소 클릭 시 onChange가 호출되지 않는다', async () => {
+it('취소 버튼을 누르면 날짜 변경이 적용되지 않는다', async () => {
   const user = userEvent.setup();
   const onChange = jest.fn();
   render(<DatePicker value={null} onChange={onChange} />);
   await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
   await user.click(screen.getByRole('button', { name: '취소' }));
   expect(onChange).not.toHaveBeenCalled();
+});
+
+it('확인 버튼을 누르면 선택한 날짜가 전달된다', async () => {
+  const user = userEvent.setup();
+  const onChange = jest.fn();
+  const value = new CalendarDate(2024, 5, 15);
+  render(<DatePicker value={value} onChange={onChange} />);
+  await user.click(screen.getByText('2024. 05. 15').closest('button') as HTMLButtonElement);
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(onChange).toHaveBeenCalledWith(value);
+});
+
+it('확인 버튼을 누르면 팝업이 닫힌다', async () => {
+  const user = userEvent.setup();
+  render(<DatePicker value={null} />);
+  await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(screen.queryByRole('button', { name: '확인' })).not.toBeInTheDocument();
 });
