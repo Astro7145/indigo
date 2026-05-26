@@ -1,9 +1,9 @@
 'use client';
 
+import TodoList from '@/src/components/common/TodoList/TodoList';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
-import TodoRow from '@/src/components/todo/TodoRow';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { cn } from '@/src/utils/cn';
@@ -12,8 +12,6 @@ export type RecentTodosSize = 'default' | 'small';
 
 export interface RecentTodosProps {
   size?: RecentTodosSize;
-  /** 항목(제목) 클릭 핸들러 — 라우팅 등 호출 측 위임 */
-  onItemClick?: (todoId: number) => void;
   /** "모두 보기" 클릭 핸들러 — 항상 button, 동작은 외부 주입 */
   onSeeAll?: () => void;
   className?: string;
@@ -27,23 +25,18 @@ const sizeClasses: Record<RecentTodosSize, string> = {
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
  * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
- * 헤더(아이콘 + subtitle + "모두 보기")는 카드 밖, 본문은 별도 흰 카드(border).
+ * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ size = 'default', onItemClick, onSeeAll, className }: RecentTodosProps) {
+export default function RecentTodos({ size = 'default', onSeeAll, className }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest' });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
   const todos = data?.todos ?? [];
 
-  const toggle = (todoId: number) => {
-    const todo = todos.find((t) => t.id === todoId);
-    if (todo) update.mutate({ todoId, body: { done: !todo.done } });
-  };
-  const toggleFavorite = (todoId: number) => {
-    const todo = todos.find((t) => t.id === todoId);
-    if (!todo) return;
-    if (todo.isFavorite) removeFavorite.mutate(todoId);
+  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
+  const toggleFavorite = (todoId: number, isFavorite: boolean) => {
+    if (isFavorite) removeFavorite.mutate(todoId);
     else addFavorite.mutate(todoId);
   };
 
@@ -69,13 +62,22 @@ export default function RecentTodos({ size = 'default', onItemClick, onSeeAll, c
         ) : (
           <ul className="flex flex-col gap-1.5">
             {todos.map((t) => (
-              <TodoRow
-                key={t.id}
-                todo={t}
-                onItemClick={onItemClick}
-                onToggle={toggle}
-                onToggleFavorite={toggleFavorite}
-              />
+              <li key={t.id}>
+                <TodoList
+                  title={t.title}
+                  checked={t.done}
+                  onCheckedChange={(done) => toggle(t.id, done)}
+                  size={size === 'small' ? 'small' : 'large'}
+                >
+                  <TodoList.Actions>
+                    {t.noteIds.length > 0 && <TodoList.NoteAction />}
+                    {t.linkUrl && <TodoList.LinkAction />}
+                    <TodoList.EditAction hoverOnly />
+                    <TodoList.KebabAction hoverOnly />
+                    <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                  </TodoList.Actions>
+                </TodoList>
+              </li>
             ))}
           </ul>
         )}
