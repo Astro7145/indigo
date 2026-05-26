@@ -1,6 +1,16 @@
 'use client';
 
-import { createContext, use, type ChangeEvent, type MouseEvent, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  use,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+} from 'react';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Checkbox from '@/src/components/common/checkbox/Checkbox';
@@ -199,17 +209,79 @@ function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   );
 }
 
-function KebabAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
+interface KebabActionProps {
+  /** 메뉴 "수정하기" 선택 시 */
+  onEdit?: () => void;
+  /** 메뉴 "삭제하기" 선택 시 */
+  onDelete?: () => void;
+  /** 행 hover 시에만 표시 (메뉴가 열려 있으면 계속 표시) */
+  hoverOnly?: boolean;
+  className?: string;
+}
+
+// 케밥은 외부 onClick을 받지 않고 자체적으로 수정/삭제 드롭다운을 토글한다(외부 클릭·Esc로 닫힘).
+// 수정/삭제의 실제 동작(API)은 onEdit/onDelete로 호출 측이 연결 — TodoList는 도메인 무관 유지.
+function KebabAction({ onEdit, onDelete, hoverOnly, className }: KebabActionProps) {
   useTodoListContext();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDocMouseDown = (e: globalThis.MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  const select = (handler?: () => void) => {
+    setOpen(false);
+    handler?.();
+  };
+
   return (
-    <ActionButton
-      label={rest['aria-label'] ?? '더보기 메뉴'}
-      onClick={onClick}
-      hoverOnly={hoverOnly}
-      className={cn('bg-white', className)}
-    >
-      <IcKebab className="size-[14px] text-indigo-600" />
-    </ActionButton>
+    <div ref={ref} className={cn('relative shrink-0', hoverOnly && !open && 'hidden group-hover:block', className)}>
+      <ActionButton label="더보기 메뉴" onClick={() => setOpen((o) => !o)} className="bg-white">
+        <IcKebab className="size-[14px] text-indigo-600" />
+      </ActionButton>
+      {open && (
+        <div
+          role="menu"
+          className="absolute top-full right-0 z-20 mt-1 flex w-[102px] flex-col overflow-hidden rounded bg-white p-[5px] shadow-[0_4px_8px_0_rgba(0,0,0,0.1)]"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={(e) => {
+              e.stopPropagation();
+              select(onEdit);
+            }}
+            className="rounded-lg px-1.5 py-[3px] text-left text-sm leading-5 font-medium text-slate-700 hover:bg-slate-50"
+          >
+            수정하기
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={(e) => {
+              e.stopPropagation();
+              select(onDelete);
+            }}
+            className="text-destructive rounded-lg px-1.5 py-[3px] text-left text-sm leading-5 font-medium hover:bg-slate-50"
+          >
+            삭제하기
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
