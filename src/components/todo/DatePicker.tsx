@@ -46,7 +46,12 @@ export default function DatePicker({ value, onChange, onBlur, ref, firstDayOfWee
   };
 
   const { buttonProps } = useButton(
-    { onPress: handleToggle, 'aria-haspopup': 'dialog', 'aria-expanded': isOpen },
+    {
+      onPress: handleToggle,
+      'aria-haspopup': 'dialog',
+      'aria-expanded': isOpen,
+      onBlur,
+    },
     triggerRef,
   );
 
@@ -60,28 +65,17 @@ export default function DatePicker({ value, onChange, onBlur, ref, firstDayOfWee
     popupRef,
   );
 
-  const { dialogProps } = useDialog({}, popupRef);
-
-  const contentProps = {
-    pendingDate,
-    firstDayOfWeek,
-    onChangePending: setPendingDate,
-    onCancel: handleCancel,
-    onConfirm: handleConfirm,
-  };
-
+  const { dialogProps } = useDialog({ 'aria-label': '날짜 선택' }, popupRef);
   return (
     <div ref={containerRef} className="relative flex w-full flex-col">
       <button
         ref={triggerRef}
         {...buttonProps}
-        onBlur={onBlur}
         className={cn(
           'flex w-full items-center gap-2 rounded bg-white p-4 text-base font-normal tracking-[-0.02em] text-slate-700 transition-colors',
           isOpen ? 'border border-indigo-500' : 'border border-slate-300 hover:border-slate-400',
         )}
       >
-        {/* 날짜 텍스트가 길어질 때 아이콘이 찌그러지지 않도록 shrink-0 */}
         <IcCalendarOutline className="shrink-0" />
         {formatDate(isOpen ? pendingDate : value)}
       </button>
@@ -89,8 +83,14 @@ export default function DatePicker({ value, onChange, onBlur, ref, firstDayOfWee
       {/* 모바일 바텀시트 */}
       <div className="md:hidden">
         <BottomSheet isOpen={isOpen} onClose={handleCancel}>
-          <div role="dialog" aria-modal="true">
-            <DatePickerContent {...contentProps} />
+          <div {...dialogProps} aria-label="날짜 선택" className="outline-none">
+            <DatePickerContent
+              pendingDate={pendingDate}
+              firstDayOfWeek={firstDayOfWeek}
+              onChangePending={setPendingDate}
+              onCancel={handleCancel}
+              onConfirm={handleConfirm}
+            />
           </div>
         </BottomSheet>
       </div>
@@ -108,7 +108,13 @@ export default function DatePicker({ value, onChange, onBlur, ref, firstDayOfWee
               'hidden md:block',
             )}
           >
-            <DatePickerContent {...contentProps} />
+            <DatePickerContent
+              pendingDate={pendingDate}
+              firstDayOfWeek={firstDayOfWeek}
+              onChangePending={setPendingDate}
+              onCancel={handleCancel}
+              onConfirm={handleConfirm}
+            />
           </div>
         </FocusScope>
       )}

@@ -24,7 +24,7 @@ export default function DatePickerContent({
     <>
       <div className="px-6 py-5">
         <Calendar
-          value={pendingDate ?? undefined}
+          value={pendingDate}
           onChange={(date: DateValue) => onChangePending(toCalendarDate(date))}
           firstDayOfWeek={firstDayOfWeek}
         />
