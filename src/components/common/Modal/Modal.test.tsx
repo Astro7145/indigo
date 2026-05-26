@@ -265,3 +265,23 @@ it('showCloseButton 기본값(false)이면 닫기 버튼이 없다', () => {
   );
   expect(screen.queryByRole('button', { name: '닫기' })).not.toBeInTheDocument();
 });
+
+it('닫기 버튼의 아이콘은 aria-hidden으로 스크린리더에서 숨겨진다', () => {
+  render(
+    <Modal open showCloseButton onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  const closeButton = screen.getByRole('button', { name: '닫기' });
+  expect(closeButton.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+});
+
+it('showCloseButton이 있어도 열릴 때 포커스는 닫기 버튼이 아닌 콘텐츠로 간다', () => {
+  render(
+    <Modal open showCloseButton onClose={() => {}}>
+      <button data-testid="inside">내부</button>
+    </Modal>,
+  );
+  expect(screen.getByTestId('inside')).toHaveFocus();
+  expect(screen.getByRole('button', { name: '닫기' })).not.toHaveFocus();
+});
