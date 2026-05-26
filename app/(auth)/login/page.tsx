@@ -12,6 +12,7 @@ import PasswordInput from '@/src/components/common/inputs/PasswordInput';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/src/utils/schema';
+import { LogoFull } from '@/src/components/common/icons';
 
 export default function LoginPage() {
   const {
@@ -30,7 +31,7 @@ export default function LoginPage() {
   return (
     <div className="flex w-full max-w-100 flex-col gap-10">
       {/* 로고 */}
-      <Image src="/logo_login.svg" alt="INdigo 로고" width={253} height={52} />
+      <LogoFull type="indigo" />
 
       {/* 폼 영역 */}
       <form
