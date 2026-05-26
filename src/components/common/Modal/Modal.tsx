@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, type ReactNode, type Ref } from 'react';
+import { createContext, useEffect, useState, type ReactNode, type Ref } from 'react';
 import { createPortal } from 'react-dom';
 
 import { cn } from '@/src/utils/cn';
@@ -31,14 +31,38 @@ const sizeContainerClasses: Record<ModalSize, string> = {
   small: 'w-[343px] px-4 pt-12 pb-4',
 };
 
-export default function Modal({ open, onClose, size = 'large', className, children, ref }: ModalProps) {
+export default function Modal({
+  open,
+  onClose,
+  size = 'large',
+  closeOnBackdropClick = true,
+  closeOnEsc = true,
+  className,
+  children,
+  ref,
+}: ModalProps) {
   const [titleId, setTitleId] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!open || !closeOnEsc) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open, closeOnEsc, onClose]);
 
   if (typeof window === 'undefined' || !open) return null;
 
   return createPortal(
     <ModalContext value={{ size, close: onClose, setTitleId }}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        onClick={(e) => {
+          if (closeOnBackdropClick && e.target === e.currentTarget) onClose();
+        }}
+        data-testid="modal-backdrop"
+      >
         <div
           ref={ref}
           role="dialog"

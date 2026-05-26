@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import Modal from '@/src/components/common/Modal/Modal';
 
@@ -70,4 +70,59 @@ it('ref가 다이얼로그 컨테이너에 연결된다', () => {
     </Modal>,
   );
   expect(node).toBe(screen.getByRole('dialog'));
+});
+
+it('ESC 키를 누르면 onClose를 호출한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.keyDown(document, { key: 'Escape' });
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+it('closeOnEsc=false이면 ESC를 무시한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open closeOnEsc={false} onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.keyDown(document, { key: 'Escape' });
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+it('백드롭 클릭 시 onClose를 호출한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByTestId('modal-backdrop'));
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+it('모달 컨테이너 내부 클릭은 닫지 않는다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByRole('dialog'));
+  expect(onClose).not.toHaveBeenCalled();
+});
+
+it('closeOnBackdropClick=false이면 백드롭 클릭을 무시한다', () => {
+  const onClose = jest.fn();
+  render(
+    <Modal open closeOnBackdropClick={false} onClose={onClose}>
+      <p>내용</p>
+    </Modal>,
+  );
+  fireEvent.click(screen.getByTestId('modal-backdrop'));
+  expect(onClose).not.toHaveBeenCalled();
 });
