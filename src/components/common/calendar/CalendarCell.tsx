@@ -19,15 +19,12 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
     ref,
   );
 
-  const variant =
-    isOutsideVisibleRange || isDisabled ? 'outside'
-    : isSelected ? 'selected'
-    : 'default';
+  const variant = isOutsideVisibleRange || isDisabled ? 'outside' : isSelected ? 'selected' : 'default';
 
   const variantClass = {
-    outside:  'cursor-default font-normal text-slate-400',
+    outside: 'cursor-default font-normal text-slate-400',
     selected: 'bg-indigo-600 font-medium text-white hover:bg-indigo-700',
-    default:  'font-normal text-slate-700 hover:bg-indigo-700 hover:font-medium hover:text-white',
+    default: 'font-normal text-slate-700 hover:bg-indigo-700 hover:font-medium hover:text-white',
   }[variant];
 
   return (
