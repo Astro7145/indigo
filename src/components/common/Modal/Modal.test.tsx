@@ -38,22 +38,13 @@ it('document.body에 포탈로 렌더링한다', () => {
   expect(document.body).toContainElement(screen.getByRole('dialog'));
 });
 
-it('size=large면 large 너비 클래스를 적용한다', () => {
+it('너비를 반응형으로 적용한다 (모바일 343px / 데스크탑 456px)', () => {
   render(
-    <Modal open size="large" onClose={() => {}}>
+    <Modal open onClose={() => {}}>
       <p>내용</p>
     </Modal>,
   );
-  expect(screen.getByRole('dialog')).toHaveClass('w-[456px]');
-});
-
-it('size=small면 small 너비 클래스를 적용한다', () => {
-  render(
-    <Modal open size="small" onClose={() => {}}>
-      <p>내용</p>
-    </Modal>,
-  );
-  expect(screen.getByRole('dialog')).toHaveClass('w-[343px]');
+  expect(screen.getByRole('dialog')).toHaveClass('w-[343px]', 'sm:w-[456px]');
 });
 
 it('ref가 다이얼로그 컨테이너에 연결된다', () => {
@@ -286,24 +277,44 @@ it('showCloseButton이 있어도 열릴 때 포커스는 닫기 버튼이 아닌
   expect(screen.getByRole('button', { name: '닫기' })).not.toHaveFocus();
 });
 
-it('showCloseButton이면 헤더형 대칭 패딩(p-8)을 적용한다', () => {
+it('showCloseButton이면 헤더형 대칭 패딩을 반응형으로 적용한다 (p-4 sm:p-8)', () => {
   render(
     <Modal open showCloseButton onClose={() => {}}>
       <p>내용</p>
     </Modal>,
   );
   const dialog = screen.getByRole('dialog');
-  expect(dialog).toHaveClass('p-8');
-  expect(dialog).not.toHaveClass('pt-16');
+  expect(dialog).toHaveClass('p-4', 'sm:p-8');
+  expect(dialog).not.toHaveClass('pt-12');
 });
 
-it('showCloseButton이 없으면 센터형 패딩(pt-16)을 적용한다', () => {
+it('showCloseButton이 없으면 센터형 패딩을 반응형으로 적용한다 (pt-12 sm:pt-16)', () => {
   render(
     <Modal open onClose={() => {}}>
       <p>내용</p>
     </Modal>,
   );
   const dialog = screen.getByRole('dialog');
-  expect(dialog).toHaveClass('pt-16');
-  expect(dialog).not.toHaveClass('p-8');
+  expect(dialog).toHaveClass('pt-12', 'sm:pt-16');
+  expect(dialog).not.toHaveClass('p-4');
+});
+
+it('제목 타이포를 반응형으로 적용한다 (text-sm sm:text-xl)', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <Modal.Title>제목</Modal.Title>
+    </Modal>,
+  );
+  expect(screen.getByRole('heading', { name: '제목' })).toHaveClass('text-sm', 'sm:text-xl');
+});
+
+it('Cancel/Confirm 버튼은 데스크탑(sm:)에서 large 크기로 반응한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <Modal.Cancel>취소</Modal.Cancel>
+      <Modal.Confirm onClick={() => {}}>확인</Modal.Confirm>
+    </Modal>,
+  );
+  expect(screen.getByRole('button', { name: '취소' })).toHaveClass('text-sm', 'sm:text-lg');
+  expect(screen.getByRole('button', { name: '확인' })).toHaveClass('text-sm', 'sm:text-lg');
 });

@@ -18,10 +18,7 @@ import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons';
 import { cn } from '@/src/utils/cn';
 
-type ModalSize = 'large' | 'small';
-
 interface ModalContextValue {
-  size: ModalSize;
   close: () => void;
   setTitleId: (id: string | undefined) => void;
 }
@@ -31,7 +28,6 @@ const ModalContext = createContext<ModalContextValue | null>(null);
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  size?: ModalSize;
   closeOnBackdropClick?: boolean;
   closeOnEsc?: boolean;
   showCloseButton?: boolean;
@@ -40,16 +36,9 @@ interface ModalProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-const sizeClasses: Record<ModalSize, { width: string; padding: string; headerPadding: string; closeInset: string }> = {
-  // padding: 센터 메시지(확인 popup)용 비대칭 여백 / headerPadding: 제목+X 헤더형 대칭 여백
-  large: { width: 'w-[456px]', padding: 'px-8 pt-16 pb-8', headerPadding: 'p-8', closeInset: 'top-8 right-8' },
-  small: { width: 'w-[343px]', padding: 'px-4 pt-12 pb-4', headerPadding: 'p-4', closeInset: 'top-4 right-4' },
-};
-
 export default function Modal({
   open,
   onClose,
-  size = 'large',
   closeOnBackdropClick = true,
   closeOnEsc = true,
   showCloseButton = false,
@@ -126,7 +115,7 @@ export default function Modal({
   };
 
   return createPortal(
-    <ModalContext value={{ size, close: onClose, setTitleId }}>
+    <ModalContext value={{ close: onClose, setTitleId }}>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
         onClick={(e) => {
@@ -142,15 +131,17 @@ export default function Modal({
           tabIndex={-1}
           className={cn(
             'relative flex max-w-[calc(100vw-2rem)] flex-col rounded bg-white shadow-xl',
-            sizeClasses[size].width,
-            showCloseButton ? sizeClasses[size].headerPadding : sizeClasses[size].padding,
+            // 크기는 반응형: 모바일=small(343px) / 데스크탑(sm:≥640px)=large(456px)
+            'w-[343px] sm:w-[456px]',
+            // padding: 센터 메시지(확인 popup) 비대칭 / 헤더형(제목+X) 대칭, 둘 다 모바일→데스크탑 반응형
+            showCloseButton ? 'p-4 sm:p-8' : 'px-4 pt-12 pb-4 sm:px-8 sm:pt-16 sm:pb-8',
             className,
           )}
         >
           {children}
           {/* 닫기 버튼은 DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
           {showCloseButton && (
-            <IconButton aria-label="닫기" onClick={onClose} className={cn('absolute', sizeClasses[size].closeInset)}>
+            <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4 sm:top-8 sm:right-8">
               <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
             </IconButton>
           )}
@@ -175,28 +166,35 @@ interface ModalActionsProps {
 }
 
 function ModalActions({ children, className }: ModalActionsProps) {
-  const { size } = useModalContext();
-  return (
-    <div className={cn('flex w-full items-center [&>*]:flex-1', size === 'large' ? 'gap-3' : 'gap-2', className)}>
-      {children}
-    </div>
-  );
+  // gap도 반응형: 모바일 gap-2 / 데스크탑 gap-3
+  return <div className={cn('flex w-full items-center gap-2 sm:gap-3 [&>*]:flex-1', className)}>{children}</div>;
 }
 
 type ModalCancelProps = Omit<ButtonProps, 'variant' | 'size'>;
 
-function ModalCancel({ onClick, ...props }: ModalCancelProps) {
-  const { size, close } = useModalContext();
-  return <Button variant="tertiary" size={size} onClick={onClick ?? close} {...props} />;
+// Button의 size는 prop(고정)이라 반응형이 안 되므로, 모바일=small + sm:로 데스크탑 large(py/text)를 보강한다.
+// (Button large 값과 동기화 필요 — 추후 Button(#15)이 반응형 size를 지원하면 그쪽으로 이전)
+const responsiveButtonClass = 'sm:py-[13px] sm:text-lg';
+
+function ModalCancel({ onClick, className, ...props }: ModalCancelProps) {
+  const { close } = useModalContext();
+  return (
+    <Button
+      variant="tertiary"
+      size="small"
+      onClick={onClick ?? close}
+      className={cn(responsiveButtonClass, className)}
+      {...props}
+    />
+  );
 }
 
 type ModalConfirmProps = Omit<ButtonProps, 'variant' | 'size' | 'onClick'> & {
   onClick: MouseEventHandler<HTMLButtonElement>;
 };
 
-function ModalConfirm(props: ModalConfirmProps) {
-  const { size } = useModalContext();
-  return <Button variant="primary" size={size} {...props} />;
+function ModalConfirm({ className, ...props }: ModalConfirmProps) {
+  return <Button variant="primary" size="small" className={cn(responsiveButtonClass, className)} {...props} />;
 }
 
 interface ModalTitleProps {
@@ -205,14 +203,15 @@ interface ModalTitleProps {
 }
 
 function ModalTitle({ children, className }: ModalTitleProps) {
-  const { size, setTitleId } = useModalContext();
+  const { setTitleId } = useModalContext();
   const id = useId();
   useEffect(() => {
     setTitleId(id);
     return () => setTitleId(undefined);
   }, [id, setTitleId]);
+  // 타이포도 반응형: 모바일 text-sm / 데스크탑 text-xl
   return (
-    <h2 id={id} className={cn('font-semibold text-slate-800', size === 'large' ? 'text-xl' : 'text-sm', className)}>
+    <h2 id={id} className={cn('text-sm font-semibold text-slate-800 sm:text-xl', className)}>
       {children}
     </h2>
   );
