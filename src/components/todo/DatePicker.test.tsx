@@ -35,3 +35,20 @@ it('value가 있으면 포맷된 날짜를 표시한다', () => {
   render(<DatePicker value={new CalendarDate(2024, 5, 15)} />);
   expect(screen.getByText('2024. 05. 15')).toBeInTheDocument();
 });
+
+it('트리거 클릭 시 취소·확인 버튼이 노출된다', async () => {
+  const user = userEvent.setup();
+  render(<DatePicker value={null} />);
+  await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
+  expect(screen.getByRole('button', { name: '취소' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '확인' })).toBeInTheDocument();
+});
+
+it('열린 상태에서 트리거 재클릭 시 팝업이 닫힌다', async () => {
+  const user = userEvent.setup();
+  render(<DatePicker value={null} />);
+  const trigger = screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement;
+  await user.click(trigger);
+  await user.click(trigger);
+  expect(screen.queryByRole('button', { name: '취소' })).not.toBeInTheDocument();
+});
