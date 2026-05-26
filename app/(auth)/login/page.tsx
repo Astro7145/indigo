@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -9,15 +8,17 @@ import { IcGoogle } from '@/src/components/common/icons/IcGoogle';
 import { IcKakao } from '@/src/components/common/icons/IcKakao';
 import Input from '@/src/components/common/inputs/Input';
 import PasswordInput from '@/src/components/common/inputs/PasswordInput';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/src/utils/schema';
 import { LogoFull } from '@/src/components/common/icons';
+import { useLogin } from '@/src/hooks/auth';
 
 export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isSubmitting, isSubmitted, errors, isValid },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -27,6 +28,15 @@ export default function LoginPage() {
     },
     mode: 'onBlur',
   });
+  const { email, password } = useWatch({ control });
+
+  const { mutate } = useLogin();
+
+  const handleLoginBehavior = () => {
+    if (!email || !password) return;
+
+    mutate({ email, password });
+  };
 
   return (
     <div className="flex w-full max-w-100 flex-col gap-10">
@@ -34,13 +44,7 @@ export default function LoginPage() {
       <LogoFull type="indigo" />
 
       {/* 폼 영역 */}
-      <form
-        className="flex flex-col gap-8"
-        onSubmit={handleSubmit(async (data) => {
-          await new Promise((r) => setTimeout(r, 1000));
-          alert(JSON.stringify(data));
-        })}
-      >
+      <form className="flex flex-col gap-8" onSubmit={handleSubmit(handleLoginBehavior)}>
         {/* 입력 필드 */}
         <div className="flex flex-col gap-4">
           <span className="flex flex-col gap-y-1">
