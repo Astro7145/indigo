@@ -1,28 +1,8 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
-import {
-  todoKeys,
-  getTodos,
-  getTodo,
-  createTodo,
-  patchTodo,
-  deleteTodo,
-  addTodoFavorite,
-  removeTodoFavorite,
-  getFavoriteTodos,
-} from '@/src/api/todo';
-import type {
-  Todo,
-  TodoListParams,
-  TodoListResponse,
-  CreateTodoBody,
-  UpdateTodoBody,
-  FavoriteTodo,
-  FavoriteTodoListResponse,
-} from '@/src/types/todo';
-import type { CursorParams, ApiError } from '@/src/types/common';
-
-// favorites filter 변형까지 한 번에 invalidate 하기 위한 prefix
-export const favoritesPrefix = [...todoKeys.all, 'favorites'] as const;
+import { todoKeys, getTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
+import { favoriteKeys } from '@/src/api/favorite';
+import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
+import type { ApiError } from '@/src/types/common';
 
 export function useTodoList(params: TodoListParams = {}) {
   return useQuery<TodoListResponse, ApiError>({
@@ -47,22 +27,6 @@ export function useTodo(id: number | undefined) {
   });
 }
 
-export function useFavoriteTodoList(params: CursorParams = {}) {
-  return useQuery<FavoriteTodoListResponse, ApiError>({
-    queryKey: todoKeys.favorites(params),
-    queryFn: () => getFavoriteTodos(params),
-  });
-}
-
-export function useInfiniteFavoriteTodoList(params: Omit<CursorParams, 'cursor'> = {}) {
-  return useInfiniteQuery<FavoriteTodoListResponse, ApiError>({
-    queryKey: [...todoKeys.favorites(params), 'infinite'],
-    queryFn: ({ pageParam }) => getFavoriteTodos({ ...params, cursor: pageParam as number | undefined }),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (last) => last.nextCursor ?? undefined,
-  });
-}
-
 export function useCreateTodo() {
   const qc = useQueryClient();
   return useMutation<Todo, ApiError, CreateTodoBody>({
@@ -82,7 +46,7 @@ export function useUpdateTodo() {
       // PATCH 응답 shape가 GET 응답과 동일하므로 detail 캐시 직접 갱신.
       qc.setQueryData(todoKeys.detail(todoId), data);
       // FavoriteTodo.todo가 title/done을 품으므로 favorites 변형도 동기화.
-      qc.invalidateQueries({ queryKey: favoritesPrefix });
+      qc.invalidateQueries({ queryKey: favoriteKeys.all });
     },
   });
 }
@@ -95,31 +59,7 @@ export function useDeleteTodo() {
       qc.invalidateQueries({ queryKey: todoKeys.lists() });
       qc.removeQueries({ queryKey: todoKeys.detail(todoId) });
       // 삭제된 todo가 favorites 목록에 남지 않도록 함께 무효화.
-      qc.invalidateQueries({ queryKey: favoritesPrefix });
-    },
-  });
-}
-
-export function useAddTodoFavorite() {
-  const qc = useQueryClient();
-  return useMutation<FavoriteTodo, ApiError, number>({
-    mutationFn: (todoId) => addTodoFavorite(todoId),
-    onSuccess: (_, todoId) => {
-      qc.invalidateQueries({ queryKey: todoKeys.lists() });
-      qc.invalidateQueries({ queryKey: favoritesPrefix });
-      qc.invalidateQueries({ queryKey: todoKeys.detail(todoId) });
-    },
-  });
-}
-
-export function useRemoveTodoFavorite() {
-  const qc = useQueryClient();
-  return useMutation<void, ApiError, number>({
-    mutationFn: (todoId) => removeTodoFavorite(todoId),
-    onSuccess: (_, todoId) => {
-      qc.invalidateQueries({ queryKey: todoKeys.lists() });
-      qc.invalidateQueries({ queryKey: favoritesPrefix });
-      qc.invalidateQueries({ queryKey: todoKeys.detail(todoId) });
+      qc.invalidateQueries({ queryKey: favoriteKeys.all });
     },
   });
 }
