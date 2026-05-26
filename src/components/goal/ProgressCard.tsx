@@ -1,5 +1,6 @@
 'use client';
 
+import { animate, useReducedMotion } from 'motion/react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import Card from '@/src/components/common/cards/Card';
@@ -42,41 +43,37 @@ const COMPACT_WIDTH: Record<'small' | 'xsmall', string> = {
 };
 
 /**
- * 0에서 target까지 부드럽게 차오르는 수치를 반환(easeOutCubic).
+ * 0에서 target까지 부드럽게 차오르는 수치를 반환(easeOutCubic — cubic-bezier 근사).
  * 마운트 시 0→target, target이 바뀌면 현재 값에서 새 target으로 재애니메이션.
  * `prefers-reduced-motion`이면 애니메이션 없이 즉시 target.
+ * 보간·중단(retarget) 처리는 Motion `animate`에 위임 — 프로젝트 표준 애니메이션 라이브러리.
  */
 function useAnimatedNumber(target: number, duration = 700): number {
   const [value, setValue] = useState(0);
   const valueRef = useRef(0);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
-    const reduce =
-      typeof window !== 'undefined' &&
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let raf = 0;
     if (reduce) {
-      // 애니메이션 없이 즉시 target (effect 본문 동기 setState 회피 위해 rAF로 한 프레임 지연)
-      raf = requestAnimationFrame(() => {
+      // 즉시 target. 동기 setState는 react-hooks/set-state-in-effect 위반이라 rAF로 한 프레임 지연
+      const raf = requestAnimationFrame(() => {
         valueRef.current = target;
         setValue(target);
       });
       return () => cancelAnimationFrame(raf);
     }
-    const from = valueRef.current;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      const next = from + (target - from) * eased;
-      valueRef.current = next;
-      setValue(next);
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, duration]);
+    // 현재 값(valueRef)에서 새 target으로 — target 변경 시 cleanup이 이전 애니메이션을 멈춰 재애니메이션
+    const controls = animate(valueRef.current, target, {
+      duration: duration / 1000,
+      // 원본 1-(1-t)³(easeOutCubic)에 대응하는 cubic-bezier
+      ease: [0.215, 0.61, 0.355, 1],
+      onUpdate: (latest) => {
+        valueRef.current = latest;
+        setValue(latest);
+      },
+    });
+    return () => controls.stop();
+  }, [target, duration, reduce]);
 
   return value;
 }
