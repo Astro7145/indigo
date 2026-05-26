@@ -28,7 +28,7 @@ export default function Calendar(props: CalendarProps) {
   const { buttonProps: nextDomProps } = useButton(nextButtonProps, nextRef);
 
   return (
-    <div {...calendarProps} className="calendar flex flex-col items-center">
+    <div {...calendarProps} className="calendar flex w-[280px] flex-col">
       <div className="flex w-full items-center justify-between">
         <IconButton {...prevDomProps} aria-label="이전 달" className="size-8 overflow-hidden rounded-[6px] p-1.5">
           <IcChevron direction="left" />

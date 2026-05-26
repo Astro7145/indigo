@@ -24,7 +24,7 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
           />
 
           <motion.div
-            className="fixed bottom-0 left-0 z-50 w-full rounded-t-2xl bg-white"
+            className="fixed bottom-0 left-0 z-50 w-full rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -36,8 +36,8 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
               if (info.offset.y > 80 || info.velocity.y > 500) onClose();
             }}
           >
-            <div className="flex justify-center pt-3">
-              <div className="h-1 w-10 rounded-full bg-slate-300" />
+            <div className="flex justify-center pt-[10px]">
+              <div className="h-1 w-9 rounded-[2px] bg-slate-300" />
             </div>
             {children}
           </motion.div>
