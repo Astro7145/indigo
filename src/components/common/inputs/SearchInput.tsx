@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import Input from './Input'
-import SearchButton from './inputButtons/SearchButton'
+import Input from './Input';
+import SearchButton from './inputButtons/SearchButton';
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  onSearch?: () => void
+  onSearch?: () => void;
 }
 
 export default function SearchInput({ onSearch, ...props }: SearchInputProps) {
   const handleEnterSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') onSearch?.()
-  }
+    if (e.key === 'Enter') onSearch?.();
+  };
 
   const handleSearch = () => {
-    onSearch?.()
-  }
+    onSearch?.();
+  };
 
   return (
     <search>
@@ -27,5 +27,5 @@ export default function SearchInput({ onSearch, ...props }: SearchInputProps) {
         {...props}
       />
     </search>
-  )
+  );
 }

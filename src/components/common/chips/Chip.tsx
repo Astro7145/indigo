@@ -1,26 +1,26 @@
-import { cn } from '@/src/utils/cn'
+import { cn } from '@/src/utils/cn';
 
 /**
  * 칩 타입
  * - `todo`: 연보라 배경 / indigo-700 텍스트
  * - `done`: 회색 배경 / 흰 텍스트
  */
-export type ChipType = 'todo' | 'done'
+export type ChipType = 'todo' | 'done';
 
 interface ChipProps {
-  type?: ChipType
-  className?: string
+  type?: ChipType;
+  className?: string;
 }
 
 const typeStyles: Record<ChipType, string> = {
   todo: 'bg-indigo-300 text-indigo-700',
   done: 'bg-slate-300 text-white',
-}
+};
 
 const typeLabels: Record<ChipType, string> = {
   todo: 'TO DO',
   done: 'DONE',
-}
+};
 
 /**
  * 할일 상태 표시 칩. 클릭 불가 표시 전용 컴포넌트
@@ -43,5 +43,5 @@ export default function Chip({ type = 'todo', className }: ChipProps) {
     >
       {typeLabels[type]}
     </span>
-  )
+  );
 }

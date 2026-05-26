@@ -1,14 +1,9 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 export function IcKakao({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6', className)} {...rest}>
       <g transform="scale(1.5625)">
         <path
           fill="#000000"
@@ -16,5 +11,5 @@ export function IcKakao({ className, ...rest }: SVGProps<SVGSVGElement>) {
         />
       </g>
     </svg>
-  )
+  );
 }

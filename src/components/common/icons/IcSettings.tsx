@@ -1,14 +1,9 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 export function IcSettings({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6 text-slate-300', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6 text-slate-300', className)} {...rest}>
       <path
         d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
         stroke="currentColor"
@@ -28,5 +23,5 @@ export function IcSettings({ className, ...rest }: SVGProps<SVGSVGElement>) {
         fill="currentColor"
       />
     </svg>
-  )
+  );
 }

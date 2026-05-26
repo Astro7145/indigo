@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react';
 
-import { useToastStore } from '@/src/stores/toast'
+import { useToastStore } from '@/src/stores/toast';
 
-import ToastPortal from '../portals/ToastPortal'
-import { IcCheck } from '../icons'
+import ToastPortal from '../portals/ToastPortal';
+import { IcCheck } from '../icons';
 
 export default function Toast() {
-  const { isOpen, message } = useToastStore()
+  const { isOpen, message } = useToastStore();
 
   return (
     <ToastPortal>
@@ -24,12 +24,10 @@ export default function Toast() {
           >
             <IcCheck color="indigo" className="size-6" />
             {/* 1초전 이라는 문구는 큰 의미가 없어 보여 추가하지 않고 대신 메세지를 자유롭게 입력 가능하도록 구현함 */}
-            <span className="text-sm font-semibold text-indigo-600">
-              {message}
-            </span>
+            <span className="text-sm font-semibold text-indigo-600">{message}</span>
           </motion.div>
         )}
       </AnimatePresence>
     </ToastPortal>
-  )
+  );
 }

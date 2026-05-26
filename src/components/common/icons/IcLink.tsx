@@ -1,26 +1,15 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcLinkProps extends SVGProps<SVGSVGElement> {
-  state?: 'default' | 'active'
+  state?: 'default' | 'active';
 }
 
 export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
   if (state === 'default') {
     return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        className={cn('size-6', className)}
-        {...rest}
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="12"
-          fill="var(--color-white)"
-          fillOpacity="0.4"
-        />
+      <svg viewBox="0 0 24 24" fill="none" className={cn('size-6', className)} {...rest}>
+        <circle cx="12" cy="12" r="12" fill="var(--color-white)" fillOpacity="0.4" />
         <path
           d="M13.3332 10.6663L10.6665 13.333"
           stroke="var(--color-indigo-600)"
@@ -35,16 +24,11 @@ export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
           strokeLinecap="round"
         />
       </svg>
-    )
+    );
   }
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6 text-indigo-700', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6 text-indigo-700', className)} {...rest}>
       <circle cx="12" cy="12" r="12" fill="currentColor" fillOpacity="0.2" />
       <path
         d="M13.3332 10.6663L10.6665 13.333"
@@ -60,5 +44,5 @@ export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
         strokeLinecap="round"
       />
     </svg>
-  )
+  );
 }

@@ -1,14 +1,9 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 export function IcGoogle({ className, ...rest }: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn('size-6', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6', className)} {...rest}>
       <g clipPath="url(#clip0_21209_59772)">
         <path
           d="M23.7663 12.2763C23.7663 11.4605 23.7001 10.6404 23.559 9.83789H12.2402V14.4589H18.722C18.453 15.9492 17.5888 17.2676 16.3233 18.1054V21.1037H20.1903C22.4611 19.0137 23.7663 15.9272 23.7663 12.2763Z"
@@ -33,5 +28,5 @@ export function IcGoogle({ className, ...rest }: SVGProps<SVGSVGElement>) {
         </clipPath>
       </defs>
     </svg>
-  )
+  );
 }
