@@ -26,5 +26,12 @@ jest.mock('@/src/components/todo/BottomSheet', () => ({
   default: () => null,
 }));
 
-// TODO: 테스트 케이스는 Task 2에서 추가한다.
-it.todo('DatePicker 테스트 케이스 추가 예정');
+it('value가 null이면 "날짜를 선택해주세요"를 표시한다', () => {
+  render(<DatePicker value={null} />);
+  expect(screen.getByText('날짜를 선택해주세요')).toBeInTheDocument();
+});
+
+it('value가 있으면 포맷된 날짜를 표시한다', () => {
+  render(<DatePicker value={new CalendarDate(2024, 5, 15)} />);
+  expect(screen.getByText('2024. 05. 15')).toBeInTheDocument();
+});
