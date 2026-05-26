@@ -70,7 +70,7 @@ it('취소 버튼을 누르면 날짜 변경이 적용되지 않는다', async (
   expect(onChange).not.toHaveBeenCalled();
 });
 
-it('확인 버튼을 누르면 선택한 날짜가 전달된다', async () => {
+it('확인 버튼을 누르면 선택한 날짜가 적용된다', async () => {
   const user = userEvent.setup();
   const onChange = jest.fn();
   const value = new CalendarDate(2024, 5, 15);
@@ -86,4 +86,30 @@ it('확인 버튼을 누르면 팝업이 닫힌다', async () => {
   await user.click(screen.getByText('날짜를 선택해주세요').closest('button') as HTMLButtonElement);
   await user.click(screen.getByRole('button', { name: '확인' }));
   expect(screen.queryByRole('button', { name: '확인' })).not.toBeInTheDocument();
+});
+
+it('날짜를 변경하고 취소하면 원래 날짜로 돌아온다', async () => {
+  const user = userEvent.setup();
+  render(<DatePicker value={new CalendarDate(2024, 5, 15)} />);
+  // 열기
+  await user.click(screen.getByText('2024. 05. 15').closest('button') as HTMLButtonElement);
+  // 날짜 변경 → pendingDate = 2024/6/20
+  await user.click(screen.getByText('날짜 변경'));
+  // 취소 → pendingDate 리셋, 닫힘
+  await user.click(screen.getByRole('button', { name: '취소' }));
+  // 재오픈
+  await user.click(screen.getByText('2024. 05. 15').closest('button') as HTMLButtonElement);
+  // pendingDate가 value(05/15)로 리셋됐으면 06/20은 표시되지 않는다
+  expect(screen.queryByText('2024. 06. 20')).not.toBeInTheDocument();
+});
+
+it('날짜를 변경하고 확인하면 새 날짜가 적용된다', async () => {
+  const user = userEvent.setup();
+  const onChange = jest.fn();
+  render(<DatePicker value={new CalendarDate(2024, 5, 15)} onChange={onChange} />);
+  await user.click(screen.getByText('2024. 05. 15').closest('button') as HTMLButtonElement);
+  // 날짜 변경 → pendingDate = 2024/6/20
+  await user.click(screen.getByText('날짜 변경'));
+  await user.click(screen.getByRole('button', { name: '확인' }));
+  expect(onChange).toHaveBeenCalledWith(new CalendarDate(2024, 6, 20));
 });
