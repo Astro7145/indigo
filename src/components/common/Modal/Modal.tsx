@@ -40,9 +40,10 @@ interface ModalProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-const sizeContainerClasses: Record<ModalSize, string> = {
-  large: 'w-[456px] px-8 pt-16 pb-8',
-  small: 'w-[343px] px-4 pt-12 pb-4',
+const sizeClasses: Record<ModalSize, { width: string; padding: string; headerPadding: string; closeInset: string }> = {
+  // padding: 센터 메시지(확인 popup)용 비대칭 여백 / headerPadding: 제목+X 헤더형 대칭 여백
+  large: { width: 'w-[456px]', padding: 'px-8 pt-16 pb-8', headerPadding: 'p-8', closeInset: 'top-8 right-8' },
+  small: { width: 'w-[343px]', padding: 'px-4 pt-12 pb-4', headerPadding: 'p-4', closeInset: 'top-4 right-4' },
 };
 
 export default function Modal({
@@ -141,14 +142,15 @@ export default function Modal({
           tabIndex={-1}
           className={cn(
             'relative flex max-w-[calc(100vw-2rem)] flex-col rounded bg-white shadow-xl',
-            sizeContainerClasses[size],
+            sizeClasses[size].width,
+            showCloseButton ? sizeClasses[size].headerPadding : sizeClasses[size].padding,
             className,
           )}
         >
           {children}
           {/* 닫기 버튼은 DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
           {showCloseButton && (
-            <IconButton aria-label="닫기" onClick={onClose} className="absolute top-6 right-6">
+            <IconButton aria-label="닫기" onClick={onClose} className={cn('absolute', sizeClasses[size].closeInset)}>
               <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
             </IconButton>
           )}

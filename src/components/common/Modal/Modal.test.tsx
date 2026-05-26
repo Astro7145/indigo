@@ -285,3 +285,25 @@ it('showCloseButton이 있어도 열릴 때 포커스는 닫기 버튼이 아닌
   expect(screen.getByTestId('inside')).toHaveFocus();
   expect(screen.getByRole('button', { name: '닫기' })).not.toHaveFocus();
 });
+
+it('showCloseButton이면 헤더형 대칭 패딩(p-8)을 적용한다', () => {
+  render(
+    <Modal open showCloseButton onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  const dialog = screen.getByRole('dialog');
+  expect(dialog).toHaveClass('p-8');
+  expect(dialog).not.toHaveClass('pt-16');
+});
+
+it('showCloseButton이 없으면 센터형 패딩(pt-16)을 적용한다', () => {
+  render(
+    <Modal open onClose={() => {}}>
+      <p>내용</p>
+    </Modal>,
+  );
+  const dialog = screen.getByRole('dialog');
+  expect(dialog).toHaveClass('pt-16');
+  expect(dialog).not.toHaveClass('p-8');
+});
