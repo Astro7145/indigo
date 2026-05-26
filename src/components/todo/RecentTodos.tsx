@@ -5,7 +5,7 @@ import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
-import { useDeleteTodo, useTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { cn } from '@/src/utils/cn';
 
 export type RecentTodosSize = 'default' | 'small';
@@ -30,7 +30,6 @@ const sizeClasses: Record<RecentTodosSize, string> = {
 export default function RecentTodos({ size = 'default', onSeeAll, className }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest' });
   const update = useUpdateTodo();
-  const removeTodo = useDeleteTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
   const todos = data?.todos ?? [];
@@ -73,13 +72,7 @@ export default function RecentTodos({ size = 'default', onSeeAll, className }: R
                   <TodoList.Actions>
                     {t.noteIds.length > 0 && <TodoList.NoteAction />}
                     {t.linkUrl && <TodoList.LinkAction />}
-                    <TodoList.KebabAction
-                      hoverOnly
-                      onEdit={() => {
-                        // TODO: 편집 모달 연결 (Modal #56 dev 머지 후)
-                      }}
-                      onDelete={() => removeTodo.mutate(t.id)}
-                    />
+                    <TodoList.KebabAction hoverOnly />
                     <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                   </TodoList.Actions>
                 </TodoList>
