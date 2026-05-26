@@ -115,7 +115,11 @@ function Actions({ children, className }: { children?: ReactNode; className?: st
   );
 }
 
-/** 액션 공통 — 모든 액션은 IconButton. hoverOnly면 행 hover 시에만 표시(CSS group-hover). */
+/**
+ * 액션 공통. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
+ * onClick이 있으면 IconButton(`<button>`), 없으면 동작 없는 인디케이터이므로 포커스 잡히는
+ * no-op 버튼 대신 비대화형 `<span role="img">`으로 렌더한다(a11y — 표시만 하고 클릭/포커스 없음).
+ */
 function ActionButton({
   label,
   onClick,
@@ -129,19 +133,25 @@ function ActionButton({
   className?: string;
   children: ReactNode;
 }) {
+  const classes = cn('size-7 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className);
+
+  if (!onClick) {
+    return (
+      <span role="img" aria-label={label} className={cn('inline-flex items-center justify-center rounded', classes)}>
+        {children}
+      </span>
+    );
+  }
+
   return (
     <IconButton
       aria-label={label}
       hover={false}
-      onClick={
-        onClick
-          ? (e: MouseEvent<HTMLButtonElement>) => {
-              e.stopPropagation();
-              onClick();
-            }
-          : undefined
-      }
-      className={cn('size-7 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className)}
+      onClick={(e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className={classes}
     >
       {children}
     </IconButton>
