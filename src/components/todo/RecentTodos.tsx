@@ -8,26 +8,21 @@ import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite'
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { cn } from '@/src/utils/cn';
 
-export type RecentTodosSize = 'default' | 'small';
-
 export interface RecentTodosProps {
-  size?: RecentTodosSize;
   /** "모두 보기" 클릭 핸들러 — 항상 button, 동작은 외부 주입 */
   onSeeAll?: () => void;
   className?: string;
 }
 
-const sizeClasses: Record<RecentTodosSize, string> = {
-  default: 'w-full md:w-[640px]',
-  small: 'w-[344px]',
-};
+// 반응형 폭 — Figma Large(640) / Tablet(312) / Mobile(344). 외부 size prop 없이 뷰포트 자동 적응.
+const rootClass = 'flex flex-col gap-2.5 w-[344px] md:w-[312px] lg:w-[640px]';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
  * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ size = 'default', onSeeAll, className }: RecentTodosProps) {
+export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest' });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
@@ -41,7 +36,7 @@ export default function RecentTodos({ size = 'default', onSeeAll, className }: R
   };
 
   return (
-    <div className={cn('flex flex-col gap-2.5', sizeClasses[size], className)}>
+    <div className={cn(rootClass, className)}>
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
           <IcTask aria-hidden className="shrink-0" />
@@ -63,12 +58,7 @@ export default function RecentTodos({ size = 'default', onSeeAll, className }: R
           <ul className="flex flex-col gap-1.5">
             {todos.map((t) => (
               <li key={t.id}>
-                <TodoList
-                  title={t.title}
-                  checked={t.done}
-                  onCheckedChange={(done) => toggle(t.id, done)}
-                  size={size === 'small' ? 'small' : 'large'}
-                >
+                <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
                   <TodoList.Actions>
                     {t.noteIds.length > 0 && <TodoList.NoteAction />}
                     {t.linkUrl && <TodoList.LinkAction />}
