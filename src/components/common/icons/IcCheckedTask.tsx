@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import { SVGProps, useId } from 'react';
 import { cn } from '@/src/utils/cn';
 
 export function IcCheckedTask({ className, ...rest }: SVGProps<SVGSVGElement>) {
-  const id = useId()
+  const id = useId();
 
   return (
     <svg viewBox="0 0 180 180" fill="none" className={cn('size-[180px]', className)} {...rest}>
@@ -39,14 +39,7 @@ export function IcCheckedTask({ className, ...rest }: SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
       />
       <defs>
-        <linearGradient
-          id={id}
-          x1="90.2381"
-          y1="51.4712"
-          x2="90.2381"
-          y2="139.419"
-          gradientUnits="userSpaceOnUse"
-        >
+        <linearGradient id={id} x1="90.2381" y1="51.4712" x2="90.2381" y2="139.419" gradientUnits="userSpaceOnUse">
           <stop stopColor="var(--color-indigo-600)" />
           <stop offset="1" stopColor="var(--color-indigo-500)" />
         </linearGradient>

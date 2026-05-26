@@ -1,19 +1,14 @@
-import { SVGProps } from 'react'
-import { cn } from '@/src/utils/cn'
+import { SVGProps } from 'react';
+import { cn } from '@/src/utils/cn';
 
 interface IcSpringNoteProps extends SVGProps<SVGSVGElement> {
-  size?: 'sm' | 'lg'
-  bgShape?: 'square' | 'circle'
+  size?: 'sm' | 'lg';
+  bgShape?: 'square' | 'circle';
 }
 
 export function IcSpringNote({ size = 'sm', bgShape = 'square', className, ...rest }: IcSpringNoteProps) {
   return (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      className={cn(size === 'lg' ? 'size-[180px]' : 'size-8', className)}
-      {...rest}
-    >
+    <svg viewBox="0 0 40 40" fill="none" className={cn(size === 'lg' ? 'size-[180px]' : 'size-8', className)} {...rest}>
       {bgShape === 'circle' ? (
         <circle cx="20" cy="20" r="20" fill="var(--color-indigo-300)" />
       ) : (
@@ -45,5 +40,5 @@ export function IcSpringNote({ size = 'sm', bgShape = 'square', className, ...re
         />
       </svg>
     </svg>
-  )
+  );
 }
