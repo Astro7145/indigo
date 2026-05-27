@@ -4,7 +4,7 @@
 // 대시보드가 기대하는 shape(goals의 진행률 카운트, todos의 done/isFavorite 등)를
 // 돌려주는가"를 확인한다. BACKEND_TEST_EMAIL/PASSWORD 미설정 시 전체 스킵.
 import { NextRequest, type NextResponse } from 'next/server';
-import { POST as authPost } from '@/app/api/auth/[action]/route';
+import { POST as authPost } from '@/app/api/iauth/[action]/route';
 import { GET as proxyGet } from '@/app/api/[...path]/route';
 import { COOKIE } from '@/src/api/server/bff';
 
@@ -28,7 +28,7 @@ async function login(): Promise<string> {
   // 있다(연속 실행·pre-commit 재실행 등). 짧게 재시도해 충돌 윈도가 지나길 기다린다.
   for (let attempt = 1; ; attempt++) {
     const res = await authPost(
-      new NextRequest('http://localhost/api/auth/login', {
+      new NextRequest('http://localhost/api/iauth/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
@@ -48,7 +48,7 @@ async function login(): Promise<string> {
 async function logout(cookie: string): Promise<void> {
   // 세션(refresh 토큰)을 해제해 다음 실행의 로그인이 409로 충돌하지 않게 한다. best-effort.
   await authPost(
-    new NextRequest('http://localhost/api/auth/logout', {
+    new NextRequest('http://localhost/api/iauth/logout', {
       method: 'POST',
       headers: { 'content-type': 'application/json', cookie },
     }),
