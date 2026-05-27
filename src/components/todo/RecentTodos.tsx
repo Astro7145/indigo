@@ -27,7 +27,7 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
-  const todos = data?.todos ?? [];
+  const todos = (data?.todos ?? []).slice(0, 4);
 
   const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
   const toggleFavorite = (todoId: number, isFavorite: boolean) => {
@@ -60,6 +60,14 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
               <li key={t.id}>
                 <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
                   <TodoList.Actions>
+                    {t.goal && (
+                      <span
+                        data-testid="recent-todo-goal"
+                        className="max-w-[140px] truncate rounded bg-indigo-200 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                      >
+                        {t.goal.title}
+                      </span>
+                    )}
                     {t.noteIds.length > 0 && <TodoList.NoteAction />}
                     {t.linkUrl && <TodoList.LinkAction />}
                     <TodoList.KebabAction hoverOnly />
