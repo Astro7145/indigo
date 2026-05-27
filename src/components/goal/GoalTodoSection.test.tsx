@@ -57,17 +57,8 @@ it('목표가 0개면 섹션을 렌더하지 않는다', () => {
   expect(screen.queryByTestId('board')).not.toBeInTheDocument();
 });
 
-it('다음 페이지가 있으면 sentinel 교차 시 fetchNextPage를 호출한다', () => {
-  setHook({ hasNextPage: true });
-  render(<GoalTodoSection />);
-  expect(mockFetchNextPage).toHaveBeenCalled();
-});
-
-it('다음 페이지가 없으면 fetchNextPage를 호출하지 않는다', () => {
-  setHook({ hasNextPage: false });
-  render(<GoalTodoSection />);
-  expect(mockFetchNextPage).not.toHaveBeenCalled();
-});
+// 무한 스크롤의 "실제 다음 페이지 로딩"은 스크롤·뷰포트가 필요해 e2e(e2e/dashboard.spec.ts)에서 검증한다.
+// 여기서는 렌더 계열만 단위로 본다.
 
 it('다음 페이지 로딩 중이면 로딩 표시를 렌더한다', () => {
   setHook({ hasNextPage: true, isFetchingNextPage: true });
