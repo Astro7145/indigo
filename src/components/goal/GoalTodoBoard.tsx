@@ -64,7 +64,7 @@ function Column({
     <div
       role="group"
       aria-label={label}
-      className="flex min-w-0 flex-1 flex-col gap-2 rounded-xl border border-slate-200 p-5"
+      className="flex min-w-0 flex-1 flex-col gap-2 rounded border border-slate-200 p-5"
     >
       <span
         className={cn(
@@ -107,7 +107,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
     <Card
       onClick={() => router.push(`/goals/${goal.id}`)}
       className={cn(
-        'flex cursor-pointer flex-col gap-5 rounded-2xl border border-slate-200 p-7 transition-shadow hover:shadow-xl',
+        'flex cursor-pointer flex-col gap-5 border border-slate-200 p-7 transition-shadow hover:shadow-xl',
         className,
       )}
     >

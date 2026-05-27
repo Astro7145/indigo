@@ -47,7 +47,7 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </button>
       </div>
-      <Card className="rounded-2xl border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
+      <Card className="border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
         {isLoading ? (
           <p className="text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
