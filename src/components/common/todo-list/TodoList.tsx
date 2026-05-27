@@ -148,7 +148,13 @@ function ActionButton({
   className?: string;
   children: ReactNode;
 }) {
-  const classes = cn('size-6 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className);
+  // 액션 아이콘 공통 hover/click 피드백 — 배경색이 액션마다 달라(투명/indigo-alpha/흰색)
+  // 색 대신 scale 트랜스폼으로 통일(hover 시 살짝 확대, 누를 때 축소).
+  const classes = cn(
+    'size-6 shrink-0 rounded-full transition-transform hover:scale-110 active:scale-90',
+    hoverOnly && 'hidden group-hover:inline-flex',
+    className,
+  );
 
   if (!onClick) {
     return (
