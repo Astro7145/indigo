@@ -19,5 +19,4 @@ class MockIntersectionObserver implements IntersectionObserver {
   disconnect = () => {};
   takeRecords = (): IntersectionObserverEntry[] => [];
 }
-// @ts-expect-error jsdom 미구현 전역 주입
 global.IntersectionObserver = MockIntersectionObserver;
