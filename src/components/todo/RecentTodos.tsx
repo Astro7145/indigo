@@ -15,7 +15,8 @@ export interface RecentTodosProps {
 }
 
 // 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — 데스크톱·태블릿 2열, 모바일 1열은 페이지가 결정.
-const rootClass = 'flex w-full flex-col gap-2.5';
+// @container: 카드 폭 기준으로 높이를 ProgressCard와 동일하게 전환(셀 ≥480px=데스크톱 256, 그 외 187).
+const rootClass = '@container flex w-full flex-col gap-2.5';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
@@ -47,7 +48,7 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </button>
       </div>
-      <Card className="border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
+      <Card className="flex h-[187px] flex-col border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] @min-[480px]:h-64">
         {isLoading ? (
           <p className="text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
@@ -55,7 +56,7 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
         ) : todos.length === 0 ? (
           <p className="text-sm text-slate-500">할일이 없습니다.</p>
         ) : (
-          <ul className="flex flex-col gap-1.5">
+          <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 overflow-y-auto">
             {todos.map((t) => (
               <li key={t.id}>
                 <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
