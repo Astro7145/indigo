@@ -5,3 +5,19 @@
 // 3. 일관성 유지: 모든 테스트에 동일한 확장 기능이 적용되므로 테스트 코드가 일관성을 유지합니다.
 // 4. 설정 집중화: 테스트 환경 설정을 한 곳에서 관리할 수 있어 나중에 변경이 필요할 때 편리합니다.
 import '@testing-library/jest-dom';
+
+// jsdom은 IntersectionObserver를 구현하지 않는다. observe() 시 즉시 1회 교차 콜백을 호출하는 목.
+class MockIntersectionObserver implements IntersectionObserver {
+  readonly root = null;
+  readonly rootMargin = '';
+  readonly thresholds: ReadonlyArray<number> = [];
+  constructor(private cb: IntersectionObserverCallback) {}
+  observe = (target: Element) => {
+    this.cb([{ isIntersecting: true, target } as IntersectionObserverEntry], this);
+  };
+  unobserve = () => {};
+  disconnect = () => {};
+  takeRecords = (): IntersectionObserverEntry[] => [];
+}
+// @ts-expect-error jsdom 미구현 전역 주입
+global.IntersectionObserver = MockIntersectionObserver;
