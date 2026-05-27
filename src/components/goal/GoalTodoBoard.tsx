@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { motion, useReducedMotion } from 'motion/react';
 
 import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
@@ -90,6 +91,8 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
 
+  const reduce = useReducedMotion();
+
   const todos = data?.todos ?? [];
   const todoItems = todos.filter((t) => !t.done);
   const doneItems = todos.filter((t) => t.done);
@@ -119,7 +122,12 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
               aria-valuemax={100}
               className="h-2 w-full max-w-[310px] overflow-hidden rounded-full bg-slate-200"
             >
-              <div className="h-full rounded-full bg-indigo-500" style={{ width: `${percent}%` }} />
+              <motion.div
+                className="h-full rounded-full bg-indigo-500"
+                initial={reduce ? false : { width: 0 }}
+                animate={{ width: `${percent}%` }}
+                transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+              />
             </div>
             <span className="shrink-0 text-sm font-semibold text-indigo-700">{percent}%</span>
           </div>
