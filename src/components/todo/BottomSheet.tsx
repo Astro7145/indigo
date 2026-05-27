@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { usePreventScroll } from 'react-aria';
 
 interface BottomSheetProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface BottomSheetProps {
 }
 
 export default function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
+  usePreventScroll({ isDisabled: !isOpen });
+
   return (
     <AnimatePresence>
       {isOpen && (

@@ -61,7 +61,11 @@ export default function DatePicker(props: DatePickerProps) {
       {isMobile ? (
         <BottomSheet isOpen={isOpen} onClose={handleCancel}>
           <div className="flex justify-center px-[23.5px] pt-4 pb-3">
-            <div {...dialogProps} className={cn('w-full max-w-[328px] overflow-hidden outline-none', pickerCardClass)}>
+            <div
+              ref={popupRef}
+              {...dialogProps}
+              className={cn('w-full max-w-[328px] overflow-hidden outline-none', pickerCardClass)}
+            >
               <DatePickerContent
                 pendingDate={pendingDate}
                 firstDayOfWeek={firstDayOfWeek}
