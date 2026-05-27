@@ -71,7 +71,9 @@ function Column({
         isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
     >
-      <span className={cn('text-base font-bold tracking-[-0.03em]', isTodo ? 'text-indigo-700' : 'text-slate-400')}>
+      <span
+        className={cn('px-2 text-base font-bold tracking-[-0.03em]', isTodo ? 'text-indigo-700' : 'text-slate-400')}
+      >
         {isTodo ? 'TO DO' : 'DONE'}
       </span>
       <ul className="scrollbar-slate flex flex-1 flex-col gap-1 overflow-y-auto">
