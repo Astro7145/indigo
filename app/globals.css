@@ -81,6 +81,10 @@
   --color-badge-purple-bg: #f9f5ff;
   --color-badge-purple-border: #e9d7fe;
   --color-badge-purple-text: #6941c6;
+
+  /* ---- Shadow ---- */
+  --shadow-md: 0 0 30px 0 rgba(0, 0, 0, 0.05); /* Card 기본 */
+  --shadow-xl: 0 0 60px 0 rgba(0, 0, 0, 0.05); /* Modal 등 큰 표면 */
 }
 
 /* 전역 스타일 설정 */
