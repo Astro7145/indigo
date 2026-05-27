@@ -9,7 +9,7 @@ jest.mock('@/src/api/auth', () => ({
 import * as authApi from '@/src/api/auth';
 import { userKeys } from '@/src/api/user';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
-import { useSignup, useLogin, useOauthLogin, useLogout, useRefresh } from '@/src/hooks/auth';
+import { useSignup, useLogin, useLogout, useRefresh } from '@/src/hooks/auth';
 
 const mocked = authApi as jest.Mocked<typeof authApi>;
 
@@ -38,15 +38,6 @@ it('useLogin은 login을 호출하고 userKeys.me를 무효화한다', async () 
   const inv = jest.spyOn(client, 'invalidateQueries');
   await result.current.mutateAsync({ email: 'a', password: 'p' });
   expect(mocked.login).toHaveBeenCalledWith({ email: 'a', password: 'p' });
-  expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() });
-});
-
-it('useOauthLogin은 provider와 body로 oauthLogin을 호출한다', async () => {
-  mocked.oauthLogin.mockResolvedValue({ user: { id: 1 } } as never);
-  const { result, client } = renderHookWithClient(() => useOauthLogin());
-  const inv = jest.spyOn(client, 'invalidateQueries');
-  await result.current.mutateAsync({ provider: 'google', body: { token: 't' } });
-  expect(mocked.oauthLogin).toHaveBeenCalledWith('google', { token: 't' });
   expect(inv).toHaveBeenCalledWith({ queryKey: userKeys.me() });
 });
 

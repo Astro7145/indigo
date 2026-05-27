@@ -1,6 +1,6 @@
 jest.mock('@/src/api/axiosInstance');
 import instance from '@/src/api/axiosInstance';
-import { signup, login, refresh, logout, oauthLogin, authKeys } from '@/src/api/auth';
+import { signup, login, refresh, logout, authKeys } from '@/src/api/auth';
 
 const mocked = instance as jest.Mocked<typeof instance>;
 beforeEach(() => {
@@ -29,11 +29,6 @@ it('logout은 body 없이 /auth/logout으로 POST하고 void를 반환한다', a
   const r = await logout();
   expect(mocked.post).toHaveBeenCalledWith('/iauth/logout');
   expect(r).toBeUndefined();
-});
-it('oauthLogin은 /oauth/:provider로 POST하고 { user }를 반환한다', async () => {
-  const r = await oauthLogin('google', { token: 't' });
-  expect(mocked.post).toHaveBeenCalledWith('/oauth/google', { token: 't' });
-  expect(r).toEqual({ user: { id: 1, email: 'a@b.c', name: 'n', image: null } });
 });
 it('authKeys.all은 안정적이다', () => {
   expect(authKeys.all).toEqual(['auth']);
