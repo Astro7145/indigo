@@ -70,6 +70,14 @@ it('할일을 done 기준으로 To Do/Done 열에 나눠 렌더한다', async ()
   expect(within(doneCol).getByText('완료 할일')).toBeInTheDocument();
 });
 
+it('노트가 없으면 노트 작성(연필) 액션을, 있으면 노트 인디케이터를 렌더한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '노트없음'), { ...makeTodo(2, '노트있음'), noteIds: [10] }]));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('노트없음');
+  expect(screen.getByLabelText('노트 작성')).toBeInTheDocument();
+  expect(screen.getByLabelText('노트')).toBeInTheDocument();
+});
+
 it('할일이 없으면 빈 UI 메시지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<GoalTodoBoard goal={goal} />);

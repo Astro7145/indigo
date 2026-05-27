@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 
@@ -44,8 +43,11 @@ function Row({
         onCheckedChange={(done) => onToggle(todo.id, done)}
       >
         <TodoList.Actions>
+          {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
           {todo.noteIds.length > 0 && <TodoList.NoteAction />}
           {todo.linkUrl && <TodoList.LinkAction />}
+          {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
+          {todo.noteIds.length === 0 && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
           <TodoList.KebabAction hoverOnly />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
@@ -72,7 +74,7 @@ function Column({
       aria-label={label}
       className={cn(
         // 컨테이너(카드) 폭 기준: <1024 compact(p-4·gap-2·auto 높이), ≥1024 spacious(p-6·gap-4·고정 324)
-        'flex min-w-0 flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 @min-[600px]:flex-1 @min-[1024px]:h-[324px] @min-[1024px]:gap-4 @min-[1024px]:p-6',
+        'flex min-w-0 flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 @min-[512px]:flex-1 @min-[1024px]:h-[324px] @min-[1024px]:gap-4 @min-[1024px]:p-6',
         // figma: To Do = slate-50 배경(그림자 없음), Done = 흰 배경 + 옅은 그림자
         isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
@@ -124,18 +126,18 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
     >
       {/*
         헤더 — 카드(컨테이너) 폭 기준 반응형(figma):
-        - 카드 <600:  세로 스택 [제목+(+아이콘) / 바+%]  위 + [검색(전체폭)] 아래
-        - 600~1023:   한 줄 [제목 / 바+%] + [검색 + 할 일 추가]  (제목 위 바 아래)
+        - 카드 <512:  세로 스택 [제목+(+아이콘) / 바+%]  위 + [검색(전체폭)] 아래
+        - 512~1023:   한 줄 [제목 / 바+%] + [검색 + 할 일 추가]  (제목 위 바 아래)
         - ≥1024:      한 줄 [제목 + 바 + %] inline + [검색 + 할 일 추가]
       */}
-      <div className="flex flex-col gap-4 px-2 @min-[600px]:flex-row @min-[600px]:items-center @min-[600px]:justify-between">
-        <div className="flex min-w-0 flex-col gap-4 @min-[600px]:flex-1 @min-[1024px]:flex-row @min-[1024px]:items-center">
-          {/* 제목 행 — 모바일은 우측에 + 아이콘(600px+에선 숨기고 우측 텍스트 버튼 사용) */}
+      <div className="flex flex-col gap-4 @min-[512px]:flex-row @min-[512px]:items-center @min-[512px]:justify-between">
+        <div className="flex min-w-0 flex-col gap-4 @min-[512px]:flex-1 @min-[1024px]:flex-row @min-[1024px]:items-center">
+          {/* 제목 행 — 모바일은 우측에 + 아이콘(512px+에선 숨기고 우측 텍스트 버튼 사용) */}
           <div className="flex items-center justify-between gap-2 @min-[1024px]:shrink-0 @min-[1024px]:justify-start">
             <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700">{goal.title}</h3>
             <IconButton
               aria-label="할 일 추가"
-              className="size-9 shrink-0 rounded border border-indigo-500 @min-[600px]:hidden"
+              className="size-9 shrink-0 rounded border border-indigo-500 @min-[512px]:hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <IcPlus className="size-4 text-indigo-600" />
@@ -165,28 +167,30 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         </div>
         {/* 검색 + 할 일 추가(텍스트) — 모바일은 검색만 전체폭, 텍스트 버튼은 600px+에서 노출. 둘 다 높이 40px */}
         <div
-          className="flex w-full items-center gap-2 @min-[600px]:w-auto @min-[600px]:shrink-0 @min-[1024px]:gap-3.5"
+          className="flex w-full items-center gap-2 @min-[512px]:w-auto @min-[512px]:shrink-0 @min-[1024px]:gap-3.5"
           onClick={(e) => e.stopPropagation()}
+          // 검색창 Enter 등 키보드 이벤트가 카드(role=button)까지 버블링돼 목표 상세로 이동하는 것 차단
+          onKeyDown={(e) => e.stopPropagation()}
         >
           <SearchInput
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onSearch={() => setKeyword(input)}
-            className="h-10 w-full @min-[600px]:w-[240px]"
+            className="h-10 w-full @min-[512px]:w-[240px]"
           />
           <Button
             variant="secondary"
             size="small"
             startIcon={<IcPlus className="size-5 text-indigo-600" />}
-            className="hidden h-10 shrink-0 whitespace-nowrap @min-[600px]:inline-flex"
+            className="hidden h-10 shrink-0 whitespace-nowrap @min-[512px]:inline-flex"
           >
             할 일 추가
           </Button>
         </div>
       </div>
 
-      {/* 카드 클릭(목표 상세 이동)이 본문 내 컨트롤 조작으로 트리거되지 않도록 차단 */}
-      <div onClick={(e) => e.stopPropagation()}>
+      {/* 카드 활성화(클릭·Enter/Space 키)가 본문 내 컨트롤 조작으로 트리거되지 않도록 차단 */}
+      <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         {isLoading ? (
           <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
@@ -195,13 +199,10 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
           keyword ? (
             <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
           ) : (
-            <div className="flex flex-col items-center gap-3 py-8">
-              <Image src="/images/empty-goal.svg" alt="" width={88} height={88} unoptimized aria-hidden />
-              <p className="text-sm text-slate-500">아직 할 일이 없어요</p>
-            </div>
+            <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
           )
         ) : (
-          <div className="flex flex-col gap-5 @min-[600px]:flex-row @min-[600px]:gap-2 @min-[1024px]:gap-8">
+          <div className="flex flex-col gap-5 @min-[512px]:flex-row @min-[512px]:gap-2 @min-[1024px]:gap-8">
             <Column label="To do" todos={todoItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
             <Column label="Done" todos={doneItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
           </div>

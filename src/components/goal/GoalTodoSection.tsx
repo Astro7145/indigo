@@ -38,7 +38,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
   return (
     <section aria-label="목표 별 할일" className={cn('flex flex-col gap-2.5', className)}>
       <div className="flex items-center gap-3 px-2">
-        <IcGoal aria-hidden className="shrink-0" />
+        <IcGoal aria-hidden className="size-10 shrink-0" />
         <h2 className="text-lg leading-7 font-medium text-black">목표 별 할일</h2>
       </div>
       <div className="flex flex-col gap-8">
