@@ -61,8 +61,11 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
               <li key={t.id}>
                 <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
                   <TodoList.Actions>
+                    {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
                     {t.noteIds.length > 0 && <TodoList.NoteAction />}
                     {t.linkUrl && <TodoList.LinkAction />}
+                    {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
+                    {t.noteIds.length === 0 && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
                     <TodoList.KebabAction hoverOnly />
                     <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                   </TodoList.Actions>
