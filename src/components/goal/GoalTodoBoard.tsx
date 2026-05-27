@@ -145,6 +145,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         </div>
       </div>
 
+      {/* 카드 클릭(목표 상세 이동)이 본문 내 컨트롤 조작으로 트리거되지 않도록 차단 */}
       <div onClick={(e) => e.stopPropagation()}>
         {isLoading ? (
           <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>

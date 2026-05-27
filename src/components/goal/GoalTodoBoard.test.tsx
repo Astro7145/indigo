@@ -145,3 +145,12 @@ it('진행바는 최종 percent를 aria-valuenow로 노출하고 fill 요소를 
   expect(bar).toHaveAttribute('aria-valuenow', '25');
   expect(bar.firstElementChild).toBeTruthy();
 });
+
+it('이미 즐겨찾기된 별 클릭 시 removeTodoFavorite를 호출한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([{ ...makeTodo(1, '할일 A'), isFavorite: true }]));
+  (favoriteApi.removeTodoFavorite as jest.Mock).mockResolvedValue(undefined);
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('할일 A');
+  fireEvent.click(screen.getByLabelText('즐겨찾기 해제'));
+  await waitFor(() => expect(favoriteApi.removeTodoFavorite).toHaveBeenCalledWith(1));
+});

@@ -14,9 +14,11 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* 모바일은 GNB가 타이틀을 담당 → md+ 에서만 노출 */}
-      <h1 className="hidden text-2xl font-semibold tracking-[-0.03em] text-slate-800 md:block">
-        {me?.name ?? ''}님의 대시보드
-      </h1>
+      {me?.name && (
+        <h1 className="hidden text-2xl font-semibold tracking-[-0.03em] text-slate-800 md:block">
+          {me.name}님의 대시보드
+        </h1>
+      )}
       <div className="flex flex-col gap-8 lg:flex-row">
         <RecentTodos onSeeAll={() => router.push('/todos')} />
         <ProgressCard />

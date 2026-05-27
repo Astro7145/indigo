@@ -47,7 +47,7 @@ const listOf = (todos: Todo[]) => ({
 
 beforeEach(() => jest.resetAllMocks());
 
-it('useTodoList 결과의 모든 할일 제목을 렌더한다', async () => {
+it('useTodoList 결과의 할일 제목을 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A'), makeTodo(2, '할일 B', true)]));
   renderWithClient(<RecentTodos />);
   expect(await screen.findByText('할일 A')).toBeInTheDocument();
