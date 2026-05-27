@@ -45,7 +45,7 @@ afterEach(() => {
 
 const ctx = (provider: string) => ({ params: Promise.resolve({ provider }) });
 function req(provider: string) {
-  return new NextRequest(`http://localhost/api/oauth/${provider}`, {
+  return new NextRequest(`http://localhost:3000/api/oauth/${provider}`, {
     method: 'GET',
   });
 }
