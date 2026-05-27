@@ -27,7 +27,9 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
           <tr key={weekIndex}>
             {state
               .getDatesInWeek(weekIndex)
-              .map((date, i) => (date ? <CalendarCell key={i} state={state} date={date} /> : <td key={i} />))}
+              .map((date, i) =>
+                date ? <CalendarCell key={date.toString()} state={state} date={date} /> : <td key={`empty-${i}`} />,
+              )}
           </tr>
         ))}
       </tbody>
