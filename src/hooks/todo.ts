@@ -1,6 +1,7 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
 import { todoKeys, getTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
 import { favoriteKeys } from '@/src/api/favorite';
+import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 import type { ApiError } from '@/src/types/common';
 
@@ -47,6 +48,8 @@ export function useUpdateTodo() {
       qc.setQueryData(todoKeys.detail(todoId), data);
       // FavoriteTodo.todo가 title/done을 품으므로 favorites 변형도 동기화.
       qc.invalidateQueries({ queryKey: favoriteKeys.all });
+      // 대시보드 목표 카드의 진척도(completedCount/todoCount)를 최신 상태로 유지.
+      qc.invalidateQueries({ queryKey: goalKeys.lists() });
     },
   });
 }
