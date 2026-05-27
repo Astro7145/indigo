@@ -30,11 +30,19 @@ export default function Calendar(props: CalendarProps) {
   return (
     <div {...calendarProps} className="calendar flex w-[280px] flex-col">
       <div className="flex w-full items-center justify-between">
-        <IconButton {...prevDomProps} className="size-8 overflow-hidden rounded-[6px] p-1.5">
+        <IconButton
+          {...prevDomProps}
+          aria-label={prevDomProps['aria-label'] as string}
+          className="size-8 overflow-hidden rounded-[6px] p-1.5"
+        >
           <IcChevron direction="left" />
         </IconButton>
         <h2 className="text-sm font-semibold tracking-[-0.42px] text-slate-700">{title}</h2>
-        <IconButton {...nextDomProps} className="size-8 overflow-hidden rounded-[6px] p-1.5">
+        <IconButton
+          {...nextDomProps}
+          aria-label={prevDomProps['aria-label'] as string}
+          className="size-8 overflow-hidden rounded-[6px] p-1.5"
+        >
           <IcChevron direction="right" />
         </IconButton>
       </div>
