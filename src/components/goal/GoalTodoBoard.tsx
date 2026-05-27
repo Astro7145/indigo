@@ -63,7 +63,7 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
 
 export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
   const [keyword, setKeyword] = useState('');
-  const { data } = useTodoList({ goalId: goal.id, keyword: keyword || undefined });
+  const { data, isLoading, isError } = useTodoList({ goalId: goal.id, keyword: keyword || undefined });
   const todos = data?.todos ?? [];
   const todoItems = todos.filter((t) => !t.done);
   const doneItems = todos.filter((t) => t.done);
@@ -98,11 +98,19 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         </div>
       </div>
 
-      {todos.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-10">
-          <Image src="/images/empty-goal.png" alt="" width={120} height={120} aria-hidden />
-          <p className="text-sm text-slate-500">아직 할 일이 없어요</p>
-        </div>
+      {isLoading ? (
+        <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
+      ) : isError ? (
+        <p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>
+      ) : todos.length === 0 ? (
+        keyword ? (
+          <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
+        ) : (
+          <div className="flex flex-col items-center gap-3 py-10">
+            <Image src="/images/empty-goal.png" alt="" width={120} height={120} aria-hidden />
+            <p className="text-sm text-slate-500">아직 할 일이 없어요</p>
+          </div>
+        )
       ) : (
         <div className="flex flex-col gap-5 lg:flex-row">
           <Column label="To do" todos={todoItems} />

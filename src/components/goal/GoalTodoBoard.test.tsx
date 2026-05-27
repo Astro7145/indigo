@@ -11,7 +11,7 @@ jest.mock('@/src/api/favorite', () => ({
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
 
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 
 import * as todoApi from '@/src/api/todo';
 import GoalTodoBoard from '@/src/components/goal/GoalTodoBoard';
@@ -73,4 +73,19 @@ it('할일이 없으면 빈 UI 메시지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<GoalTodoBoard goal={goal} />);
   expect(await screen.findByText('아직 할 일이 없어요')).toBeInTheDocument();
+});
+
+it('조회 실패 시 에러 메시지를 렌더한다', async () => {
+  mocked.getTodos.mockRejectedValue(new Error('fail'));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  expect(await screen.findByText('불러오지 못했어요')).toBeInTheDocument();
+});
+
+it('검색어가 있고 결과가 없으면 "검색 결과가 없어요"를 렌더한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([]));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('아직 할 일이 없어요');
+  fireEvent.change(screen.getByLabelText('할 일 검색'), { target: { value: '없는키워드' } });
+  expect(await screen.findByText('검색 결과가 없어요')).toBeInTheDocument();
+  expect(screen.queryByText('아직 할 일이 없어요')).not.toBeInTheDocument();
 });
