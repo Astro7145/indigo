@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CalendarDate } from '@internationalized/date';
 import Calendar from '@/src/components/common/calendar/Calendar';
-import DatePicker from '@/src/components/todo/DatePicker';
+import DatePicker from '@/src/components/todo/date-picker/DatePicker';
 
 jest.mock('@/src/components/common/calendar/Calendar');
 jest.mock('@/src/components/todo/BottomSheet');

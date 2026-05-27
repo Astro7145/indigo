@@ -6,8 +6,8 @@ import { IcCalendarOutline } from '@/src/components/common/icons';
 import BottomSheet from '@/src/components/todo/BottomSheet';
 import { cn } from '@/src/utils/cn';
 import DatePickerContent from './DatePickerContent';
-import { useDatePicker } from '../../hooks/useDatePicker';
-import { useIsMobile } from '../../hooks/useIsMobile';
+import { useDatePicker } from '@/src/hooks/useDatePicker';
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 interface DatePickerProps {
   value: CalendarDate | null;
