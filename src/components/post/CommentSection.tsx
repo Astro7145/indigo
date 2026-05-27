@@ -5,7 +5,7 @@ import CommentItem from './CommentItem';
 
 interface CommentSectionProps {
   comments: Comment[];
-  currentUserId: number;
+  currentUserId: number | undefined;
 }
 
 export default function CommentSection({ comments, currentUserId }: CommentSectionProps) {

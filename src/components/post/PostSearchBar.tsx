@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { IcFilter } from '@/src/components/common/icons/IcFilter';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
@@ -13,8 +14,13 @@ const SORT_OPTIONS: { value: SortBy; label: string }[] = [
 ];
 
 export default function PostSearchBar() {
-  const [query, setQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortBy>('latest');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const query = searchParams.get('search') ?? '';
+  const sortBy = (searchParams.get('sortBy') as SortBy) ?? 'latest';
+
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortContainerRef = useRef<HTMLDivElement>(null);
 
@@ -31,6 +37,16 @@ export default function PostSearchBar() {
     return () => document.removeEventListener('mousedown', handleOutside);
   }, [isSortOpen]);
 
+  function updateParam(key: string, value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
   const currentLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)!.label;
 
   return (
@@ -46,7 +62,7 @@ export default function PostSearchBar() {
       <div className="flex-1 md:w-[432px] md:flex-none">
         <SearchInput
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => updateParam('search', e.target.value)}
           placeholder="궁금한 내용을 검색해주세요"
           aria-label="게시글 검색"
         />
@@ -73,7 +89,7 @@ export default function PostSearchBar() {
                   type="button"
                   role="menuitem"
                   onClick={() => {
-                    setSortBy(opt.value);
+                    updateParam('sortBy', opt.value);
                     setIsSortOpen(false);
                   }}
                   className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"

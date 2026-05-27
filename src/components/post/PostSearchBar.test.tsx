@@ -1,4 +1,11 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+jest.mock('next/navigation', () => ({
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useRouter: jest.fn(() => ({ replace: jest.fn() })),
+  usePathname: jest.fn(() => '/posts'),
+}));
+
+import { fireEvent, render, screen } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 
 import PostSearchBar from './PostSearchBar';
 
@@ -14,10 +21,12 @@ it('정렬 셀렉터 클릭 시 옵션이 노출된다', () => {
   expect(screen.getByRole('menuitem', { name: '인기순' })).toBeInTheDocument();
 });
 
-it('인기순 선택 시 셀렉터 라벨이 인기순으로 바뀌고 드롭다운이 닫힌다', () => {
+it('인기순 선택 시 sortBy=popular 파라미터를 URL에 반영하고 드롭다운이 닫힌다', () => {
+  const replace = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ replace });
   render(<PostSearchBar />);
   fireEvent.click(screen.getByRole('button', { name: /최신순/ }));
   fireEvent.click(screen.getByRole('menuitem', { name: '인기순' }));
-  expect(screen.getByRole('button', { name: /인기순/ })).toBeInTheDocument();
-  expect(screen.queryByRole('menuitem', { name: '최신순' })).not.toBeInTheDocument();
+  expect(replace).toHaveBeenCalledWith(expect.stringContaining('sortBy=popular'));
+  expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
 });
