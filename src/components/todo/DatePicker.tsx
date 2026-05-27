@@ -7,6 +7,7 @@ import BottomSheet from '@/src/components/todo/BottomSheet';
 import { cn } from '@/src/utils/cn';
 import DatePickerContent from './DatePickerContent';
 import { useDatePicker } from '../../hooks/useDatePicker';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 interface DatePickerProps {
   value: CalendarDate | null;
@@ -40,6 +41,8 @@ export default function DatePicker(props: DatePickerProps) {
     handleConfirm,
   } = useDatePicker(props);
 
+  const isMobile = useIsMobile();
+
   return (
     <div ref={containerRef} className="relative flex w-full flex-col">
       {/* 트리거 */}
@@ -55,8 +58,7 @@ export default function DatePicker(props: DatePickerProps) {
         {formatDate(isOpen ? pendingDate : props.value)}
       </button>
 
-      {/* 모바일 바텀시트 */}
-      <div className="md:hidden">
+      {isMobile ? (
         <BottomSheet isOpen={isOpen} onClose={handleCancel}>
           <div className="flex justify-center px-[23.5px] pt-4 pb-3">
             <div {...dialogProps} className={cn('w-full max-w-[328px] overflow-hidden outline-none', pickerCardClass)}>
@@ -70,26 +72,25 @@ export default function DatePicker(props: DatePickerProps) {
             </div>
           </div>
         </BottomSheet>
-      </div>
-
-      {/* 데스크탑 팝오버 */}
-      {isOpen && (
-        <FocusScope restoreFocus autoFocus>
-          <div
-            ref={popupRef}
-            {...overlayProps}
-            {...dialogProps}
-            className={cn('absolute top-full left-0 z-50 mt-1 hidden w-[328px] md:block', pickerCardClass)}
-          >
-            <DatePickerContent
-              pendingDate={pendingDate}
-              firstDayOfWeek={firstDayOfWeek}
-              onChangePending={setPendingDate}
-              onCancel={handleCancel}
-              onConfirm={handleConfirm}
-            />
-          </div>
-        </FocusScope>
+      ) : (
+        isOpen && (
+          <FocusScope restoreFocus autoFocus>
+            <div
+              ref={popupRef}
+              {...overlayProps}
+              {...dialogProps}
+              className={cn('absolute top-full left-0 z-50 mt-1 w-[328px]', pickerCardClass)}
+            >
+              <DatePickerContent
+                pendingDate={pendingDate}
+                firstDayOfWeek={firstDayOfWeek}
+                onChangePending={setPendingDate}
+                onCancel={handleCancel}
+                onConfirm={handleConfirm}
+              />
+            </div>
+          </FocusScope>
+        )
       )}
     </div>
   );

@@ -12,7 +12,7 @@ interface CalendarCellProps {
 }
 
 export default function CalendarCell({ state, date }: CalendarCellProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLButtonElement>(null);
   const { cellProps, buttonProps, isSelected, isOutsideVisibleRange, isDisabled, formattedDate } = useCalendarCell(
     { date },
     state,
@@ -29,7 +29,7 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
 
   return (
     <td {...cellProps} className="p-0">
-      <div
+      <button
         {...buttonProps}
         ref={ref}
         className={cn(
@@ -39,7 +39,7 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
         )}
       >
         {formattedDate}
-      </div>
+      </button>
     </td>
   );
 }

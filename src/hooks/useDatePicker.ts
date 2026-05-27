@@ -19,7 +19,7 @@ export function useDatePicker({ value, onChange, onBlur, ref, firstDayOfWeek = '
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
-  useImperativeHandle(ref, () => triggerRef.current!);
+  useImperativeHandle(ref ?? null, () => triggerRef.current!);
 
   const handleToggle = () => {
     if (!isOpen) setPendingDate(value ?? null);
