@@ -57,7 +57,7 @@ it('useTodoList 결과의 할일 제목을 렌더한다', async () => {
 it('할일이 없으면 빈 상태를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<RecentTodos />);
-  expect(await screen.findByText('할일이 없습니다.')).toBeInTheDocument();
+  expect(await screen.findByText('최근에 등록한 할 일이 없어요')).toBeInTheDocument();
 });
 
 it('체크박스를 클릭하면 patchTodo로 done을 토글한다', async () => {
