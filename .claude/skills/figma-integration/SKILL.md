@@ -7,6 +7,8 @@ description: INdigo 프로젝트의 Figma MCP 연동 사용법 — 디자인을 
 
 디자인 참조·구현 시 Figma MCP를 사용한다.
 
+> **전제**: 이 스킬은 **Figma MCP 커넥터 연결**을 전제로 한다. 미연결 상태면 먼저 Claude Code에 Figma MCP를 연결한 뒤 사용한다 (`/figma-use` 등 Figma 스킬·`use_figma` 도구는 커넥터가 있어야 동작).
+
 - **fileKey**: `4nokcUJykpeU7rSg5wILTN` (파일: _INsighty-SlidTodo_)
 - 작업할 **개별 화면의 Figma 링크는 사용자가 제공**한다. 링크가 없으면 추측하지 말고 요청한다.
 
