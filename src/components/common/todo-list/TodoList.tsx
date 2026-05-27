@@ -148,7 +148,7 @@ function ActionButton({
   className?: string;
   children: ReactNode;
 }) {
-  const classes = cn('size-7 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className);
+  const classes = cn('size-6 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className);
 
   if (!onClick) {
     return (
@@ -191,7 +191,7 @@ function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
     >
-      <IcNote className="size-7" />
+      <IcNote className="size-6" />
     </ActionButton>
   );
 }
@@ -205,7 +205,7 @@ function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
     >
-      <IcLink className="size-7" />
+      <IcLink className="size-6" />
     </ActionButton>
   );
 }
