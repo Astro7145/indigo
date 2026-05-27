@@ -53,6 +53,7 @@ node_modules/
 docs/superpowers/
 
 # claude code
-.claude
-!.claude/skills
-!.claude/rules
+.claude/*
+!.claude/skills/
+!.claude/rules/
+!.claude/settings.json

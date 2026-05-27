@@ -53,3 +53,5 @@ export { IcTextUnderline } from './IcTextUnderline';
 export { IcUpload } from './IcUpload';
 export { Logo } from './Logo';
 export { LogoFull } from './LogoFull';
+export { default as Moonphase } from './Moonphase';
+export { default as StarsDecor } from './StarsDecor';
