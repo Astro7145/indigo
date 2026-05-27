@@ -68,3 +68,9 @@ it('다음 페이지가 없으면 fetchNextPage를 호출하지 않는다', () =
   render(<GoalTodoSection />);
   expect(mockFetchNextPage).not.toHaveBeenCalled();
 });
+
+it('다음 페이지 로딩 중이면 로딩 표시를 렌더한다', () => {
+  setHook({ hasNextPage: true, isFetchingNextPage: true });
+  render(<GoalTodoSection />);
+  expect(screen.getByText('불러오는 중…')).toBeInTheDocument();
+});

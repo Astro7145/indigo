@@ -23,9 +23,12 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasNextPage || isFetchingNextPage) return;
-    const io = new IntersectionObserver((entries) => {
-      if (entries[0]?.isIntersecting) fetchNextPage();
-    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) fetchNextPage();
+      },
+      { rootMargin: '200px' },
+    );
     io.observe(el);
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -44,6 +47,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
         ))}
       </div>
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
+      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
     </section>
   );
 }
