@@ -111,26 +111,24 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
       )}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <h3 className="shrink-0 text-lg font-medium text-slate-800">{goal.title}</h3>
-          <div className="flex flex-1 items-center gap-2">
-            <div
-              role="progressbar"
-              aria-label={`${goal.title} 진행률`}
-              aria-valuenow={percent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              className="h-2 w-full max-w-[310px] overflow-hidden rounded-full bg-slate-200"
-            >
-              <motion.div
-                className="h-full rounded-full bg-indigo-500"
-                initial={reduce ? false : { width: 0 }}
-                animate={{ width: `${percent}%` }}
-                transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
-              />
-            </div>
-            <span className="shrink-0 text-sm font-semibold text-indigo-700">{percent}%</span>
+          <div
+            role="progressbar"
+            aria-label={`${goal.title} 진행률`}
+            aria-valuenow={percent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-slate-200"
+          >
+            <motion.div
+              className="h-full rounded-full bg-indigo-500"
+              initial={reduce ? false : { width: 0 }}
+              animate={{ width: `${percent}%` }}
+              transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+            />
           </div>
+          <span className="shrink-0 text-sm font-semibold text-indigo-700">{percent}%</span>
         </div>
         <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
           <SearchInput
@@ -139,7 +137,12 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             onSearch={() => setKeyword(input)}
             className="w-full lg:w-[240px]"
           />
-          <Button variant="secondary" size="small" startIcon={<IcPlus />} className="shrink-0">
+          <Button
+            variant="secondary"
+            size="medium"
+            startIcon={<IcPlus className="size-4 text-indigo-600" />}
+            className="shrink-0 whitespace-nowrap"
+          >
             할일 추가
           </Button>
         </div>

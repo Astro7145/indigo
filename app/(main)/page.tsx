@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const { data: me } = useMe();
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="mx-auto flex w-full max-w-[1312px] flex-col gap-8">
       {/* 모바일은 GNB가 타이틀을 담당 → md+ 에서만 노출 */}
       {me?.name && (
         <h1 className="hidden text-2xl font-semibold tracking-[-0.03em] text-slate-800 md:block">
