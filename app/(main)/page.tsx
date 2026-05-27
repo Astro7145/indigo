@@ -19,7 +19,7 @@ export default function DashboardPage() {
           {me.name}님의 대시보드
         </h1>
       )}
-      <div className="flex flex-col gap-8 lg:flex-row">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
         <RecentTodos onSeeAll={() => router.push('/todos')} />
         <ProgressCard />
       </div>
