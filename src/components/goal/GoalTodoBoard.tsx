@@ -66,17 +66,21 @@ function Column({
       role="group"
       aria-label={label}
       className={cn(
-        'flex h-[210px] min-w-0 flex-1 flex-col gap-4 overflow-hidden rounded border border-slate-200 p-6 sm:h-[324px]',
+        // 컨테이너(카드) 폭 기준: <1024 compact(p-4·gap-2·auto 높이), ≥1024 spacious(p-6·gap-4·고정 324)
+        'flex min-w-0 flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 @min-[600px]:flex-1 @min-[1024px]:h-[324px] @min-[1024px]:gap-4 @min-[1024px]:p-6',
         // figma: To Do = slate-50 배경(그림자 없음), Done = 흰 배경 + 옅은 그림자
         isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
     >
       <span
-        className={cn('px-2 text-base font-bold tracking-[-0.03em]', isTodo ? 'text-indigo-700' : 'text-slate-400')}
+        className={cn(
+          'px-1 text-sm font-semibold tracking-[-0.03em] @min-[1024px]:px-2 @min-[1024px]:text-base @min-[1024px]:font-bold',
+          isTodo ? 'text-indigo-700' : 'text-slate-400',
+        )}
       >
         {isTodo ? 'TO DO' : 'DONE'}
       </span>
-      <ul className="scrollbar-slate flex flex-1 flex-col gap-1 overflow-y-auto">
+      <ul className="scrollbar-slate flex flex-col gap-0.5 @min-[1024px]:flex-1 @min-[1024px]:gap-1 @min-[1024px]:overflow-y-auto">
         {todos.map((t) => (
           <Row key={t.id} todo={t} onToggle={onToggle} onToggleFavorite={onToggleFavorite} />
         ))}
@@ -109,25 +113,31 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
     <Card
       onClick={() => router.push(`/goals/${goal.id}`)}
       className={cn(
-        'flex cursor-pointer flex-col gap-4 border border-slate-200 px-8 py-6 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg',
+        '@container flex cursor-pointer flex-col gap-4 border border-slate-200 px-8 py-6 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg',
         className,
       )}
     >
-      <div className="flex flex-col gap-4 px-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-          {/* 제목 행 — 모바일은 우측에 + 아이콘(태블릿+에선 숨기고 우측 텍스트 버튼 사용) */}
-          <div className="flex items-center justify-between gap-2 sm:shrink-0 sm:justify-start">
+      {/*
+        헤더 — 카드(컨테이너) 폭 기준 반응형(figma):
+        - 카드 <600:  세로 스택 [제목+(+아이콘) / 바+%]  위 + [검색(전체폭)] 아래
+        - 600~1023:   한 줄 [제목 / 바+%] + [검색 + 할 일 추가]  (제목 위 바 아래)
+        - ≥1024:      한 줄 [제목 + 바 + %] inline + [검색 + 할 일 추가]
+      */}
+      <div className="flex flex-col gap-4 px-2 @min-[600px]:flex-row @min-[600px]:items-center @min-[600px]:justify-between">
+        <div className="flex min-w-0 flex-col gap-4 @min-[600px]:flex-1 @min-[1024px]:flex-row @min-[1024px]:items-center">
+          {/* 제목 행 — 모바일은 우측에 + 아이콘(600px+에선 숨기고 우측 텍스트 버튼 사용) */}
+          <div className="flex items-center justify-between gap-2 @min-[1024px]:shrink-0 @min-[1024px]:justify-start">
             <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700">{goal.title}</h3>
             <IconButton
               aria-label="할 일 추가"
-              className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
+              className="size-9 shrink-0 rounded border border-indigo-500 @min-[600px]:hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <IcPlus className="size-4 text-indigo-600" />
             </IconButton>
           </div>
           {/* 진행바 + % */}
-          <div className="flex flex-1 items-center gap-2.5">
+          <div className="flex items-center gap-2 @min-[1024px]:flex-1">
             <div
               role="progressbar"
               aria-label={`${goal.title} 진행률`}
@@ -143,22 +153,27 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
                 transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
               />
             </div>
-            <span className="shrink-0 text-base font-bold tracking-[-0.03em] text-indigo-600">{percent}%</span>
+            <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 @min-[1024px]:text-base">
+              {percent}%
+            </span>
           </div>
         </div>
-        {/* 검색 + 할 일 추가(텍스트) — 모바일은 검색만 전체폭, 텍스트 버튼은 태블릿+에서 노출 */}
-        <div className="flex w-full items-center gap-3.5 sm:w-auto sm:shrink-0" onClick={(e) => e.stopPropagation()}>
+        {/* 검색 + 할 일 추가(텍스트) — 모바일은 검색만 전체폭, 텍스트 버튼은 600px+에서 노출. 둘 다 높이 40px */}
+        <div
+          className="flex w-full items-center gap-2 @min-[600px]:w-auto @min-[600px]:shrink-0 @min-[1024px]:gap-3.5"
+          onClick={(e) => e.stopPropagation()}
+        >
           <SearchInput
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onSearch={() => setKeyword(input)}
-            className="w-full sm:w-[240px]"
+            className="h-10 w-full @min-[600px]:w-[240px]"
           />
           <Button
             variant="secondary"
             size="small"
             startIcon={<IcPlus className="size-5 text-indigo-600" />}
-            className="hidden shrink-0 whitespace-nowrap sm:inline-flex"
+            className="hidden h-10 shrink-0 whitespace-nowrap @min-[600px]:inline-flex"
           >
             할 일 추가
           </Button>
@@ -181,7 +196,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             </div>
           )
         ) : (
-          <div className="flex flex-col gap-8 sm:flex-row">
+          <div className="flex flex-col gap-5 @min-[600px]:flex-row @min-[600px]:gap-2 @min-[1024px]:gap-8">
             <Column label="To do" todos={todoItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
             <Column label="Done" todos={doneItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
           </div>
