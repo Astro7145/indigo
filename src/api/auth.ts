@@ -6,21 +6,21 @@ export const authKeys = {
 };
 
 export async function signup(body: SignupBody): Promise<LoginResult> {
-  const { data } = await instance.post<LoginResult>('/auth/signup', body);
+  const { data } = await instance.post<LoginResult>('/iauth/signup', body);
   return data;
 }
 
 export async function login(body: LoginBody): Promise<LoginResult> {
-  const { data } = await instance.post<LoginResult>('/auth/login', body);
+  const { data } = await instance.post<LoginResult>('/iauth/login', body);
   return data;
 }
 
 export async function refresh(): Promise<void> {
-  await instance.post('/auth/refresh');
+  await instance.post('/iauth/refresh');
 }
 
 export async function logout(): Promise<void> {
-  await instance.post('/auth/logout');
+  await instance.post('/iauth/logout');
 }
 
 export async function oauthLogin(provider: OAuthProvider, body: OAuthBody): Promise<LoginResult> {

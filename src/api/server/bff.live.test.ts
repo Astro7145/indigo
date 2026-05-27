@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server';
-import { POST as authPost } from '@/app/api/auth/[action]/route';
+import { POST as authPost } from '@/app/api/iauth/[action]/route';
 import { GET as proxyGet } from '@/app/api/[...path]/route';
 import { COOKIE } from '@/src/api/server/bff';
 
@@ -24,7 +24,7 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
 
   it('login은 쿠키를 설정하고 토큰을 제거하며, 프록시된 GET이 동작한다', async () => {
     const loginRes = await authPost(
-      new NextRequest('http://localhost/api/auth/login', {
+      new NextRequest('http://localhost/api/iauth/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
@@ -56,7 +56,7 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
 
   it('logout은 쿠키를 삭제하고, 이후 프록시된 GET은 401이다', async () => {
     const loginRes = await authPost(
-      new NextRequest('http://localhost/api/auth/login', {
+      new NextRequest('http://localhost/api/iauth/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
@@ -65,7 +65,7 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
     );
     const cookie = cookieHeaderFrom(loginRes);
     const logoutRes = await authPost(
-      new NextRequest('http://localhost/api/auth/logout', {
+      new NextRequest('http://localhost/api/iauth/logout', {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie },
       }),
