@@ -1,3 +1,5 @@
+import PostDetailPage from '@/src/components/post/PostDetailPage';
+
 export default function PostDetailRoute() {
-  return <div>post detail (wip)</div>;
+  return <PostDetailPage />;
 }

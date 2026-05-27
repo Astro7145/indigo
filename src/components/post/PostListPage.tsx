@@ -1,5 +1,7 @@
 'use client';
 
+import Button from '@/src/components/common/buttons/Button';
+import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import PostListEmpty from '@/src/components/post/PostListEmpty';
 import PostListItem from '@/src/components/post/PostListItem';
 import PostSearchBar from '@/src/components/post/PostSearchBar';
@@ -161,14 +163,10 @@ export default function PostListPage() {
         )}
       </section>
 
-      {/* FAB — 작성 페이지 라우팅은 에디터 작업 시점에 연결 */}
-      <button
-        type="button"
-        className="fixed right-8 bottom-8 inline-flex items-center gap-2 rounded-full bg-indigo-500 px-6 py-3 text-sm font-medium text-white shadow-lg hover:bg-indigo-600"
-      >
-        <span aria-hidden>+</span>
-        <span>게시물 작성하기</span>
-      </button>
+      {/* 게시물 작성 버튼 — 우측 하단 고정. 라우팅은 에디터 작업 시점에 연결 */}
+      <Button type="button" size="large" startIcon={<IcPlus />} className="fixed right-8 bottom-16">
+        게시물 작성하기
+      </Button>
     </div>
   );
 }
