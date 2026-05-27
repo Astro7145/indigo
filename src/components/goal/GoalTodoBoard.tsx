@@ -22,7 +22,9 @@ export interface GoalTodoBoardProps {
 }
 
 function percentOf(done: number, total: number): number {
-  return total > 0 ? Math.round((done / total) * 100) : 0;
+  if (total <= 0) return 0;
+  // 데이터 이상(done>total 등)에도 진행바 width가 100%를 넘지 않도록 clamp
+  return Math.max(0, Math.min(100, Math.round((done / total) * 100)));
 }
 
 function Row({
