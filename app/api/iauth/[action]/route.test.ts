@@ -1,6 +1,6 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server';
-import { POST } from '@/app/api/auth/[action]/route';
+import { POST } from '@/app/api/iauth/[action]/route';
 import { COOKIE, backendHttp } from '@/src/api/server/bff';
 import { type AxiosAdapter } from 'axios';
 
@@ -41,7 +41,7 @@ afterEach(() => {
 });
 
 function req(action: string, body?: unknown, cookie?: string) {
-  return new NextRequest(`http://localhost/api/auth/${action}`, {
+  return new NextRequest(`http://localhost/api/iauth/${action}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
     body: body === undefined ? undefined : JSON.stringify(body),
