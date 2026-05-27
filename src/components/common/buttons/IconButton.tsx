@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@/src/utils/cn';
 
-interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
   'aria-label': string;
   children: ReactNode;
   /** false이면 hover 스타일 비활성화. 기본값 true */
