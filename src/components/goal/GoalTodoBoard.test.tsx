@@ -11,9 +11,10 @@ jest.mock('@/src/api/favorite', () => ({
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
 
-import { fireEvent, screen, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 
 import * as todoApi from '@/src/api/todo';
+import * as favoriteApi from '@/src/api/favorite';
 import GoalTodoBoard from '@/src/components/goal/GoalTodoBoard';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { GoalListItem } from '@/src/types/goal';
@@ -85,7 +86,54 @@ it('검색어가 있고 결과가 없으면 "검색 결과가 없어요"를 렌�
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<GoalTodoBoard goal={goal} />);
   await screen.findByText('아직 할 일이 없어요');
-  fireEvent.change(screen.getByLabelText('할 일 검색'), { target: { value: '없는키워드' } });
+  const input = screen.getByLabelText('할 일 검색');
+  fireEvent.change(input, { target: { value: '없는키워드' } });
+  fireEvent.keyUp(input, { key: 'Enter' });
   expect(await screen.findByText('검색 결과가 없어요')).toBeInTheDocument();
   expect(screen.queryByText('아직 할 일이 없어요')).not.toBeInTheDocument();
+});
+
+it('체크박스 클릭 시 patchTodo로 done을 토글한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일', false)]));
+  mocked.patchTodo.mockResolvedValue(makeTodo(1, '미완료 할일', true));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('미완료 할일');
+  fireEvent.click(screen.getByRole('checkbox', { name: '미완료 할일' }));
+  await waitFor(() => expect(mocked.patchTodo).toHaveBeenCalledWith(1, { done: true }));
+});
+
+it('별 클릭 시 addTodoFavorite를 호출한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
+  (favoriteApi.addTodoFavorite as jest.Mock).mockResolvedValue({ todo: makeTodo(1, '할일 A') });
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('할일 A');
+  fireEvent.click(screen.getByLabelText('즐겨찾기'));
+  await waitFor(() => expect(favoriteApi.addTodoFavorite).toHaveBeenCalledWith(1));
+});
+
+it('검색어 입력 후 Enter 시 keyword로 getTodos를 호출한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([]));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('디자인 시스템 정복하기');
+  const input = screen.getByLabelText('할 일 검색');
+  fireEvent.change(input, { target: { value: '실습' } });
+  fireEvent.keyUp(input, { key: 'Enter' });
+  await waitFor(() =>
+    expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ goalId: 9, keyword: '실습' })),
+  );
+});
+
+it('카드 클릭 시 목표 상세로 이동한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([]));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  fireEvent.click(await screen.findByText('디자인 시스템 정복하기'));
+  expect(mockPush).toHaveBeenCalledWith('/goals/9');
+});
+
+it('"할일 추가" 클릭은 카드 네비게이션을 트리거하지 않는다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([]));
+  renderWithClient(<GoalTodoBoard goal={goal} />);
+  await screen.findByText('디자인 시스템 정복하기');
+  fireEvent.click(screen.getByRole('button', { name: '할일 추가' }));
+  expect(mockPush).not.toHaveBeenCalled();
 });
