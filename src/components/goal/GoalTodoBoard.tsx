@@ -37,7 +37,12 @@ function Row({
 }) {
   return (
     <li>
-      <TodoList title={todo.title} checked={todo.done} onCheckedChange={(done) => onToggle(todo.id, done)}>
+      <TodoList
+        size="responsive"
+        title={todo.title}
+        checked={todo.done}
+        onCheckedChange={(done) => onToggle(todo.id, done)}
+      >
         <TodoList.Actions>
           {todo.noteIds.length > 0 && <TodoList.NoteAction />}
           {todo.linkUrl && <TodoList.LinkAction />}
