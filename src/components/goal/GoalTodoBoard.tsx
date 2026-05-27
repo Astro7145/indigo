@@ -155,7 +155,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
           ) : (
             <div className="flex flex-col items-center gap-3 py-10">
-              <Image src="/images/empty-goal.png" alt="" width={120} height={120} aria-hidden />
+              <Image src="/images/empty-goal.svg" alt="" width={88} height={88} unoptimized aria-hidden />
               <p className="text-sm text-slate-500">아직 할 일이 없어요</p>
             </div>
           )
