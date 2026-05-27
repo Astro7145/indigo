@@ -131,9 +131,9 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         - ≥1024:      한 줄 [제목 + 바 + %] inline + [검색 + 할 일 추가]
       */}
       <div className="flex flex-col gap-4 @min-[512px]:flex-row @min-[512px]:items-center @min-[512px]:justify-between">
-        <div className="flex min-w-0 flex-col gap-4 @min-[512px]:flex-1 @min-[1024px]:flex-row @min-[1024px]:items-center">
-          {/* 제목 행 — 모바일은 우측에 + 아이콘(512px+에선 숨기고 우측 텍스트 버튼 사용) */}
-          <div className="flex items-center justify-between gap-2 @min-[1024px]:shrink-0 @min-[1024px]:justify-start">
+        <div className="flex min-w-0 flex-col gap-4 @min-[512px]:flex-1 @min-[1024px]:w-[600px] @min-[1024px]:flex-none @min-[1024px]:flex-row @min-[1024px]:items-center">
+          {/* 제목 행 — 데스크톱에선 flex-1로 늘어나 진행바를 고정 위치(우측)로 밀어낸다. 모바일은 우측에 + 아이콘 */}
+          <div className="flex items-center justify-between gap-2 @min-[1024px]:min-w-0 @min-[1024px]:flex-1 @min-[1024px]:justify-start">
             <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700">{goal.title}</h3>
             <IconButton
               aria-label="할 일 추가"
@@ -143,15 +143,15 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
               <IcPlus className="size-4 text-indigo-600" />
             </IconButton>
           </div>
-          {/* 진행바 + % */}
-          <div className="flex items-center gap-2 @min-[1024px]:flex-1">
+          {/* 진행바 + % — 데스크톱은 고정폭(우측 정렬), 그 외엔 컬럼 폭을 채움 */}
+          <div className="flex items-center gap-2 @min-[1024px]:shrink-0">
             <div
               role="progressbar"
               aria-label={`${goal.title} 진행률`}
               aria-valuenow={percent}
               aria-valuemin={0}
               aria-valuemax={100}
-              className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-[#e9e9e9]"
+              className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-[#e9e9e9] @min-[1024px]:w-[310px]"
             >
               <motion.div
                 className="h-full rounded-full bg-indigo-500"
@@ -160,7 +160,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
                 transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
               />
             </div>
-            <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 @min-[1024px]:text-base">
+            <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 @min-[1024px]:w-10 @min-[1024px]:text-right @min-[1024px]:text-base">
               {percent}%
             </span>
           </div>
@@ -189,8 +189,16 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         </div>
       </div>
 
-      {/* 카드 활성화(클릭·Enter/Space 키)가 본문 내 컨트롤 조작으로 트리거되지 않도록 차단 */}
-      <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      {/*
+        카드 활성화(클릭·Enter/Space 키)가 본문 내 컨트롤 조작으로 트리거되지 않도록 차단.
+        데스크톱은 칼럼 높이(324)를 예약해 로딩/빈 상태에도 카드 높이를 유지 — 무한스크롤 sentinel이
+        조기에 화면에 들어와 다음 페이지가 연쇄 로딩되는 것을 막고 레이아웃 시프트도 방지한다.
+      */}
+      <div
+        className="@min-[1024px]:flex @min-[1024px]:min-h-[324px] @min-[1024px]:flex-col @min-[1024px]:justify-center"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
         {isLoading ? (
           <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
