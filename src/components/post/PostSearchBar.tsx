@@ -40,14 +40,17 @@ export default function PostSearchBar() {
         - Input(`src/components/common/inputs/Input.tsx`)의 `<input>`에 `flex-1` 누락 → iconRight가 우측 끝에 정렬 안 됨
         - SearchInput에 폭·높이 override prop(`containerClassName` 등) 없음 → Figma 다양한 사이즈
           (48 높이: 320/280/248/432, 40 높이: 432/239/210) 매칭 불가
-        작성자 측 수정 후 `<SearchInput ... containerClassName="w-[432px] h-12" />` 형태로 교체 예정.
+        작성자 측 수정 후 `<SearchInput ... containerClassName="w-full md:w-[432px]" />` 형태로 교체 예정.
+        반응형은 외부 wrapper에서 처리.
       */}
-      <SearchInput
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="궁금한 내용을 검색해주세요"
-        aria-label="게시글 검색"
-      />
+      <div className="flex-1 md:w-[432px] md:flex-none">
+        <SearchInput
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="궁금한 내용을 검색해주세요"
+          aria-label="게시글 검색"
+        />
+      </div>
 
       <div ref={sortContainerRef} className="relative">
         <button
