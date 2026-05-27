@@ -159,35 +159,36 @@ function ProgressCardView({
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
-      {/* 헤더 — lg+ 에서만 노출 (Tablet/Mobile은 본문만) */}
-      <div className="hidden items-center gap-3 px-2 lg:flex">
+    <div className={cn('@container flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
+      {/* 헤더 — 전 사이즈 노출 (RecentTodos와 동일, figma 데스크톱/태블릿/모바일 모두 표시) */}
+      <div className="flex items-center gap-3 px-2">
         <IcProgress aria-hidden className="shrink-0" />
         <h3 className="text-lg leading-7 font-medium text-black">{headerText}</h3>
       </div>
 
       {/*
-        본문 카드 (그라데이션 120° 전 사이즈 공통):
-        - sm/md(default):  h-[187px], 도넛 outside
-        - lg+:             h-64, 도넛 inside (flex)
+        본문 카드 (그라데이션 120° 전 사이즈 공통). 레이아웃 전환은 뷰포트가 아니라
+        카드(컨테이너) 폭 기준 — 사이드바로 셀이 좁아져도 안 깨진다.
+        - 카드 < 480px:  h-[187px], 도넛 overlay (compact)
+        - 카드 ≥ 480px:  h-64, 도넛 inside (flex, wide)
       */}
       <Card
         className={cn(
           'relative h-[187px] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,
-          'lg:h-64',
+          '@min-[480px]:h-64',
           GRADIENT_SHADOW,
         )}
       >
         {/* figma overlay — 본체 위에 미세한 하단 어둠 (transparent → rgba(0,0,0,0.07)) */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.07]" />
-        {/* Mobile/Tablet 도넛 (lg에서 숨김). figma: mobile top=3, tablet top=-2 */}
+        {/* compact 도넛 (카드 ≥480px에서 숨김). figma: mobile top=3, tablet top=-2 */}
         <Moonphase
           percent={animatedPercent}
-          className="absolute top-[3px] -left-[11px] size-[182px] md:-top-[2px] md:-left-[12px] md:size-[192px] lg:hidden"
+          className="absolute top-[3px] -left-[11px] size-[182px] md:-top-[2px] md:-left-[12px] md:size-[192px] @min-[480px]:hidden"
         />
-        {/* Desktop 도넛 (lg에서만) */}
-        <div className="hidden lg:absolute lg:top-[18px] lg:left-12 lg:flex lg:items-center lg:gap-8">
+        {/* wide 도넛 (카드 ≥480px에서만) */}
+        <div className="hidden @min-[480px]:absolute @min-[480px]:top-[18px] @min-[480px]:left-12 @min-[480px]:flex @min-[480px]:items-center @min-[480px]:gap-8">
           <Moonphase percent={animatedPercent} className="size-[220px] shrink-0" />
           <div className="flex w-[172px] flex-col gap-3">
             <p className="text-xl leading-[30px] font-semibold tracking-[-0.03em]">{bodyText}</p>
@@ -207,8 +208,8 @@ function ProgressCardView({
           </div>
         </div>
 
-        {/* Mobile/Tablet 텍스트 (lg에서 숨김) */}
-        <div className="absolute top-[60px] left-[156px] flex flex-col gap-0.5 md:left-[164px] lg:hidden">
+        {/* compact 텍스트 (카드 ≥480px에서 숨김) */}
+        <div className="absolute top-[60px] left-[156px] flex flex-col gap-0.5 md:left-[164px] @min-[480px]:hidden">
           <span className="text-xs leading-[15px] text-white/85 md:text-[13px] md:leading-4">{bodyText}</span>
           <div className="flex items-baseline gap-0.5">
             <span

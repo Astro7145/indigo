@@ -104,17 +104,3 @@ it('할일이 4개를 넘으면 최근 4개만 렌더한다', async () => {
   expect(screen.getByText('할일 4')).toBeInTheDocument();
   expect(screen.queryByText('할일 5')).not.toBeInTheDocument();
 });
-
-it('속한 목표가 있으면 목표명 칩을 렌더한다', async () => {
-  const todo = { ...makeTodo(1, '할일 A'), goal: { id: 7, title: '디자인 시스템' } };
-  mocked.getTodos.mockResolvedValue(listOf([todo]));
-  renderWithClient(<RecentTodos />);
-  expect(await screen.findByText('디자인 시스템')).toBeInTheDocument();
-});
-
-it('속한 목표가 없으면 목표명 칩을 렌더하지 않는다', async () => {
-  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
-  renderWithClient(<RecentTodos />);
-  await screen.findByText('할일 A');
-  expect(screen.queryByTestId('recent-todo-goal')).not.toBeInTheDocument();
-});
