@@ -44,7 +44,7 @@ export default function LoginPage() {
     signIn('google', { callbackUrl: '/api/oauth/google' });
   };
 
-  // 구글 소셜 로그인
+  // 카카오 소셜 로그인
   const loginWithKakao = () => {
     signIn('kakao', { callbackUrl: '/api/oauth/kakao' });
   };
