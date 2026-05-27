@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '@/src/utils/schema';
 import { LogoFull } from '@/src/components/common/icons';
 import { useLogin } from '@/src/hooks/auth';
+import { signIn } from 'next-auth/react';
 
 export default function LoginPage() {
   const {
@@ -36,6 +37,16 @@ export default function LoginPage() {
     if (!email || !password) return;
 
     mutate({ email, password });
+  };
+
+  // 구글 소셜 로그인
+  const loginWithGoogle = () => {
+    signIn('google', { callbackUrl: '/api/oauth/google' });
+  };
+
+  // 구글 소셜 로그인
+  const loginWithKakao = () => {
+    signIn('kakao', { callbackUrl: '/api/oauth/kakao' });
   };
 
   return (
@@ -104,6 +115,7 @@ export default function LoginPage() {
             aria-label="구글로 로그인"
             hover={false}
             className="size-14 rounded-full border border-slate-200 bg-white hover:brightness-95"
+            onClick={loginWithGoogle}
           >
             <IcGoogle />
           </IconButton>
@@ -111,6 +123,7 @@ export default function LoginPage() {
             aria-label="카카오로 로그인"
             hover={false}
             className="size-14 rounded-full bg-[#FFEE01] hover:brightness-95"
+            onClick={loginWithKakao}
           >
             <IcKakao />
           </IconButton>
