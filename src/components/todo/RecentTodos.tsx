@@ -14,8 +14,8 @@ export interface RecentTodosProps {
   className?: string;
 }
 
-// 반응형 폭 — Figma Large(640) / Tablet(312) / Mobile(344). 외부 size prop 없이 뷰포트 자동 적응.
-const rootClass = 'flex flex-col gap-2.5 w-[344px] md:w-[312px] lg:w-[640px]';
+// 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — 데스크톱·태블릿 2열, 모바일 1열은 페이지가 결정.
+const rootClass = 'flex w-full flex-col gap-2.5';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
@@ -47,7 +47,7 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </button>
       </div>
-      <Card className="border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
+      <Card className="rounded-2xl border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
         {isLoading ? (
           <p className="text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (

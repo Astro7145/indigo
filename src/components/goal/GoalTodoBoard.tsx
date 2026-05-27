@@ -8,6 +8,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
+import IconButton from '@/src/components/common/buttons/IconButton';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
@@ -63,7 +64,7 @@ function Column({
     <div
       role="group"
       aria-label={label}
-      className="flex min-w-0 flex-1 flex-col gap-2 rounded border border-slate-200 p-5"
+      className="flex min-w-0 flex-1 flex-col gap-2 rounded-xl border border-slate-200 p-5"
     >
       <span
         className={cn(
@@ -106,42 +107,56 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
     <Card
       onClick={() => router.push(`/goals/${goal.id}`)}
       className={cn(
-        'flex cursor-pointer flex-col gap-5 border border-slate-200 p-7 transition-shadow hover:shadow-xl',
+        'flex cursor-pointer flex-col gap-5 rounded-2xl border border-slate-200 p-7 transition-shadow hover:shadow-xl',
         className,
       )}
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <h3 className="shrink-0 text-lg font-medium text-slate-800">{goal.title}</h3>
-          <div
-            role="progressbar"
-            aria-label={`${goal.title} 진행률`}
-            aria-valuenow={percent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-slate-200"
-          >
-            <motion.div
-              className="h-full rounded-full bg-indigo-500"
-              initial={reduce ? false : { width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
-            />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          {/* 제목 행 — 모바일은 우측에 + 아이콘(태블릿+에선 숨기고 우측 텍스트 버튼 사용) */}
+          <div className="flex items-center justify-between gap-2 sm:shrink-0 sm:justify-start">
+            <h3 className="min-w-0 truncate text-lg font-medium text-slate-800">{goal.title}</h3>
+            <IconButton
+              aria-label="할일 추가"
+              className="size-9 shrink-0 rounded-lg border border-indigo-500 sm:hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <IcPlus className="size-4 text-indigo-600" />
+            </IconButton>
           </div>
-          <span className="shrink-0 text-sm font-semibold text-indigo-700">{percent}%</span>
+          {/* 진행바 + % */}
+          <div className="flex flex-1 items-center gap-3">
+            <div
+              role="progressbar"
+              aria-label={`${goal.title} 진행률`}
+              aria-valuenow={percent}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-slate-200"
+            >
+              <motion.div
+                className="h-full rounded-full bg-indigo-500"
+                initial={reduce ? false : { width: 0 }}
+                animate={{ width: `${percent}%` }}
+                transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+              />
+            </div>
+            <span className="shrink-0 text-sm font-semibold text-indigo-700">{percent}%</span>
+          </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        {/* 검색 + 할일 추가(텍스트) — 모바일은 검색만 전체폭, 텍스트 버튼은 태블릿+에서 노출 */}
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0" onClick={(e) => e.stopPropagation()}>
           <SearchInput
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onSearch={() => setKeyword(input)}
-            className="w-full lg:w-[240px]"
+            className="w-full sm:w-[240px]"
           />
           <Button
             variant="secondary"
             size="medium"
             startIcon={<IcPlus className="size-4 text-indigo-600" />}
-            className="shrink-0 whitespace-nowrap"
+            className="hidden shrink-0 whitespace-nowrap sm:inline-flex"
           >
             할일 추가
           </Button>
@@ -158,13 +173,13 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
           keyword ? (
             <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
           ) : (
-            <div className="flex flex-col items-center gap-3 py-10">
+            <div className="flex flex-col items-center gap-3 py-8">
               <Image src="/images/empty-goal.svg" alt="" width={88} height={88} unoptimized aria-hidden />
               <p className="text-sm text-slate-500">아직 할 일이 없어요</p>
             </div>
           )
         ) : (
-          <div className="flex flex-col gap-5 lg:flex-row">
+          <div className="flex flex-col gap-5 sm:flex-row">
             <Column label="To do" todos={todoItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
             <Column label="Done" todos={doneItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
           </div>

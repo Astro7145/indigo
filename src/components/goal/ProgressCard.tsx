@@ -159,7 +159,7 @@ function ProgressCardView({
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-2.5 md:w-[344px] lg:w-[640px]', className)} {...interactiveProps}>
+    <div className={cn('flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
       {/* 헤더 — lg+ 에서만 노출 (Tablet/Mobile은 본문만) */}
       <div className="hidden items-center gap-3 px-2 lg:flex">
         <IcProgress aria-hidden className="shrink-0" />
@@ -173,7 +173,7 @@ function ProgressCardView({
       */}
       <Card
         className={cn(
-          'relative h-[187px] overflow-hidden border-0 p-0 text-white',
+          'relative h-[187px] overflow-hidden rounded-2xl border-0 p-0 text-white',
           GRADIENT_BODY,
           'lg:h-64',
           GRADIENT_SHADOW,

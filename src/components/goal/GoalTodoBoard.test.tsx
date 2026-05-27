@@ -130,11 +130,12 @@ it('카드 클릭 시 목표 상세로 이동한다', async () => {
   expect(mockPush).toHaveBeenCalledWith('/goals/9');
 });
 
-it('"할일 추가" 클릭은 카드 네비게이션을 트리거하지 않는다', async () => {
+it('"할일 추가" 버튼 클릭은 카드 네비게이션을 트리거하지 않는다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<GoalTodoBoard goal={goal} />);
   await screen.findByText('디자인 시스템 정복하기');
-  fireEvent.click(screen.getByRole('button', { name: '할일 추가' }));
+  // 모바일 +아이콘 버튼과 태블릿+ 텍스트 버튼 둘 다 카드 이동을 막아야 한다
+  screen.getAllByRole('button', { name: '할일 추가' }).forEach((btn) => fireEvent.click(btn));
   expect(mockPush).not.toHaveBeenCalled();
 });
 
