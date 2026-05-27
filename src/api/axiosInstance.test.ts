@@ -62,7 +62,8 @@ it('데이터 요청이 401이면 /login으로 보낸다', async () => {
 });
 
 it('로그인 요청 401(잘못된 자격)은 redirect 하지 않는다', async () => {
-  window.history.pushState({}, '', '/login');
+  // /login이 아닌 경로에서 검증해야 /iauth/* 제외 로직 자체가 동작하는지 확인된다
+  window.history.pushState({}, '', '/dashboard');
   rejectWith(401);
   await instance.post('/iauth/login', {}).catch(() => undefined);
   expect(redirectMock).not.toHaveBeenCalled();

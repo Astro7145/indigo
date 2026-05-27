@@ -30,7 +30,7 @@ function toApiError(error: AxiosError): ApiError {
 function shouldRedirectToLogin(error: AxiosError): boolean {
   if (error.response?.status !== 401) return false;
   if (typeof window === 'undefined') return false;
-  if ((error.config?.url ?? '').startsWith('/iauth/')) return false;
+  if (/(^|\/)iauth\//.test(error.config?.url ?? '')) return false;
   return window.location.pathname !== '/login';
 }
 
