@@ -173,7 +173,7 @@ function ProgressCardView({
       */}
       <Card
         className={cn(
-          'relative h-[187px] overflow-hidden rounded-2xl border-0 p-0 text-white',
+          'relative h-[187px] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,
           'lg:h-64',
           GRADIENT_SHADOW,
