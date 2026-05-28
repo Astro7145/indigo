@@ -55,7 +55,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           <p className="text-sm text-slate-400">불러오지 못했어요</p>
         ) : todos.length === 0 ? (
           // figma: 빈 상태는 카드 정중앙에 안내 문구
-          <p className="text-md m-auto text-center text-black">최근에 등록한 할 일이 없어요</p>
+          <p className="text-md m-auto text-center text-slate-500">최근에 등록한 할 일이 없어요</p>
         ) : (
           <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 overflow-y-auto">
             {todos.map((t) => {

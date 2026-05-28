@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import GoalTodoBoard from '@/src/components/goal/GoalTodoBoard';
+import Card from '@/src/components/common/cards/Card';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import { useInfiniteGoalList } from '@/src/hooks/goal';
 import { cn } from '@/src/utils/cn';
@@ -13,12 +14,11 @@ export interface GoalTodoSectionProps {
 
 /**
  * "목표 별 할일" 섹션. 목표를 2개씩 무한 스크롤로 불러와 GoalTodoBoard로 렌더한다.
- * 목표가 0개면 섹션 자체를 렌더하지 않는다(기획 SSOT).
+ * 목표가 0개면 섹션 헤더와 함께 "등록한 목표가 없어요" 안내를 표시한다(일러스트 없음).
  */
 export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteGoalList({
-    limit: 2,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
+    useInfiniteGoalList({ limit: 2 });
   const goals = data?.pages.flatMap((p) => p.goals) ?? [];
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -37,21 +37,32 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
-  if (goals.length === 0) return null;
-
   return (
     <section aria-label="목표 별 할일" className={cn('flex flex-col gap-2.5', className)}>
       <div className="flex items-center gap-3 px-2">
         <IcGoal aria-hidden className="size-10 shrink-0" />
         <h2 className="text-lg leading-7 font-medium text-black">목표 별 할일</h2>
       </div>
-      <div className="flex flex-col gap-8">
-        {goals.map((goal) => (
-          <GoalTodoBoard key={goal.id} goal={goal} />
-        ))}
-      </div>
-      {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+      {isLoading ? (
+        <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
+      ) : isError ? (
+        <p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>
+      ) : goals.length === 0 ? (
+        // figma 21209:52456 — 카드 chrome 그대로(일러스트 제외). 텍스트 가운데 정렬용 min-h 확보.
+        <Card className="flex min-h-[200px] items-center justify-center border border-slate-200 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
+          <p className="text-md m-auto text-center text-slate-500">등록한 목표가 없어요</p>
+        </Card>
+      ) : (
+        <>
+          <div className="flex flex-col gap-8">
+            {goals.map((goal) => (
+              <GoalTodoBoard key={goal.id} goal={goal} />
+            ))}
+          </div>
+          {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
+          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+        </>
+      )}
     </section>
   );
 }
