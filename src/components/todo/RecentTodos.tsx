@@ -58,21 +58,25 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           <p className="m-auto text-center text-sm text-slate-500">최근에 등록한 할 일이 없어요</p>
         ) : (
           <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 overflow-y-auto">
-            {todos.map((t) => (
-              <li key={t.id}>
-                <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
-                  <TodoList.Actions>
-                    {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-                    {t.noteIds.length > 0 && <TodoList.NoteAction />}
-                    {t.linkUrl && <TodoList.LinkAction />}
-                    {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-                    {t.noteIds.length === 0 && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                    <TodoList.KebabAction hoverOnly />
-                    <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
-                  </TodoList.Actions>
-                </TodoList>
-              </li>
-            ))}
+            {todos.map((t) => {
+              // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
+              const hasNote = (t.noteIds?.length ?? 0) > 0;
+              return (
+                <li key={t.id}>
+                  <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
+                    <TodoList.Actions>
+                      {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
+                      {hasNote && <TodoList.NoteAction />}
+                      {t.linkUrl && <TodoList.LinkAction />}
+                      {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
+                      {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
+                      <TodoList.KebabAction hoverOnly />
+                      <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                    </TodoList.Actions>
+                  </TodoList>
+                </li>
+              );
+            })}
           </ul>
         )}
       </Card>

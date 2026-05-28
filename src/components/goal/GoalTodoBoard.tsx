@@ -36,6 +36,8 @@ function Row({
   onToggle: (id: number, done: boolean) => void;
   onToggleFavorite: (id: number, isFavorite: boolean) => void;
 }) {
+  // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
+  const hasNote = (todo.noteIds?.length ?? 0) > 0;
   return (
     <li>
       <TodoList
@@ -46,10 +48,10 @@ function Row({
       >
         <TodoList.Actions>
           {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-          {todo.noteIds.length > 0 && <TodoList.NoteAction />}
+          {hasNote && <TodoList.NoteAction />}
           {todo.linkUrl && <TodoList.LinkAction />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-          {todo.noteIds.length === 0 && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
+          {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
           <TodoList.KebabAction hoverOnly />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
