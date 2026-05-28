@@ -4,13 +4,16 @@ import { useSignup } from '@/src/hooks/auth';
 import { signupSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
 import Button from '../common/buttons/Button';
 import Input from '../common/inputs/Input';
 import PasswordInput from '../common/inputs/PasswordInput';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -28,13 +31,20 @@ export default function LoginForm() {
   });
   const { name, email, password } = useWatch({ control });
 
-  const { mutate } = useSignup();
+  const { mutate, isSuccess } = useSignup();
 
   const handleSignupBehavior = () => {
     if (!email || !name || !password) return;
 
     mutate({ email, name, password });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      alert('회원가입이 완료되었습니다.');
+      router.push('/');
+    }
+  }, [isSuccess]);
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit(handleSignupBehavior)}>
