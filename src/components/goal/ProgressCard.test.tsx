@@ -94,7 +94,5 @@ it('전체 변형은 이름을 넣어 본문을 만든다', async () => {
   });
   userMock.getMe.mockResolvedValue(me);
   renderWithClient(<ProgressCard />);
-  // 본문은 "{name}님의" / "진행도는"으로 분리 렌더 — 두 부분이 모두 나타나는지 검증
-  expect(await screen.findAllByText('체다치즈님의')).not.toHaveLength(0);
-  expect(screen.getAllByText('진행도는')).not.toHaveLength(0);
+  expect(await screen.findAllByText('체다치즈님의 진행도는')).not.toHaveLength(0);
 });
