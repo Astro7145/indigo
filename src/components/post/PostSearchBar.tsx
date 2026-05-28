@@ -18,9 +18,9 @@ export default function PostSearchBar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const query = searchParams.get('search') ?? '';
   const sortBy = (searchParams.get('sortBy') as SortBy) ?? 'latest';
 
+  const [input, setInput] = useState(searchParams.get('search') ?? '');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortContainerRef = useRef<HTMLDivElement>(null);
 
@@ -60,9 +60,11 @@ export default function PostSearchBar() {
         반응형은 외부 wrapper에서 처리.
       */}
       <div className="flex-1 md:w-[432px] md:flex-none">
+        {/* 공통 debounce 유틸 추가 시 onSearch 대신 debounce 적용으로 교체 고려 */}
         <SearchInput
-          value={query}
-          onChange={(e) => updateParam('search', e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onSearch={() => updateParam('search', input)}
           placeholder="궁금한 내용을 검색해주세요"
           aria-label="게시글 검색"
         />

@@ -36,7 +36,7 @@ export default function CommentItem({ comment, isMine = false }: CommentItemProp
         </div>
         {isMine && (
           /*
-            TODO: 공통 Dropdown 컴포넌트 머지 후 그것으로 교체.
+            TODO: 공통 Dropdown 컴포넌트 머지 후 교체하기
             메뉴 옵션: "수정하기"(setIsEditing(true)) / "삭제하기".
             현재는 placeholder 트리거를 곧장 인라인 수정 모드 진입에 연결 (단순화).
           */
