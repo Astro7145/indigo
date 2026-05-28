@@ -28,8 +28,8 @@ export default function Calendar(props: CalendarProps) {
   const { buttonProps: nextDomProps } = useButton(nextButtonProps, nextRef);
 
   return (
-    <div {...calendarProps} className="calendar flex w-[280px] flex-col">
-      <div className="flex w-full items-center justify-between">
+    <div {...calendarProps} className="calendar flex w-full flex-col">
+      <div className="flex w-full items-center justify-between px-[calc(100%/16-1rem)]">
         <IconButton
           {...prevDomProps}
           aria-label={prevDomProps['aria-label'] as string}

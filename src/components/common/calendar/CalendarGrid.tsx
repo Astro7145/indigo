@@ -12,11 +12,11 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
   const { gridProps, headerProps, weekDays, weeksInMonth } = useCalendarGrid(props, state);
 
   return (
-    <table {...gridProps} className="w-[280px] table-fixed border-separate [border-spacing:0_4px]">
+    <table {...gridProps} className="w-full table-fixed border-separate [border-spacing:0_4px]">
       <thead {...headerProps}>
         <tr>
           {weekDays.map((day, index) => (
-            <th key={index} className="size-10 text-center text-sm font-medium tracking-[-0.42px] text-slate-700">
+            <th key={index} className="h-10 text-center text-sm font-medium tracking-[-0.42px] text-slate-700">
               {day}
             </th>
           ))}
@@ -36,7 +36,7 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
           [...new Array(6 - weeksInMonth).keys()].map((i) => (
             <tr key={`pad-${i}`} aria-hidden="true">
               {[...new Array(7).keys()].map((j) => (
-                <td key={j} className="size-10" />
+                <td key={j} className="aspect-square" />
               ))}
             </tr>
           ))}
