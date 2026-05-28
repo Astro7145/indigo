@@ -219,10 +219,11 @@ function ProgressCardView({
           </div>
         </div>
 
-        {/* compact 텍스트 (xl에서 숨김) */}
+        {/* compact 텍스트 (2xl에서 숨김) */}
         <div className="absolute top-[60px] left-[156px] flex flex-col gap-0.5 sm:left-[164px] 2xl:hidden">
-          {/* wide와 동일한 분리 — 좁은 셀에서 "진행도는"이 mid-word로 끊기지 않도록 name/verb 단위로 분리 wrap */}
-          <div className="flex flex-wrap gap-x-1 text-xs leading-[15px] text-white/85 sm:text-[13px] sm:leading-4">
+          {/* wide와 동일한 분리 — 좁은 셀에서 "진행도는"이 mid-word로 끊기지 않도록 name/verb 단위로 분리 wrap.
+              폰트는 wide와 동일하게 text-xl semibold로 통일 (이전 text-xs는 얇아 보였음). */}
+          <div className="flex flex-wrap gap-x-1.5 text-lg leading-[20px] font-semibold tracking-[-0.03em] text-white">
             <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
             {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
           </div>
