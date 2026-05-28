@@ -16,13 +16,17 @@ export interface GoalTodoSectionProps {
  * 목표가 0개면 섹션 자체를 렌더하지 않는다(기획 SSOT).
  */
 export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteGoalList({ limit: 2 });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteGoalList({
+    limit: 2,
+  });
   const goals = data?.pages.flatMap((p) => p.goals) ?? [];
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el || !hasNextPage || isFetchingNextPage) return;
+    // 다음 페이지 fetch가 실패하면 sentinel을 관찰하지 않는다. 관찰하면 sentinel이 화면에 남아
+    // 있는 한 IntersectionObserver가 즉시 다시 교차해 fetchNextPage를 무한 재호출(API 스팸)한다.
+    if (!el || !hasNextPage || isFetchingNextPage || isFetchNextPageError) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) fetchNextPage();
@@ -31,7 +35,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   if (goals.length === 0) return null;
 
