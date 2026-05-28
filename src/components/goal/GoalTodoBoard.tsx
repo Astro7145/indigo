@@ -74,9 +74,13 @@ function Column({
     <div
       role="group"
       aria-label={label}
+      // 칼럼 내부 클릭/키 이벤트는 카드(목표 상세 이동)로 전파시키지 않는다 — 단,
+      // 칼럼 사이 gap·빈 상태·로딩은 본문 wrapper에 그대로 두어 카드 클릭이 전파된다.
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
       className={cn(
         // 컨테이너(카드) 폭 기준: <1024 compact(p-4·gap-2·auto 높이), ≥1024 spacious(p-6·gap-4·고정 324)
-        'flex min-w-0 flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 @min-[512px]:flex-1 @min-[1024px]:h-[324px] @min-[1024px]:gap-4 @min-[1024px]:p-6',
+        'flex min-w-0 cursor-auto flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 @min-[512px]:flex-1 @min-[1024px]:h-[324px] @min-[1024px]:gap-4 @min-[1024px]:p-6',
         // figma: To Do = slate-50 배경(그림자 없음), Done = 흰 배경 + 옅은 그림자
         isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
@@ -192,15 +196,12 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
       </div>
 
       {/*
-        카드 활성화(클릭·Enter/Space 키)가 본문 내 컨트롤 조작으로 트리거되지 않도록 차단.
-        데스크톱은 칼럼 높이(324)를 예약해 로딩/빈 상태에도 카드 높이를 유지 — 무한스크롤 sentinel이
-        조기에 화면에 들어와 다음 페이지가 연쇄 로딩되는 것을 막고 레이아웃 시프트도 방지한다.
+        본문 영역. 카드 활성화 차단은 각 Column에서 처리 — 칼럼 사이 gap·빈 상태·로딩은 카드 클릭이
+        그대로 전파돼 목표 상세로 이동한다. 데스크톱은 칼럼 높이(324)를 예약해 로딩/빈 상태에도
+        카드 높이를 유지 — 무한스크롤 sentinel이 조기에 화면에 들어와 다음 페이지가 연쇄 로딩되는
+        것을 막고 레이아웃 시프트도 방지한다.
       */}
-      <div
-        className="cursor-auto @min-[1024px]:flex @min-[1024px]:min-h-[324px] @min-[1024px]:flex-col @min-[1024px]:justify-center"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
+      <div className="@min-[1024px]:flex @min-[1024px]:min-h-[324px] @min-[1024px]:flex-col @min-[1024px]:justify-center">
         {isLoading ? (
           <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
