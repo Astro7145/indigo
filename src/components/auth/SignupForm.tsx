@@ -41,7 +41,7 @@ export default function SignupForm() {
     mode: 'onBlur',
   });
 
-  const { mutate, isSuccess } = useSignup();
+  const { mutate } = useSignup();
 
   const { name } = useWatch({ control });
   const debouncedName = useDebounce(name ?? '');
@@ -59,15 +59,16 @@ export default function SignupForm() {
   const handleSignupBehavior = (data: SignupFields) => {
     const { email, name, password } = data;
 
-    mutate({ email, name, password });
+    mutate(
+      { email, name, password },
+      {
+        onSuccess: () => {
+          alert('회원가입이 완료되었습니다.');
+          router.push('/');
+        },
+      },
+    );
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      alert('회원가입이 완료되었습니다.');
-      router.push('/');
-    }
-  }, [isSuccess, router]);
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit(handleSignupBehavior)}>

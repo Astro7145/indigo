@@ -86,21 +86,27 @@ describe('SignupForm', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: '회원가입 하기' }));
     await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        name: '홍길동',
-        password: 'password123',
-      });
+      expect(mockMutate).toHaveBeenCalledWith(
+        { email: 'user@example.com', name: '홍길동', password: 'password123' },
+        expect.any(Object),
+      );
     });
   });
 
-  it('회원가입 성공 시 router.push("/")를 호출한다', () => {
+  it('회원가입 성공 시 router.push("/")를 호출한다', async () => {
     jest.spyOn(window, 'alert').mockImplementation(() => {});
-    mockedUseSignup.mockReturnValue({ mutate: mockMutate, isSuccess: true } as unknown as ReturnType<
-      typeof authHooks.useSignup
-    >);
+    mockMutate.mockImplementation((_data: unknown, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.();
+    });
     renderWithClient(<SignupForm />);
-    expect(mockPush).toHaveBeenCalledWith('/');
+    fillValidForm();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '회원가입 하기' })).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByRole('button', { name: '회원가입 하기' }));
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
   });
 
   describe('이름 필드', () => {

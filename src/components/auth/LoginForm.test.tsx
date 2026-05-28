@@ -2,12 +2,17 @@ jest.mock('@/src/hooks/auth', () => ({
   useLogin: jest.fn(),
 }));
 
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+}));
+
 jest.mock('@/src/components/common/icons', () => ({
   IcEye: () => <svg data-testid="ic-eye" />,
   IcEyeOff: () => <svg data-testid="ic-eye-off" />,
 }));
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 
 import * as authHooks from '@/src/hooks/auth';
 import LoginForm from '@/src/components/auth/LoginForm';
@@ -15,9 +20,11 @@ import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 
 const mockedUseLogin = authHooks.useLogin as jest.MockedFunction<typeof authHooks.useLogin>;
 const mockMutate = jest.fn();
+const mockPush = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
   mockedUseLogin.mockReturnValue({ mutate: mockMutate } as unknown as ReturnType<typeof authHooks.useLogin>);
 });
 
@@ -71,7 +78,30 @@ describe('LoginForm', () => {
     fireEvent.click(screen.getByRole('button', { name: '로그인하기' }));
 
     await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalledWith({ email: 'user@example.com', password: 'password' });
+      expect(mockMutate).toHaveBeenCalledWith({ email: 'user@example.com', password: 'password' }, expect.any(Object));
+    });
+  });
+
+  it('로그인 성공 시 router.push("/")를 호출한다', async () => {
+    mockMutate.mockImplementation((_data: unknown, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.();
+    });
+    renderWithClient(<LoginForm />);
+    const emailInput = screen.getByPlaceholderText('이메일을 입력해주세요');
+    const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
+
+    fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
+    fireEvent.blur(emailInput);
+    fireEvent.change(passwordInput, { target: { value: 'password' } });
+    fireEvent.blur(passwordInput);
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByRole('button', { name: '로그인하기' }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/');
     });
   });
 

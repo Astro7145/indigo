@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import Button from '../common/buttons/Button';
 import Input from '../common/inputs/Input';
 import PasswordInput from '../common/inputs/PasswordInput';
+import { useRouter } from 'next/navigation';
 
 type LoginFields = {
   email: string;
@@ -15,6 +16,8 @@ type LoginFields = {
 };
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -32,7 +35,7 @@ export default function LoginForm() {
   const handleLoginBehavior = (data: LoginFields) => {
     const { email, password } = data;
 
-    mutate({ email, password });
+    mutate({ email, password }, { onSuccess: () => router.push('/') });
   };
 
   return (
