@@ -1,6 +1,8 @@
 'use client';
 
 import { useSignup } from '@/src/hooks/auth';
+import { useDebounce } from '@/src/hooks/useDebounce';
+import { useCheckNickname } from '@/src/hooks/user';
 import { signupSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -18,6 +20,8 @@ export default function LoginForm() {
     register,
     handleSubmit,
     control,
+    setError,
+    clearErrors,
     formState: { isSubmitting, isSubmitted, errors, isValid },
   } = useForm({
     resolver: zodResolver(signupSchema),
@@ -32,6 +36,17 @@ export default function LoginForm() {
   const { name, email, password } = useWatch({ control });
 
   const { mutate, isSuccess } = useSignup();
+  const debouncedName = useDebounce(name ?? '');
+  const { data: nicknameCheck } = useCheckNickname(debouncedName);
+
+  useEffect(() => {
+    if (!nicknameCheck) return;
+    if (!nicknameCheck.available) {
+      setError('name', { type: 'manual', message: '이미 사용 중인 닉네임입니다.' });
+    } else {
+      clearErrors('name');
+    }
+  }, [nicknameCheck, setError, clearErrors]);
 
   const handleSignupBehavior = () => {
     if (!email || !name || !password) return;
