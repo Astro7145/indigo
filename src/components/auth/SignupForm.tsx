@@ -67,7 +67,7 @@ export default function SignupForm() {
       alert('회원가입이 완료되었습니다.');
       router.push('/');
     }
-  }, [isSuccess]);
+  }, [isSuccess, router]);
 
   return (
     <form className="flex flex-col gap-8" onSubmit={handleSubmit(handleSignupBehavior)}>
