@@ -11,26 +11,25 @@ import { IcPencil } from '@/src/components/common/icons/IcPencil';
 import { IcStar } from '@/src/components/common/icons/IcStar';
 import { cn } from '@/src/utils/cn';
 
-// 'responsive' — 부모 `@container` 폭 기준으로 small↔large 전환(<1024 small, ≥1024 large).
-//   목표 카드(GoalTodoBoard)처럼 한 컴포넌트가 데스크톱은 큰 행, 태블릿/모바일은 작은 행을
-//   써야 할 때 사용. `@container` 조상이 없으면 small과 동일하게 동작.
+// 'responsive' — viewport 폭 기준 small↔large 전환 (`2xl:` = 1536+).
+//   목표 카드(GoalTodoBoard)처럼 데스크톱은 큰 행, 태블릿/모바일은 작은 행을 써야 할 때 사용.
 export type TodoListSize = 'large' | 'small' | 'responsive';
 export type TodoListVariant = 'default' | 'onDark';
 
 const TITLE_SIZE: Record<TodoListSize, string> = {
   large: 'text-base leading-6',
   small: 'text-sm leading-5',
-  responsive: 'text-sm leading-5 @min-[1024px]:text-base @min-[1024px]:leading-6',
+  responsive: 'text-sm leading-5 2xl:text-base 2xl:leading-6',
 };
 const ROW_SIZE: Record<TodoListSize, string> = {
   large: 'gap-2 px-2 py-2.5',
   small: 'gap-1.5 px-1 py-1.5',
-  responsive: 'gap-1.5 px-1 py-1.5 @min-[1024px]:gap-2 @min-[1024px]:px-2 @min-[1024px]:py-2.5',
+  responsive: 'gap-1.5 px-1 py-1.5 2xl:gap-2 2xl:px-2 2xl:py-2.5',
 };
 const ACTIONS_GAP: Record<TodoListSize, string> = {
   large: 'gap-2',
   small: 'gap-1.5',
-  responsive: 'gap-1.5 @min-[1024px]:gap-2',
+  responsive: 'gap-1.5 2xl:gap-2',
 };
 
 interface TodoListContextValue {
