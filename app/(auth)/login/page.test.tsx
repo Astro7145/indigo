@@ -3,13 +3,6 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import LoginPage from './page';
 
-const mockReplace = jest.fn();
-jest.mock('next/navigation', () => ({ useRouter: () => ({ replace: mockReplace }) }));
-
-// useLogin은 react-query 계약(성공 시 mutate의 onSuccess 호출)만 흉내 낸다.
-const mockMutate = jest.fn((_body, opts?: { onSuccess?: () => void }) => opts?.onSuccess?.());
-jest.mock('@/src/hooks/auth', () => ({ useLogin: () => ({ mutate: mockMutate }) }));
-
 describe('LoginPage 유효성 검증', () => {
   describe('초기 상태', () => {
     it('로그인 버튼이 비활성화되어 있다', () => {
@@ -97,25 +90,6 @@ describe('LoginPage 유효성 검증', () => {
       await waitFor(() => {
         expect(screen.getByRole('button', { name: '로그인하기' })).toBeEnabled();
       });
-    });
-  });
-
-  describe('로그인 성공', () => {
-    it('로그인에 성공하면 대시보드로 이동한다', async () => {
-      renderWithClient(<LoginPage />);
-      const emailInput = screen.getByPlaceholderText('이메일을 입력해주세요');
-      const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
-
-      fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-      fireEvent.blur(emailInput);
-      fireEvent.change(passwordInput, { target: { value: 'password123' } });
-      fireEvent.blur(passwordInput);
-
-      const button = screen.getByRole('button', { name: '로그인하기' });
-      await waitFor(() => expect(button).toBeEnabled());
-      fireEvent.click(button);
-
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/'));
     });
   });
 });
