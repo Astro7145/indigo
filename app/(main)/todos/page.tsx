@@ -63,9 +63,8 @@ export default function TodosPage() {
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:54371) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">모든 할 일</h1>
-        <span aria-label="모든 할 일 개수" className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">
-          {totalCount}
-        </span>
+        {/* aria-label 미부착 — 스크린리더가 h1 "모든 할 일" + 숫자 텍스트를 그대로 이어 읽도록 둔다 */}
+        <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{totalCount}</span>
       </div>
 
       {/* tabs → card 간격은 시안상 12px (header → tabs는 24px = 바깥 section gap-6) */}
