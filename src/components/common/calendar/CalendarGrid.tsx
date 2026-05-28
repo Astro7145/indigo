@@ -32,6 +32,14 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
               )}
           </tr>
         ))}
+        {weeksInMonth < 6 &&
+          [...new Array(6 - weeksInMonth).keys()].map((i) => (
+            <tr key={`pad-${i}`} aria-hidden="true">
+              {[...new Array(7).keys()].map((j) => (
+                <td key={j} className="size-10" />
+              ))}
+            </tr>
+          ))}
       </tbody>
     </table>
   );
