@@ -21,16 +21,13 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
 
   const variant = isOutsideVisibleRange || isDisabled ? 'outside' : isSelected ? 'selected' : 'default';
 
-  const buttonClass = {
-    outside: 'cursor-default font-normal text-slate-400',
-    selected: 'font-medium text-white',
-    default: 'font-normal text-slate-700 group-hover:font-medium group-hover:text-white',
-  }[variant];
-
-  const circleClass = {
-    outside: '',
-    selected: 'bg-indigo-600 group-hover:bg-indigo-700',
-    default: 'group-hover:bg-indigo-700',
+  const { buttonClass, circleClass } = {
+    outside: { buttonClass: 'cursor-default font-normal text-slate-400', circleClass: '' },
+    selected: { buttonClass: 'font-medium text-white', circleClass: 'bg-indigo-600 group-hover:bg-indigo-700' },
+    default: {
+      buttonClass: 'font-normal text-slate-700 hover:font-medium hover:text-white',
+      circleClass: 'group-hover:bg-indigo-700',
+    },
   }[variant];
 
   return (
@@ -38,13 +35,19 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
       <button
         {...buttonProps}
         ref={ref}
+        tabIndex={isOutsideVisibleRange ? -1 : buttonProps.tabIndex}
         className={cn(
           'group relative flex h-10 w-full cursor-pointer items-center justify-center outline-none disabled:cursor-not-allowed',
           'text-sm tracking-[-0.42px]',
           buttonClass,
         )}
       >
-        <span className={cn('absolute size-10 rounded-full', circleClass)} />
+        <span
+          className={cn(
+            'absolute size-10 rounded-full group-focus-visible:ring-2 group-focus-visible:ring-indigo-500 group-focus-visible:ring-inset',
+            circleClass,
+          )}
+        />
         <span className="relative">{formattedDate}</span>
       </button>
     </td>

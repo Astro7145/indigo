@@ -74,7 +74,7 @@ export default function DatePicker(props: DatePickerProps) {
         </BottomSheet>
       ) : (
         isOpen && (
-          <FocusScope restoreFocus autoFocus>
+          <FocusScope restoreFocus autoFocus contain>
             <div
               ref={popupRef}
               {...overlayProps}
