@@ -197,7 +197,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         조기에 화면에 들어와 다음 페이지가 연쇄 로딩되는 것을 막고 레이아웃 시프트도 방지한다.
       */}
       <div
-        className="@min-[1024px]:flex @min-[1024px]:min-h-[324px] @min-[1024px]:flex-col @min-[1024px]:justify-center"
+        className="cursor-auto @min-[1024px]:flex @min-[1024px]:min-h-[324px] @min-[1024px]:flex-col @min-[1024px]:justify-center"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
