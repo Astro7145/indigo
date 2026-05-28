@@ -5,6 +5,9 @@ import path from 'path';
 // e2e에서 .env의 테스트 계정(BACKEND_TEST_*)을 읽는다. (CI 등은 환경변수로 주입)
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
+// setup 프로젝트가 1회 로그인해 저장하고, 모든 브라우저 프로젝트가 재사용하는 인증 상태.
+const STORAGE_STATE = path.resolve(__dirname, 'playwright/.auth/user.json');
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -31,19 +34,25 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // 1회 로그인해 storageState를 저장한다. 아래 브라우저 프로젝트가 모두 의존한다.
+    { name: 'setup', testMatch: /auth\.setup\.ts/ },
+
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], storageState: STORAGE_STATE },
+      dependencies: ['setup'],
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { ...devices['Desktop Firefox'], storageState: STORAGE_STATE },
+      dependencies: ['setup'],
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { ...devices['Desktop Safari'], storageState: STORAGE_STATE },
+      dependencies: ['setup'],
     },
 
     /* Test against mobile viewports. */
