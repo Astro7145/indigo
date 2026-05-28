@@ -103,7 +103,7 @@ function TodoList({
       <div
         ref={ref}
         className={cn(
-          'group flex w-full items-center rounded',
+          'group flex w-full cursor-pointer items-center rounded',
           ROW_SIZE[size],
           variant === 'default' && 'hover:bg-indigo-700/30',
           className,
