@@ -80,13 +80,11 @@ it('별을 클릭하면 addTodoFavorite를 호출한다', async () => {
   await waitFor(() => expect(mockedFav.addTodoFavorite).toHaveBeenCalledWith(1));
 });
 
-it('"모두 보기"는 항상 button이며 onSeeAll로 호출된다', async () => {
-  const onSeeAll = jest.fn();
+it('"모두 보기"는 /todos로 가는 링크다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
-  renderWithClient(<RecentTodos onSeeAll={onSeeAll} />);
+  renderWithClient(<RecentTodos />);
   await screen.findByText('할일 A');
-  fireEvent.click(screen.getByRole('button', { name: '모두 보기' }));
-  expect(onSeeAll).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('link', { name: '모두 보기' })).toHaveAttribute('href', '/todos');
 });
 
 it('할일이 4개를 넘으면 최근 4개만 렌더한다', async () => {

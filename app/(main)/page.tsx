@@ -1,14 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import ProgressCard from '@/src/components/goal/ProgressCard';
 import RecentTodos from '@/src/components/todo/RecentTodos';
 import { useMe } from '@/src/hooks/user';
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { data: me } = useMe();
 
   return (
@@ -20,7 +17,7 @@ export default function DashboardPage() {
         </h1>
       )}
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-        <RecentTodos onSeeAll={() => router.push('/todos')} />
+        <RecentTodos />
         <ProgressCard />
       </div>
       <GoalTodoSection />
