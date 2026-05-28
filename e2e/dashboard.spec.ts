@@ -41,10 +41,11 @@ test.describe('대시보드', () => {
       await expect(section.getByRole('progressbar').first()).toBeVisible({ timeout: 15_000 });
       const initial = await section.getByRole('progressbar').count();
 
-      // (main) 레이아웃은 min-h-screen이라 윈도우가 스크롤 컨테이너다(IO root=뷰포트).
-      // 끝까지 스크롤 → sentinel 교차 → fetchNextPage. 페이지가 길어질 수 있어 toPass로 재시도.
+      // 스크롤 컨테이너는 <main>(overflow-y-auto). window 스크롤은 noop이라 <main>을 직접 스크롤한다.
+      // IO root는 기본(viewport)이지만, <main> 내부 스크롤이 sentinel과 viewport 간 교차 위치를 이동시켜 정상 발화한다.
+      // 페이지가 길어질 수 있어 toPass로 재시도.
       await expect(async () => {
-        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await page.locator('main').evaluate((el) => el.scrollTo(0, el.scrollHeight));
         expect(await section.getByRole('progressbar').count()).toBeGreaterThan(initial);
       }).toPass({ timeout: 10_000 });
     });
