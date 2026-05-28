@@ -40,15 +40,15 @@ export default function PostsPage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
-      <header className="mx-auto mb-6 max-w-5xl">
-        <h1 className="text-xl font-bold text-slate-900 md:text-2xl">소통 게시판</h1>
+    <div>
+      <header className="mx-auto mb-6 max-w-[1200px]">
+        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">소통 게시판</h1>
       </header>
 
       {/* 베스트 게시글 — 데이터 로드 후 노출. 모바일: 가로 스크롤 / md+: 3열 grid */}
       {bestPosts.length > 0 && (
-        <section className="mx-auto mb-6 max-w-5xl">
-          <div className="-mx-4 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 [-ms-overflow-style:none] md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:px-0 [&::-webkit-scrollbar]:hidden">
+        <section className="mx-auto mb-6 max-w-[1200px]">
+          <div className="-mx-4 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 [-ms-overflow-style:none] md:mx-0 md:gap-6 md:px-0 xl:grid xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
             {bestPosts.map((post) => (
               <PostCard key={post.id} post={post} onClick={() => router.push(`/posts/${post.id}`)} />
             ))}
@@ -57,12 +57,12 @@ export default function PostsPage() {
       )}
 
       {/* 검색·정렬 */}
-      <section className="mx-auto mb-4 max-w-5xl">
+      <section className="mx-auto mb-4 max-w-[1200px]">
         <PostSearchBar />
       </section>
 
       {/* 목록 또는 빈 상태 */}
-      <section className="mx-auto max-w-5xl">
+      <section className="mx-auto max-w-[1200px]">
         {!isPending && posts.length === 0 ? (
           <PostListEmpty />
         ) : (

@@ -15,7 +15,7 @@ export interface PostCardProps {
 }
 
 const rootClass =
-  'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden md:shrink md:h-auto md:w-full md:p-8 md:gap-4';
+  'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden md:h-auto md:w-[384px] md:p-8 md:gap-4 xl:w-full';
 
 export default function PostCard({ post, onClick, className }: PostCardProps) {
   return (
@@ -32,7 +32,7 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
           />
         </div>
       )}
-      <div className="flex items-center justify-between gap-2">
+      <div className="mt-auto flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-base text-slate-500">
           {post.writer.image ? (
             <Image src={post.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
