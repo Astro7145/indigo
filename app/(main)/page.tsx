@@ -10,8 +10,8 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1312px] flex-col gap-8 lg:gap-8.5">
-      {/* 모바일은 GNB가 타이틀을 담당 → md+ 에서만 노출. me.name 로드 전후 grid가 밀려나지 않도록 h-8(text-2xl 줄높이) 예약 */}
-      <div className="hidden h-8 md:block">
+      {/* 모바일(<sm)은 GNB가 타이틀을 담당 → sm+ 에서 노출. me.name 로드 전후 grid가 밀려나지 않도록 h-8(text-2xl 줄높이) 예약 */}
+      <div className="hidden h-8 sm:block">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{me?.name}님의 대시보드</h1>
       </div>
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">

@@ -14,9 +14,10 @@ export interface RecentTodosProps {
   className?: string;
 }
 
-// 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — 데스크톱·태블릿 2열, 모바일 1열은 페이지가 결정.
-// @container: 카드 폭 기준으로 높이를 ProgressCard와 동일하게 전환(셀 ≥480px=데스크톱 256, 그 외 187).
-const rootClass = '@container flex w-full flex-col gap-2.5';
+// 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — sm+ 2열, 모바일 1열.
+// 카드 크롬(아이콘·패딩·높이)은 viewport `2xl:`(1280+) 기준으로 desktop ↔ tablet/mobile 전환
+// — ProgressCard wide 레이아웃과 동시 활성되도록(2-col 셀이 1024~1279에서 좁아 양쪽 모두 tablet 유지).
+const rootClass = 'flex w-full flex-col gap-2.5';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
@@ -38,17 +39,22 @@ export default function RecentTodos({ className }: RecentTodosProps) {
 
   return (
     <div className={cn(rootClass, className)}>
-      <div className="flex items-center justify-between px-2">
-        <div className="flex items-center gap-3">
-          <IcTask aria-hidden className="size-8 shrink-0 @min-[480px]:size-10" />
-          <h3 className="text-lg leading-7 font-medium text-black">최근 등록한 할일</h3>
+      {/* 좁은 폭(2열 셀이 ~260px대로 떨어지는 sm 구간)에서 제목·모두보기가 둘 다 wrap돼 카드가 밀리는 걸 방지:
+          좌측 그룹은 min-w-0 + truncate(필요 시 …), 우측 링크는 shrink-0 + whitespace-nowrap로 보존. */}
+      <div className="flex items-center justify-between gap-2 px-2">
+        <div className="flex min-w-0 items-center gap-3">
+          <IcTask aria-hidden className="size-8 shrink-0 2xl:size-10" />
+          <h3 className="truncate text-lg leading-7 font-medium text-black">최근 등록한 할일</h3>
         </div>
-        <Link href="/todos" className="flex items-center text-base font-semibold text-indigo-600">
+        <Link
+          href="/todos"
+          className="flex shrink-0 items-center text-base font-semibold whitespace-nowrap text-indigo-600"
+        >
           모두 보기
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </Link>
       </div>
-      <Card className="flex h-[187px] flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] @min-[480px]:h-64 @min-[480px]:px-8 @min-[480px]:py-[30px]">
+      <Card className="flex h-[187px] flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] 2xl:h-64 2xl:px-8 2xl:py-[30px]">
         {isLoading ? (
           <p className="text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
