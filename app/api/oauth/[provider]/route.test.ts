@@ -16,7 +16,6 @@ const mockGetServerSession = getServerSession as jest.Mock;
 beforeEach(() => {
   process.env.BACKEND_API_BASE_URL = 'https://api.test';
   process.env.BACKEND_TEAM_ID = 'indigo';
-  process.env.NEXTAUTH_URL = 'http://localhost:3000';
   jest.restoreAllMocks();
 });
 

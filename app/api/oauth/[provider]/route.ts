@@ -7,11 +7,13 @@ type Ctx = { params: Promise<{ provider: string }> };
 
 export async function GET(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const { provider } = await ctx.params;
+  // 리다이렉트 기준 origin은 요청에서 직접 얻는다
+  const { origin } = req.nextUrl;
   // Auth.js에서 소셜 로그인을 통해 발급 받은 토큰을 세션으로부터 불러옴
   const session = await getServerSession(authOptions);
 
   if (!session?.accessToken) {
-    return NextResponse.redirect(new URL('/login', process.env.NEXTAUTH_URL!));
+    return NextResponse.redirect(new URL('/login', origin));
   }
 
   const r = await callExternal({
@@ -30,10 +32,10 @@ export async function GET(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   try {
     data = JSON.parse(r.body);
   } catch {
-    return NextResponse.redirect(new URL('/login?error=parse', process.env.NEXTAUTH_URL!));
+    return NextResponse.redirect(new URL('/login?error=parse', origin));
   }
 
-  const res = NextResponse.redirect(new URL('/', process.env.NEXTAUTH_URL!));
+  const res = NextResponse.redirect(new URL('/', origin));
   setAuthCookies(res, { accessToken: data.accessToken, refreshToken: data.refreshToken });
 
   return res;
