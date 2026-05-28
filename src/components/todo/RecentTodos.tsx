@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
@@ -9,8 +11,6 @@ import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface RecentTodosProps {
-  /** "모두 보기" 클릭 핸들러 — 항상 button, 동작은 외부 주입 */
-  onSeeAll?: () => void;
   className?: string;
 }
 
@@ -23,7 +23,7 @@ const rootClass = '@container flex w-full flex-col gap-2.5';
  * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
+export default function RecentTodos({ className }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest' });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
@@ -40,15 +40,15 @@ export default function RecentTodos({ onSeeAll, className }: RecentTodosProps) {
     <div className={cn(rootClass, className)}>
       <div className="flex items-center justify-between px-2">
         <div className="flex items-center gap-3">
-          <IcTask aria-hidden className="shrink-0" />
+          <IcTask aria-hidden className="size-8 shrink-0 @min-[480px]:size-10" />
           <h3 className="text-lg leading-7 font-medium text-black">최근 등록한 할일</h3>
         </div>
-        <button type="button" onClick={onSeeAll} className="flex items-center text-base font-semibold text-indigo-600">
+        <Link href="/todos" className="flex items-center text-base font-semibold text-indigo-600">
           모두 보기
           <IcChevron direction="right" className="size-5 text-indigo-600" />
-        </button>
+        </Link>
       </div>
-      <Card className="flex h-[187px] flex-col border border-slate-200 px-8 py-[30px] shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] @min-[480px]:h-64">
+      <Card className="flex h-[187px] flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] @min-[480px]:h-64 @min-[480px]:px-8 @min-[480px]:py-[30px]">
         {isLoading ? (
           <p className="text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
