@@ -13,7 +13,7 @@ import Input from '../common/inputs/Input';
 import PasswordInput from '../common/inputs/PasswordInput';
 import { useRouter } from 'next/navigation';
 
-export default function LoginForm() {
+export default function SignupForm() {
   const router = useRouter();
 
   const {
