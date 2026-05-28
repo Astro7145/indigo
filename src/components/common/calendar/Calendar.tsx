@@ -40,7 +40,7 @@ export default function Calendar(props: CalendarProps) {
         <h2 className="text-sm font-semibold tracking-[-0.42px] text-slate-700">{title}</h2>
         <IconButton
           {...nextDomProps}
-          aria-label={prevDomProps['aria-label'] as string}
+          aria-label={nextDomProps['aria-label'] as string}
           className="size-8 overflow-hidden rounded-[6px] p-1.5"
         >
           <IcChevron direction="right" />
