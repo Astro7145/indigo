@@ -13,6 +13,13 @@ import Input from '../common/inputs/Input';
 import PasswordInput from '../common/inputs/PasswordInput';
 import { useRouter } from 'next/navigation';
 
+type SignupFields = {
+  name: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+};
+
 export default function SignupForm() {
   const router = useRouter();
 
@@ -23,7 +30,7 @@ export default function SignupForm() {
     setError,
     clearErrors,
     formState: { isSubmitting, isSubmitted, errors, isValid },
-  } = useForm({
+  } = useForm<SignupFields>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: undefined,
@@ -33,9 +40,10 @@ export default function SignupForm() {
     },
     mode: 'onBlur',
   });
-  const { name, email, password } = useWatch({ control });
 
   const { mutate, isSuccess } = useSignup();
+
+  const { name } = useWatch({ control });
   const debouncedName = useDebounce(name ?? '');
   const { data: nicknameCheck } = useCheckNickname(debouncedName);
 
@@ -48,8 +56,8 @@ export default function SignupForm() {
     }
   }, [nicknameCheck, setError, clearErrors]);
 
-  const handleSignupBehavior = () => {
-    if (!email || !name || !password) return;
+  const handleSignupBehavior = (data: SignupFields) => {
+    const { email, name, password } = data;
 
     mutate({ email, name, password });
   };

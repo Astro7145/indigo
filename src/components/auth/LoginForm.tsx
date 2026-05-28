@@ -4,18 +4,22 @@ import { useLogin } from '@/src/hooks/auth';
 import { loginSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import Button from '../common/buttons/Button';
 import Input from '../common/inputs/Input';
 import PasswordInput from '../common/inputs/PasswordInput';
+
+type LoginFields = {
+  email: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const {
     register,
     handleSubmit,
-    control,
     formState: { isSubmitting, isSubmitted, errors, isValid },
-  } = useForm({
+  } = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: undefined,
@@ -23,12 +27,10 @@ export default function LoginForm() {
     },
     mode: 'onBlur',
   });
-  const { email, password } = useWatch({ control });
-
   const { mutate } = useLogin();
 
-  const handleLoginBehavior = () => {
-    if (!email || !password) return;
+  const handleLoginBehavior = (data: LoginFields) => {
+    const { email, password } = data;
 
     mutate({ email, password });
   };
