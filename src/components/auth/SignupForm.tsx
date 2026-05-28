@@ -33,10 +33,10 @@ export default function SignupForm() {
   } = useForm<SignupFields>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      name: undefined,
-      email: undefined,
-      password: undefined,
-      passwordConfirm: undefined,
+      name: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
     },
     mode: 'onBlur',
   });

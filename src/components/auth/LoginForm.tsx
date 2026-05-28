@@ -22,8 +22,8 @@ export default function LoginForm() {
   } = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: undefined,
-      password: undefined,
+      email: '',
+      password: '',
     },
     mode: 'onBlur',
   });
