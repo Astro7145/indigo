@@ -50,10 +50,11 @@ it('목표마다 GoalTodoBoard를 렌더한다', () => {
   expect(screen.getByText('목표1')).toBeInTheDocument();
 });
 
-it('목표가 0개면 섹션을 렌더하지 않는다', () => {
+it('목표가 0개면 섹션 헤더와 빈 안내를 렌더한다', () => {
   setHook({ goals: [] });
   render(<GoalTodoSection />);
-  expect(screen.queryByRole('region', { name: '목표 별 할일' })).not.toBeInTheDocument();
+  expect(screen.getByRole('region', { name: '목표 별 할일' })).toBeInTheDocument();
+  expect(screen.getByText('등록한 목표가 없어요')).toBeInTheDocument();
   expect(screen.queryByTestId('board')).not.toBeInTheDocument();
 });
 
