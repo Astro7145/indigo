@@ -27,12 +27,12 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
         </div>
         <div className="flex items-center gap-1 text-xs text-slate-500 md:gap-2 md:text-base">
           <IcProfileYellow className="size-5 shrink-0 md:size-6" />
-          <div className="flex items-center gap-0.5 md:gap-1">
-            <span className="whitespace-nowrap">{post.writer.name}</span>
+          <div className="flex items-center gap-0.5 whitespace-nowrap md:gap-1">
+            <span>{post.writer.name}</span>
             <span aria-hidden>·</span>
-            <span className="whitespace-nowrap">{post.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
+            <span>{post.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
             <span aria-hidden>·</span>
-            <span className="whitespace-nowrap">조회 {post.viewCount}</span>
+            <span>조회 {post.viewCount}</span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-0.5 text-slate-600">
               <IcMessageCircle className="size-3 md:size-4" />
