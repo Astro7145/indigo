@@ -87,18 +87,9 @@ it('"모두 보기"는 /todos로 가는 링크다', async () => {
   expect(screen.getByRole('link', { name: '모두 보기' })).toHaveAttribute('href', '/todos');
 });
 
-it('할일이 4개를 넘으면 최근 4개만 렌더한다', async () => {
-  mocked.getTodos.mockResolvedValue(
-    listOf([
-      makeTodo(1, '할일 1'),
-      makeTodo(2, '할일 2'),
-      makeTodo(3, '할일 3'),
-      makeTodo(4, '할일 4'),
-      makeTodo(5, '할일 5'),
-    ]),
-  );
+it('useTodoList를 limit: 4로 호출해 최신 4개를 요청한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
   renderWithClient(<RecentTodos />);
-  expect(await screen.findByText('할일 1')).toBeInTheDocument();
-  expect(screen.getByText('할일 4')).toBeInTheDocument();
-  expect(screen.queryByText('할일 5')).not.toBeInTheDocument();
+  await screen.findByText('할일 A');
+  expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ sort: 'latest', limit: 4 }));
 });

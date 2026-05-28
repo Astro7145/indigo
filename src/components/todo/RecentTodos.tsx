@@ -24,11 +24,11 @@ const rootClass = '@container flex w-full flex-col gap-2.5';
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
 export default function RecentTodos({ className }: RecentTodosProps) {
-  const { data, isLoading, isError } = useTodoList({ sort: 'latest' });
+  const { data, isLoading, isError } = useTodoList({ sort: 'latest', limit: 4 });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
-  const todos = (data?.todos ?? []).slice(0, 4);
+  const todos = data?.todos ?? [];
 
   const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
   const toggleFavorite = (todoId: number, isFavorite: boolean) => {
