@@ -109,12 +109,6 @@ function ProgressCardView({
   const animatedPercent = useAnimatedNumber(safePercent);
   const displayPercent = Math.round(animatedPercent);
 
-  // wide 레이아웃 bodyText 분리 — "{name}님의 진행도는" 의 마지막 공백 기준.
-  // 짧으면 한 줄, 컬럼(174px) 넘으면 자연스럽게 두 줄로 분리, 이름 부분이 단독으로도 길면 ellipsis.
-  const lastSpace = bodyText ? bodyText.lastIndexOf(' ') : -1;
-  const bodyNamePart = lastSpace > 0 ? bodyText!.slice(0, lastSpace) : (bodyText ?? '');
-  const bodyVerbPart = lastSpace > 0 ? bodyText!.slice(lastSpace + 1) : null;
-
   // onClick 제공 시 root를 키보드 접근 버튼으로 (Card 비-root라 인라인)
   const interactiveProps = onClick
     ? {
@@ -196,13 +190,9 @@ function ProgressCardView({
         {/* wide 도넛 (xl 이상에서만) */}
         <div className="hidden 2xl:absolute 2xl:top-[18px] 2xl:left-12 2xl:flex 2xl:items-center 2xl:gap-8">
           <Moonphase percent={animatedPercent} className="size-[220px] shrink-0" />
-          <div className="flex w-[174px] flex-col gap-3">
-            {/* "{name}님의 진행도는" 분리 렌더 — 짧으면 한 줄(name + verb), 길면 verb가 다음 줄로 wrap,
-                name이 단독으로도 컬럼 폭 초과 시 …로 truncate. shrink-0 verb가 절대 줄어들지 않게 한다. */}
-            <div className="flex flex-wrap gap-x-1.5 text-xl leading-[30px] font-semibold tracking-[-0.03em]">
-              <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
-              {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
-            </div>
+          <div className="flex min-w-0 flex-col gap-3">
+            {/* bodyText 전체 길이 기준 — 카드 폭 부족 시 어절(공백) 경계에서 두 줄로 wrap. break-keep으로 단어 중간 끊김 방지. */}
+            <p className="text-xl leading-[30px] font-semibold tracking-[-0.03em] break-keep">{bodyText}</p>
             <div className="flex items-end gap-[5px]">
               <span
                 role="progressbar"
@@ -219,14 +209,10 @@ function ProgressCardView({
           </div>
         </div>
 
-        {/* compact 텍스트 (2xl에서 숨김) */}
-        <div className="absolute top-[60px] left-[156px] flex flex-col gap-0.5 sm:left-[164px] 2xl:hidden">
-          {/* wide와 동일한 분리 — 좁은 셀에서 "진행도는"이 mid-word로 끊기지 않도록 name/verb 단위로 분리 wrap.
-              폰트는 wide와 동일하게 text-xl semibold로 통일 (이전 text-xs는 얇아 보였음). */}
-          <div className="flex flex-wrap gap-x-1.5 text-lg leading-[20px] font-semibold tracking-[-0.03em] text-white">
-            <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
-            {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
-          </div>
+        {/* compact 텍스트 (2xl에서 숨김). right 작은 여백으로 카드 폭 부족 시 truncate 트리거. */}
+        <div className="absolute top-[60px] right-3 left-[156px] flex min-w-0 flex-col gap-0.5 sm:left-[164px] 2xl:hidden">
+          {/* bodyText 전체 길이 기준 — 카드 폭 부족 시 어절(공백) 경계에서 두 줄로 wrap. */}
+          <p className="text-lg leading-[20px] font-semibold tracking-[-0.03em] break-keep text-white">{bodyText}</p>
           <div className="flex items-baseline gap-0.5">
             <span
               role="progressbar"
