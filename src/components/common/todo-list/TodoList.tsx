@@ -130,9 +130,8 @@ function Actions({ children, className }: { children?: ReactNode; className?: st
 }
 
 /**
- * 액션 공통. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
- * onClick이 있으면 IconButton(`<button>`), 없으면 동작 없는 인디케이터이므로 포커스 잡히는
- * no-op 버튼 대신 비대화형 `<span role="img">`으로 렌더한다(a11y — 표시만 하고 클릭/포커스 없음).
+ * 액션 공통. 항상 IconButton(`<button>`)으로 렌더한다. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
+ * 모든 액션 아이콘은 클릭 가능한 버튼 — 핸들러 미구현이어도 호출부에서 빈 onClick을 넘긴다.
  */
 function ActionButton({
   label,
@@ -155,21 +154,13 @@ function ActionButton({
     className,
   );
 
-  if (!onClick) {
-    return (
-      <span role="img" aria-label={label} className={cn('inline-flex items-center justify-center rounded', classes)}>
-        {children}
-      </span>
-    );
-  }
-
   return (
     <IconButton
       aria-label={label}
       hover={false}
       onClick={(e: MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        onClick();
+        onClick?.();
       }}
       className={classes}
     >
