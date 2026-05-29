@@ -90,26 +90,30 @@ export default function TodosPage() {
             <p className="py-20 text-center text-sm text-slate-500">아직 등록한 할 일이 없어요</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {todos.map((t, idx) => (
-                <motion.li
-                  key={t.id}
-                  initial={reduce ? false : { opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  // 페이지가 누적되면 인덱스가 커진다 — 신규 페이지 행만 지연을 받도록 모듈로로 감싼다.
-                  transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min((idx % 40) * 0.015, 0.3) }}
-                  className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
-                >
-                  <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
-                    <TodoList.Actions>
-                      {t.noteIds.length > 0 && <TodoList.NoteAction />}
-                      {t.linkUrl && <TodoList.LinkAction />}
-                      {t.noteIds.length === 0 && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction hoverOnly />
-                      <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
-                    </TodoList.Actions>
-                  </TodoList>
-                </motion.li>
-              ))}
+              {todos.map((t, idx) => {
+                // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
+                const hasNote = (t.noteIds?.length ?? 0) > 0;
+                return (
+                  <motion.li
+                    key={t.id}
+                    initial={reduce ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    // 페이지가 누적되면 인덱스가 커진다 — 신규 페이지 행만 지연을 받도록 모듈로로 감싼다.
+                    transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min((idx % 40) * 0.015, 0.3) }}
+                    className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
+                  >
+                    <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
+                      <TodoList.Actions>
+                        {hasNote && <TodoList.NoteAction />}
+                        {t.linkUrl && <TodoList.LinkAction />}
+                        {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
+                        <TodoList.KebabAction hoverOnly />
+                        <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                      </TodoList.Actions>
+                    </TodoList>
+                  </motion.li>
+                );
+              })}
             </ul>
           )}
           {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
