@@ -46,7 +46,9 @@ export default function RecentTodos({ className }: RecentTodosProps) {
       <div className="flex items-center justify-between gap-2 px-2">
         <div className="flex min-w-0 items-center gap-3">
           <IcTask aria-hidden className="size-8 shrink-0 2xl:size-10" />
-          <h3 className="truncate text-lg leading-7 font-medium text-black">최근 등록한 할일</h3>
+          <h3 className="truncate text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">
+            최근 등록한 할일
+          </h3>
         </div>
         <Link
           href="/todos"
