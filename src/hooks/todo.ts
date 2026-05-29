@@ -79,10 +79,13 @@ export function useUpdateTodo() {
       qc.setQueryData(todoKeys.detail(todoId), data);
     },
     // 서버 확정 후 동기화: 리스트(재검증)·favorites·목표 진척도(completedCount/todoCount).
-    onSettled: () => {
+    // 해당 목표의 상세(goalKeys.detail)도 무효화 — 목표 상세 페이지 진행도는 useGoal.todos 기반이라
+    // 완료 토글 즉시 갱신되도록 한다. 목표 미연결(goalId null) 할 일은 제외.
+    onSettled: (data) => {
       qc.invalidateQueries({ queryKey: todoKeys.lists() });
       qc.invalidateQueries({ queryKey: favoriteKeys.all });
       qc.invalidateQueries({ queryKey: goalKeys.lists() });
+      if (data?.goalId != null) qc.invalidateQueries({ queryKey: goalKeys.detail(data.goalId) });
     },
   });
 }
