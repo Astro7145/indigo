@@ -20,8 +20,17 @@ export interface GoalDetailProps {
  * - 반응형: 모바일 세로 스택 → 태블릿(sm) 진행도·노트 2열 → 데스크톱(2xl) 전체 가로 배치
  */
 export default function GoalDetail({ goalId }: GoalDetailProps) {
-  const { data: goal } = useGoal(goalId);
+  const { data: goal, isError } = useGoal(goalId);
   const { data: me } = useMe();
+
+  // 목표 조회 실패(삭제된 목표·네트워크 오류 등) 시 빈 화면 대신 안내를 보여준다.
+  if (isError) {
+    return (
+      <div className="mx-auto w-full max-w-[1312px] py-20 text-center text-slate-500">
+        목표 정보를 불러오지 못했어요
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-[1312px] flex-col gap-8">

@@ -39,3 +39,12 @@ it('페이지 타이틀(유저명)과 목표명을 렌더한다', async () => {
   expect(await screen.findByText('자바스크립트로 웹 서비스 만들기')).toBeInTheDocument();
   expect(await screen.findByText('체다치즈님의 목표')).toBeInTheDocument();
 });
+
+it('목표 조회 실패 시 에러 안내를 보여준다', async () => {
+  (goalApi.getGoal as jest.Mock).mockRejectedValue(new Error('fail'));
+  (userApi.getMe as jest.Mock).mockResolvedValue({ id: 1, name: '체다치즈' });
+
+  renderWithClient(<GoalDetail goalId={3} />);
+
+  expect(await screen.findByText('목표 정보를 불러오지 못했어요')).toBeInTheDocument();
+});
