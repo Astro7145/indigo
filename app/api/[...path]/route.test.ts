@@ -50,11 +50,29 @@ it('Bearer + query와 함께 GET을 전달하고 body/status를 그대로 통과
   expect(await res.json()).toEqual({ goals: [] });
 });
 
-it('access 쿠키 없음 → 외부 호출 없이 401', async () => {
+it('access 쿠키 삭제됨(refresh 유효) → silent refresh → 성공 + 쿠키 갱신', async () => {
+  const calls = queueAdapter([
+    { status: 200, body: JSON.stringify({ accessToken: 'NA', refreshToken: 'NR' }) },
+    { status: 200, body: JSON.stringify({ ok: true }), contentType: 'application/json' },
+  ]);
+  const res = await GET(r('/api/goals', 'GET', `${COOKIE.REFRESH}=RFR`), ctx(['goals']));
+  expect(res.status).toBe(200);
+  expect(await res.json()).toEqual({ ok: true });
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('NA');
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('NR');
+  // 삭제된 access로의 첫 호출은 건너뛰고 곧장 refresh → 재시도한다 (총 2회)
+  expect(calls.length).toBe(2);
+  expect(calls[0].url).toBe('https://api.test/indigo/auth/refresh');
+  expect(AxiosHeaders.from(calls[1].headers as never).get('Authorization')).toBe('Bearer NA');
+});
+
+it('access·refresh 모두 없음 → 외부 호출 없이 쿠키 정리 + 401', async () => {
   const calls = queueAdapter([{ status: 200, body: '{}' }]);
   const res = await GET(r('/api/goals', 'GET'), ctx(['goals']));
   expect(res.status).toBe(401);
   expect(calls.length).toBe(0);
+  expect(res.cookies.get(COOKIE.ACCESS)?.value).toBe('');
+  expect(res.cookies.get(COOKIE.REFRESH)?.value).toBe('');
 });
 
 it('401 → refresh → 새 토큰으로 재시도 → 성공 + 쿠키 갱신', async () => {

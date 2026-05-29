@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 
 import { cn } from '@/src/utils/cn';
 
-interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
   'aria-label': string;
   children: ReactNode;
   ref?: Ref<HTMLButtonElement>;

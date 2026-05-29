@@ -22,26 +22,26 @@ async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const search = req.nextUrl.search;
   const { access, refresh } = parseAuthCookies(req);
 
-  if (!access) {
-    return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
-  }
-
   // DELETE/GET body is intentionally not forwarded (all SlidTodo DELETE/GET endpoints are body-less)
   const hasBody = req.method === 'POST' || req.method === 'PATCH';
   const body = hasBody ? await req.text() : undefined;
   const contentType = req.headers.get('content-type') ?? undefined;
 
-  const first = await callExternal({
-    method: req.method as HttpMethod,
-    path: joined,
-    search,
-    accessToken: access,
-    body,
-    contentType,
-  });
-
-  if (first.status !== 401) {
-    return passthrough(first);
+  // access 쿠키가 있으면 우선 시도하고, 401이 아니면 그대로 통과시킨다.
+  // access 쿠키가 없으면(예: 사용자가 devtools로 직접 삭제) 첫 호출을 건너뛰고
+  // 곧장 refresh 경로로 진입해 silent 재발급을 시도한다.
+  if (access) {
+    const first = await callExternal({
+      method: req.method as HttpMethod,
+      path: joined,
+      search,
+      accessToken: access,
+      body,
+      contentType,
+    });
+    if (first.status !== 401) {
+      return passthrough(first);
+    }
   }
 
   const tokens = refresh ? await refreshTokens(refresh) : null;

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { signup, login, refresh, logout, oauthLogin } from '@/src/api/auth';
+import { signup, login, refresh, logout } from '@/src/api/auth';
 import { userKeys } from '@/src/api/user';
-import type { LoginResult, SignupBody, LoginBody, OAuthProvider, OAuthBody } from '@/src/types/auth';
+import type { LoginResult, SignupBody, LoginBody } from '@/src/types/auth';
 import type { ApiError } from '@/src/types/common';
 
 export function useSignup() {
@@ -18,16 +18,6 @@ export function useLogin() {
   const qc = useQueryClient();
   return useMutation<LoginResult, ApiError, LoginBody>({
     mutationFn: (body) => login(body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: userKeys.me() });
-    },
-  });
-}
-
-export function useOauthLogin() {
-  const qc = useQueryClient();
-  return useMutation<LoginResult, ApiError, { provider: OAuthProvider; body: OAuthBody }>({
-    mutationFn: ({ provider, body }) => oauthLogin(provider, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: userKeys.me() });
     },

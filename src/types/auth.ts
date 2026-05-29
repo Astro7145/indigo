@@ -19,9 +19,3 @@ export interface LoginBody {
   email: string;
   password: string;
 }
-
-export type OAuthProvider = 'google' | 'kakao';
-
-export interface OAuthBody {
-  token: string;
-}
