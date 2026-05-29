@@ -205,8 +205,13 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
 
   if (!isOpen) return null;
 
+  const closeAndFocusTrigger = () => {
+    close();
+    triggerRef.current?.focus();
+  };
+
   return (
-    <MenuContext value={{ size, close }}>
+    <MenuContext value={{ size, close: closeAndFocusTrigger }}>
       <div
         ref={menuRef}
         role="menu"
