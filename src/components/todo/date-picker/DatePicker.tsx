@@ -60,17 +60,19 @@ export default function DatePicker(props: DatePickerProps) {
 
       {isMobile ? (
         <BottomSheet isOpen={isOpen} onClose={handleCancel}>
-          <div className="flex justify-center px-[23.5px] pt-4 pb-3">
-            <div ref={popupRef} {...dialogProps} className={cn('w-full overflow-hidden outline-none')}>
-              <DatePickerContent
-                pendingDate={pendingDate}
-                firstDayOfWeek={firstDayOfWeek}
-                onChangePending={setPendingDate}
-                onCancel={handleCancel}
-                onConfirm={handleConfirm}
-              />
+          <FocusScope restoreFocus autoFocus contain>
+            <div className="flex justify-center px-[23.5px] pt-4 pb-3">
+              <div ref={popupRef} {...dialogProps} className={cn('w-full overflow-hidden outline-none')}>
+                <DatePickerContent
+                  pendingDate={pendingDate}
+                  firstDayOfWeek={firstDayOfWeek}
+                  onChangePending={setPendingDate}
+                  onCancel={handleCancel}
+                  onConfirm={handleConfirm}
+                />
+              </div>
             </div>
-          </div>
+          </FocusScope>
         </BottomSheet>
       ) : (
         isOpen && (

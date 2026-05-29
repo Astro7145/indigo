@@ -28,6 +28,7 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
 
           <motion.div
             className="fixed bottom-0 left-0 z-50 w-full rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
+            onKeyDown={(e) => e.key === 'Escape' && onClose()}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
