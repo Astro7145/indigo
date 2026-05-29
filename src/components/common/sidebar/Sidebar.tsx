@@ -7,6 +7,8 @@ import { cn } from '@/src/utils/cn';
 import { Logo, LogoFull } from '../icons';
 import SidebarGoalRow from './SidebarGoalRow';
 import SidebarRow from './SidebarRow';
+import SidebarProfileButton from './SidebarProfileButton';
+import SidebarNotificationButton from './SidebarNotificationButton';
 
 const SAMPLE_GOALS = [
   { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
@@ -76,7 +78,7 @@ export default function Sidebar() {
           />
         )}
       </AnimatePresence>
-
+      {isTablet && <span className="w-15" />}
       <motion.aside
         style={{ width }}
         className={cn('flex h-screen overflow-hidden bg-[#1A1B2E]', isTablet && 'fixed top-0 left-0 z-50')}
@@ -116,7 +118,14 @@ export default function Sidebar() {
               <SidebarRow type="logout" text="로그아웃" collapsed={collapsed} />
             </div>
           </div>
-          <div className="flex flex-col gap-y-8"></div>
+          {!collapsed && (
+            <div className="flex flex-col gap-y-8">
+              <div className="flex gap-x-2">
+                <SidebarProfileButton />
+                <SidebarNotificationButton />
+              </div>
+            </div>
+          )}
         </div>
         <motion.span
           drag="x"
