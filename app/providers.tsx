@@ -18,9 +18,6 @@ export default function Providers({ children }: { children: ReactNode }) {
             staleTime: 60 * 1000,
             // 탭 전환마다 refetch는 UX 호불호가 큰 옵션이라 default off.
             refetchOnWindowFocus: false,
-            // 라우트 진입(컴포넌트 마운트)마다 최신 데이터를 보장 — staleTime 안이라도 fetch.
-            // 같은 마운트 내 re-render에는 영향 없고, focus refetch는 위 옵션으로 off.
-            refetchOnMount: 'always',
           },
         },
       }),
