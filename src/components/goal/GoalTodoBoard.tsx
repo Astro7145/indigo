@@ -48,11 +48,11 @@ function Row({
       >
         <TodoList.Actions>
           {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-          {hasNote && <TodoList.NoteAction />}
-          {todo.linkUrl && <TodoList.LinkAction />}
+          {hasNote && <TodoList.NoteAction onClick={() => {}} />}
+          {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-          {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-          <TodoList.KebabAction hoverOnly />
+          {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
+          <TodoList.KebabAction onClick={() => {}} hoverOnly />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
       </TodoList>
