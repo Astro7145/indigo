@@ -1,9 +1,19 @@
 'use client';
 
-import { createContext, use, type ChangeEvent, type MouseEvent, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  use,
+  useState,
+  type ButtonHTMLAttributes,
+  type ChangeEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+} from 'react';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Checkbox from '@/src/components/common/checkbox/Checkbox';
+import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcKebab } from '@/src/components/common/icons/IcKebab';
 import { IcLink } from '@/src/components/common/icons/IcLink';
 import { IcNote } from '@/src/components/common/icons/IcNote';
@@ -129,23 +139,22 @@ function Actions({ children, className }: { children?: ReactNode; className?: st
   return <div className={cn('flex shrink-0 items-center', ACTIONS_GAP[size], className)}>{children}</div>;
 }
 
-/**
- * 액션 공통. 항상 IconButton(`<button>`)으로 렌더한다. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
- * 모든 액션 아이콘은 클릭 가능한 버튼 — 핸들러 미구현이어도 호출부에서 빈 onClick을 넘긴다.
- */
-function ActionButton({
-  label,
-  onClick,
-  hoverOnly,
-  className,
-  children,
-}: {
+interface ActionButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'aria-label'> {
   label: string;
   onClick?: () => void;
   hoverOnly?: boolean;
   className?: string;
   children: ReactNode;
-}) {
+  /** Dropdown.Trigger asChild 합성 시 주입되는 ref — 실제 <button>까지 전달 */
+  ref?: Ref<HTMLButtonElement>;
+}
+
+/**
+ * 액션 공통. 항상 IconButton(`<button>`)으로 렌더한다. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
+ * `ref`와 나머지 button 속성(`...rest`: aria-haspopup/expanded 등)을 IconButton에 전달해
+ * `Dropdown.Trigger asChild`의 트리거로도 합성될 수 있다(케밥 메뉴).
+ */
+function ActionButton({ label, onClick, hoverOnly, className, children, ref, ...rest }: ActionButtonProps) {
   // 액션 아이콘 공통 hover/click 피드백 — 배경색이 액션마다 달라(투명/indigo-alpha/흰색)
   // 색 대신 scale 트랜스폼으로 통일(hover 시 살짝 확대, 누를 때 축소).
   const classes = cn(
@@ -156,6 +165,7 @@ function ActionButton({
 
   return (
     <IconButton
+      ref={ref}
       aria-label={label}
       hover={false}
       onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -163,6 +173,7 @@ function ActionButton({
         onClick?.();
       }}
       className={classes}
+      {...rest}
     >
       {children}
     </IconButton>
@@ -220,18 +231,42 @@ function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   );
 }
 
-// 케밥 — 현재는 클릭 시 동작 없음(placeholder). 공통 Dropdown 컴포넌트 작업 시 트리거로 연결 예정.
-function KebabAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
+interface KebabActionProps {
+  hoverOnly?: boolean;
+  /** 기본 aria-label('더보기 메뉴') 오버라이드 */
+  'aria-label'?: string;
+  className?: string;
+  /** "수정하기" 클릭 핸들러 — 미구현 시 메뉴만 닫힌다 */
+  onEdit?: () => void;
+  /** "삭제하기" 클릭 핸들러 */
+  onDelete?: () => void;
+}
+
+// 케밥 — 클릭 시 수정/삭제 Dropdown(Figma 21209:54392).
+// hover 토글을 Dropdown 래퍼에 적용해, 닫힘+미hover 시 wrapper를 display:none으로 만들어
+// Actions flex에 빈 슬롯(gap)이 생기지 않게 한다. 메뉴가 열린 동안엔 hover와 무관하게 트리거를
+// 유지(!open)해야 absolute 메뉴 위치가 어긋나지 않는다.
+function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ariaLabel }: KebabActionProps) {
   useTodoListContext();
+  const [open, setOpen] = useState(false);
   return (
-    <ActionButton
-      label={rest['aria-label'] ?? '더보기 메뉴'}
-      onClick={onClick}
-      hoverOnly={hoverOnly}
-      className={cn('bg-white', className)}
+    <Dropdown
+      open={open}
+      onOpenChange={setOpen}
+      className={cn('inline-flex', hoverOnly && !open && 'hidden group-hover:inline-flex')}
     >
-      <IcKebab className="size-[14px] text-indigo-600" />
-    </ActionButton>
+      <Dropdown.Trigger asChild>
+        <ActionButton label={ariaLabel ?? '더보기 메뉴'} className={cn('bg-white', className)}>
+          <IcKebab className="size-[14px] text-indigo-600" />
+        </ActionButton>
+      </Dropdown.Trigger>
+      <Dropdown.Menu size="small" placement="bottom-end">
+        <Dropdown.Item onClick={onEdit}>수정하기</Dropdown.Item>
+        <Dropdown.Item onClick={onDelete} className="text-destructive">
+          삭제하기
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 

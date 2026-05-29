@@ -52,7 +52,7 @@ function Row({
           {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
           {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-          <TodoList.KebabAction onClick={() => {}} hoverOnly />
+          <TodoList.KebabAction hoverOnly />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
       </TodoList>
