@@ -30,23 +30,24 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{`${me?.name ?? ''}님의 목표`}</h1>
       </div>
 
-      {/* 상단 3카드 */}
-      <section className="flex flex-col gap-4 2xl:flex-row 2xl:gap-8">
-        <GoalDetailHeader title={goal?.title} className="2xl:w-[640px] 2xl:shrink-0" />
-        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6 2xl:flex-1">
+      {/* 상단 3카드 — 2xl에서 목표 카드와 진행도·노트 그룹이 1:1(figma 640:640)로 함께 비례 축소.
+          비대칭 flex 분배 이슈를 피하려 grid로 균등 분할. */}
+      <section className="grid grid-cols-1 gap-4 2xl:grid-cols-2 2xl:gap-8">
+        <GoalDetailHeader title={goal?.title} className="min-w-0" />
+        <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
           <ProgressCard
             goalId={goalId}
             size="xsmall"
-            className="w-full shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)] sm:flex-1"
+            className="w-full min-w-0 shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)]"
           />
-          <GoalNotesCard goalId={goalId} className="w-full sm:flex-1" />
+          <GoalNotesCard goalId={goalId} className="w-full min-w-0" />
         </div>
       </section>
 
-      {/* 본문 2컬럼 — To do / Done */}
-      <div className="flex flex-col gap-8 2xl:flex-row 2xl:gap-8">
-        <GoalTodoColumn goalId={goalId} done={false} className="2xl:flex-1" />
-        <GoalTodoColumn goalId={goalId} done className="2xl:flex-1" />
+      {/* 본문 2컬럼 — To do / Done. grid로 균등 분할(2xl) */}
+      <div className="grid grid-cols-1 gap-8 2xl:grid-cols-2 2xl:gap-8">
+        <GoalTodoColumn goalId={goalId} done={false} />
+        <GoalTodoColumn goalId={goalId} done />
       </div>
     </div>
   );
