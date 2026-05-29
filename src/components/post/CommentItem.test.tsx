@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 
+import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Comment } from '@/src/types/comment';
 
 import CommentItem from './CommentItem';
@@ -19,19 +20,19 @@ const baseComment: Comment = {
 };
 
 it('isMine=false면 "내 댓글" 칩이 보이지 않는다', () => {
-  render(<CommentItem comment={baseComment} isMine={false} />);
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={false} />);
   expect(screen.queryByText('내 댓글')).not.toBeInTheDocument();
 });
 
 it('isMine=true면 "내 댓글" 칩이 보인다', () => {
-  render(<CommentItem comment={baseComment} isMine={true} />);
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
   expect(screen.getByText('내 댓글')).toBeInTheDocument();
 });
 
 // NOTE: 공통 Dropdown 머지 전이라 placeholder 트리거(더보기 클릭)가 곧장 수정 모드 진입.
 // 머지 후엔 더보기 → "수정하기" 메뉴 선택 흐름으로 복원해야 한다.
 it('더보기 클릭 시 본문이 input으로 바뀌고 취소/수정 버튼이 노출된다', () => {
-  render(<CommentItem comment={baseComment} isMine={true} />);
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
   fireEvent.click(screen.getByRole('button', { name: /더보기/ }));
 
   expect(screen.getByDisplayValue(baseComment.content)).toBeInTheDocument();
@@ -40,7 +41,7 @@ it('더보기 클릭 시 본문이 input으로 바뀌고 취소/수정 버튼이
 });
 
 it('취소 클릭 시 본문 텍스트로 돌아가고 input/버튼이 사라진다', () => {
-  render(<CommentItem comment={baseComment} isMine={true} />);
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
   fireEvent.click(screen.getByRole('button', { name: /더보기/ }));
   fireEvent.click(screen.getByRole('button', { name: '취소' }));
 

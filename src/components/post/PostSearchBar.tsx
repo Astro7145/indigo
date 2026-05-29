@@ -60,7 +60,6 @@ export default function PostSearchBar() {
         반응형은 외부 wrapper에서 처리.
       */}
       <div className="flex-1 md:w-[432px] md:flex-none">
-        {/* 공통 debounce 유틸 추가 시 onSearch 대신 debounce 적용으로 교체 고려 */}
         <SearchInput
           value={input}
           onChange={(e) => setInput(e.target.value)}

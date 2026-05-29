@@ -6,16 +6,19 @@ import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
+import { useUpdateComment } from '@/src/hooks/comment';
 import type { Comment } from '@/src/types/comment';
 
 interface CommentItemProps {
   comment: Comment;
+  postId: number;
   isMine?: boolean;
 }
 
-export default function CommentItem({ comment, isMine = false }: CommentItemProps) {
+export default function CommentItem({ comment, postId, isMine = false }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
+  const { mutate: updateComment } = useUpdateComment(postId);
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -23,7 +26,7 @@ export default function CommentItem({ comment, isMine = false }: CommentItemProp
   };
 
   const handleSave = () => {
-    setIsEditing(false);
+    updateComment({ commentId: comment.id, body: { content: draft } }, { onSuccess: () => setIsEditing(false) });
   };
 
   return (

@@ -15,18 +15,29 @@ export default function PostsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || undefined;
+  const sortBy = searchParams.get('sortBy');
+  const type = sortBy === 'popular' ? 'best' : 'all';
 
   const { data: bestData } = usePostList({ type: 'best', limit: 3 });
   const bestPosts = bestData?.posts ?? [];
 
-  const { data: listData, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfinitePostList({ search });
+  const {
+    data: listData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetchNextPageError,
+    isPending,
+  } = useInfinitePostList({ search, type });
   const posts = listData?.pages.flatMap((page) => page.posts) ?? [];
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || !hasNextPage || isFetchingNextPage) return;
+    // 다음 페이지 fetch 실패 시 sentinel을 관찰하지 않는다 — 화면에 남아 있는 한 IO가 즉시
+    // 다시 교차해 fetchNextPage를 무한 재호출(API 스팸)하기 때문.
+    if (!sentinel || !hasNextPage || isFetchingNextPage || isFetchNextPageError) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -37,7 +48,7 @@ export default function PostsPage() {
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   return (
     <div>
@@ -84,7 +95,7 @@ export default function PostsPage() {
         type="button"
         size="large"
         startIcon={<IcPlus />}
-        className="fixed right-4 bottom-4 md:right-8 md:bottom-16"
+        className="fixed right-4 bottom-4 p-[13px] md:right-8 md:bottom-16 md:px-[18px] md:py-[13px]"
       >
         <span className="hidden md:inline">게시물 작성하기</span>
       </Button>
