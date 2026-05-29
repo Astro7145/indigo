@@ -109,6 +109,13 @@ function ProgressCardView({
   const animatedPercent = useAnimatedNumber(safePercent);
   const displayPercent = Math.round(animatedPercent);
 
+  // bodyText를 마지막 공백 기준으로 어절 분리 — "{name}님의 진행도는".
+  // 한 줄에 둘 다 들어가면 1줄, 안 들어가면 verb가 다음 줄로 wrap.
+  // 어느 한 어절(주로 name)이 줄 폭 초과 시 그 어절만 truncate + ….
+  const lastSpace = bodyText ? bodyText.lastIndexOf(' ') : -1;
+  const bodyNamePart = lastSpace > 0 ? bodyText!.slice(0, lastSpace) : (bodyText ?? '');
+  const bodyVerbPart = lastSpace > 0 ? bodyText!.slice(lastSpace + 1) : null;
+
   // onClick 제공 시 root를 키보드 접근 버튼으로 (Card 비-root라 인라인)
   const interactiveProps = onClick
     ? {
@@ -159,38 +166,44 @@ function ProgressCardView({
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-2.5 md:w-[344px] lg:w-[640px]', className)} {...interactiveProps}>
-      {/* 헤더 — lg+ 에서만 노출 (Tablet/Mobile은 본문만) */}
-      <div className="hidden items-center gap-3 px-2 lg:flex">
-        <IcProgress aria-hidden className="shrink-0" />
-        <h3 className="text-lg leading-7 font-medium text-black">{headerText}</h3>
+    <div className={cn('flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
+      {/* 헤더 — 전 사이즈 노출 (RecentTodos와 동일, figma 데스크톱/태블릿/모바일 모두 표시).
+          아이콘 박스는 viewport `2xl:`(=wide 레이아웃 활성 시점)에서 32→40으로 확대. */}
+      <div className="flex items-center gap-3 px-2">
+        <IcProgress aria-hidden className="size-8 shrink-0 2xl:size-10" />
+        <h3 className="text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">{headerText}</h3>
       </div>
 
       {/*
-        본문 카드 (그라데이션 120° 전 사이즈 공통):
-        - sm/md(default):  h-[187px], 도넛 outside
-        - lg+:             h-64, 도넛 inside (flex)
+        본문 카드 (그라데이션 120° 전 사이즈 공통). 레이아웃 전환은 viewport 기준 통일:
+        - base/sm/lg(<1280): h-[187px], 도넛 overlay (compact) — 1024~1280 셀이 ~275~400으로 좁아 wide 미수용
+        - xl(≥1280): h-64, 도넛 inside (flex, wide) — 셀이 충분히 넓어진 뒤 활성
       */}
       <Card
         className={cn(
           'relative h-[187px] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,
-          'lg:h-64',
+          '2xl:h-64',
           GRADIENT_SHADOW,
         )}
       >
         {/* figma overlay — 본체 위에 미세한 하단 어둠 (transparent → rgba(0,0,0,0.07)) */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.07]" />
-        {/* Mobile/Tablet 도넛 (lg에서 숨김). figma: mobile top=3, tablet top=-2 */}
+        {/* compact 도넛 (xl에서 숨김). figma: mobile top=3, tablet(sm) top=-2 */}
         <Moonphase
           percent={animatedPercent}
-          className="absolute top-[3px] -left-[11px] size-[182px] md:-top-[2px] md:-left-[12px] md:size-[192px] lg:hidden"
+          className="absolute top-[3px] -left-[11px] size-[182px] sm:-top-[2px] sm:-left-[12px] sm:size-[192px] 2xl:hidden"
         />
-        {/* Desktop 도넛 (lg에서만) */}
-        <div className="hidden lg:absolute lg:top-[18px] lg:left-12 lg:flex lg:items-center lg:gap-8">
+        {/* wide 도넛 (xl 이상에서만). right-12로 우측 경계 → 긴 이름이 카드를 넘지 않고 col이 shrink하며 truncate 발화. */}
+        <div className="hidden 2xl:absolute 2xl:top-[18px] 2xl:right-12 2xl:left-12 2xl:flex 2xl:items-center 2xl:gap-8">
           <Moonphase percent={animatedPercent} className="size-[220px] shrink-0" />
-          <div className="flex w-[172px] flex-col gap-3">
-            <p className="text-xl leading-[30px] font-semibold tracking-[-0.03em]">{bodyText}</p>
+          <div className="flex min-w-0 flex-col gap-3">
+            {/* 두 어절 분리 렌더 — 둘 다 한 줄에 들어가면 1줄, 안 들어가면 verb가 다음 줄로 wrap.
+                긴 어절(주로 name)이 줄 폭 초과 시 그 어절만 truncate + …. */}
+            <div className="flex flex-wrap gap-x-1.5 text-xl leading-[30px] font-semibold tracking-[-0.03em]">
+              <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
+              {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
+            </div>
             <div className="flex items-end gap-[5px]">
               <span
                 role="progressbar"
@@ -207,9 +220,13 @@ function ProgressCardView({
           </div>
         </div>
 
-        {/* Mobile/Tablet 텍스트 (lg에서 숨김) */}
-        <div className="absolute top-[60px] left-[156px] flex flex-col gap-0.5 md:left-[164px] lg:hidden">
-          <span className="text-xs leading-[15px] text-white/85 md:text-[13px] md:leading-4">{bodyText}</span>
+        {/* compact 텍스트 (2xl에서 숨김). right 작은 여백으로 카드 폭 부족 시 truncate 트리거. */}
+        <div className="absolute top-[60px] right-3 left-[156px] flex min-w-0 flex-col gap-0.5 sm:left-[164px] 2xl:hidden">
+          {/* 두 어절 분리 렌더 — wide와 동일 패턴. */}
+          <div className="flex flex-wrap gap-x-1.5 text-lg leading-[20px] font-semibold tracking-[-0.03em] text-white">
+            <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
+            {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
+          </div>
           <div className="flex items-baseline gap-0.5">
             <span
               role="progressbar"
@@ -217,11 +234,11 @@ function ProgressCardView({
               aria-valuenow={safePercent}
               aria-valuemin={0}
               aria-valuemax={100}
-              className="text-[38px] leading-[46px] font-bold tracking-[-0.03em] md:text-[40px] md:leading-[48px]"
+              className="text-[38px] leading-[46px] font-bold tracking-[-0.03em] sm:text-[40px] sm:leading-[48px]"
             >
               {displayPercent}
             </span>
-            <span className="text-[19px] leading-[23px] font-bold md:text-xl md:leading-6">%</span>
+            <span className="text-[19px] leading-[23px] font-bold sm:text-xl sm:leading-6">%</span>
           </div>
         </div>
 

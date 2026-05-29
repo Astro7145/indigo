@@ -1,9 +1,19 @@
 'use client';
 
-import { createContext, use, type ChangeEvent, type MouseEvent, type ReactNode, type Ref } from 'react';
+import {
+  createContext,
+  use,
+  useState,
+  type ButtonHTMLAttributes,
+  type ChangeEvent,
+  type MouseEvent,
+  type ReactNode,
+  type Ref,
+} from 'react';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Checkbox from '@/src/components/common/checkbox/Checkbox';
+import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcKebab } from '@/src/components/common/icons/IcKebab';
 import { IcLink } from '@/src/components/common/icons/IcLink';
 import { IcNote } from '@/src/components/common/icons/IcNote';
@@ -11,8 +21,26 @@ import { IcPencil } from '@/src/components/common/icons/IcPencil';
 import { IcStar } from '@/src/components/common/icons/IcStar';
 import { cn } from '@/src/utils/cn';
 
-export type TodoListSize = 'large' | 'small';
+// 'responsive' — viewport 폭 기준 small↔large 전환 (`2xl:` = 1536+).
+//   목표 카드(GoalTodoBoard)처럼 데스크톱은 큰 행, 태블릿/모바일은 작은 행을 써야 할 때 사용.
+export type TodoListSize = 'large' | 'small' | 'responsive';
 export type TodoListVariant = 'default' | 'onDark';
+
+const TITLE_SIZE: Record<TodoListSize, string> = {
+  large: 'text-base leading-6',
+  small: 'text-sm leading-5',
+  responsive: 'text-sm leading-5 2xl:text-base 2xl:leading-6',
+};
+const ROW_SIZE: Record<TodoListSize, string> = {
+  large: 'gap-2 px-2 py-2.5',
+  small: 'gap-1.5 px-1 py-1.5',
+  responsive: 'gap-1.5 px-1 py-1.5 2xl:gap-2 2xl:px-2 2xl:py-2.5',
+};
+const ACTIONS_GAP: Record<TodoListSize, string> = {
+  large: 'gap-2',
+  small: 'gap-1.5',
+  responsive: 'gap-1.5 2xl:gap-2',
+};
 
 interface TodoListContextValue {
   checked: boolean;
@@ -70,7 +98,7 @@ function TodoList({
 }: TodoListProps) {
   const titleClass = cn(
     'min-w-0 flex-1 truncate',
-    size === 'small' ? 'text-sm leading-5' : 'text-base leading-6',
+    TITLE_SIZE[size],
     variant === 'onDark'
       ? 'font-semibold text-white'
       : cn(
@@ -84,8 +112,8 @@ function TodoList({
       <div
         ref={ref}
         className={cn(
-          'group flex w-full items-center',
-          size === 'small' ? 'gap-1.5 rounded px-1 py-1.5' : 'gap-2 rounded px-2 py-2.5',
+          'group flex w-full cursor-pointer items-center rounded',
+          ROW_SIZE[size],
           variant === 'default' && 'hover:bg-indigo-700/30',
           className,
         )}
@@ -108,50 +136,44 @@ function TodoList({
 
 function Actions({ children, className }: { children?: ReactNode; className?: string }) {
   const { size } = useTodoListContext();
-  return (
-    <div className={cn('flex shrink-0 items-center', size === 'small' ? 'gap-1.5' : 'gap-2', className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex shrink-0 items-center', ACTIONS_GAP[size], className)}>{children}</div>;
 }
 
-/**
- * 액션 공통. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
- * onClick이 있으면 IconButton(`<button>`), 없으면 동작 없는 인디케이터이므로 포커스 잡히는
- * no-op 버튼 대신 비대화형 `<span role="img">`으로 렌더한다(a11y — 표시만 하고 클릭/포커스 없음).
- */
-function ActionButton({
-  label,
-  onClick,
-  hoverOnly,
-  className,
-  children,
-}: {
+interface ActionButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'aria-label'> {
   label: string;
   onClick?: () => void;
   hoverOnly?: boolean;
   className?: string;
   children: ReactNode;
-}) {
-  const classes = cn('size-7 shrink-0 rounded-full', hoverOnly && 'hidden group-hover:inline-flex', className);
+  /** Dropdown.Trigger asChild 합성 시 주입되는 ref — 실제 <button>까지 전달 */
+  ref?: Ref<HTMLButtonElement>;
+}
 
-  if (!onClick) {
-    return (
-      <span role="img" aria-label={label} className={cn('inline-flex items-center justify-center rounded', classes)}>
-        {children}
-      </span>
-    );
-  }
+/**
+ * 액션 공통. 항상 IconButton(`<button>`)으로 렌더한다. hoverOnly면 행 hover 시에만 표시(CSS group-hover).
+ * `ref`와 나머지 button 속성(`...rest`: aria-haspopup/expanded 등)을 IconButton에 전달해
+ * `Dropdown.Trigger asChild`의 트리거로도 합성될 수 있다(케밥 메뉴).
+ */
+function ActionButton({ label, onClick, hoverOnly, className, children, ref, ...rest }: ActionButtonProps) {
+  // 액션 아이콘 공통 hover/click 피드백 — 배경색이 액션마다 달라(투명/indigo-alpha/흰색)
+  // 색 대신 scale 트랜스폼으로 통일(hover 시 살짝 확대, 누를 때 축소).
+  const classes = cn(
+    'size-6 shrink-0 rounded-full transition-transform hover:scale-110 active:scale-90',
+    hoverOnly && 'hidden group-hover:inline-flex',
+    className,
+  );
 
   return (
     <IconButton
+      ref={ref}
       aria-label={label}
       hover={false}
       onClick={(e: MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
-        onClick();
+        onClick?.();
       }}
       className={classes}
+      {...rest}
     >
       {children}
     </IconButton>
@@ -176,7 +198,7 @@ function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
     >
-      <IcNote className="size-7" />
+      <IcNote className="size-6" />
     </ActionButton>
   );
 }
@@ -190,7 +212,7 @@ function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
     >
-      <IcLink className="size-7" />
+      <IcLink className="size-6" />
     </ActionButton>
   );
 }
@@ -209,18 +231,42 @@ function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   );
 }
 
-// 케밥 — 현재는 클릭 시 동작 없음(placeholder). 공통 Dropdown 컴포넌트 작업 시 트리거로 연결 예정.
-function KebabAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
+interface KebabActionProps {
+  hoverOnly?: boolean;
+  /** 기본 aria-label('더보기 메뉴') 오버라이드 */
+  'aria-label'?: string;
+  className?: string;
+  /** "수정하기" 클릭 핸들러 — 미구현 시 메뉴만 닫힌다 */
+  onEdit?: () => void;
+  /** "삭제하기" 클릭 핸들러 */
+  onDelete?: () => void;
+}
+
+// 케밥 — 클릭 시 수정/삭제 Dropdown(Figma 21209:54392).
+// hover 토글을 Dropdown 래퍼에 적용해, 닫힘+미hover 시 wrapper를 display:none으로 만들어
+// Actions flex에 빈 슬롯(gap)이 생기지 않게 한다. 메뉴가 열린 동안엔 hover와 무관하게 트리거를
+// 유지(!open)해야 absolute 메뉴 위치가 어긋나지 않는다.
+function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ariaLabel }: KebabActionProps) {
   useTodoListContext();
+  const [open, setOpen] = useState(false);
   return (
-    <ActionButton
-      label={rest['aria-label'] ?? '더보기 메뉴'}
-      onClick={onClick}
-      hoverOnly={hoverOnly}
-      className={cn('bg-white', className)}
+    <Dropdown
+      open={open}
+      onOpenChange={setOpen}
+      className={cn('inline-flex', hoverOnly && !open && 'hidden group-hover:inline-flex')}
     >
-      <IcKebab className="size-[14px] text-indigo-600" />
-    </ActionButton>
+      <Dropdown.Trigger asChild>
+        <ActionButton label={ariaLabel ?? '더보기 메뉴'} className={cn('bg-white', className)}>
+          <IcKebab className="size-[14px] text-indigo-600" />
+        </ActionButton>
+      </Dropdown.Trigger>
+      <Dropdown.Menu size="small" placement="bottom-end">
+        <Dropdown.Item onClick={onEdit}>수정하기</Dropdown.Item>
+        <Dropdown.Item onClick={onDelete} className="text-destructive">
+          삭제하기
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 

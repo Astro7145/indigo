@@ -46,10 +46,12 @@ export default function IconButton({
   hover = true,
   className,
   children,
+  ref,
   ...props
 }: IconButtonProps) {
   return (
     <button
+      ref={ref}
       type="button"
       aria-label={ariaLabel}
       className={cn(
