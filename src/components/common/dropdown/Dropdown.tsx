@@ -259,7 +259,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseEnter={(e) => {
-          if (!disabled) e.currentTarget.focus();
+          if (!disabled) e.currentTarget.focus({ preventScroll: true });
         }}
         className={cn(
           'cursor-pointer font-medium text-slate-700',
