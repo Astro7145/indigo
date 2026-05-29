@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
+import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import NotesIllustration from '@/src/components/common/icons/NotesIllustration';
 import { cn } from '@/src/utils/cn';
@@ -21,15 +22,16 @@ const GRADIENT = 'bg-[linear-gradient(120deg,#6E66C8_0%,#3D3677_73.21%)]';
  * Figma 21209:54557 (308×160). 그라데이션 + 노트북 일러스트(시안 SVG 그대로) + 안내 텍스트.
  * 이동 대상 페이지(`/goals/[goalId]/notes`)는 별도 작업으로, 이 카드는 진입점만 담당한다.
  *
- * 네비게이션 진입점이므로 Card(div)+useRouter 대신 `next/link`로 렌더한다 — 키보드 포커스·
- * 새 탭으로 열기·스크린리더 인식·프리페치가 자연히 동작한다.
+ * 인접한 ProgressCard와 동일하게 Card를 그라데이션 표면으로 재사용한다. Card는 `onClick`을
+ * 주면 `role="button"`·`tabIndex`·Enter/Space 활성화를 부여하므로 키보드 접근성도 확보된다.
  */
 export default function GoalNotesCard({ goalId, className }: GoalNotesCardProps) {
+  const router = useRouter();
   return (
-    <Link
-      href={`/goals/${goalId}/notes`}
+    <Card
+      onClick={() => router.push(`/goals/${goalId}/notes`)}
       className={cn(
-        'relative block h-40 cursor-pointer overflow-hidden rounded text-white shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)]',
+        'relative h-40 cursor-pointer overflow-hidden border-0 p-0 text-white shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)]',
         GRADIENT,
         className,
       )}
@@ -46,6 +48,6 @@ export default function GoalNotesCard({ goalId, className }: GoalNotesCardProps)
         <span className="text-2xl font-bold tracking-[-0.03em]">노트 모아보기</span>
         <IcChevron aria-hidden direction="right" className="size-6 text-white" />
       </div>
-    </Link>
+    </Card>
   );
 }
