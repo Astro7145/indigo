@@ -171,7 +171,7 @@ function ProgressCardView({
           아이콘 박스는 viewport `2xl:`(=wide 레이아웃 활성 시점)에서 32→40으로 확대. */}
       <div className="flex items-center gap-3 px-2">
         <IcProgress aria-hidden className="size-8 shrink-0 2xl:size-10" />
-        <h3 className="text-lg leading-7 font-medium text-black">{headerText}</h3>
+        <h3 className="text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">{headerText}</h3>
       </div>
 
       {/*

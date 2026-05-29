@@ -40,8 +40,8 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
   return (
     <section aria-label="목표 별 할일" className={cn('flex flex-col gap-2.5', className)}>
       <div className="flex items-center gap-3 px-2">
-        <IcGoal aria-hidden className="size-10 shrink-0" />
-        <h2 className="text-lg leading-7 font-medium text-black">목표 별 할일</h2>
+        <IcGoal aria-hidden className="size-8 shrink-0 2xl:size-10" />
+        <h2 className="text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">목표 별 할일</h2>
       </div>
       {isLoading ? (
         <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>

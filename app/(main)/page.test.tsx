@@ -20,7 +20,7 @@ beforeEach(() => {
 
 it('사용자 이름으로 헤더를 렌더한다', () => {
   render(<DashboardPage />);
-  expect(screen.getByRole('heading', { name: '체다치즈님의 대시보드' })).toBeInTheDocument();
+  expect(screen.getByTestId('user-name')).toHaveTextContent('체다치즈');
 });
 
 it('세 영역(최근 할일·진행 상황·목표 별 할일)을 합성한다', () => {
