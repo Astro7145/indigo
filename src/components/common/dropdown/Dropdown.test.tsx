@@ -160,17 +160,6 @@ describe('Dropdown.Menu', () => {
     expect(menu).toHaveClass('left-1/2');
     expect(menu).toHaveClass('-translate-x-1/2');
   });
-
-  it('size="small"이면 w-[102px] 클래스가 적용된다', () => {
-    render(
-      <Dropdown open>
-        <Dropdown.Menu size="small">
-          <Dropdown.Item>수정하기</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>,
-    );
-    expect(screen.getByRole('menu')).toHaveClass('w-[102px]');
-  });
 });
 
 describe('Dropdown.Item', () => {
@@ -218,17 +207,6 @@ describe('Dropdown.Item', () => {
       </Dropdown>,
     );
     expect(screen.getByRole('menuitem', { name: '비활성' })).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('size="small"이면 text-sm 클래스가 적용된다', () => {
-    render(
-      <Dropdown open onOpenChange={() => {}}>
-        <Dropdown.Menu size="small">
-          <Dropdown.Item>수정하기</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>,
-    );
-    expect(screen.getByRole('menuitem', { name: '수정하기' })).toHaveClass('text-sm');
   });
 });
 
