@@ -139,43 +139,49 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         - desktop(lg+): 한 줄 [제목 + 바 + %] inline + [검색 + 할 일 추가]
       */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-col gap-4 sm:flex-1 2xl:w-[600px] 2xl:flex-none 2xl:flex-row 2xl:items-center">
-          {/* 제목 행 — 데스크톱에선 flex-1로 늘어나 진행바를 고정 위치(우측)로 밀어낸다. 모바일은 우측에 + 아이콘 */}
-          <div className="flex items-center justify-between gap-2 2xl:min-w-0 2xl:flex-1 2xl:justify-start">
-            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700">{goal.title}</h3>
-            <IconButton
-              aria-label="할 일 추가"
-              className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <IcPlus className="size-4 text-indigo-600" />
-            </IconButton>
-          </div>
-          {/* 진행바 + % — 데스크톱은 고정폭(우측 정렬), 그 외엔 컬럼 폭을 채움 */}
-          <div className="flex items-center gap-2 2xl:shrink-0">
-            <div
-              role="progressbar"
-              aria-label={`${goal.title} 진행률`}
-              aria-valuenow={percent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              className="h-2 w-full max-w-[310px] shrink overflow-hidden rounded-full bg-[#e9e9e9] 2xl:w-[310px]"
-            >
-              <motion.div
-                className="h-full rounded-full bg-indigo-500"
-                initial={reduce ? false : { width: 0 }}
-                animate={{ width: `${percent}%` }}
-                transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
-              />
+        {/* 모바일: [제목+진행바](왼쪽 flex-1) + [추가 아이콘버튼](오른쪽)을 한 줄로 채운다.
+            sm+에선 contents로 래퍼를 풀어 제목+진행바 그룹과 검색 그룹이 outer의 flex-row 자식이 되고,
+            아이콘버튼은 숨는다(검색 옆 텍스트 '할 일 추가' 버튼이 대신). */}
+        <div className="flex items-center gap-4 sm:contents">
+          <div className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-4 2xl:w-[600px] 2xl:flex-none 2xl:flex-row 2xl:items-center">
+            {/* 제목 — 데스크톱에선 flex-1로 늘어나 진행바를 고정 위치(우측)로 밀어낸다 */}
+            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 2xl:flex-1">
+              {goal.title}
+            </h3>
+            {/* 진행바 + % — 모바일은 202px 고정(시안), tablet은 컬럼 폭 채움(max 310), desktop 310 고정 */}
+            <div className="flex items-center gap-2 2xl:shrink-0">
+              <div
+                role="progressbar"
+                aria-label={`${goal.title} 진행률`}
+                aria-valuenow={percent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                className="h-2 w-[202px] shrink overflow-hidden rounded-full bg-[#e9e9e9] sm:w-full sm:max-w-[310px] 2xl:w-[310px]"
+              >
+                <motion.div
+                  className="h-full rounded-full bg-indigo-500"
+                  initial={reduce ? false : { width: 0 }}
+                  animate={{ width: `${percent}%` }}
+                  transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+                />
+              </div>
+              <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 2xl:w-10 2xl:text-right 2xl:text-base">
+                {percent}%
+              </span>
             </div>
-            <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 2xl:w-10 2xl:text-right 2xl:text-base">
-              {percent}%
-            </span>
           </div>
+          {/* 할 일 추가 — 모바일 전용 아이콘 버튼 */}
+          <IconButton
+            aria-label="할 일 추가"
+            className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <IcPlus className="size-4 text-indigo-600" />
+          </IconButton>
         </div>
-        {/* 검색 + 할 일 추가(텍스트) — 모바일은 검색만 전체폭, 텍스트 버튼은 sm+에서 노출. 둘 다 높이 40px */}
+        {/* 검색 + 할 일 추가(텍스트) — 모바일은 block으로 검색이 줄 전체를 채우고, 텍스트 버튼은 sm+에서 노출. 둘 다 높이 40px */}
         <div
-          className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0 2xl:gap-3.5"
+          className="w-full sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:gap-2 2xl:gap-3.5"
           onClick={(e) => e.stopPropagation()}
           // 검색창 Enter 등 키보드 이벤트가 카드(role=button)까지 버블링돼 목표 상세로 이동하는 것 차단
           onKeyDown={(e) => e.stopPropagation()}
