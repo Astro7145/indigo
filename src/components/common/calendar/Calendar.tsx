@@ -32,6 +32,7 @@ export default function Calendar(props: CalendarProps) {
       <div className="flex w-full items-center justify-between px-[calc(100%/16-1rem)]">
         <IconButton
           {...prevDomProps}
+          ref={prevRef}
           aria-label={prevDomProps['aria-label'] as string}
           className="size-8 overflow-hidden rounded-[6px] p-1.5"
         >
@@ -40,6 +41,7 @@ export default function Calendar(props: CalendarProps) {
         <h2 className="text-sm font-semibold tracking-[-0.42px] text-slate-700">{title}</h2>
         <IconButton
           {...nextDomProps}
+          ref={nextRef}
           aria-label={nextDomProps['aria-label'] as string}
           className="size-8 overflow-hidden rounded-[6px] p-1.5"
         >
