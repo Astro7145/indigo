@@ -96,7 +96,8 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
 
   return (
     <section aria-label={label} className={cn('flex min-w-0 flex-col gap-2.5', className)}>
-      <div className="flex items-center justify-between px-2">
+      {/* 헤더는 두 컬럼 모두 40px로 통일 — To do의 버튼(40px)과 Done의 라벨 본문 상단이 같은 높이에서 시작하도록 */}
+      <div className="flex h-10 items-center justify-between px-2">
         <h3 className="text-lg font-semibold tracking-[-0.03em] text-slate-800">{label}</h3>
         {/* To do 컬럼에만 노출 — 둘 다 placeholder (캘린더 페이지 / 할 일 작성 모달은 별도 작업) */}
         {!done && (
@@ -121,21 +122,29 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
         )}
       </div>
 
+      {/* 본문 카드 — 데스크톱(2xl)에선 두 컬럼이 동일한 높이의 큰 카드(시안). 그 이하는 내용 높이. */}
       <div
-        className={cn('rounded px-7 py-8', done ? 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]' : 'bg-indigo-100')}
+        className={cn(
+          'flex flex-col rounded px-7 py-8 2xl:h-[576px]',
+          done ? 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]' : 'bg-indigo-100',
+        )}
       >
         {isLoading ? (
-          <p className="py-16 text-center text-sm text-slate-400">불러오는 중…</p>
+          <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
+            불러오는 중…
+          </p>
         ) : isError ? (
-          <p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>
+          <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
+            불러오지 못했어요
+          </p>
         ) : todos.length === 0 ? (
-          <p className="py-16 text-center text-sm text-slate-500">
+          <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
             {done ? '완료한 일이 아직 없어요' : '해야할 일이 아직 없어요'}
           </p>
         ) : (
           <ul
             ref={scrollRef}
-            className="scrollbar-slate flex max-h-[420px] flex-col gap-1 overflow-y-auto 2xl:max-h-[512px]"
+            className="scrollbar-slate flex max-h-[420px] flex-1 flex-col gap-1 overflow-y-auto 2xl:max-h-none"
           >
             {todos.map((t) => (
               <Row key={t.id} todo={t} onToggle={toggle} onToggleFavorite={toggleFavorite} />
