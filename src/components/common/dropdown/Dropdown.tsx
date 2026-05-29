@@ -70,7 +70,7 @@ interface ItemProps {
   children: ReactNode;
 }
 
-// ── Stubs (Task 2~7에서 순차 교체) ───────────────────────────────────────────
+// ── components ───────────────────────────────────────────
 
 function Dropdown({ open: controlledOpen, onOpenChange, className, children }: DropdownProps) {
   const isControlled = controlledOpen !== undefined;
@@ -231,6 +231,9 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
         aria-disabled={disabled || undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        onMouseEnter={(e) => {
+          if (!disabled) e.currentTarget.focus();
+        }}
         className={cn(
           'cursor-pointer font-medium text-slate-700',
           textSize,
