@@ -143,7 +143,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             sm+에선 contents로 래퍼를 풀어 제목+진행바 그룹과 검색 그룹이 outer의 flex-row 자식이 되고,
             아이콘버튼은 숨는다(검색 옆 텍스트 '할 일 추가' 버튼이 대신). */}
         <div className="flex items-center gap-4 sm:contents">
-          <div className="flex min-w-0 flex-1 flex-col gap-1 sm:gap-4 2xl:w-[600px] 2xl:flex-none 2xl:flex-row 2xl:items-center">
+          <div className="flex min-w-0 flex-1 flex-col gap-1 2xl:w-[600px] 2xl:flex-none 2xl:flex-row 2xl:items-center 2xl:gap-4">
             {/* 제목 — 데스크톱에선 flex-1로 늘어나 진행바를 고정 위치(우측)로 밀어낸다 */}
             <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 2xl:flex-1">
               {goal.title}
