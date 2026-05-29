@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "@react-aria/calendar": "^3.10.0",
     "@tanstack/react-query": "^5.100.10",
     "axios": "^1.16.1",
     "class-variance-authority": "^0.7.1",
@@ -23,8 +24,10 @@
     "next": "16.2.6",
     "next-auth": "^4.24.14",
     "react": "19.2.4",
+    "react-aria": "^3.48.0",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.76.0",
+    "react-stately": "^3.46.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3",
     "zustand": "^5.0.13"
