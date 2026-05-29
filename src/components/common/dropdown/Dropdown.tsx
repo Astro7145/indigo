@@ -109,7 +109,29 @@ function Trigger({ asChild, className, children }: TriggerProps) {
   };
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<Record<string, unknown>>, injectedProps);
+    const child = children as React.ReactElement<{
+      ref?: React.Ref<HTMLElement>;
+      onClick?: React.MouseEventHandler<HTMLElement>;
+      className?: string;
+    }>;
+    return React.cloneElement(child, {
+      ...injectedProps,
+      className: cn(className, child.props.className),
+      ref: (node: HTMLElement | null) => {
+        triggerRef.current = node;
+        const childRef = child.props.ref;
+        if (typeof childRef === 'function') {
+          childRef(node);
+        } else if (childRef && typeof childRef === 'object' && 'current' in childRef) {
+          // eslint-disable-next-line react-hooks/immutability
+          (childRef as React.MutableRefObject<HTMLElement | null>).current = node;
+        }
+      },
+      onClick: (e: React.MouseEvent<HTMLElement>) => {
+        toggle();
+        child.props.onClick?.(e);
+      },
+    });
   }
 
   return (
