@@ -80,7 +80,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
                       {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
                       {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
                       {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction onClick={() => {}} hoverOnly />
+                      <TodoList.KebabAction hoverOnly />
                       <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                     </TodoList.Actions>
                   </TodoList>
