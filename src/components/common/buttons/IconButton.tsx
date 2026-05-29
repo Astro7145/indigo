@@ -8,8 +8,6 @@ interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 
   ref?: Ref<HTMLButtonElement>;
   /** false이면 hover 스타일 비활성화. 기본값 true */
   hover?: boolean;
-  /** 버튼 DOM 참조 — Dropdown.Trigger 등으로 합성할 때 트리거 ref 부착용 */
-  ref?: Ref<HTMLButtonElement>;
 }
 
 /**
