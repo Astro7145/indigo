@@ -18,6 +18,8 @@ export interface RecentTodosProps {
 // 카드 크롬(아이콘·패딩·높이)은 viewport `2xl:`(1280+) 기준으로 desktop ↔ tablet/mobile 전환
 // — ProgressCard wide 레이아웃과 동시 활성되도록(2-col 셀이 1024~1279에서 좁아 양쪽 모두 tablet 유지).
 const rootClass = 'flex w-full flex-col gap-2.5';
+// 로딩·에러·빈 상태 안내 문구 공통 스타일 — 카드 정중앙 배치.
+const statusMessageClass = 'text-md m-auto text-center text-slate-500';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
@@ -56,12 +58,12 @@ export default function RecentTodos({ className }: RecentTodosProps) {
       </div>
       <Card className="flex h-[187px] flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] 2xl:h-64 2xl:px-8 2xl:py-[30px]">
         {isLoading ? (
-          <p className="text-sm text-slate-400">불러오는 중…</p>
+          <p className={statusMessageClass}>불러오는 중…</p>
         ) : isError ? (
-          <p className="text-sm text-slate-400">불러오지 못했어요</p>
+          <p className={statusMessageClass}>불러오지 못했어요</p>
         ) : todos.length === 0 ? (
           // figma: 빈 상태는 카드 정중앙에 안내 문구
-          <p className="text-md m-auto text-center text-slate-500">최근에 등록한 할 일이 없어요</p>
+          <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>
         ) : (
           <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 overflow-y-auto">
             {todos.map((t) => {
