@@ -1,25 +1,32 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
+import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import CommentSection from '@/src/components/post/CommentSection';
 import { useComments } from '@/src/hooks/comment';
-import { usePost } from '@/src/hooks/post';
+import { useDeletePost, usePost } from '@/src/hooks/post';
 import { useMe } from '@/src/hooks/user';
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
+  const router = useRouter();
   const id = Number(postId);
 
   const { data: post, isPending: postPending } = usePost(id);
   const { data: commentsData } = useComments(id);
   const { data: me } = useMe();
+  const { mutate: deletePost } = useDeletePost();
 
   const comments = commentsData?.comments ?? [];
+
+  const handleDelete = () => {
+    deletePost(id, { onSuccess: () => router.push('/posts') });
+  };
 
   if (postPending || !post) {
     return (
@@ -33,13 +40,20 @@ export default function PostDetailPage() {
     <article className="mx-auto min-h-[calc(100vh-104px)] w-full max-w-[343px] rounded-lg bg-white p-4 shadow-sm md:max-w-[636px] md:p-10 xl:max-w-[768px]">
       <div className="mb-4 flex items-start justify-between gap-4">
         <h1 className="text-lg font-bold text-slate-900 md:text-2xl">{post.title}</h1>
-        {/*
-            TODO: 공통 Dropdown 컴포넌트 머지 후 그것으로 교체.
-            메뉴 옵션: "수정하기" / "삭제하기". 현재는 placeholder 트리거만 렌더 (클릭 동작 없음).
-          */}
-        <IconButton aria-label="더보기" className="shrink-0">
-          <IcMeetballs className="size-5 text-slate-400" />
-        </IconButton>
+        <Dropdown className="shrink-0">
+          <Dropdown.Trigger asChild>
+            <IconButton aria-label="더보기">
+              <IcMeetballs className="size-5 text-slate-400" />
+            </IconButton>
+          </Dropdown.Trigger>
+          <Dropdown.Menu placement="bottom-end" size="small">
+            {/* 수정 페이지(/posts/[id]/edit)는 별도 작업 — 라우트 생성 후 연결 */}
+            <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>수정하기</Dropdown.Item>
+            <Dropdown.Item onClick={handleDelete} className="text-destructive">
+              삭제하기
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </div>
 
       {/* 작성자 */}

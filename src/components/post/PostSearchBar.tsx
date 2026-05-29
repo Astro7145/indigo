@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
+import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcFilter } from '@/src/components/common/icons/IcFilter';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 
@@ -21,21 +22,6 @@ export default function PostSearchBar() {
   const sortBy = (searchParams.get('sortBy') as SortBy) ?? 'latest';
 
   const [input, setInput] = useState(searchParams.get('search') ?? '');
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const sortContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isSortOpen) return;
-
-    function handleOutside(event: MouseEvent) {
-      if (sortContainerRef.current && !sortContainerRef.current.contains(event.target as Node)) {
-        setIsSortOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleOutside);
-    return () => document.removeEventListener('mousedown', handleOutside);
-  }, [isSortOpen]);
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -69,39 +55,19 @@ export default function PostSearchBar() {
         />
       </div>
 
-      <div ref={sortContainerRef} className="relative">
-        <button
-          type="button"
-          onClick={() => setIsSortOpen((prev) => !prev)}
-          className="inline-flex items-center gap-1.5 text-sm text-slate-700"
-        >
+      <Dropdown>
+        <Dropdown.Trigger className="inline-flex items-center gap-1.5 text-sm text-slate-700">
           {currentLabel}
           <IcFilter className="size-5 text-slate-500" />
-        </button>
-
-        {isSortOpen && (
-          <ul
-            role="menu"
-            className="absolute right-0 z-10 mt-2 w-32 rounded border border-slate-200 bg-white py-1 shadow-md"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <li key={opt.value}>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    updateParam('sortBy', opt.value);
-                    setIsSortOpen(false);
-                  }}
-                  className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
-                >
-                  {opt.label}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+        </Dropdown.Trigger>
+        <Dropdown.Menu placement="bottom-end" size="small">
+          {SORT_OPTIONS.map((opt) => (
+            <Dropdown.Item key={opt.value} onClick={() => updateParam('sortBy', opt.value)}>
+              {opt.label}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
     </div>
   );
 }
