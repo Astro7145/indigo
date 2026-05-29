@@ -36,7 +36,7 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
           [...new Array(6 - weeksInMonth).keys()].map((i) => (
             <tr key={`pad-${i}`} aria-hidden="true">
               {[...new Array(7).keys()].map((j) => (
-                <td key={j} className="aspect-square" />
+                <td key={j} className="h-10" />
               ))}
             </tr>
           ))}
