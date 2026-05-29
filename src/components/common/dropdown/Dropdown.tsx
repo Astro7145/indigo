@@ -124,7 +124,7 @@ function Trigger({ asChild, className, children }: TriggerProps) {
           childRef(node);
         } else if (childRef && typeof childRef === 'object' && 'current' in childRef) {
           // eslint-disable-next-line react-hooks/immutability
-          (childRef as React.MutableRefObject<HTMLElement | null>).current = node;
+          (childRef as React.RefObject<HTMLElement | null>).current = node;
         }
       },
       onClick: (e: React.MouseEvent<HTMLElement>) => {
