@@ -42,7 +42,7 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
       {/* 상단 3카드 — 2xl에서 목표 카드와 진행도·노트 그룹이 1:1(figma 640:640)로 함께 비례 축소.
           비대칭 flex 분배 이슈를 피하려 grid로 균등 분할. */}
       <section className="grid grid-cols-1 gap-4 2xl:grid-cols-2 2xl:gap-8">
-        <GoalDetailHeader title={goal?.title} className="min-w-0" />
+        <GoalDetailHeader goalId={goalId} title={goal?.title} className="min-w-0" />
         <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
           <ProgressCard
             goalId={goalId}

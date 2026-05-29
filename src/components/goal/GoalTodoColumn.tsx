@@ -43,8 +43,8 @@ function Row({
           {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 — 노트 작성 모달(별도 작업) 연동 전 placeholder */}
           {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-          {/* 수정/삭제 케밥 — 공통 Dropdown(#68) 연동 전 placeholder */}
-          <TodoList.KebabAction onClick={() => {}} hoverOnly />
+          {/* 할 일 수정/삭제 케밥 — 드롭다운은 열리되, 할 일 CRUD(TaskForm 모달)는 별도 작업이라 핸들러 미연결 */}
+          <TodoList.KebabAction hoverOnly />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
       </TodoList>
