@@ -47,7 +47,11 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
               <IcProfileYellow className="size-5 md:size-6" />
             )}
             <span className="text-sm text-slate-700 md:text-base">{comment.writer.name}</span>
-            {isMine && <span className="rounded-md bg-amber-100 px-2 py-0.5 text-xs text-amber-700">내 댓글</span>}
+            {isMine && (
+              <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
+                내 댓글
+              </span>
+            )}
           </div>
           {isMine && (
             <Dropdown className="shrink-0">

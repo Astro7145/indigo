@@ -48,7 +48,7 @@ export default function PostSearchBar() {
       </div>
 
       <Dropdown>
-        <Dropdown.Trigger className="inline-flex items-center gap-1.5 text-sm text-slate-700 md:gap-3 md:text-base">
+        <Dropdown.Trigger className="inline-flex items-center gap-1 text-sm text-slate-700 md:gap-3 md:text-base">
           {currentLabel}
           <IcFilter className="size-5 text-slate-500" />
         </Dropdown.Trigger>
