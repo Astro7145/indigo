@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import type { Post } from '@/src/types/post';
+import { stripHtml } from '@/src/utils/stripHtml';
 
 interface PostListItemProps {
   post: Post;
@@ -20,9 +21,8 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
           <h3 className="truncate text-sm font-semibold text-slate-900 md:text-xl md:leading-[30px] md:whitespace-normal">
             {post.title}
           </h3>
-          {/* 에디터 HTML에서 태그만 제거. &amp; 등 HTML 엔티티는 미처리 — 필요 시 DOM 방식으로 교체 */}
           <p className="truncate text-sm text-slate-700 md:line-clamp-2 md:min-h-[48px] md:text-base md:whitespace-normal">
-            {post.content.replace(/<[^>]+>/g, '')}
+            {stripHtml(post.content)}
           </p>
         </div>
         <div className="flex items-center gap-1 text-xs text-slate-500 md:gap-2 md:text-base">

@@ -7,6 +7,7 @@ import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import type { Post } from '@/src/types/post';
 import { cn } from '@/src/utils/cn';
+import { stripHtml } from '@/src/utils/stripHtml';
 
 export interface PostCardProps {
   post: Post;
@@ -21,7 +22,7 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
   return (
     <Card className={cn(rootClass, className)} onClick={onClick}>
       <h3 className="line-clamp-2 text-xl font-semibold text-slate-900">{post.title}</h3>
-      {post.image && (
+      {post.image ? (
         <div className="flex items-center gap-3">
           <Image
             src={post.image}
@@ -31,6 +32,8 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
             className="size-[100px] shrink-0 rounded border border-slate-200 object-cover"
           />
         </div>
+      ) : (
+        <p className="line-clamp-2 text-sm text-slate-500">{stripHtml(post.content)}</p>
       )}
       <div className="mt-auto flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-base text-slate-500">

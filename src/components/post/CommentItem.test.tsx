@@ -1,9 +1,18 @@
-import { screen, fireEvent } from '@testing-library/react';
+jest.mock('@/src/api/comment', () => ({
+  ...jest.requireActual('@/src/api/comment'),
+  deleteComment: jest.fn(),
+  patchComment: jest.fn(),
+}));
 
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+
+import { deleteComment } from '@/src/api/comment';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Comment } from '@/src/types/comment';
 
 import CommentItem from './CommentItem';
+
+beforeEach(() => jest.clearAllMocks());
 
 const baseComment: Comment = {
   id: 1,
@@ -47,4 +56,34 @@ it('취소 클릭 시 본문 텍스트로 돌아가고 input/버튼이 사라진
 
   expect(screen.queryByDisplayValue(baseComment.content)).not.toBeInTheDocument();
   expect(screen.getByText(baseComment.content)).toBeInTheDocument();
+});
+
+it('더보기 → 삭제하기 선택 시 확인 모달이 열린다 (즉시 삭제되지 않음)', () => {
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
+  fireEvent.click(screen.getByRole('button', { name: /더보기/ }));
+  fireEvent.click(screen.getByRole('menuitem', { name: '삭제하기' }));
+
+  expect(screen.getByRole('heading', { name: '댓글을 삭제하시겠어요?' })).toBeInTheDocument();
+  expect(deleteComment).not.toHaveBeenCalled();
+});
+
+it('확인 모달에서 취소 시 deleteComment가 호출되지 않는다', () => {
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
+  fireEvent.click(screen.getByRole('button', { name: /더보기/ }));
+  fireEvent.click(screen.getByRole('menuitem', { name: '삭제하기' }));
+  // 모달의 취소 버튼 — 모달이 열린 뒤 새로 생긴 '취소' 버튼을 찾는다
+  fireEvent.click(screen.getByRole('button', { name: '취소' }));
+
+  expect(deleteComment).not.toHaveBeenCalled();
+});
+
+it('확인 모달에서 삭제하기 클릭 시 deleteComment(postId, id)를 호출한다', async () => {
+  (deleteComment as jest.Mock).mockResolvedValue(undefined);
+  renderWithClient(<CommentItem comment={baseComment} postId={baseComment.postId} isMine={true} />);
+  fireEvent.click(screen.getByRole('button', { name: /더보기/ }));
+  fireEvent.click(screen.getByRole('menuitem', { name: '삭제하기' }));
+  // 메뉴 항목이 사라진 뒤 남은 '삭제하기' 버튼이 모달의 confirm
+  fireEvent.click(screen.getByRole('button', { name: '삭제하기' }));
+
+  await waitFor(() => expect(deleteComment).toHaveBeenCalledWith(baseComment.postId, baseComment.id));
 });

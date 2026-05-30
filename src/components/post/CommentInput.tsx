@@ -26,9 +26,9 @@ export default function CommentInput({ onSubmit }: CommentInputProps) {
         onChange={(e) => setText(e.target.value)}
         placeholder="댓글을 입력해주세요."
         aria-label="댓글 입력"
-        className="flex-1 rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none md:px-4 md:py-2.5"
+        className="h-12 flex-1 rounded border border-slate-200 px-3 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none md:px-4 md:text-base"
       />
-      <Button type="button" size="medium" disabled={isEmpty} onClick={handleSubmit}>
+      <Button type="button" size="medium" disabled={isEmpty} onClick={handleSubmit} className="min-w-[80px]">
         등록
       </Button>
     </div>

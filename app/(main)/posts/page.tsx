@@ -18,7 +18,7 @@ export default function PostsPage() {
   const sortBy = searchParams.get('sortBy');
   const type = sortBy === 'popular' ? 'best' : 'all';
 
-  const { data: bestData } = usePostList({ type: 'best', limit: 3 });
+  const { data: bestData } = usePostList({ type: 'best', limit: 3 }); //인기글
   const bestPosts = bestData?.posts ?? [];
 
   const {
@@ -95,7 +95,7 @@ export default function PostsPage() {
         type="button"
         size="large"
         startIcon={<IcPlus />}
-        className="fixed right-4 bottom-4 p-[13px] md:right-8 md:bottom-16 md:px-[18px] md:py-[13px]"
+        className="fixed right-4 bottom-4 p-[13px] md:right-8 md:bottom-16 md:min-w-[190px] md:px-[18px] md:py-[13px]"
       >
         <span className="hidden md:inline">게시물 작성하기</span>
       </Button>

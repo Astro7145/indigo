@@ -39,6 +39,11 @@ it('image가 있으면 썸네일을 렌더한다', () => {
   expect(container.querySelector('img')).toBeInTheDocument();
 });
 
+it('image가 null이면 HTML 태그를 제거한 본문 미리보기를 렌더한다', () => {
+  render(<PostCard post={{ ...post, content: '<p>본문 미리보기</p>' }} />);
+  expect(screen.getByText('본문 미리보기')).toBeInTheDocument();
+});
+
 it('onClick이 전달되면 클릭 시 호출된다', () => {
   const onClick = jest.fn();
   render(<PostCard post={post} onClick={onClick} />);

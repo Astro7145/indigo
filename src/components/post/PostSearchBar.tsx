@@ -37,14 +37,6 @@ export default function PostSearchBar() {
 
   return (
     <div className="flex w-full items-center justify-between gap-4">
-      {/*
-        공통 SearchInput을 재사용. 단 현재 SearchInput은 두 가지 한계가 있어 시각이 Figma와 다름.
-        - Input(`src/components/common/inputs/Input.tsx`)의 `<input>`에 `flex-1` 누락 → iconRight가 우측 끝에 정렬 안 됨
-        - SearchInput에 폭·높이 override prop(`containerClassName` 등) 없음 → Figma 다양한 사이즈
-          (48 높이: 320/280/248/432, 40 높이: 432/239/210) 매칭 불가
-        작성자 측 수정 후 `<SearchInput ... containerClassName="w-full md:w-[432px]" />` 형태로 교체 예정.
-        반응형은 외부 wrapper에서 처리.
-      */}
       <div className="flex-1 md:w-[432px] md:flex-none">
         <SearchInput
           value={input}
@@ -56,7 +48,7 @@ export default function PostSearchBar() {
       </div>
 
       <Dropdown>
-        <Dropdown.Trigger className="inline-flex items-center gap-1.5 text-sm text-slate-700">
+        <Dropdown.Trigger className="inline-flex items-center gap-1.5 text-sm text-slate-700 md:gap-3 md:text-base">
           {currentLabel}
           <IcFilter className="size-5 text-slate-500" />
         </Dropdown.Trigger>
