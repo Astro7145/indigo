@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import type { Post } from '@/src/types/post';
+import { formatRelativeTime } from '@/src/utils/date';
 import { stripHtml } from '@/src/utils/stripHtml';
 
 interface PostListItemProps {
@@ -30,7 +31,7 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
           <div className="flex items-center gap-0.5 whitespace-nowrap md:gap-1">
             <span>{post.writer.name}</span>
             <span aria-hidden>·</span>
-            <span>{post.createdAt.slice(0, 10).replace(/-/g, '.')}</span>
+            <span>{formatRelativeTime(post.createdAt)}</span>
             <span aria-hidden>·</span>
             <span>조회 {post.viewCount}</span>
             <span aria-hidden>·</span>

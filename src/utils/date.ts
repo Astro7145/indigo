@@ -9,3 +9,19 @@ export function isoToCalendarDate(iso: string | null): CalendarDate | null {
 export function calendarDateToIso(date: CalendarDate | null): string | null {
   return date ? date.toDate('UTC').toISOString() : null;
 }
+
+/**
+ * 현재 시각 대비 상대 시간을 한국어로 포맷한다.
+ * 1시간 미만 → "방금", 1일 미만 → "N시간", 그 외 → "YYYY.MM.DD".
+ * @param now 현재 시각(ms). 테스트용 주입 파라미터. 기본값 `Date.now()`.
+ */
+export function formatRelativeTime(iso: string, now: number = Date.now()): string {
+  const past = new Date(iso);
+  const diffSec = Math.max(0, Math.floor((now - past.getTime()) / 1000));
+  if (diffSec < 3600) return '방금';
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}시간`;
+  const y = past.getFullYear();
+  const m = String(past.getMonth() + 1).padStart(2, '0');
+  const d = String(past.getDate()).padStart(2, '0');
+  return `${y}.${m}.${d}`;
+}

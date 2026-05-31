@@ -23,12 +23,14 @@ it('제목과 HTML 태그를 제거한 본문을 렌더한다', () => {
   expect(screen.getByText('오전에는 집중이 잘 됐다')).toBeInTheDocument();
 });
 
-it('작성자명, 날짜, 조회수, 댓글수를 렌더한다', () => {
+it('작성자명, 상대 시간, 조회수, 댓글수를 렌더한다', () => {
+  jest.useFakeTimers().setSystemTime(new Date('2026-05-30T00:00:00Z'));
   render(<PostListItem post={post} />);
   expect(screen.getByText('김수진')).toBeInTheDocument();
   expect(screen.getByText('2026.05.20')).toBeInTheDocument();
   expect(screen.getByText(/조회 42/)).toBeInTheDocument();
   expect(screen.getByText('3')).toBeInTheDocument();
+  jest.useRealTimers();
 });
 
 it('image가 null이면 썸네일을 렌더하지 않는다', () => {
