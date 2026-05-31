@@ -78,36 +78,76 @@ export default function PostForm(props: PostFormProps) {
   };
 
   const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
-  const submitText = props.mode === 'edit' ? '수정' : '등록';
+  const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
+
+  const contentText = content.replace(/<[^>]*>/g, '');
+  const contentCharCount = contentText.length;
+  const contentNoSpaceCount = contentText.replace(/\s/g, '').length;
 
   return (
-    <div>
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-800">{headingText}</h1>
-        <div className="flex gap-2">
-          <Button variant="tertiary" size="medium" onClick={handleCancel}>
+    <div className="mx-auto w-full max-w-[343px] md:max-w-[636px] xl:max-w-[768px]">
+      <header className="mb-4 flex h-10 items-center justify-between gap-3 md:mb-3">
+        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 md:text-2xl">
+          {headingText}
+        </h1>
+        <div className="flex shrink-0 gap-2">
+          <Button
+            variant="tertiary"
+            size="small"
+            onClick={handleCancel}
+            className="md:h-10 md:w-[106px] md:px-0 md:py-0 md:text-base"
+          >
             취소
           </Button>
-          <Button variant="primary" size="medium" disabled={!isValid} onClick={handleSubmit}>
+          <Button
+            variant="primary"
+            size="small"
+            disabled={!isValid}
+            onClick={handleSubmit}
+            className="md:h-10 md:w-[106px] md:px-0 md:py-0 md:text-base"
+          >
             {submitText}
           </Button>
         </div>
       </header>
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        maxLength={30}
-        placeholder="게시물의 제목을 입력해주세요"
-        aria-label="제목"
-      />
-      <PostEditor
-        value={content}
-        onChange={setContent}
-        onImageClick={handleImageClick}
-        placeholder="이 곳을 통해 내용을 작성해주세요"
-      />
-      {image && <PostImageAttachment src={image} onDelete={() => setImage(null)} />}
+
+      <div className="rounded-lg bg-white px-4 py-4 md:px-[30px] md:py-8 xl:px-[34px]">
+        <PostEditor
+          value={content}
+          onChange={setContent}
+          onImageClick={handleImageClick}
+          placeholder="이 곳을 통해 내용을 작성해주세요"
+          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 md:min-h-[600px] md:pt-5 md:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          titleSlot={
+            <div className="pt-[29px]">
+              <div className="flex items-end justify-between gap-3 pb-4 md:gap-4 md:pb-6 xl:pb-7">
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  maxLength={30}
+                  placeholder="게시물의 제목을 입력해주세요"
+                  aria-label="제목"
+                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 md:text-2xl"
+                />
+                <span className="shrink-0 text-xs text-slate-400 md:text-sm">{title.length}/30</span>
+              </div>
+              <div className="border-b border-slate-200" />
+            </div>
+          }
+        />
+
+        {image && (
+          <div className="pt-4 md:pt-6">
+            <PostImageAttachment src={image} onDelete={() => setImage(null)} />
+          </div>
+        )}
+
+        <div className="pt-4 text-right text-xs text-slate-400 md:text-sm">
+          공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+        </div>
+      </div>
+
       <input
         ref={fileInputRef}
         type="file"
