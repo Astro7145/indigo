@@ -5,6 +5,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import type { ReactNode } from 'react';
 
 import EditorToolbar from '@/src/components/common/editor/EditorToolbar';
 
@@ -13,9 +14,20 @@ export interface PostEditorProps {
   onChange: (html: string) => void;
   onImageClick?: () => void;
   placeholder?: string;
+  /** 툴바 아래, 본문 위에 렌더할 영역 (제목 input 등) */
+  titleSlot?: ReactNode;
+  /** EditorContent 래퍼에 적용할 클래스 (min-h 등) */
+  contentClassName?: string;
 }
 
-export default function PostEditor({ value, onChange, onImageClick, placeholder }: PostEditorProps) {
+export default function PostEditor({
+  value,
+  onChange,
+  onImageClick,
+  placeholder,
+  titleSlot,
+  contentClassName,
+}: PostEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -58,7 +70,8 @@ export default function PostEditor({ value, onChange, onImageClick, placeholder 
         onBulletList={() => editor?.chain().focus().toggleBulletList().run()}
         onImageUpload={onImageClick}
       />
-      <EditorContent editor={editor} />
+      {titleSlot}
+      <EditorContent editor={editor} className={contentClassName} />
     </div>
   );
 }
