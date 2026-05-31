@@ -47,7 +47,7 @@ export default function PostEditor({ value, onChange, onImageClick, placeholder 
   return (
     <div>
       <EditorToolbar
-        state={state}
+        state={state ?? {}}
         showLink={false}
         onBold={() => editor?.chain().focus().toggleBold().run()}
         onItalic={() => editor?.chain().focus().toggleItalic().run()}
