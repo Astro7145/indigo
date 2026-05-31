@@ -79,8 +79,8 @@ export default function PostDetailPage() {
 
         {/* 이미지 */}
         {post.image && (
-          <div className="relative mb-6 h-48 w-full max-w-sm">
-            <Image src={post.image} alt="" fill className="rounded object-cover" />
+          <div className="relative mb-6 size-[150px] overflow-hidden rounded border border-slate-200 md:size-[232px]">
+            <Image src={post.image} alt="" fill className="object-cover" />
           </div>
         )}
 
