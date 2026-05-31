@@ -117,7 +117,7 @@ export default function PostForm(props: PostFormProps) {
           onChange={setContent}
           onImageClick={handleImageClick}
           placeholder="이 곳을 통해 내용을 작성해주세요"
-          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 md:min-h-[600px] md:pt-5 md:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 md:min-h-[600px] md:pt-5 md:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
             <div className="pt-[29px]">
               <div className="flex items-end justify-between gap-3 pb-4 md:gap-4 md:pb-6 xl:pb-7">
