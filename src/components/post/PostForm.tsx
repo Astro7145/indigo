@@ -111,7 +111,7 @@ export default function PostForm(props: PostFormProps) {
         </div>
       </header>
 
-      <div className="rounded-lg bg-white px-4 py-4 md:px-[30px] md:py-8 xl:px-[34px]">
+      <div className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 md:min-h-[calc(100vh-100px)] md:px-[30px] md:py-8 lg:min-h-[calc(100vh-212px)] xl:px-[34px]">
         <PostEditor
           value={content}
           onChange={setContent}
@@ -143,7 +143,7 @@ export default function PostForm(props: PostFormProps) {
           </div>
         )}
 
-        <div className="pt-4 text-right text-xs text-slate-400 md:text-sm">
+        <div className="mt-auto pt-4 text-right text-xs text-slate-400 md:text-sm">
           공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
         </div>
       </div>
@@ -157,11 +157,22 @@ export default function PostForm(props: PostFormProps) {
         onChange={handleFileChange}
       />
 
-      <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)}>
-        <Modal.Title>작성 중인 내용이 사라져요. 그래도 나가시겠어요?</Modal.Title>
+      <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
+        <Modal.Title className="text-center text-base sm:text-xl">게시물 작성을 취소하시겠어요?</Modal.Title>
+        <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
+          <span
+            aria-hidden
+            className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
+          >
+            !
+          </span>
+          작성하신 모든 내용이 사라집니다.
+        </p>
         <Modal.Actions>
-          <Modal.Cancel>계속 작성</Modal.Cancel>
-          <Modal.Confirm onClick={() => router.back()}>나가기</Modal.Confirm>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
+            확인
+          </Modal.Confirm>
         </Modal.Actions>
       </Modal>
     </div>
