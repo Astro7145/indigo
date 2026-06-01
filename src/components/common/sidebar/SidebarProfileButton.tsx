@@ -15,10 +15,10 @@ export default function SidebarProfileButton() {
     >
       {isLoading ? (
         <span aria-hidden className="size-9 shrink-0 animate-pulse rounded-full bg-indigo-800" />
-      ) : data?.image ? (
+      ) : data && data.image ? (
         <Image
           src={data.image}
-          alt={data.name}
+          alt={data.name ?? ''}
           width={36}
           height={36}
           unoptimized
