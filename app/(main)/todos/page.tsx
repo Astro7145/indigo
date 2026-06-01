@@ -13,6 +13,11 @@ import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import type { TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
+const EMPTY_MSG_BY_TAP = {
+  all: '아직 등록한 할 일이 없어요',
+  todo: '해야할 일이 아직 없어요',
+  done: '완료한 일이 아직 없어요',
+};
 
 const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
   all: undefined,
@@ -21,7 +26,7 @@ const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
 };
 
 /**
- * /todos — 모든 할 일 페이지. Figma `21209:54289` / `21209:54318` / `21209:54371`.
+ * /todos — 모든 할 일 페이지
  * 전체/To Do/Done 탭으로 `done` 파라미터 매핑, 40개씩 무한 스크롤, 행 등장 애니메이션.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
@@ -40,7 +45,7 @@ export default function TodosPage() {
 
   useEffect(() => {
     const el = sentinelRef.current;
-    // 실패 시 sentinel 관찰 중단 — 화면에 남아 있는 한 무한 재호출되므로 (GoalTodoSection 패턴 동일)
+    // 실패 시 sentinel 관찰 중단
     if (!el || !hasNextPage || isFetchingNextPage || isFetchNextPageError) return;
     const io = new IntersectionObserver(
       (entries) => {
@@ -87,7 +92,7 @@ export default function TodosPage() {
           ) : isError ? (
             <p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>
           ) : todos.length === 0 ? (
-            <p className="py-20 text-center text-sm text-slate-500">아직 등록한 할 일이 없어요</p>
+            <p className="py-20 text-center text-sm text-slate-500">{EMPTY_MSG_BY_TAP[tab]}</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {todos.map((t, idx) => {
