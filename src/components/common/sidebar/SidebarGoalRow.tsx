@@ -126,7 +126,7 @@ export default function SidebarGoalRow({
 
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <motion.ul
             key="goal-list"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -135,16 +135,19 @@ export default function SidebarGoalRow({
             className="flex flex-col overflow-hidden"
           >
             {goals.map((goal) => (
-              <button
-                key={goal.id}
-                type="button"
-                onClick={() => onSelectGoal?.(goal.id)}
-                className="flex cursor-pointer items-center px-6 py-2 hover:bg-white/5"
-              >
-                <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-white">{goal.title}</span>
-              </button>
+              <li key={goal.id} className="w-full list-none">
+                <button
+                  type="button"
+                  onClick={() => onSelectGoal?.(goal.id)}
+                  className="flex w-full cursor-pointer items-center px-6 py-2 hover:bg-white/5"
+                >
+                  <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-white">
+                    {goal.title}
+                  </span>
+                </button>
+              </li>
             ))}
-          </motion.div>
+          </motion.ul>
         )}
       </AnimatePresence>
     </li>
