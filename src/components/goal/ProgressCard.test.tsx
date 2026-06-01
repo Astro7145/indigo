@@ -80,7 +80,7 @@ it('goalId 있으면 해당 goal todos로 진행도를 계산한다 (1/2 → 50)
     ],
   };
   goalMock.getGoal.mockResolvedValue(detail);
-  renderWithClient(<ProgressCard goalId={9} size="small" />);
+  renderWithClient(<ProgressCard goalId={9} />);
   const bar = (await screen.findAllByRole('progressbar'))[0];
   await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '50'));
   expect(goalMock.getGoal).toHaveBeenCalledWith(9);

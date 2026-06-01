@@ -11,16 +11,13 @@ import { useGoal, useGoalList } from '@/src/hooks/goal';
 import { useMe } from '@/src/hooks/user';
 import { cn } from '@/src/utils/cn';
 
-export type ProgressCardSize = 'default' | 'small' | 'xsmall';
-
 interface ProgressCardViewProps {
-  /** 헤더 라벨. default은 카드 위 헤더, small/xsmall은 카드 안 라벨. */
+  /** 헤더 라벨 (카드 위 헤더). */
   headerText: string;
-  /** 본문 부제(예: "{userName}님의 진행도는"). default에서만 사용. */
+  /** 본문 부제(예: "{userName}님의 진행도는"). */
   bodyText?: string;
   /** 진행률 0~100 (범위 밖이면 clamp). */
   percent: number;
-  size?: ProgressCardSize;
   onClick?: () => void;
   className?: string;
 }
@@ -28,12 +25,6 @@ interface ProgressCardViewProps {
 // 카드 배경 그라데이션(120°)·그림자 — 전 사이즈 공통
 const GRADIENT_BODY = 'bg-[linear-gradient(120deg,#6E66C8_0%,#3D3677_73.21%)]';
 const GRADIENT_SHADOW = 'shadow-[0_12px_32px_rgba(69,54,143,0.25)]';
-
-// small/xsmall은 높이 같고 폭만 다름
-const COMPACT_WIDTH: Record<'small' | 'xsmall', string> = {
-  small: 'w-[343px]',
-  xsmall: 'w-[308px]',
-};
 
 /**
  * 0 → target으로 부드럽게 차오르는 숫자. target이 바뀌면 현재 값에서 다시 애니메이션.
@@ -71,19 +62,10 @@ function useAnimatedNumber(target: number, duration = 700): number {
 
 /**
  * 진행률 카드 (표시 전용) — text/percent props만 받아 호출 측에서 조합한다.
- *
- * - default: 헤더 + 본문 카드. 본문은 viewport로 형태가 바뀜 —
- *   <xl(모바일·태블릿)=작은 형태, ≥xl(데스크탑)=큰 형태(달·숫자 확대).
- * - small/xsmall: 폭만 다른 작은 카드(dropdown 등). bodyText 미사용.
+ * 헤더 + 본문 카드. 본문은 viewport로 형태가 바뀜 —
+ * <xl(모바일·태블릿)=작은 형태, ≥xl(데스크탑)=큰 형태(달·숫자 확대).
  */
-function ProgressCardView({
-  headerText,
-  bodyText,
-  percent,
-  size = 'default',
-  onClick,
-  className,
-}: ProgressCardViewProps) {
+function ProgressCardView({ headerText, bodyText, percent, onClick, className }: ProgressCardViewProps) {
   const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
   // 달 모양과 숫자를 같은 애니메이션 값으로 그린다
   const animatedPercent = useAnimatedNumber(safePercent);
@@ -108,42 +90,6 @@ function ProgressCardView({
         },
       }
     : {};
-
-  if (size === 'small' || size === 'xsmall') {
-    // small/xsmall — 폭만 다른 작은 카드
-    return (
-      <div
-        className={cn(
-          'relative flex h-40 items-start overflow-hidden rounded text-white',
-          COMPACT_WIDTH[size],
-          GRADIENT_BODY,
-          className,
-        )}
-        {...interactiveProps}
-      >
-        {/* 달: 음수 margin으로 모서리에 살짝 걸치고(넘친 부분은 잘림), mr로 텍스트와 간격.
-            텍스트는 달 뒤를 따라 흐름 → 달 크기가 바뀌어도 위치가 안 깨짐 */}
-        <Moonphase percent={animatedPercent} className="-mt-[2px] mr-[9px] -ml-[5px] size-[165px] shrink-0" />
-        <div className="mt-[49px] flex flex-col gap-0.5">
-          <span className="text-sm text-white/85">{headerText}</span>
-          <div className="flex items-baseline gap-[3px]">
-            <span
-              role="progressbar"
-              aria-label={headerText}
-              aria-valuenow={safePercent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              className="text-[32px] leading-[39px] font-bold tracking-[-0.03em]"
-            >
-              {displayPercent}
-            </span>
-            <span className="text-base leading-[19px] font-bold">%</span>
-          </div>
-        </div>
-        <StarsDecor className="pointer-events-none absolute inset-0 size-full" />
-      </div>
-    );
-  }
 
   return (
     // @container: 본문 wide가 카드(그리드 칸) 폭에 cqw로 반응하도록 컨테이너 지정
@@ -172,8 +118,11 @@ function ProgressCardView({
         {/* relative: overlay 위·stars 아래로 쌓이게. 데스크탑은 달을 좌측에서 pl(12cqw)만큼 띄워
             좌측-중앙에 두고(텍스트가 우측을 채움) — 달 위치가 이름 길이와 무관하게 카드 폭에만 반응 */}
         <div className="relative flex h-full items-center pl-1 xl:pr-[7.5cqw] xl:pl-[10cqw]">
-          {/* 달: 모바일·태블릿은 모서리에 걸침(음수 margin), 데스크탑은 카드 폭에 비례(cqw)해 연속 스케일 */}
-          <Moonphase percent={animatedPercent} className="mt-0 mr-0 ml-0 size-[182px] shrink-0 xl:size-[34.375cqw]" />
+          {/* 달: 평소 182px이되 카드가 좁아지면 비례 축소(min 55cqw). 데스크탑(xl)은 폭 비례 연속 스케일 */}
+          <Moonphase
+            percent={animatedPercent}
+            className="mt-0 mr-0 ml-0 size-[min(182px,55cqw)] shrink-0 xl:size-[34.375cqw]"
+          />
           {/* 텍스트: 남은 폭을 채우고 좁으면 truncate (달 위치는 텍스트와 무관) */}
           <div className="mr-3 flex min-w-0 flex-1 flex-col gap-0.5 xl:mr-0 xl:gap-[1.875cqw]">
             {/* 이름 + 뒷말. 좁으면 뒷말은 줄바꿈, 이름은 truncate */}
@@ -208,7 +157,6 @@ function ProgressCardView({
 export interface ProgressCardProps {
   /** 있으면 해당 goal "목표 진행도", 없으면 전체 "내 진행 상황" */
   goalId?: number;
-  size?: ProgressCardSize;
   /** 기본 라벨 오버라이드 */
   headerText?: string;
   /** 본문 부제 오버라이드 (기본: "{name}님의 진행도는") */
@@ -222,7 +170,7 @@ function toPercent(done: number, total: number): number {
 }
 
 /** 전체 "내 진행 상황" — 모든 goal의 완료/전체 todo를 집계 */
-function OverallProgress({ size, headerText, bodyText, onClick, className }: Omit<ProgressCardProps, 'goalId'>) {
+function OverallProgress({ headerText, bodyText, onClick, className }: Omit<ProgressCardProps, 'goalId'>) {
   const { data: list } = useGoalList();
   const { data: me } = useMe();
   const goals = list?.goals ?? [];
@@ -233,7 +181,6 @@ function OverallProgress({ size, headerText, bodyText, onClick, className }: Omi
       headerText={headerText ?? '내 진행 상황'}
       bodyText={bodyText ?? `${me?.name ?? ''}님의 진행도는`}
       percent={toPercent(done, total)}
-      size={size}
       onClick={onClick}
       className={className}
     />
@@ -241,14 +188,7 @@ function OverallProgress({ size, headerText, bodyText, onClick, className }: Omi
 }
 
 /** 단일 "목표 진행도" — 해당 goal의 todos 완료 비율 */
-function GoalProgress({
-  goalId,
-  size,
-  headerText,
-  bodyText,
-  onClick,
-  className,
-}: ProgressCardProps & { goalId: number }) {
+function GoalProgress({ goalId, headerText, bodyText, onClick, className }: ProgressCardProps & { goalId: number }) {
   const { data: goal } = useGoal(goalId);
   const todos = goal?.todos ?? [];
   const done = todos.filter((t) => t.done).length;
@@ -257,7 +197,6 @@ function GoalProgress({
       headerText={headerText ?? '목표 진행도'}
       bodyText={bodyText}
       percent={toPercent(done, todos.length)}
-      size={size}
       onClick={onClick}
       className={className}
     />
