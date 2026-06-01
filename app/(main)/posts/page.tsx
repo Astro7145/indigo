@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import Button from '@/src/components/common/buttons/Button';
@@ -11,7 +11,17 @@ import PostListItem from '@/src/components/post/PostListItem';
 import PostSearchBar from '@/src/components/post/PostSearchBar';
 import { useInfinitePostList, usePostList } from '@/src/hooks/post';
 
+// useSearchParams는 prerender 단계에서 CSR bailout을 일으키므로 Suspense 바운더리가 필요하다.
+// 바운더리 바깥은 정적 prerender되고, 안쪽만 client에서 채워진다.
 export default function PostsPage() {
+  return (
+    <Suspense>
+      <PostsPageContent />
+    </Suspense>
+  );
+}
+
+function PostsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || undefined;
