@@ -26,7 +26,7 @@ setup('테스트 계정 로그인', async ({ page }) => {
   await pw.fill(PASSWORD);
   await pw.blur(); // onBlur 검증 → 로그인 버튼 활성화
   const [res] = await Promise.all([
-    page.waitForResponse((r) => r.url().includes('/iauth/login') && r.request().method() === 'POST'),
+    page.waitForResponse((r) => r.url().includes('/auth/login') && r.request().method() === 'POST'),
     page.getByRole('button', { name: '로그인하기' }).click(),
   ]);
   // 로그인 라우트는 성공 시 200으로 정규화하고 실패(동시 로그인 409 등)는 그대로 통과시킨다.
