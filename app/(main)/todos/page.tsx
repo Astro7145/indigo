@@ -59,7 +59,7 @@ export default function TodosPage() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
+    <section className="mx-auto flex w-full max-w-180 flex-col gap-6 sm:my-2 xl:my-4">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:54371) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">모든 할 일</h1>
