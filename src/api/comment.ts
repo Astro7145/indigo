@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import { postKeys } from '@/src/api/post';
 import type {
   Comment,

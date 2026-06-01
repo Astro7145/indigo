@@ -1,10 +1,11 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 
 import { cn } from '@/src/utils/cn';
 
 interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
   'aria-label': string;
   children: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
   /** false이면 hover 스타일 비활성화. 기본값 true */
   hover?: boolean;
 }
@@ -45,10 +46,12 @@ export default function IconButton({
   hover = true,
   className,
   children,
+  ref,
   ...props
 }: IconButtonProps) {
   return (
     <button
+      ref={ref}
       type="button"
       aria-label={ariaLabel}
       className={cn(

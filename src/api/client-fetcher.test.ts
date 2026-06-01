@@ -1,5 +1,5 @@
 import type { AxiosAdapter, AxiosError } from 'axios';
-import instance, { shouldRedirectToLogin } from '@/src/api/axiosInstance';
+import instance, { shouldRedirectToLogin } from '@/src/api/client-fetcher';
 
 afterEach(() => {
   // restore default adapter so per-test overrides don't leak
@@ -48,9 +48,9 @@ it('데이터 요청 401은 /login 리다이렉트 대상이다', () => {
 });
 
 it('로그인 요청 401(잘못된 자격)은 리다이렉트하지 않는다', () => {
-  // /login이 아닌 경로에서 판정해야 /iauth/* 제외 로직 자체가 검증된다
+  // /login이 아닌 경로에서 판정해야 /auth/* 제외 로직 자체가 검증된다
   window.history.pushState({}, '', '/dashboard');
-  expect(shouldRedirectToLogin(err(401, '/iauth/login'))).toBe(false);
+  expect(shouldRedirectToLogin(err(401, '/auth/login'))).toBe(false);
 });
 
 it('이미 /login 페이지면 401이어도 리다이렉트하지 않는다', () => {

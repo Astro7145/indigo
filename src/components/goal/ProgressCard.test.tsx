@@ -80,7 +80,7 @@ it('goalId 있으면 해당 goal todos로 진행도를 계산한다 (1/2 → 50)
     ],
   };
   goalMock.getGoal.mockResolvedValue(detail);
-  renderWithClient(<ProgressCard goalId={9} size="small" />);
+  renderWithClient(<ProgressCard goalId={9} />);
   const bar = (await screen.findAllByRole('progressbar'))[0];
   await waitFor(() => expect(bar).toHaveAttribute('aria-valuenow', '50'));
   expect(goalMock.getGoal).toHaveBeenCalledWith(9);
@@ -94,5 +94,7 @@ it('전체 변형은 이름을 넣어 본문을 만든다', async () => {
   });
   userMock.getMe.mockResolvedValue(me);
   renderWithClient(<ProgressCard />);
-  expect(await screen.findAllByText('체다치즈님의 진행도는')).not.toHaveLength(0);
+  // 본문은 "{name}님의" / "진행도는"으로 분리 렌더 — 두 부분이 모두 나타나는지 검증
+  expect(await screen.findAllByText('체다치즈님의')).not.toHaveLength(0);
+  expect(screen.getAllByText('진행도는')).not.toHaveLength(0);
 });
