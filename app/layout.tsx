@@ -3,8 +3,6 @@ import localFont from 'next/font/local';
 import './globals.css';
 import Toast from '@/src/components/common/toast/Toast';
 import Providers from './providers';
-import Sidebar from '@/src/components/common/sidebar/Sidebar';
-import Topbar from '@/src/components/common/sidebar/Topbar';
 
 const pretendard = localFont({
   src: './fonts/PretendardVariable.woff2',
@@ -27,8 +25,6 @@ export default function RootLayout({
       <body className="flex min-h-full bg-slate-100">
         <Providers>
           <Toast />
-          <Topbar />
-          <Sidebar />
           {children}
         </Providers>
       </body>

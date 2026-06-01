@@ -9,6 +9,7 @@ import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import TodoAddButton from './TodoAddButton';
+import { usePathname } from 'next/navigation';
 
 const SAMPLE_GOALS = [
   { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
@@ -25,6 +26,8 @@ const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Sidebar() {
+  const path = usePathname();
+
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const width = useMotionValue(EXPANDED_WIDTH);
@@ -93,7 +96,10 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
       {isTablet && <span className="w-15" />}
-      <motion.aside style={{ width }} className="fixed top-0 left-0 z-50 flex h-screen overflow-hidden bg-[#1A1B2E]">
+      <motion.aside
+        style={{ width }}
+        className={cn('top-0 left-0 z-50 flex h-screen overflow-hidden bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
+      >
         <div
           className={cn(
             'flex flex-1 flex-col justify-between',
@@ -110,7 +116,7 @@ export default function Sidebar() {
               {collapsed ? <Logo size={isTablet ? 'sm' : 'md'} /> : <LogoFull type="white" />}
             </button>
             <ul className="flex flex-col gap-y-3">
-              <SidebarRow type="dashboard" text="대쉬보드" href="/" collapsed={collapsed} />
+              <SidebarRow type="dashboard" text="대쉬보드" href="/" current={path === '/'} collapsed={collapsed} />
               <SidebarGoalRow goals={SAMPLE_GOALS} collapsed={collapsed} onExpand={() => applyCollapsed(false)} />
               <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
               <SidebarRow type="posts" text="소통 게시판" href="/posts" collapsed={collapsed} />

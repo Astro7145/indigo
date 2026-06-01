@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { useEffect } from 'react';
 import { cn } from '@/src/utils/cn';
 
 interface TodoAddButtonProps {
@@ -8,7 +9,26 @@ interface TodoAddButtonProps {
   className?: string;
 }
 
+// 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
+const isTypingTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+};
+
 export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
+  useEffect(() => {
+    if (!onClick) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+      if (event.key !== 'n' && event.key !== 'N') return;
+      if (isTypingTarget(event.target)) return;
+      event.preventDefault();
+      onClick();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClick]);
+
   return (
     <motion.button
       type="button"
@@ -24,12 +44,11 @@ export default function TodoAddButton({ onClick, className }: TodoAddButtonProps
       <motion.span
         variants={{ raised: { y: 0 }, pressed: { y: 4 } }}
         transition={{ ease: 'linear', duration: 0.1 }}
-        className="absolute -top-1 right-0 left-0 flex items-center justify-between rounded-lg bg-indigo-700 px-2 py-2"
+        className="absolute -top-1 right-0 left-0 flex items-center justify-center rounded-lg bg-indigo-700 px-2 py-2"
       >
-        <span className="w-8.75" />
         <span className="text-lg font-bold tracking-[-0.03em] text-white">새 할일</span>
-        <span className="rounded px-1 py-0.5 text-sm font-semibold tracking-[-0.03em] text-white opacity-40">
-          Ctrl N
+        <span className="absolute right-2 rounded px-1 py-0.5 text-sm font-semibold text-white opacity-40">
+          Press N
         </span>
       </motion.span>
     </motion.button>
