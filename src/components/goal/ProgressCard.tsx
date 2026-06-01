@@ -13,11 +13,13 @@ import { cn } from '@/src/utils/cn';
 
 interface ProgressCardViewProps {
   /** 헤더 라벨 (카드 위 헤더). */
-  headerText: string;
+  headerText?: string;
   /** 본문 부제(예: "{userName}님의 진행도는"). */
   bodyText?: string;
   /** 진행률 0~100 (범위 밖이면 clamp). */
   percent: number;
+  /** 카드 본문 높이(px, 187 또는 160). xl에서는 max(이 값, 40cqw)로 확장. 기본 187. */
+  cardHeight?: 187 | 160;
   onClick?: () => void;
   className?: string;
 }
@@ -25,6 +27,13 @@ interface ProgressCardViewProps {
 // 카드 배경 그라데이션(120°)·그림자 — 전 사이즈 공통
 const GRADIENT_BODY = 'bg-[linear-gradient(120deg,#6E66C8_0%,#3D3677_73.21%)]';
 const GRADIENT_SHADOW = 'shadow-[0_12px_32px_rgba(69,54,143,0.25)]';
+
+// 카드 높이를 CSS 변수(--card-h)로 주입 — 동적 px는 Tailwind JIT가 못 잡아 허용 값만 리터럴 클래스로 매핑.
+// 카드·달이 var(--card-h)를 참조한다(h-[var(--card-h)], size-[min(...,var(--card-h))]).
+const CARD_H_CLASS: Record<NonNullable<ProgressCardViewProps['cardHeight']>, string> = {
+  187: '[--card-h:187px]',
+  160: '[--card-h:160px]',
+};
 
 /**
  * 0 → target으로 부드럽게 차오르는 숫자. target이 바뀌면 현재 값에서 다시 애니메이션.
@@ -65,7 +74,14 @@ function useAnimatedNumber(target: number, duration = 700): number {
  * 헤더 + 본문 카드. 본문은 viewport로 형태가 바뀜 —
  * <xl(모바일·태블릿)=작은 형태, ≥xl(데스크탑)=큰 형태(달·숫자 확대).
  */
-function ProgressCardView({ headerText, bodyText, percent, onClick, className }: ProgressCardViewProps) {
+function ProgressCardView({
+  headerText,
+  bodyText,
+  percent,
+  cardHeight = 187,
+  onClick,
+  className,
+}: ProgressCardViewProps) {
   const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
   // 달 모양과 숫자를 같은 애니메이션 값으로 그린다
   const animatedPercent = useAnimatedNumber(safePercent);
@@ -93,12 +109,17 @@ function ProgressCardView({ headerText, bodyText, percent, onClick, className }:
 
   return (
     // @container: 본문 wide가 카드(그리드 칸) 폭에 cqw로 반응하도록 컨테이너 지정
-    <div className={cn('@container flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
+    <div
+      className={cn('@container flex w-full flex-col gap-2.5', CARD_H_CLASS[cardHeight], className)}
+      {...interactiveProps}
+    >
       {/* 헤더 (전 사이즈 공통). 데스크탑(xl)에서 아이콘·글씨 한 단계 커짐 */}
-      <div className="flex items-center gap-3 px-2">
-        <IcProgress aria-hidden className="size-8 shrink-0 xl:size-10" />
-        <h3 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">{headerText}</h3>
-      </div>
+      {headerText && (
+        <div className="flex items-center gap-3 px-2">
+          <IcProgress aria-hidden className="size-8 shrink-0 xl:size-10" />
+          <h3 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">{headerText}</h3>
+        </div>
+      )}
 
       {/* 본문 카드. 한 flex 블록이 viewport로 바뀐다:
           - <xl(모바일·태블릿): 작은 카드, 달이 좌측 모서리에 걸침, 텍스트 위 정렬 (달은 sm에서 살짝 커짐)
@@ -106,10 +127,10 @@ function ProgressCardView({ headerText, bodyText, percent, onClick, className }:
             좁은 칸에선 작게, 넓어질수록 풀사이즈(카드 640px에서 달 220·숫자 80px). */}
       <Card
         className={cn(
-          'relative h-[187px] overflow-hidden border-0 p-0 text-white',
+          'relative h-[var(--card-h)] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,
           GRADIENT_SHADOW,
-          'xl:h-[max(187px,40cqw)]',
+          'xl:h-[max(var(--card-h),40cqw)]',
         )}
       >
         {/* 아래로 갈수록 살짝 어두워지는 오버레이 */}
@@ -118,10 +139,10 @@ function ProgressCardView({ headerText, bodyText, percent, onClick, className }:
         {/* relative: overlay 위·stars 아래로 쌓이게. 데스크탑은 달을 좌측에서 pl(12cqw)만큼 띄워
             좌측-중앙에 두고(텍스트가 우측을 채움) — 달 위치가 이름 길이와 무관하게 카드 폭에만 반응 */}
         <div className="relative flex h-full items-center pl-1 xl:pr-[7.5cqw] xl:pl-[10cqw]">
-          {/* 달: 평소 182px이되 카드가 좁아지면 비례 축소(min 55cqw). 데스크탑(xl)은 폭 비례 연속 스케일 */}
+          {/* 달: 평소 182px이되 카드가 좁아지면 폭(55cqw)·높이(var(--card-h))에 맞춰 축소. xl은 폭 비례 연속 스케일 */}
           <Moonphase
             percent={animatedPercent}
-            className="mt-0 mr-0 ml-0 size-[min(182px,55cqw)] shrink-0 xl:size-[34.375cqw]"
+            className="mt-0 mr-0 ml-0 size-[min(182px,55cqw,var(--card-h))] shrink-0 xl:size-[34.375cqw]"
           />
           {/* 텍스트: 남은 폭을 채우고 좁으면 truncate (달 위치는 텍스트와 무관) */}
           <div className="mr-3 flex min-w-0 flex-1 flex-col gap-0.5 xl:mr-0 xl:gap-[1.875cqw]">
@@ -157,9 +178,9 @@ function ProgressCardView({ headerText, bodyText, percent, onClick, className }:
 export interface ProgressCardProps {
   /** 있으면 해당 goal "목표 진행도", 없으면 전체 "내 진행 상황" */
   goalId?: number;
-  /** 기본 라벨 오버라이드 */
+  /** 기본 라벨 */
   headerText?: string;
-  /** 본문 부제 오버라이드 (기본: "{name}님의 진행도는") */
+  /** 본문 */
   bodyText?: string;
   onClick?: () => void;
   className?: string;
@@ -181,6 +202,7 @@ function OverallProgress({ headerText, bodyText, onClick, className }: Omit<Prog
       headerText={headerText ?? '내 진행 상황'}
       bodyText={bodyText ?? `${me?.name ?? ''}님의 진행도는`}
       percent={toPercent(done, total)}
+      cardHeight={187}
       onClick={onClick}
       className={className}
     />
@@ -188,15 +210,15 @@ function OverallProgress({ headerText, bodyText, onClick, className }: Omit<Prog
 }
 
 /** 단일 "목표 진행도" — 해당 goal의 todos 완료 비율 */
-function GoalProgress({ goalId, headerText, bodyText, onClick, className }: ProgressCardProps & { goalId: number }) {
+function GoalProgress({ goalId, bodyText, onClick, className }: ProgressCardProps & { goalId: number }) {
   const { data: goal } = useGoal(goalId);
   const todos = goal?.todos ?? [];
   const done = todos.filter((t) => t.done).length;
   return (
     <ProgressCardView
-      headerText={headerText ?? '목표 진행도'}
-      bodyText={bodyText}
+      bodyText={bodyText ?? '목표 진행도'}
       percent={toPercent(done, todos.length)}
+      cardHeight={160}
       onClick={onClick}
       className={className}
     />
