@@ -21,7 +21,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
   const colorIndexRef = useRef(0);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return;
+    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
     e.preventDefault();
     const text = inputValue.trim();
     if (!text || value.some((t) => t.text === text)) return;

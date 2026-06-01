@@ -7,19 +7,24 @@ import DeleteButton from '../buttons/DeleteButton';
 
 interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onFileChange?: (file: File | null) => void;
+  initialUrl?: string | null;
+  onInitialUrlRemove?: () => void;
 }
 
 // file과 blob URL을 항상 함께 업데이트하므로 하나의 타입으로 묶는다
 type FileWithUrl = { file: File; url: string };
 
-export default function ImageInput({ onFileChange, ...props }: ImageInputProps) {
+export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemove, ...props }: ImageInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   // 이전 blob URL을 revokeObjectURL로 해제하기 위한 참조
   // 렌더를 유발할 필요가 없으므로 ref로 충분하다
   const prevUrlRef = useRef<string | null>(null);
 
   const [selected, setSelected] = useState<FileWithUrl | null>(null);
+  const [urlRemoved, setUrlRemoved] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
+
+  const showInitialUrl = !selected && !urlRemoved && !!initialUrl;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.currentTarget.files?.[0];
@@ -51,6 +56,12 @@ export default function ImageInput({ onFileChange, ...props }: ImageInputProps) 
     }
   };
 
+  const handleRemoveInitialUrl = () => {
+    setUrlRemoved(true);
+    setStatusMessage('이미지가 삭제되었습니다');
+    onInitialUrlRemove?.();
+  };
+
   useEffect(() => {
     return () => {
       if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
@@ -67,6 +78,13 @@ export default function ImageInput({ onFileChange, ...props }: ImageInputProps) 
           <Image src={selected.url} alt={`선택된 이미지: ${selected.file.name}`} fill className="object-cover" />
           <span className="absolute top-2.5 right-2.5">
             <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
+          </span>
+        </div>
+      ) : showInitialUrl ? (
+        <div className="relative h-25 w-40 overflow-hidden rounded-sm">
+          <Image src={initialUrl!} alt="기존 이미지" fill className="object-cover" />
+          <span className="absolute top-2.5 right-2.5">
+            <DeleteButton className="cursor-pointer" onClick={handleRemoveInitialUrl} />
           </span>
         </div>
       ) : (

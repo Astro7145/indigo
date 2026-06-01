@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useToastStore } from '@/src/stores/toast';
 
@@ -18,13 +18,6 @@ export function useToast(duration = DEFAULT_DURATION) {
     },
     [show, hide, duration],
   );
-
-  useEffect(() => {
-    return () => {
-      // 언마운트 시 타이머가 남아 있으면 store 업데이트가 발생하지 않도록 정리
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
 
   return { showToast, hideToast: hide };
 }
