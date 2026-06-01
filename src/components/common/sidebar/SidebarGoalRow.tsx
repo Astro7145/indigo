@@ -115,6 +115,7 @@ export default function SidebarGoalRow({
                   if (e.key === 'Enter') handleCreate();
                 }}
                 placeholder="새 목표를 입력하세요"
+                aria-label="새 목표 입력"
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white placeholder:text-slate-400 focus:outline-none"
               />
               <span className="shrink-0 text-sm font-semibold text-indigo-400">Enter</span>
