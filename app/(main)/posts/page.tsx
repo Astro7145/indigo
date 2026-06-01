@@ -11,11 +11,13 @@ import PostListItem from '@/src/components/post/PostListItem';
 import PostSearchBar from '@/src/components/post/PostSearchBar';
 import { useInfinitePostList, usePostList } from '@/src/hooks/post';
 
-// useSearchParams는 prerender 단계에서 CSR bailout을 일으키므로 Suspense 바운더리가 필요하다.
-// 바운더리 바깥은 정적 prerender되고, 안쪽만 client에서 채워진다.
+// useSearchParams는 prerender 시 CSR bailout을 일으키므로 Suspense 바운더리가 필요하다.
+// 정석은 page를 server component로 두고 useSearchParams 호출부만 client 자식 컴포넌트로 분리하는 것.
+// 다만 별도 파일로 빼면 CLAUDE.md의 "app/는 라우팅 전용" 컨벤션과 배치되어 일단 같은 파일에 둔다.
+// 추후 팀 합의 후 server component로 분리할지 별도 이슈에서 결정한다.
 export default function PostsPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div />}>
       <PostsPageContent />
     </Suspense>
   );
