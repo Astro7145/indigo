@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
 
@@ -12,14 +12,15 @@ export default function CommentInput({ onSubmit }: CommentInputProps) {
   const [text, setText] = useState('');
   const isEmpty = text.trim().length === 0;
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isEmpty) return;
     onSubmit?.(text);
     setText('');
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2">
       <input
         type="text"
         value={text}
@@ -28,15 +29,9 @@ export default function CommentInput({ onSubmit }: CommentInputProps) {
         aria-label="댓글 입력"
         className="h-10 w-[235px] rounded border border-slate-200 px-3 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none md:w-[480px] md:px-4 md:text-base"
       />
-      <Button
-        type="button"
-        size="small"
-        disabled={isEmpty}
-        onClick={handleSubmit}
-        className="h-10 w-[64px] px-0 md:w-[80px]"
-      >
+      <Button type="submit" size="small" disabled={isEmpty} className="h-10 w-[64px] px-0 md:w-[80px]">
         등록
       </Button>
-    </div>
+    </form>
   );
 }

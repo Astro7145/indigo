@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Image from 'next/image';
 
 import Button from '@/src/components/common/buttons/Button';
@@ -30,8 +30,15 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
     setDraft(comment.content);
   };
 
-  const handleSave = () => {
+  const handleSave = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     updateComment({ commentId: comment.id, body: { content: draft } }, { onSuccess: () => setIsEditing(false) });
+  };
+
+  // 수정 진입 시 현재 댓글 내용으로 draft를 동기화 (mount 이후 외부에서 comment가 갱신된 경우 대비)
+  const handleStartEdit = () => {
+    setDraft(comment.content);
+    setIsEditing(true);
   };
 
   const formattedDate = comment.createdAt.slice(0, 10).replace(/-/g, '.');
@@ -61,7 +68,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
-                <Dropdown.Item onClick={() => setIsEditing(true)}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={handleStartEdit}>수정하기</Dropdown.Item>
                 <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
                   삭제하기
                 </Dropdown.Item>
@@ -71,7 +78,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
         </div>
 
         {isEditing ? (
-          <div className="space-y-2">
+          <form onSubmit={handleSave} className="space-y-2">
             <input
               type="text"
               value={draft}
@@ -86,12 +93,12 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
                   취소
                 </Button>
-                <Button type="button" size="small" onClick={handleSave}>
+                <Button type="submit" size="small">
                   수정
                 </Button>
               </div>
             </div>
-          </div>
+          </form>
         ) : (
           <>
             <p className="text-sm text-slate-700 md:text-base">{comment.content}</p>
