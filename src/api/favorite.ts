@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import { todoKeys } from '@/src/api/todo';
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { CursorParams } from '@/src/types/common';

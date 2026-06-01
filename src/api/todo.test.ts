@@ -1,5 +1,5 @@
-jest.mock('@/src/api/axiosInstance');
-import instance from '@/src/api/axiosInstance';
+jest.mock('@/src/api/client-fetcher');
+import instance from '@/src/api/client-fetcher';
 import { getTodos, createTodo, patchTodo, deleteTodo, getTodo, todoKeys } from '@/src/api/todo';
 
 const mocked = instance as jest.Mocked<typeof instance>;

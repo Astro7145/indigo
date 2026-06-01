@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import type { Notification, NotificationListResponse, UpdateNotificationBody } from '@/src/types/notification';
 import type { CursorParams } from '@/src/types/common';
 

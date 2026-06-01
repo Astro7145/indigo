@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/oauth/[provider]/route';
-import { COOKIE, backendHttp } from '@/src/api/server/bff';
+import { COOKIE, backendHttp } from '@/src/api/server/server-fetcher';
 import { type AxiosAdapter } from 'axios';
 import { getServerSession } from 'next-auth';
 
