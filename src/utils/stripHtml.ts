@@ -7,7 +7,8 @@ const ENTITIES: Record<string, string> = {
   '&nbsp;': ' ',
 };
 
-export function stripHtml(html: string): string {
+export function stripHtml(html: string | null | undefined): string {
+  if (!html) return '';
   return html
     .replace(/<(p|div|br|li|h[1-6])[^>]*>/gi, ' ')
     .replace(/<[^>]+>/g, '')

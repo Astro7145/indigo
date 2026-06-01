@@ -13,10 +13,13 @@ export function calendarDateToIso(date: CalendarDate | null): string | null {
 /**
  * 현재 시각 대비 상대 시간을 한국어로 포맷한다.
  * 1시간 미만 → "방금", 1일 미만 → "N시간", 그 외 → "YYYY.MM.DD".
+ * 빈 값/잘못된 날짜는 빈 문자열을 반환한다.
  * @param now 현재 시각(ms). 테스트용 주입 파라미터. 기본값 `Date.now()`.
  */
-export function formatRelativeTime(iso: string, now: number = Date.now()): string {
+export function formatRelativeTime(iso: string | null | undefined, now: number = Date.now()): string {
+  if (!iso) return '';
   const past = new Date(iso);
+  if (Number.isNaN(past.getTime())) return '';
   const diffSec = Math.max(0, Math.floor((now - past.getTime()) / 1000));
   if (diffSec < 3600) return '방금';
   if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}시간`;
