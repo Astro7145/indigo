@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { cn } from '@/src/utils/cn';
 import { IcCalendar, IcDashboard, IcFavorites, IcFlagFill, IcLogout, IcMessageSquare, IcSettings } from '../icons';
 
@@ -6,11 +7,12 @@ type SidebarRowType = 'dashboard' | 'goals' | 'calendar' | 'posts' | 'favorites'
 interface SidebarRowProps {
   type: SidebarRowType;
   text: string;
+  href?: string;
   current?: boolean;
   collapsed?: boolean;
 }
 
-export default function SidebarRow({ type, text, current = false, collapsed = false }: SidebarRowProps) {
+export default function SidebarRow({ type, text, href, current = false, collapsed = false }: SidebarRowProps) {
   const state = current ? 'active' : 'default';
 
   const icon: Record<SidebarRowType, React.ReactNode> = {
@@ -23,17 +25,28 @@ export default function SidebarRow({ type, text, current = false, collapsed = fa
     logout: <IcLogout />,
   };
 
-  return (
-    <li
-      title={collapsed ? text : undefined}
-      className={cn(
-        'flex h-14 w-full cursor-pointer list-none items-center gap-x-2 px-4 py-3.5 transition-colors group-focus-visible:bg-indigo-600/10 hover:bg-indigo-600/10',
-        collapsed && 'justify-center gap-x-0 px-0',
-        current && 'bg-indigo-600/20',
-      )}
-    >
+  const rowClassName = cn(
+    'flex h-14 w-full cursor-pointer items-center gap-x-2 px-4 py-3.5 transition-colors group-focus-visible:bg-indigo-600/10 hover:bg-indigo-600/10',
+    collapsed && 'justify-center gap-x-0 px-0',
+    current && 'bg-indigo-600/20',
+  );
+
+  const row = (
+    <div className={rowClassName}>
       <span className="size-6">{icon[type]}</span>
       {!collapsed && <span className="text-lg font-bold text-white">{text}</span>}
+    </div>
+  );
+
+  return (
+    <li title={collapsed ? text : undefined} className="list-none">
+      {href ? (
+        <Link href={href} className="group block">
+          {row}
+        </Link>
+      ) : (
+        row
+      )}
     </li>
   );
 }

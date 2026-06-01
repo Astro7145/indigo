@@ -1,7 +1,6 @@
 'use client';
 
 import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
 import { Logo, LogoFull } from '../icons';
@@ -110,25 +109,17 @@ export default function Sidebar() {
             >
               {collapsed ? <Logo size={isTablet ? 'sm' : 'md'} /> : <LogoFull type="white" />}
             </button>
-            <div className="flex flex-col gap-y-3">
-              <Link href="/" className="group">
-                <SidebarRow type="dashboard" text="대쉬보드" collapsed={collapsed} />
-              </Link>
+            <ul className="flex flex-col gap-y-3">
+              <SidebarRow type="dashboard" text="대쉬보드" href="/" collapsed={collapsed} />
               <SidebarGoalRow goals={SAMPLE_GOALS} collapsed={collapsed} onExpand={() => applyCollapsed(false)} />
-              <Link href="/calendar" className="group">
-                <SidebarRow type="calendar" text="캘린더" collapsed={collapsed} />
-              </Link>
-              <Link href="/posts" className="group">
-                <SidebarRow type="posts" text="소통 게시판" collapsed={collapsed} />
-              </Link>
-              <Link href="/favorites" className="group">
-                <SidebarRow type="favorites" text="찜한 할일" collapsed={collapsed} />
-              </Link>
-            </div>
-            <div className="flex flex-col">
-              <SidebarRow type="settings" text="설정" collapsed={collapsed} />
+              <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
+              <SidebarRow type="posts" text="소통 게시판" href="/posts" collapsed={collapsed} />
+              <SidebarRow type="favorites" text="찜한 할일" href="/favorites" collapsed={collapsed} />
+            </ul>
+            <ul className="flex flex-col">
+              <SidebarRow type="settings" text="설정" href="/settings" collapsed={collapsed} />
               <SidebarRow type="logout" text="로그아웃" collapsed={collapsed} />
-            </div>
+            </ul>
           </div>
           {!collapsed && (
             <div className="flex flex-col gap-y-8">
