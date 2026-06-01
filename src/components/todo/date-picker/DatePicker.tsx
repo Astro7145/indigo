@@ -50,7 +50,8 @@ export default function DatePicker(props: DatePickerProps) {
         ref={triggerRef}
         {...buttonProps}
         className={cn(
-          'flex w-full items-center gap-2 rounded bg-white p-4 text-base font-normal tracking-[-0.02em] text-slate-700 transition-colors',
+          'flex w-full items-center gap-2 rounded-sm bg-white p-4 text-base font-normal tracking-[-0.02em] transition-colors focus:border-indigo-500 focus:outline-none',
+          props.value ? 'text-slate-700' : 'text-slate-500',
           isOpen ? 'border border-indigo-500' : 'border border-slate-300 hover:border-slate-400',
         )}
       >

@@ -63,14 +63,14 @@ export default function ImageInput({ onFileChange, ...props }: ImageInputProps) 
         {statusMessage}
       </span>
       {selected ? (
-        <div className="relative h-25 w-100 overflow-hidden rounded-sm">
+        <div className="relative h-25 w-40 overflow-hidden rounded-sm">
           <Image src={selected.url} alt={`선택된 이미지: ${selected.file.name}`} fill className="object-cover" />
           <span className="absolute top-2.5 right-2.5">
             <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
           </span>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center gap-y-0.5 rounded-sm border-2 border-dashed border-slate-300 p-3 focus-within:outline-2">
+        <label className="flex flex-col items-center justify-center gap-y-0.5 rounded-sm border border-dashed border-slate-300 bg-slate-50 p-3 focus-within:border-indigo-500">
           <IcUpload />
           <span className="text-base font-medium text-slate-500">이미지 첨부</span>
           <input

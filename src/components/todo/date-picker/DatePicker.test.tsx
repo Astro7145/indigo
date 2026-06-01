@@ -11,6 +11,10 @@ jest.mock('@/src/hooks/useIsMobile', () => ({
   useIsMobile: jest.fn().mockReturnValue(false),
 }));
 
+beforeEach(() => {
+  HTMLElement.prototype.scrollIntoView = jest.fn();
+});
+
 (Calendar as jest.Mock).mockImplementation(({ onChange }: ComponentProps<typeof Calendar>) => (
   <button type="button" onClick={() => onChange?.(new CalendarDate(2024, 6, 20))}>
     날짜 변경
