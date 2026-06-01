@@ -75,7 +75,7 @@ export default function PostDetailPage() {
 
         {/* 본문 — 에디터 HTML을 그대로 렌더. SSR/빌드 시점엔 window가 없으므로 빈 문자열 */}
         <div
-          className="mb-6 text-sm text-slate-800 md:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded"
+          className="mb-6 text-sm text-slate-800 md:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
           dangerouslySetInnerHTML={{
             __html: typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : '',
           }}
