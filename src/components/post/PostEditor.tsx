@@ -5,9 +5,13 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useImperativeHandle, type ReactNode, type Ref } from 'react';
 
 import EditorToolbar from '@/src/components/common/editor/EditorToolbar';
+
+export interface PostEditorHandle {
+  focus: () => void;
+}
 
 export interface PostEditorProps {
   value: string;
@@ -18,6 +22,8 @@ export interface PostEditorProps {
   titleSlot?: ReactNode;
   /** EditorContent 래퍼에 적용할 클래스 (min-h 등) */
   contentClassName?: string;
+  /** 외부에서 에디터 포커스를 제어하기 위한 ref */
+  ref?: Ref<PostEditorHandle>;
 }
 
 export default function PostEditor({
@@ -27,6 +33,7 @@ export default function PostEditor({
   placeholder,
   titleSlot,
   contentClassName,
+  ref,
 }: PostEditorProps) {
   const editor = useEditor({
     extensions: [
@@ -47,6 +54,14 @@ export default function PostEditor({
     if (editor.getHTML() === value) return;
     editor.commands.setContent(value, { emitUpdate: false });
   }, [editor, value]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => editor?.chain().focus().run(),
+    }),
+    [editor],
+  );
 
   const state = useEditorState({
     editor,

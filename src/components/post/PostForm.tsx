@@ -5,13 +5,14 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
 import Modal from '@/src/components/common/modal/Modal';
-import PostEditor from '@/src/components/post/PostEditor';
+import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
 import { useCreateImageUploadUrl } from '@/src/hooks/upload';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
+// Tiptap은 시각적으로 비어 있어도 <p></p> 같은 래퍼를 뱉어서 문자열 비교로는 빈 상태 판별 불가
 function isHtmlEmpty(html: string) {
   return html.replace(/<[^>]*>/g, '').trim() === '';
 }
@@ -29,6 +30,7 @@ export default function PostForm(props: PostFormProps) {
   const [image, setImage] = useState<string | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editorRef = useRef<PostEditorHandle>(null);
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
   const hydrated = useRef(false);
 
@@ -43,10 +45,10 @@ export default function PostForm(props: PostFormProps) {
   const initialTitle = initialPost?.title ?? '';
   const initialContent = initialPost?.content ?? '';
   const initialImage = initialPost?.image ?? null;
-  const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage;
+  const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage; //변경이 있는지
   const isValid = title.trim().length > 0 && !isHtmlEmpty(content);
 
-  // 수정 모드에서 초기 데이터 도착 전에 빈 폼을 그리면 placeholder/제목/이미지가 깜빡인다. 데이터 도착까지 로딩 표시
+  // 수정 모드에서 데이터 도착까지 로딩 표시
   if (props.mode === 'edit' && !initialPost) {
     return (
       <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white md:min-h-[calc(100vh-100px)] md:max-w-[636px] lg:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
@@ -60,6 +62,7 @@ export default function PostForm(props: PostFormProps) {
       setIsCancelModalOpen(true);
       return;
     }
+    // TODO : 수정여부 상관없이 modal 띄울거면 수정
     router.back();
   };
 
@@ -120,12 +123,21 @@ export default function PostForm(props: PostFormProps) {
         </div>
       </header>
 
-      <div className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 md:min-h-[calc(100vh-100px)] md:px-[30px] md:py-8 lg:min-h-[calc(100vh-212px)] xl:px-[34px]">
+      <div
+        // 카드 내 빈 영역(에디터 본문 아래 공간 등)을 눌러도 커서가 에디터로 들어가게 함. 인터랙티브 요소는 자기 동작 유지
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
+          editorRef.current?.focus();
+        }}
+        className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 md:min-h-[calc(100vh-100px)] md:px-[30px] md:py-8 lg:min-h-[calc(100vh-212px)] xl:px-[34px]"
+      >
         <PostEditor
+          ref={editorRef}
           value={content}
           onChange={setContent}
           onImageClick={handleImageClick}
           placeholder="이 곳을 통해 내용을 작성해주세요"
+          // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
           contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 md:min-h-[600px] md:pt-5 md:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
             <div className="pt-[29px]">
