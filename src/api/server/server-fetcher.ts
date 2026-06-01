@@ -19,7 +19,7 @@ export const COOKIE = {
 
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 7; // 7d — SlidTodo refresh 토큰 실제 TTL(관측 ≈7일)에 정렬
 
-// 외부 백엔드 호출 전용 axios 인스턴스 (클라이언트 axiosInstance와 분리:
+// 외부 백엔드 호출 전용 axios 인스턴스 (클라이언트 client-fetcher와 분리:
 // 그건 /api·ApiError 정규화용). validateStatus:()=>true → 4xx/5xx도 throw 없이
 // 그대로 프록시. responseType/transformResponse → 본문을 원문 문자열로 유지
 // (라우트가 직접 JSON.parse). NextResponse 쪽은 변경 없음.

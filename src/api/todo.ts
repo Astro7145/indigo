@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 
 export const todoKeys = {

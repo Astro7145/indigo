@@ -1,7 +1,7 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server';
 import { GET, POST, PATCH, DELETE } from '@/app/api/[...path]/route';
-import { COOKIE, backendHttp } from '@/src/api/server/bff';
+import { COOKIE, backendHttp } from '@/src/api/server/server-fetcher';
 import { AxiosHeaders, type AxiosAdapter } from 'axios';
 
 beforeEach(() => {
@@ -154,4 +154,27 @@ it('경로 traversal을 외부 호출 없이 400으로 거부한다', async () =
   const res = await GET(r('/api/x', 'GET', `${COOKIE.ACCESS}=TK`), ctx(['..', 'goals']));
   expect(res.status).toBe(400);
   expect(calls.length).toBe(0);
+});
+
+it('Swagger에 없는 경로는 외부 호출 없이 403으로 거부한다', async () => {
+  const calls = queueAdapter([{ status: 200, body: '{}' }]);
+  const res = await GET(r('/api/unknown', 'GET', `${COOKIE.ACCESS}=TK`), ctx(['unknown']));
+  expect(res.status).toBe(403);
+  expect(calls.length).toBe(0);
+});
+
+it('경로는 있지만 Swagger에 없는 메서드(DELETE /todos)는 외부 호출 없이 403으로 거부한다', async () => {
+  const calls = queueAdapter([{ status: 200, body: '{}' }]);
+  const res = await DELETE(r('/api/todos', 'DELETE', `${COOKIE.ACCESS}=TK`), ctx(['todos']));
+  expect(res.status).toBe(403);
+  expect(calls.length).toBe(0);
+});
+
+it('중첩 동적 경로(POST /posts/{id}/comments/{cid}/likes)는 허용되어 통과한다', async () => {
+  const calls = queueAdapter([{ status: 201, body: '{}' }]);
+  await POST(
+    r('/api/posts/2/comments/9/likes', 'POST', `${COOKIE.ACCESS}=TK`),
+    ctx(['posts', '2', 'comments', '9', 'likes']),
+  );
+  expect(calls[0].url).toBe('https://api.test/indigo/posts/2/comments/9/likes');
 });

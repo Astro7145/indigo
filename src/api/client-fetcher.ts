@@ -24,12 +24,12 @@ function toApiError(error: AxiosError): ApiError {
 
 // 인가 실패(401)면 로그인 페이지로 보낼지 판단한다.
 // - 브라우저 환경에서만 (SSR·노드 테스트 환경 제외)
-// - /iauth/* (로그인·회원가입 등)의 401은 폼에서 인라인 처리하므로 제외
+// - /auth/* (로그인·회원가입 등)의 401은 폼에서 인라인 처리하므로 제외
 // - 이미 /login이면 리다이렉트 루프 방지
 export function shouldRedirectToLogin(error: AxiosError): boolean {
   if (error.response?.status !== 401) return false;
   if (typeof window === 'undefined') return false;
-  if (/(^|\/)iauth\//.test(error.config?.url ?? '')) return false;
+  if (/(^|\/)auth\//.test(error.config?.url ?? '')) return false;
   return window.location.pathname !== '/login';
 }
 

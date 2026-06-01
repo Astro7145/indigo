@@ -1,8 +1,9 @@
 /** @jest-environment node */
 import { NextRequest } from 'next/server';
-import { POST as authPost } from '@/app/api/iauth/[action]/route';
+import { POST as loginPost } from '@/app/api/auth/login/route';
+import { POST as logoutPost } from '@/app/api/auth/logout/route';
 import { GET as proxyGet } from '@/app/api/[...path]/route';
-import { COOKIE } from '@/src/api/server/bff';
+import { COOKIE } from '@/src/api/server/server-fetcher';
 
 const EMAIL = process.env.BACKEND_TEST_EMAIL;
 const PASSWORD = process.env.BACKEND_TEST_PASSWORD;
@@ -23,13 +24,12 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
   jest.setTimeout(30000);
 
   it('login은 쿠키를 설정하고 토큰을 제거하며, 프록시된 GET이 동작한다', async () => {
-    const loginRes = await authPost(
-      new NextRequest('http://localhost/api/iauth/login', {
+    const loginRes = await loginPost(
+      new NextRequest('http://localhost/api/auth/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
       }),
-      { params: Promise.resolve({ action: 'login' }) },
     );
     expect(loginRes.status).toBe(200);
     const body = await loginRes.json();
@@ -55,21 +55,19 @@ d('BFF live (real SlidTodo API, teamId from env)', () => {
   // 이미 검증된다. 라이브는 결정적인 login·프록시·logout만 실API로 확인한다.
 
   it('logout은 쿠키를 삭제하고, 이후 프록시된 GET은 401이다', async () => {
-    const loginRes = await authPost(
-      new NextRequest('http://localhost/api/iauth/login', {
+    const loginRes = await loginPost(
+      new NextRequest('http://localhost/api/auth/login', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email: EMAIL, password: PASSWORD }),
       }),
-      { params: Promise.resolve({ action: 'login' }) },
     );
     const cookie = cookieHeaderFrom(loginRes);
-    const logoutRes = await authPost(
-      new NextRequest('http://localhost/api/iauth/logout', {
+    const logoutRes = await logoutPost(
+      new NextRequest('http://localhost/api/auth/logout', {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie },
       }),
-      { params: Promise.resolve({ action: 'logout' }) },
     );
     expect(logoutRes.status).toBe(204);
     expect(logoutRes.cookies.get(COOKIE.ACCESS)?.value).toBe('');
