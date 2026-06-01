@@ -11,7 +11,7 @@ export interface ApiErrorInit {
   details?: unknown;
 }
 
-/** 모든 API 실패는 이 타입으로 정규화된다 (axiosInstance 응답 인터셉터). */
+/** 모든 API 실패는 이 타입으로 정규화된다 (client-fetcher 응답 인터셉터). */
 export class ApiError extends Error {
   readonly status: number;
   readonly code?: string;

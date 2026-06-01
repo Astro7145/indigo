@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { callExternal, passthrough, setAuthCookies } from '@/src/api/server/bff';
+import { callExternal, passthrough, setAuthCookies } from '@/src/api/server/server-fetcher';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/src/utils/auth';
 
