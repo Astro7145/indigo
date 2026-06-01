@@ -165,12 +165,6 @@ it('confirm Modal에서 나가기 클릭 시 뒤로 간다', () => {
 });
 
 it('이미지 삭제 버튼 클릭 시 이미지 카드가 사라진다', async () => {
-  (createImageUploadUrl as jest.Mock).mockResolvedValue({
-    uploadUrl: 'https://signed.url/upload',
-    url: 'https://cdn.url/final.png',
-  });
-  global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
-
   const { container } = renderWithClient(<PostForm mode="create" />);
 
   const file = new File(['x'], 'photo.png', { type: 'image/png' });
@@ -183,11 +177,7 @@ it('이미지 삭제 버튼 클릭 시 이미지 카드가 사라진다', async 
   expect(container.querySelector('img')).not.toBeInTheDocument();
 });
 
-it('이미지 파일 선택 시 createImageUploadUrl과 PUT을 호출하고 이미지 카드를 렌더한다', async () => {
-  (createImageUploadUrl as jest.Mock).mockResolvedValue({
-    uploadUrl: 'https://signed.url/upload',
-    url: 'https://cdn.url/final.png',
-  });
+it('이미지 파일 선택만으로는 업로드가 일어나지 않고 미리보기만 표시된다', async () => {
   global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
 
   const { container } = renderWithClient(<PostForm mode="create" />);
@@ -195,11 +185,40 @@ it('이미지 파일 선택 시 createImageUploadUrl과 PUT을 호출하고 이�
   const file = new File(['x'], 'photo.png', { type: 'image/png' });
   fireEvent.change(screen.getByLabelText('이미지 파일 선택'), { target: { files: [file] } });
 
+  await waitFor(() => expect(container.querySelector('img')).toBeInTheDocument());
+  expect(createImageUploadUrl).not.toHaveBeenCalled();
+  expect(global.fetch).not.toHaveBeenCalled();
+});
+
+it('등록 클릭 시점에 이미지가 업로드되고 createPost에 업로드된 URL이 전달된다', async () => {
+  (createImageUploadUrl as jest.Mock).mockResolvedValue({
+    uploadUrl: 'https://signed.url/upload',
+    url: 'https://cdn.url/final.png',
+  });
+  (createPost as jest.Mock).mockResolvedValue({ id: 42 });
+  global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
+  const push = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ push, back: jest.fn() });
+
+  renderWithClient(<PostForm mode="create" />);
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '제목' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '<p>본문</p>' } });
+  const file = new File(['x'], 'photo.png', { type: 'image/png' });
+  fireEvent.change(screen.getByLabelText('이미지 파일 선택'), { target: { files: [file] } });
+
+  fireEvent.click(screen.getByRole('button', { name: '등록하기' }));
+
   await waitFor(() => expect(createImageUploadUrl).toHaveBeenCalledWith({ fileName: 'photo.png' }));
   await waitFor(() =>
     expect(global.fetch).toHaveBeenCalledWith('https://signed.url/upload', expect.objectContaining({ method: 'PUT' })),
   );
-  await waitFor(() => expect(container.querySelector('img')).toBeInTheDocument());
+  await waitFor(() =>
+    expect(createPost).toHaveBeenCalledWith(
+      expect.objectContaining({ title: '제목', content: '<p>본문</p>', image: 'https://cdn.url/final.png' }),
+    ),
+  );
+  await waitFor(() => expect(push).toHaveBeenCalledWith('/posts/42'));
 });
 
 it('수정 모드에서 데이터 로딩 중에는 폼 대신 "불러오는 중…"이 보인다', () => {

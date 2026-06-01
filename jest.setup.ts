@@ -10,3 +10,11 @@ import '@testing-library/jest-dom';
 if (typeof document !== 'undefined' && typeof document.elementFromPoint !== 'function') {
   document.elementFromPoint = () => null;
 }
+
+// jsdom은 URL.createObjectURL/revokeObjectURL을 미지원. 파일 미리보기 로직이 호출만 가능하도록 no-op으로 채워둠
+if (typeof URL !== 'undefined' && typeof URL.createObjectURL !== 'function') {
+  URL.createObjectURL = () => 'blob:mock-url';
+}
+if (typeof URL !== 'undefined' && typeof URL.revokeObjectURL !== 'function') {
+  URL.revokeObjectURL = () => {};
+}

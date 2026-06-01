@@ -28,6 +28,8 @@ export default function PostForm(props: PostFormProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState<string | null>(null);
+  // 파일은 선택 시점이 아니라 등록/수정 시점에 업로드하므로 File 자체를 들고 있다가 submit 때 PUT 한다
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<PostEditorHandle>(null);
@@ -41,6 +43,13 @@ export default function PostForm(props: PostFormProps) {
     setImage(initialPost.image);
     hydrated.current = true;
   }, [initialPost]);
+
+  // blob: URL은 브라우저가 자동 회수하지 않으므로, image가 교체되거나 컴포넌트가 unmount될 때 직접 해제
+  useEffect(() => {
+    return () => {
+      if (image?.startsWith('blob:')) URL.revokeObjectURL(image);
+    };
+  }, [image]);
 
   const initialTitle = initialPost?.title ?? '';
   const initialContent = initialPost?.content ?? '';
@@ -68,24 +77,30 @@ export default function PostForm(props: PostFormProps) {
 
   const handleImageClick = () => fileInputRef.current?.click();
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const { uploadUrl, url } = await createImageUploadUrl({ fileName: file.name });
-    await fetch(uploadUrl, { method: 'PUT', body: file });
-    setImage(url);
+    setImage(URL.createObjectURL(file));
+    setImageFile(file);
     e.target.value = '';
   };
 
   const handleSubmit = async () => {
     if (!isValid) return;
+    // 새로 선택한 파일이 있을 때만 이 시점에 업로드. 취소 시 트래픽·스토리지 낭비 방지
+    let finalImage: string | null = image;
+    if (imageFile) {
+      const { uploadUrl, url } = await createImageUploadUrl({ fileName: imageFile.name });
+      await fetch(uploadUrl, { method: 'PUT', body: imageFile });
+      finalImage = url;
+    }
     if (props.mode === 'edit') {
       // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
-      await updatePost({ postId: props.postId, body: { title, content, image } });
+      await updatePost({ postId: props.postId, body: { title, content, image: finalImage } });
       router.push(`/posts/${props.postId}`);
       return;
     }
-    const post = await createPost({ title, content, ...(image ? { image } : {}) });
+    const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
     router.push(`/posts/${post.id}`);
   };
 
@@ -160,7 +175,13 @@ export default function PostForm(props: PostFormProps) {
 
         {image && (
           <div className="pt-4 md:pt-6">
-            <PostImageAttachment src={image} onDelete={() => setImage(null)} />
+            <PostImageAttachment
+              src={image}
+              onDelete={() => {
+                setImage(null);
+                setImageFile(null);
+              }}
+            />
           </div>
         )}
 
