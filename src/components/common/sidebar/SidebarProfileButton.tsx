@@ -11,7 +11,7 @@ export default function SidebarProfileButton() {
   return (
     <Link
       href="/me"
-      className="flex w-full items-center gap-x-2 rounded-sm border border-indigo-600 bg-indigo-800/20 py-3 pr-6 pl-3 transition-shadow hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.4)]"
+      className="flex h-16 w-full items-center gap-x-2 rounded-sm border border-indigo-600 bg-indigo-800/20 pr-6 pl-3 transition-shadow hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.4)]"
     >
       {isLoading ? (
         <span aria-hidden className="size-9 shrink-0 animate-pulse rounded-full bg-indigo-800" />

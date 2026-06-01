@@ -9,6 +9,7 @@ import SidebarGoalRow from './SidebarGoalRow';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
+import TodoAddButton from './TodoAddButton';
 
 const SAMPLE_GOALS = [
   { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
@@ -35,16 +36,30 @@ export default function Sidebar() {
 
   useEffect(() => {
     const mql = window.matchMedia(TABLET_QUERY);
-    const handleChange = () => setIsTablet(mql.matches);
+    // 태블릿이면 collapsed, 데스크톱이면 expanded를 기본 상태로 둔다
+    const handleChange = () => {
+      setIsTablet(mql.matches);
+      setCollapsed(mql.matches);
+    };
     handleChange();
     mql.addEventListener('change', handleChange);
     return () => mql.removeEventListener('change', handleChange);
   }, []);
 
-  // 브레이크포인트가 바뀌면 축소 폭(96 ↔ 60)을 다시 맞춘다
+  // collapsed/브레이크포인트가 바뀌면 그에 맞는 폭으로 애니메이션한다
   useEffect(() => {
-    if (collapsed) animate(width, isTablet ? TABLET_COLLAPSED_WIDTH : COLLAPSED_WIDTH, SPRING);
+    animate(width, collapsed ? (isTablet ? TABLET_COLLAPSED_WIDTH : COLLAPSED_WIDTH) : EXPANDED_WIDTH, SPRING);
   }, [isTablet, collapsed, width]);
+
+  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
+  useEffect(() => {
+    if (!isTablet || collapsed) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isTablet, collapsed]);
 
   const applyCollapsed = (next: boolean) => {
     setCollapsed(next);
@@ -64,7 +79,7 @@ export default function Sidebar() {
   };
 
   return (
-    <>
+    <div className="hidden md:contents">
       <AnimatePresence>
         {isTablet && !collapsed && (
           <motion.div
@@ -79,10 +94,7 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
       {isTablet && <span className="w-15" />}
-      <motion.aside
-        style={{ width }}
-        className={cn('flex h-screen overflow-hidden bg-[#1A1B2E]', isTablet && 'fixed top-0 left-0 z-50')}
-      >
+      <motion.aside style={{ width }} className="fixed top-0 left-0 z-50 flex h-screen overflow-hidden bg-[#1A1B2E]">
         <div
           className={cn(
             'flex flex-1 flex-col justify-between',
@@ -120,6 +132,7 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col gap-y-8">
+              <TodoAddButton />
               <div className="flex gap-x-2">
                 <SidebarProfileButton />
                 <SidebarNotificationButton />
@@ -140,6 +153,6 @@ export default function Sidebar() {
           className="flex w-4 shrink-0 cursor-ew-resize items-center justify-center transition-colors after:h-15 after:w-1 after:rounded-full after:bg-indigo-800 hover:bg-indigo-600/10"
         />
       </motion.aside>
-    </>
+    </div>
   );
 }
