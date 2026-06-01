@@ -54,7 +54,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
         </Card>
       ) : (
         <>
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6 xl:gap-8">
             {goals.map((goal) => (
               <GoalTodoBoard key={goal.id} goal={goal} />
             ))}
