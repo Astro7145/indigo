@@ -15,9 +15,9 @@ export interface RecentTodosProps {
 }
 
 // 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — sm+ 2열, 모바일 1열.
-// 카드 크롬(아이콘·패딩·높이)은 viewport `2xl:`(1280+) 기준으로 desktop ↔ tablet/mobile 전환
-// — ProgressCard wide 레이아웃과 동시 활성되도록(2-col 셀이 1024~1279에서 좁아 양쪽 모두 tablet 유지).
-const rootClass = 'flex w-full flex-col gap-2.5';
+// ProgressCard와 동일하게 맞춤: 헤더(아이콘·타이틀)는 viewport `xl`에서 desktop 전환,
+// 카드 높이·패딩은 `@container` + cqw로 카드(그리드 칸) 폭에 비례 — 옆 ProgressCard와 높이가 항상 일치.
+const rootClass = '@container flex w-full flex-col gap-2.5';
 // 로딩·에러·빈 상태 안내 문구 공통 스타일 — 카드 정중앙 배치.
 const statusMessageClass = 'text-md m-auto text-center text-slate-500';
 
@@ -45,8 +45,8 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           좌측 그룹은 min-w-0 + truncate(필요 시 …), 우측 링크는 shrink-0 + whitespace-nowrap로 보존. */}
       <div className="flex items-center justify-between gap-2 px-2">
         <div className="flex min-w-0 items-center gap-3">
-          <IcTask aria-hidden className="size-8 shrink-0 2xl:size-10" />
-          <h3 className="truncate text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">
+          <IcTask aria-hidden className="size-8 shrink-0 xl:size-10" />
+          <h3 className="truncate text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
             최근 등록한 할일
           </h3>
         </div>
@@ -58,7 +58,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </Link>
       </div>
-      <Card className="flex h-[187px] flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] 2xl:h-64 2xl:px-8 2xl:py-[30px]">
+      <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)]">
         {isLoading ? (
           <p className={statusMessageClass}>불러오는 중…</p>
         ) : isError ? (
@@ -67,7 +67,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           // figma: 빈 상태는 카드 정중앙에 안내 문구
           <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>
         ) : (
-          <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 overflow-y-auto">
+          <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto">
             {todos.map((t) => {
               // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
               const hasNote = (t.noteIds?.length ?? 0) > 0;

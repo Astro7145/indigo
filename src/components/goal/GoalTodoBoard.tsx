@@ -82,20 +82,20 @@ function Column({
       onKeyDown={(e) => e.stopPropagation()}
       className={cn(
         // viewport 기준: <sm stacked, sm 옆나란히 compact(p-4·gap-2·auto 높이), lg+ spacious(p-6·gap-4·고정 324)
-        'flex min-w-0 cursor-auto flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 sm:flex-1 2xl:h-[324px] 2xl:gap-4 2xl:p-6',
+        'flex min-w-0 cursor-auto flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 sm:flex-1 xl:h-[324px] xl:gap-4 xl:p-6',
         // figma: To Do = slate-50 배경(그림자 없음), Done = 흰 배경 + 옅은 그림자
         isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
     >
       <span
         className={cn(
-          'px-1 text-sm font-semibold tracking-[-0.03em] 2xl:px-2 2xl:text-base 2xl:font-bold',
+          'px-1 text-sm font-semibold tracking-[-0.03em] xl:px-2 xl:text-base xl:font-bold',
           isTodo ? 'text-indigo-700' : 'text-slate-400',
         )}
       >
         {isTodo ? 'TO DO' : 'DONE'}
       </span>
-      <ul className="scrollbar-slate flex flex-col gap-0.5 2xl:flex-1 2xl:gap-1 2xl:overflow-y-auto">
+      <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
         {todos.map((t) => (
           <Row key={t.id} todo={t} onToggle={onToggle} onToggleFavorite={onToggleFavorite} />
         ))}
@@ -143,20 +143,20 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             sm+에선 contents로 래퍼를 풀어 제목+진행바 그룹과 검색 그룹이 outer의 flex-row 자식이 되고,
             아이콘버튼은 숨는다(검색 옆 텍스트 '할 일 추가' 버튼이 대신). */}
         <div className="flex items-center gap-4 sm:contents">
-          <div className="flex min-w-0 flex-1 flex-col gap-1 2xl:w-[600px] 2xl:flex-none 2xl:flex-row 2xl:items-center 2xl:gap-4">
-            {/* 제목 — 데스크톱에선 flex-1로 늘어나 진행바를 고정 위치(우측)로 밀어낸다 */}
-            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 2xl:flex-1">
+          <div className="flex min-w-0 flex-1 flex-col gap-1 xl:max-w-[550px] xl:flex-row xl:items-center xl:gap-4">
+            {/* 제목 — 데스크톱은 진행바와 226:358 비율(grow 가중치)로 함께 축소. 600폭에서 226 */}
+            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 xl:flex-[200]">
               {goal.title}
             </h3>
-            {/* 진행바 + % — 모바일은 202px 고정(시안), tablet은 컬럼 폭 채움(max 310), desktop 310 고정 */}
-            <div className="flex items-center gap-2 2xl:shrink-0">
+            {/* 진행바 + % — 모바일 202px 고정(시안), tablet은 컬럼 채움. desktop은 제목과 비율 축소(grow 358 → 600폭에서 바 310) */}
+            <div className="flex items-center gap-2 pr-4 xl:min-w-0 xl:flex-[350]">
               <div
                 role="progressbar"
                 aria-label={`${goal.title} 진행률`}
                 aria-valuenow={percent}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                className="h-2 w-[202px] shrink overflow-hidden rounded-full bg-[#e9e9e9] sm:w-full sm:max-w-[310px] 2xl:w-[310px]"
+                className="h-2 w-full shrink overflow-hidden rounded-full bg-[#e9e9e9] sm:w-full sm:max-w-[310px] xl:w-auto xl:flex-1"
               >
                 <motion.div
                   className="h-full rounded-full bg-indigo-500"
@@ -165,7 +165,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
                   transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
                 />
               </div>
-              <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 2xl:w-10 2xl:text-right 2xl:text-base">
+              <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 xl:w-10 xl:text-right xl:text-base">
                 {percent}%
               </span>
             </div>
@@ -181,7 +181,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         </div>
         {/* 검색 + 할 일 추가(텍스트) — 모바일은 block으로 검색이 줄 전체를 채우고, 텍스트 버튼은 sm+에서 노출. 둘 다 높이 40px */}
         <div
-          className="w-full sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:gap-2 2xl:gap-3.5"
+          className="w-full sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:gap-2 xl:gap-3.5"
           onClick={(e) => e.stopPropagation()}
           // 검색창 Enter 등 키보드 이벤트가 카드(role=button)까지 버블링돼 목표 상세로 이동하는 것 차단
           onKeyDown={(e) => e.stopPropagation()}
@@ -209,7 +209,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         카드 높이를 유지 — 무한스크롤 sentinel이 조기에 화면에 들어와 다음 페이지가 연쇄 로딩되는
         것을 막고 레이아웃 시프트도 방지한다.
       */}
-      <div className="2xl:flex 2xl:min-h-[324px] 2xl:flex-col 2xl:justify-center">
+      <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
         {isLoading ? (
           <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
         ) : isError ? (
@@ -221,7 +221,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
           )
         ) : (
-          <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 2xl:gap-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
             <Column label="To do" todos={todoItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
             <Column label="Done" todos={doneItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
           </div>

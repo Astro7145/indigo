@@ -14,16 +14,9 @@ import { cn } from '@/src/utils/cn';
 export type ProgressCardSize = 'default' | 'small' | 'xsmall';
 
 interface ProgressCardViewProps {
-  /**
-   * 헤더 라벨.
-   * - `default` 사이즈: lg+ 외부 헤더 텍스트 (예: "내 진행 상황", "{goalTitle}")
-   * - `small`/`xsmall` 사이즈: 카드 내부 상단 라벨 (예: "목표 진행도")
-   */
+  /** 헤더 라벨. default은 카드 위 헤더, small/xsmall은 카드 안 라벨. */
   headerText: string;
-  /**
-   * 본문 부제. `default` 사이즈에서만 카드 본문에 표시 (예: "{userName}님의 진행도는").
-   * `small`/`xsmall` 사이즈에서는 미사용.
-   */
+  /** 본문 부제(예: "{userName}님의 진행도는"). default에서만 사용. */
   bodyText?: string;
   /** 진행률 0~100 (범위 밖이면 clamp). */
   percent: number;
@@ -32,21 +25,19 @@ interface ProgressCardViewProps {
   className?: string;
 }
 
-// figma Tablet/Mobile/Small 공통 그라데이션 (figma CSS 기준 120°)
+// 카드 배경 그라데이션(120°)·그림자 — 전 사이즈 공통
 const GRADIENT_BODY = 'bg-[linear-gradient(120deg,#6E66C8_0%,#3D3677_73.21%)]';
 const GRADIENT_SHADOW = 'shadow-[0_12px_32px_rgba(69,54,143,0.25)]';
 
-// figma small(343×160, 21564:56837 계열) / xsmall(308×160, 21564:56837) — 폭만 차이
+// small/xsmall은 높이 같고 폭만 다름
 const COMPACT_WIDTH: Record<'small' | 'xsmall', string> = {
   small: 'w-[343px]',
   xsmall: 'w-[308px]',
 };
 
 /**
- * 0에서 target까지 부드럽게 차오르는 수치를 반환(easeOutCubic — cubic-bezier 근사).
- * 마운트 시 0→target, target이 바뀌면 현재 값에서 새 target으로 재애니메이션.
- * `prefers-reduced-motion`이면 애니메이션 없이 즉시 target.
- * 보간·중단(retarget) 처리는 Motion `animate`에 위임 — 프로젝트 표준 애니메이션 라이브러리.
+ * 0 → target으로 부드럽게 차오르는 숫자. target이 바뀌면 현재 값에서 다시 애니메이션.
+ * prefers-reduced-motion이면 즉시 target. 보간은 Motion animate에 맡긴다.
  */
 function useAnimatedNumber(target: number, duration = 700): number {
   const [value, setValue] = useState(0);
@@ -55,17 +46,17 @@ function useAnimatedNumber(target: number, duration = 700): number {
 
   useEffect(() => {
     if (reduce) {
-      // 즉시 target. 동기 setState는 react-hooks/set-state-in-effect 위반이라 rAF로 한 프레임 지연
+      // rAF로 한 프레임 미룸 — effect 안에서 바로 setState 하면 lint 위반
       const raf = requestAnimationFrame(() => {
         valueRef.current = target;
         setValue(target);
       });
       return () => cancelAnimationFrame(raf);
     }
-    // 현재 값(valueRef)에서 새 target으로 — target 변경 시 cleanup이 이전 애니메이션을 멈춰 재애니메이션
+    // 현재 값에서 새 target으로 (cleanup이 이전 애니메이션 정리)
     const controls = animate(valueRef.current, target, {
       duration: duration / 1000,
-      // 원본 1-(1-t)³(easeOutCubic)에 대응하는 cubic-bezier
+      // easeOutCubic
       ease: [0.215, 0.61, 0.355, 1],
       onUpdate: (latest) => {
         valueRef.current = latest;
@@ -79,22 +70,11 @@ function useAnimatedNumber(target: number, duration = 700): number {
 }
 
 /**
- * 진행률 카드 — Figma 21336:51482 (Large), 21551:56705 (Tablet),
- * 21551:56718 (Mobile), Small(343)/Small(308).
+ * 진행률 카드 (표시 전용) — text/percent props만 받아 호출 측에서 조합한다.
  *
- * Figma 컴포넌트 설명: "헤더 텍스트와 퍼센트는 인스턴스에서 오버라이드".
- * 그래서 도메인 객체 대신 text/percent props만 받는다 — 호출 측에서 컴포지션.
- *
- * 그라데이션은 전 사이즈 공통 120° (figma CSS 기준).
- *
- * default:
- *   - lg(≥1024): 외부 헤더(headerText + pie icon) + 그라데이션 본문,
- *     도넛이 카드 내부에 배치, bodyText + percent 표시
- *   - md(768~1023): 헤더 없음, 도넛이 좌측 outside, bodyText + percent 표시
- *   - sm(<768): md와 같은 레이아웃, 도넛 살짝 작게
- * small(343) / xsmall(308):
- *   - dropdown 등 별개 use case. 폭만 다른 160px 높이 그라데이션 카드(120°) +
- *     도넛(165px) + headerText + percent + stars. bodyText 미사용.
+ * - default: 헤더 + 본문 카드. 본문은 viewport로 형태가 바뀜 —
+ *   <xl(모바일·태블릿)=작은 형태, ≥xl(데스크탑)=큰 형태(달·숫자 확대).
+ * - small/xsmall: 폭만 다른 작은 카드(dropdown 등). bodyText 미사용.
  */
 function ProgressCardView({
   headerText,
@@ -105,18 +85,16 @@ function ProgressCardView({
   className,
 }: ProgressCardViewProps) {
   const safePercent = Math.max(0, Math.min(100, Math.round(percent)));
-  // 달 rx와 표시 숫자를 같은 애니메이션 값으로 구동 (0→safePercent, 변경 시 재애니메이션)
+  // 달 모양과 숫자를 같은 애니메이션 값으로 그린다
   const animatedPercent = useAnimatedNumber(safePercent);
   const displayPercent = Math.round(animatedPercent);
 
-  // bodyText를 마지막 공백 기준으로 어절 분리 — "{name}님의 진행도는".
-  // 한 줄에 둘 다 들어가면 1줄, 안 들어가면 verb가 다음 줄로 wrap.
-  // 어느 한 어절(주로 name)이 줄 폭 초과 시 그 어절만 truncate + ….
+  // "{name}님의 진행도는"을 마지막 공백에서 이름/뒷말로 나눈다 (이름만 truncate하려고).
   const lastSpace = bodyText ? bodyText.lastIndexOf(' ') : -1;
   const bodyNamePart = lastSpace > 0 ? bodyText!.slice(0, lastSpace) : (bodyText ?? '');
   const bodyVerbPart = lastSpace > 0 ? bodyText!.slice(lastSpace + 1) : null;
 
-  // onClick 제공 시 root를 키보드 접근 버튼으로 (Card 비-root라 인라인)
+  // onClick 있으면 키보드로도 누를 수 있는 버튼으로
   const interactiveProps = onClick
     ? {
         role: 'button' as const,
@@ -132,19 +110,21 @@ function ProgressCardView({
     : {};
 
   if (size === 'small' || size === 'xsmall') {
-    // figma Small(343)/Small(308) — 폭만 다른 160px 그라데이션 카드 + 도넛 + 텍스트 + stars.
+    // small/xsmall — 폭만 다른 작은 카드
     return (
       <div
         className={cn(
-          'relative h-40 overflow-hidden rounded text-white',
+          'relative flex h-40 items-start overflow-hidden rounded text-white',
           COMPACT_WIDTH[size],
           GRADIENT_BODY,
           className,
         )}
         {...interactiveProps}
       >
-        <Moonphase percent={animatedPercent} className="absolute -top-[2px] -left-[5px] size-[165px]" />
-        <div className="absolute top-[49px] left-[169px] flex flex-col gap-0.5">
+        {/* 달: 음수 margin으로 모서리에 살짝 걸치고(넘친 부분은 잘림), mr로 텍스트와 간격.
+            텍스트는 달 뒤를 따라 흐름 → 달 크기가 바뀌어도 위치가 안 깨짐 */}
+        <Moonphase percent={animatedPercent} className="-mt-[2px] mr-[9px] -ml-[5px] size-[165px] shrink-0" />
+        <div className="mt-[49px] flex flex-col gap-0.5">
           <span className="text-sm text-white/85">{headerText}</span>
           <div className="flex items-baseline gap-[3px]">
             <span
@@ -166,79 +146,56 @@ function ProgressCardView({
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
-      {/* 헤더 — 전 사이즈 노출 (RecentTodos와 동일, figma 데스크톱/태블릿/모바일 모두 표시).
-          아이콘 박스는 viewport `2xl:`(=wide 레이아웃 활성 시점)에서 32→40으로 확대. */}
+    // @container: 본문 wide가 카드(그리드 칸) 폭에 cqw로 반응하도록 컨테이너 지정
+    <div className={cn('@container flex w-full flex-col gap-2.5', className)} {...interactiveProps}>
+      {/* 헤더 (전 사이즈 공통). 데스크탑(xl)에서 아이콘·글씨 한 단계 커짐 */}
       <div className="flex items-center gap-3 px-2">
-        <IcProgress aria-hidden className="size-8 shrink-0 2xl:size-10" />
-        <h3 className="text-base leading-6 font-medium text-black 2xl:text-lg 2xl:leading-7">{headerText}</h3>
+        <IcProgress aria-hidden className="size-8 shrink-0 xl:size-10" />
+        <h3 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">{headerText}</h3>
       </div>
 
-      {/*
-        본문 카드 (그라데이션 120° 전 사이즈 공통). 레이아웃 전환은 viewport 기준 통일:
-        - base/sm/lg(<1280): h-[187px], 도넛 overlay (compact) — 1024~1280 셀이 ~275~400으로 좁아 wide 미수용
-        - xl(≥1280): h-64, 도넛 inside (flex, wide) — 셀이 충분히 넓어진 뒤 활성
-      */}
+      {/* 본문 카드. 한 flex 블록이 viewport로 바뀐다:
+          - <xl(모바일·태블릿): 작은 카드, 달이 좌측 모서리에 걸침, 텍스트 위 정렬 (달은 sm에서 살짝 커짐)
+          - ≥xl(데스크탑): 안쪽 배치 + 수직 중앙. 달·숫자·여백·높이를 카드 폭에 비례(cqw)시켜
+            좁은 칸에선 작게, 넓어질수록 풀사이즈(카드 640px에서 달 220·숫자 80px). */}
       <Card
         className={cn(
           'relative h-[187px] overflow-hidden border-0 p-0 text-white',
           GRADIENT_BODY,
-          '2xl:h-64',
           GRADIENT_SHADOW,
+          'xl:h-[max(187px,40cqw)]',
         )}
       >
-        {/* figma overlay — 본체 위에 미세한 하단 어둠 (transparent → rgba(0,0,0,0.07)) */}
+        {/* 아래로 갈수록 살짝 어두워지는 오버레이 */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-black/[0.07]" />
-        {/* compact 도넛 (xl에서 숨김). figma: mobile top=3, tablet(sm) top=-2 */}
-        <Moonphase
-          percent={animatedPercent}
-          className="absolute top-[3px] -left-[11px] size-[182px] sm:-top-[2px] sm:-left-[12px] sm:size-[192px] 2xl:hidden"
-        />
-        {/* wide 도넛 (xl 이상에서만). right-12로 우측 경계 → 긴 이름이 카드를 넘지 않고 col이 shrink하며 truncate 발화. */}
-        <div className="hidden 2xl:absolute 2xl:top-[18px] 2xl:right-12 2xl:left-12 2xl:flex 2xl:items-center 2xl:gap-8">
-          <Moonphase percent={animatedPercent} className="size-[220px] shrink-0" />
-          <div className="flex min-w-0 flex-col gap-3">
-            {/* 두 어절 분리 렌더 — 둘 다 한 줄에 들어가면 1줄, 안 들어가면 verb가 다음 줄로 wrap.
-                긴 어절(주로 name)이 줄 폭 초과 시 그 어절만 truncate + …. */}
-            <div className="flex flex-wrap gap-x-1.5 text-xl leading-[30px] font-semibold tracking-[-0.03em]">
+
+        {/* relative: overlay 위·stars 아래로 쌓이게. 데스크탑은 달을 좌측에서 pl(12cqw)만큼 띄워
+            좌측-중앙에 두고(텍스트가 우측을 채움) — 달 위치가 이름 길이와 무관하게 카드 폭에만 반응 */}
+        <div className="relative flex h-full items-center pl-1 xl:pr-[7.5cqw] xl:pl-[10cqw]">
+          {/* 달: 모바일·태블릿은 모서리에 걸침(음수 margin), 데스크탑은 카드 폭에 비례(cqw)해 연속 스케일 */}
+          <Moonphase percent={animatedPercent} className="mt-0 mr-0 ml-0 size-[182px] shrink-0 xl:size-[34.375cqw]" />
+          {/* 텍스트: 남은 폭을 채우고 좁으면 truncate (달 위치는 텍스트와 무관) */}
+          <div className="mr-3 flex min-w-0 flex-1 flex-col gap-0.5 xl:mr-0 xl:gap-[1.875cqw]">
+            {/* 이름 + 뒷말. 좁으면 뒷말은 줄바꿈, 이름은 truncate */}
+            <div className="flex flex-wrap gap-x-1.5 text-lg leading-[20px] font-semibold tracking-[-0.03em] xl:text-[max(18px,3.125cqw)] xl:leading-[1.5]">
               <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
               {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
             </div>
-            <div className="flex items-end gap-[5px]">
+            <div className="flex items-baseline gap-0.5 xl:items-end xl:gap-[5px]">
               <span
                 role="progressbar"
                 aria-label={headerText}
                 aria-valuenow={safePercent}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                className="text-display-xl leading-[74px] font-bold tracking-[-0.03em]"
+                className="text-[38px] leading-[46px] font-bold tracking-[-0.03em] xl:text-[12.5cqw] xl:leading-[0.925]"
               >
                 {displayPercent}
               </span>
-              <span className="text-3xl leading-9 font-medium tracking-[-0.03em]">%</span>
+              <span className="text-[19px] leading-[23px] font-bold xl:text-[max(20px,4.6875cqw)] xl:leading-[1.2] xl:font-medium xl:tracking-[-0.03em]">
+                %
+              </span>
             </div>
-          </div>
-        </div>
-
-        {/* compact 텍스트 (2xl에서 숨김). right 작은 여백으로 카드 폭 부족 시 truncate 트리거. */}
-        <div className="absolute top-[60px] right-3 left-[156px] flex min-w-0 flex-col gap-0.5 sm:left-[164px] 2xl:hidden">
-          {/* 두 어절 분리 렌더 — wide와 동일 패턴. */}
-          <div className="flex flex-wrap gap-x-1.5 text-lg leading-[20px] font-semibold tracking-[-0.03em] text-white">
-            <span className="max-w-full min-w-0 truncate">{bodyNamePart}</span>
-            {bodyVerbPart && <span className="shrink-0">{bodyVerbPart}</span>}
-          </div>
-          <div className="flex items-baseline gap-0.5">
-            <span
-              role="progressbar"
-              aria-label={headerText}
-              aria-valuenow={safePercent}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              className="text-[38px] leading-[46px] font-bold tracking-[-0.03em] sm:text-[40px] sm:leading-[48px]"
-            >
-              {displayPercent}
-            </span>
-            <span className="text-[19px] leading-[23px] font-bold sm:text-xl sm:leading-6">%</span>
           </div>
         </div>
 
@@ -254,7 +211,7 @@ export interface ProgressCardProps {
   size?: ProgressCardSize;
   /** 기본 라벨 오버라이드 */
   headerText?: string;
-  /** 본문 부제 오버라이드 (전체 변형 기본값: "{name}님의 진행도는") */
+  /** 본문 부제 오버라이드 (기본: "{name}님의 진행도는") */
   bodyText?: string;
   onClick?: () => void;
   className?: string;
@@ -308,9 +265,8 @@ function GoalProgress({
 }
 
 /**
- * 진행률 카드 — 데이터를 도메인 훅에서 직접 조회.
- * `goalId`가 있으면 해당 목표의 진행도(`useGoal`), 없으면 전체 진행도
- * (`useGoalList` 집계 + `useMe` 이름). 표시·애니메이션은 ProgressCardView가 담당.
+ * 진행률 카드. goalId 있으면 해당 목표, 없으면 전체 진행도.
+ * 데이터는 훅에서 조회하고 표시는 ProgressCardView가 맡는다.
  */
 export default function ProgressCard({ goalId, ...rest }: ProgressCardProps) {
   return goalId == null ? <OverallProgress {...rest} /> : <GoalProgress goalId={goalId} {...rest} />;
