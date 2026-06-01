@@ -33,7 +33,8 @@ export default function PostSearchBar() {
     router.replace(`${pathname}?${params.toString()}`);
   }
 
-  const currentLabel = SORT_OPTIONS.find((opt) => opt.value === sortBy)!.label;
+  // URL의 sortBy가 임의값/오타일 수 있으므로 매칭 실패 시 첫 옵션으로 폴백한다.
+  const currentLabel = (SORT_OPTIONS.find((opt) => opt.value === sortBy) ?? SORT_OPTIONS[0]).label;
 
   return (
     <div className="flex w-full items-center justify-between gap-4">

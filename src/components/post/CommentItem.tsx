@@ -93,7 +93,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
                   취소
                 </Button>
-                <Button type="submit" size="small">
+                <Button type="submit" size="small" disabled={draft.trim().length === 0}>
                   수정
                 </Button>
               </div>

@@ -23,3 +23,7 @@ it('HTML 엔티티를 디코딩한다', () => {
 it('알 수 없는 엔티티는 원본 그대로 보존한다', () => {
   expect(stripHtml('알수없음 &foo;')).toBe('알수없음 &foo;');
 });
+
+it('대문자 엔티티도 동일하게 디코딩한다', () => {
+  expect(stripHtml('Tom &AMP; Jerry')).toBe('Tom & Jerry');
+});
