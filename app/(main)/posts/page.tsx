@@ -95,6 +95,7 @@ export default function PostsPage() {
         type="button"
         size="large"
         startIcon={<IcPlus />}
+        onClick={() => router.push('/posts/write')}
         className="fixed right-4 bottom-4 p-[13px] md:right-8 md:bottom-16 md:min-w-[190px] md:px-[18px] md:py-[13px]"
       >
         <span className="hidden md:inline">게시물 작성하기</span>
