@@ -113,7 +113,14 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
         </div>
         <Modal.Actions>
           <Modal.Cancel>취소</Modal.Cancel>
-          <Modal.Confirm onClick={() => deleteComment(comment.id)}>삭제하기</Modal.Confirm>
+          <Modal.Confirm
+            onClick={() => {
+              deleteComment(comment.id);
+              setDeleteOpen(false);
+            }}
+          >
+            삭제하기
+          </Modal.Confirm>
         </Modal.Actions>
       </Modal>
     </>

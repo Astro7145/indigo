@@ -12,6 +12,6 @@ export function stripHtml(html: string | null | undefined): string {
   return html
     .replace(/<(p|div|br|li|h[1-6])[^>]*>/gi, ' ')
     .replace(/<[^>]+>/g, '')
-    .replace(/&[a-z]+;|&#\d+;/gi, (entity) => ENTITIES[entity] ?? '')
+    .replace(/&[a-z]+;|&#\d+;/gi, (entity) => ENTITIES[entity] ?? entity)
     .trim();
 }

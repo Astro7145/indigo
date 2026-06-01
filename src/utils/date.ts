@@ -23,8 +23,9 @@ export function formatRelativeTime(iso: string | null | undefined, now: number =
   const diffSec = Math.max(0, Math.floor((now - past.getTime()) / 1000));
   if (diffSec < 3600) return '방금';
   if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}시간`;
-  const y = past.getFullYear();
-  const m = String(past.getMonth() + 1).padStart(2, '0');
-  const d = String(past.getDate()).padStart(2, '0');
+  // ISO 문자열을 slice(0,10)으로 자르는 다른 곳들과 일관되도록 UTC 기준으로 포맷한다.
+  const y = past.getUTCFullYear();
+  const m = String(past.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(past.getUTCDate()).padStart(2, '0');
   return `${y}.${m}.${d}`;
 }

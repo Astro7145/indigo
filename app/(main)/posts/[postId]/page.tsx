@@ -45,20 +45,22 @@ export default function PostDetailPage() {
       <article className="mx-auto min-h-[calc(100vh-104px)] w-full max-w-[343px] rounded bg-white p-4 shadow-sm md:min-h-[calc(100vh-48px)] md:max-w-[636px] md:p-10 lg:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
           <h1 className="text-lg font-bold text-slate-900 md:text-2xl">{post.title}</h1>
-          <Dropdown className="shrink-0">
-            <Dropdown.Trigger asChild>
-              <IconButton aria-label="더보기">
-                <IcMeetballs className="size-5 text-slate-400" />
-              </IconButton>
-            </Dropdown.Trigger>
-            <Dropdown.Menu placement="bottom-end" size="small">
-              {/* 수정 페이지(/posts/[id]/edit)는 별도 작업 — 라우트 생성 후 연결 */}
-              <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>수정하기</Dropdown.Item>
-              <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                삭제하기
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          {me?.id === post.writer.id && (
+            <Dropdown className="shrink-0">
+              <Dropdown.Trigger asChild>
+                <IconButton aria-label="더보기">
+                  <IcMeetballs className="size-5 text-slate-400" />
+                </IconButton>
+              </Dropdown.Trigger>
+              <Dropdown.Menu placement="bottom-end" size="small">
+                {/* 수정 페이지(/posts/[id]/edit)는 별도 작업 — 라우트 생성 후 연결 */}
+                <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
+                  삭제하기
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
         </div>
 
         {/* 작성자 */}
