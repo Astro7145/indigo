@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import PostEditor from './PostEditor';
 
@@ -23,6 +23,19 @@ it('초기 value의 HTML이 에디터에 렌더된다', () => {
 
   const editor = container.querySelector('[contenteditable="true"]');
   expect(editor?.textContent).toContain('안녕하세요');
+});
+
+it('value가 빈 상태로 마운트된 뒤 외부에서 HTML이 도착하면 에디터에 반영된다', async () => {
+  // 수정 페이지의 비동기 hydration 시나리오: useEditor.content는 마운트 시점에만 소비되므로
+  // value prop이 나중에 바뀌어도 에디터가 갱신되도록 sync 로직이 필요하다
+  const { container, rerender } = render(<PostEditor value="" onChange={() => {}} />);
+
+  rerender(<PostEditor value="<p>나중에 도착한 본문</p>" onChange={() => {}} />);
+
+  await waitFor(() => {
+    const editor = container.querySelector('[contenteditable="true"]');
+    expect(editor?.textContent).toContain('나중에 도착한 본문');
+  });
 });
 
 it('게시글 작성에는 링크 버튼이 렌더되지 않는다', () => {

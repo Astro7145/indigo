@@ -46,6 +46,15 @@ export default function PostForm(props: PostFormProps) {
   const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage;
   const isValid = title.trim().length > 0 && !isHtmlEmpty(content);
 
+  // 수정 모드에서 초기 데이터 도착 전에 빈 폼을 그리면 placeholder/제목/이미지가 깜빡인다. 데이터 도착까지 로딩 표시
+  if (props.mode === 'edit' && !initialPost) {
+    return (
+      <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white md:min-h-[calc(100vh-100px)] md:max-w-[636px] lg:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400">불러오는 중…</p>
+      </div>
+    );
+  }
+
   const handleCancel = () => {
     if (isDirty) {
       setIsCancelModalOpen(true);

@@ -5,7 +5,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 import EditorToolbar from '@/src/components/common/editor/EditorToolbar';
 
@@ -39,6 +39,14 @@ export default function PostEditor({
     immediatelyRender: false,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
+
+  // useEditor.content는 마운트 시점에만 소비되므로, 수정 페이지처럼 value가 비동기로 도착하면 직접 주입해야 한다.
+  // getHTML() === value 가드로 사용자 타이핑 중 커서 리셋을 방지
+  useEffect(() => {
+    if (!editor) return;
+    if (editor.getHTML() === value) return;
+    editor.commands.setContent(value, { emitUpdate: false });
+  }, [editor, value]);
 
   const state = useEditorState({
     editor,
