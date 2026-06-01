@@ -201,3 +201,28 @@ it('이미지 파일 선택 시 createImageUploadUrl과 PUT을 호출하고 이�
   );
   await waitFor(() => expect(container.querySelector('img')).toBeInTheDocument());
 });
+
+it('수정 모드에서 기존 이미지를 삭제하고 저장하면 patchPost에 image: null이 전송된다', async () => {
+  (getPost as jest.Mock).mockResolvedValue({
+    id: 7,
+    title: '원래 제목',
+    content: '<p>원래 본문</p>',
+    image: 'https://cdn.url/old.png',
+  });
+  (patchPost as jest.Mock).mockResolvedValue({ id: 7 });
+
+  renderWithClient(<PostForm mode="edit" postId={7} />);
+
+  await waitFor(() => expect(screen.getByLabelText('제목')).toHaveValue('원래 제목'));
+
+  fireEvent.click(screen.getByRole('button', { name: '이미지 삭제' }));
+  fireEvent.click(screen.getByRole('button', { name: '수정하기' }));
+
+  await waitFor(() =>
+    expect(patchPost).toHaveBeenCalledWith(7, {
+      title: '원래 제목',
+      content: '<p>원래 본문</p>',
+      image: null,
+    }),
+  );
+});

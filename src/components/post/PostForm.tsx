@@ -67,13 +67,13 @@ export default function PostForm(props: PostFormProps) {
 
   const handleSubmit = async () => {
     if (!isValid) return;
-    const body = { title, content, ...(image ? { image } : {}) };
     if (props.mode === 'edit') {
-      await updatePost({ postId: props.postId, body });
+      // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
+      await updatePost({ postId: props.postId, body: { title, content, image } });
       router.push(`/posts/${props.postId}`);
       return;
     }
-    const post = await createPost(body);
+    const post = await createPost({ title, content, ...(image ? { image } : {}) });
     router.push(`/posts/${post.id}`);
   };
 
