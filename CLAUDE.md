@@ -71,6 +71,7 @@ npm run test:e2e    # E2E (Playwright)
 - Next.js App Router 패턴 준수 (Server/Client Component 구분, `"use client"` 최소화)
 - 포맷은 Prettier가 담당하며 규칙의 SSOT는 `.prettierrc` (수동 나열 금지, `npm run lint`로 검증).
   Tailwind 클래스는 `prettier-plugin-tailwindcss`가 자동 정렬
+- **반응형 브레이크포인트**: 모바일 `~639px` / 태블릿 `640px~1279px`(`sm`) / 데스크탑 `1280px~`(`xl`)
 - **색상·타이포는 하드코딩 금지.** `app/globals.css`의 디자인 토큰(Tailwind v4 `@theme`)에
   정의된 브랜드 `indigo` 스케일과 `text-*` 토큰을 Tailwind 유틸리티로 사용
 - 테스트는 `test`가 아닌 **`it`**으로 작성하고, 설명 문구는 **한글**로 간략히
