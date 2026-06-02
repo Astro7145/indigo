@@ -1,6 +1,6 @@
 'use client';
 
-import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
+import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
@@ -17,12 +17,15 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Topbar() {
   const title = usePageTitle();
-  const [expandedHeight, setExpandedHeight] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const height = useMotionValue(COLLAPSED_HEIGHT);
+
+  // 이벤트 핸들러에서 stale closure 없이 최신값에 접근하기 위해 ref로 관리
+  const expandedHeightRef = useRef(0);
+  const isDragging = useRef(false);
+  const startY = useRef(0);
   const dragStartHeight = useRef(COLLAPSED_HEIGHT);
 
-  // 드래그로 높이가 늘어남에 따라 접힘(인사말)→펼침(메뉴) 레이아웃을 교차 페이드
   const barOpacity = useTransform(height, [COLLAPSED_HEIGHT, COLLAPSED_HEIGHT + 80], [1, 0]);
   const menuOpacity = useTransform(height, [COLLAPSED_HEIGHT + 60, COLLAPSED_HEIGHT + 200], [0, 1]);
 
@@ -30,7 +33,7 @@ export default function Topbar() {
   useEffect(() => {
     const update = () => {
       const next = window.innerHeight;
-      setExpandedHeight(next);
+      expandedHeightRef.current = next;
       if (height.get() > COLLAPSED_HEIGHT) height.set(next);
     };
     update();
@@ -38,9 +41,19 @@ export default function Topbar() {
     return () => window.removeEventListener('resize', update);
   }, [height]);
 
+  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
+  useEffect(() => {
+    if (!expanded) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [expanded]);
+
   const expand = () => {
     setExpanded(true);
-    animate(height, expandedHeight, SPRING);
+    animate(height, expandedHeightRef.current, SPRING);
   };
 
   const collapse = () => {
@@ -48,20 +61,35 @@ export default function Topbar() {
     animate(height, COLLAPSED_HEIGHT, SPRING);
   };
 
-  const handleDragStart = () => {
+  // setPointerCapture: 포인터가 요소 밖으로 나가도 pointermove/up 이벤트를 이 요소에서 수신
+  // → Motion drag 대비 모바일에서 포인터 캡처가 안정적으로 유지됨
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isDragging.current = true;
+    startY.current = e.clientY;
     dragStartHeight.current = height.get();
   };
 
-  const handleDrag = (_event: unknown, info: PanInfo) => {
-    if (!expandedHeight) return;
-    height.set(clamp(dragStartHeight.current + info.offset.y, COLLAPSED_HEIGHT, expandedHeight));
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDragging.current) return;
+    const delta = e.clientY - startY.current;
+    height.set(clamp(dragStartHeight.current + delta, COLLAPSED_HEIGHT, expandedHeightRef.current));
   };
 
-  const handleDragEnd = () => {
-    if (!expandedHeight) return;
-    if (height.get() > (COLLAPSED_HEIGHT + expandedHeight) / 2) expand();
+  // pointerup / pointercancel 공통 처리: 중간 지점 기준으로 펼침/접힘 스냅
+  const handlePointerEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    if (height.get() > (COLLAPSED_HEIGHT + expandedHeightRef.current) / 2) expand();
     else collapse();
   };
+
+  const dragHandlers = {
+    onPointerDown: handlePointerDown,
+    onPointerMove: handlePointerMove,
+    onPointerUp: handlePointerEnd,
+    onPointerCancel: handlePointerEnd,
+  } as const;
 
   return (
     <>
@@ -81,6 +109,9 @@ export default function Topbar() {
           <span className="text-base font-semibold text-slate-50">{title}</span>
           <IcBell state="read" className="size-5 text-slate-50" />
         </motion.div>
+
+        {/* 접힌 상태 전용 드래그 레이어 — 바 전체를 터치 타깃으로 커버 */}
+        {!expanded && <div aria-hidden className="absolute inset-0 touch-none" {...dragHandlers} />}
 
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
@@ -121,21 +152,15 @@ export default function Topbar() {
           </div>
         </motion.div>
 
-        {/* 가장자리(하단) 드래그 핸들 — 사이드바의 세로 핸들과 대칭 */}
-        <motion.div
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
+        {/* 드래그 핸들 — h-12(48px)로 모바일 터치 타깃 확보, 시각 인디케이터는 하단 고정 */}
+        <div
           role="separator"
           aria-orientation="horizontal"
-          className="absolute inset-x-0 bottom-0 flex h-4 cursor-ns-resize touch-none items-center justify-center hover:bg-indigo-600/10"
+          className="absolute inset-x-0 bottom-0 flex h-12 cursor-ns-resize touch-none items-end justify-center pb-1.5 hover:bg-indigo-600/10"
+          {...dragHandlers}
         >
           <span className="h-0.5 w-7.5 rounded-full bg-indigo-800" />
-        </motion.div>
+        </div>
       </motion.div>
     </>
   );

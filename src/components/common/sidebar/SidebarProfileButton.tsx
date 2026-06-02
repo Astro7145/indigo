@@ -31,8 +31,8 @@ export default function SidebarProfileButton() {
         {isLoading ? (
           <span aria-hidden className="h-4 w-16 animate-pulse rounded-xs bg-indigo-800" />
         ) : (
-          <span className="flex items-center gap-x-1">
-            <span className="text-sm font-medium text-slate-50">{data?.name}</span>
+          <span className="flex max-w-30 items-center gap-x-1">
+            <span className="truncate text-sm font-medium text-slate-50">{data?.name}</span>
             <IcChevron direction="right" className="size-4 text-white" />
           </span>
         )}

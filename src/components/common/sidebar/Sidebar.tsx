@@ -20,7 +20,7 @@ const SAMPLE_GOALS = [
 const EXPANDED_WIDTH = 360;
 const COLLAPSED_WIDTH = 96;
 const TABLET_COLLAPSED_WIDTH = 60;
-const TABLET_QUERY = '(max-width: 1023px)';
+const TABLET_QUERY = '(max-width: 1280px)';
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
