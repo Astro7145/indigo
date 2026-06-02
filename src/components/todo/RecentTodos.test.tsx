@@ -47,7 +47,7 @@ const listOf = (todos: Todo[]) => ({
 
 beforeEach(() => jest.resetAllMocks());
 
-it('useTodoList 결과의 모든 할일 제목을 렌더한다', async () => {
+it('useTodoList 결과의 할일 제목을 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A'), makeTodo(2, '할일 B', true)]));
   renderWithClient(<RecentTodos />);
   expect(await screen.findByText('할일 A')).toBeInTheDocument();
@@ -57,7 +57,7 @@ it('useTodoList 결과의 모든 할일 제목을 렌더한다', async () => {
 it('할일이 없으면 빈 상태를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderWithClient(<RecentTodos />);
-  expect(await screen.findByText('할일이 없습니다.')).toBeInTheDocument();
+  expect(await screen.findByText('최근에 등록한 할 일이 없어요')).toBeInTheDocument();
 });
 
 it('체크박스를 클릭하면 patchTodo로 done을 토글한다', async () => {
@@ -80,11 +80,16 @@ it('별을 클릭하면 addTodoFavorite를 호출한다', async () => {
   await waitFor(() => expect(mockedFav.addTodoFavorite).toHaveBeenCalledWith(1));
 });
 
-it('"모두 보기"는 항상 button이며 onSeeAll로 호출된다', async () => {
-  const onSeeAll = jest.fn();
+it('"모두 보기"는 /todos로 가는 링크다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
-  renderWithClient(<RecentTodos onSeeAll={onSeeAll} />);
+  renderWithClient(<RecentTodos />);
   await screen.findByText('할일 A');
-  fireEvent.click(screen.getByRole('button', { name: '모두 보기' }));
-  expect(onSeeAll).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('link', { name: '모두 보기' })).toHaveAttribute('href', '/todos');
+});
+
+it('useTodoList를 limit: 4로 호출해 최신 4개를 요청한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
+  renderWithClient(<RecentTodos />);
+  await screen.findByText('할일 A');
+  expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ sort: 'latest', limit: 4 }));
 });
