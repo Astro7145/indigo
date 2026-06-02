@@ -5,10 +5,11 @@ import { favoriteKeys, addTodoFavorite, removeTodoFavorite, getFavoriteTodos } f
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { CursorParams, ApiError } from '@/src/types/common';
 
-export function useFavoriteTodoList(params: CursorParams = {}) {
+export function useFavoriteTodoList(params: CursorParams = {}, enabled = true) {
   return useQuery<FavoriteTodoListResponse, ApiError>({
     queryKey: favoriteKeys.list(params),
     queryFn: () => getFavoriteTodos(params),
+    enabled,
   });
 }
 
