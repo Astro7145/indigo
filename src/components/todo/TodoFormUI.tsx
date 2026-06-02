@@ -70,7 +70,7 @@ export default function TodoFormUI({
   const selectedGoal = goalData?.goals.find((g) => g.id === watchedGoalId);
 
   const [selectedDate, setSelectedDate] = useState<CalendarDate | null>(() =>
-    isoToCalendarDate(initialValues?.dueDate ?? null),
+    isoToCalendarDate(initialValues?.dueDate || null),
   );
   const [tags, setTags] = useState<Tag[]>(initialValues?.tags ?? []);
   const [imageFile, setImageFile] = useState<File | null>(initialValues?.imageFile ?? null);
@@ -108,6 +108,7 @@ export default function TodoFormUI({
       </div>
       <form
         noValidate
+        onSubmit={handleSubmit_}
         className="scrollbar-slate -mr-8 flex min-h-0 flex-1 scrollbar-gutter-stable flex-col overflow-y-auto py-4 pr-8 pl-1"
       >
         {/* 상태 — 수정 폼에서만 표시 */}

@@ -18,7 +18,7 @@ const BADGE_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 export default function TagInput({ value, onChange }: TagInputProps) {
   const [inputValue, setInputValue] = useState('');
-  const colorIndexRef = useRef(0);
+  const colorIndexRef = useRef(value.length);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;

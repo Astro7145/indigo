@@ -16,7 +16,7 @@ interface TodoUpdateContainerProps {
 }
 
 export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpdateContainerProps) {
-  const { mutateAsync: updateTodo } = useUpdateTodo();
+  const { mutate: updateTodo } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
@@ -25,7 +25,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
     goalId: todo.goalId ?? undefined,
     dueDate: todo.dueDate ?? '',
     linkUrl: todo.linkUrl ?? '',
-    tags: todo.tags.map((t, i) => ({ text: t.name, color: BADGE_COLORS[i % BADGE_COLORS.length] })),
+    tags: todo.tags?.map((t, i) => ({ text: t.name, color: BADGE_COLORS[i % BADGE_COLORS.length] })) ?? [],
     imageFile: null,
     fileUrl: todo.fileUrl,
     done: todo.done,
@@ -47,7 +47,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
       }
     }
 
-    await updateTodo(
+    updateTodo(
       {
         todoId: todo.id,
         body: {

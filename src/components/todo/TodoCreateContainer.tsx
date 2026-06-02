@@ -14,7 +14,7 @@ interface TodoCreateContainerProps {
 }
 
 export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }: TodoCreateContainerProps) {
-  const { mutateAsync: createTodo } = useCreateTodo();
+  const { mutate: createTodo } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
@@ -33,7 +33,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
       }
     }
 
-    await createTodo(
+    createTodo(
       {
         title: values.title,
         goalId: values.goalId,
