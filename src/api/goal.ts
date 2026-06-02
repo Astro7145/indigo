@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import type { Goal, GoalDetail, GoalListResponse, CreateGoalBody, UpdateGoalBody } from '@/src/types/goal';
 import type { CursorParams } from '@/src/types/common';
 

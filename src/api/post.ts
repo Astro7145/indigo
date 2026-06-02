@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import type { Post, PostListParams, PostListResponse, CreatePostBody, UpdatePostBody } from '@/src/types/post';
 
 export const postKeys = {

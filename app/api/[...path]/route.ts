@@ -7,15 +7,74 @@ import {
   clearAuthCookies,
   passthrough,
   type HttpMethod,
-} from '@/src/api/server/bff';
+} from '@/src/api/server/server-fetcher';
 
 type Ctx = { params: Promise<{ path: string[] }> };
+
+const ALLOWLIST: ReadonlyArray<readonly [HttpMethod, string]> = [
+  ['GET', 'goals'],
+  ['POST', 'goals'],
+  ['GET', 'goals/{goalId}'],
+  ['PATCH', 'goals/{goalId}'],
+  ['DELETE', 'goals/{goalId}'],
+  ['GET', 'todos/favorites'],
+  ['POST', 'todos/{todoId}/favorites'],
+  ['DELETE', 'todos/{todoId}/favorites'],
+  ['GET', 'todos'],
+  ['POST', 'todos'],
+  ['GET', 'todos/{todoId}'],
+  ['PATCH', 'todos/{todoId}'],
+  ['DELETE', 'todos/{todoId}'],
+  ['GET', 'notes'],
+  ['POST', 'notes'],
+  ['GET', 'notes/{noteId}'],
+  ['PATCH', 'notes/{noteId}'],
+  ['DELETE', 'notes/{noteId}'],
+  ['GET', 'notifications'],
+  ['PATCH', 'notifications'],
+  ['DELETE', 'notifications'],
+  ['PATCH', 'notifications/{notificationId}'],
+  ['DELETE', 'notifications/{notificationId}'],
+  ['GET', 'users/check-nickname'],
+  ['GET', 'users/me'],
+  ['PATCH', 'users/me'],
+  ['DELETE', 'users/me'],
+  ['PATCH', 'users/me/password'],
+  ['GET', 'posts'],
+  ['POST', 'posts'],
+  ['GET', 'posts/{postId}'],
+  ['PATCH', 'posts/{postId}'],
+  ['DELETE', 'posts/{postId}'],
+  ['GET', 'posts/{postId}/comments'],
+  ['POST', 'posts/{postId}/comments'],
+  ['PATCH', 'posts/{postId}/comments/{commentId}'],
+  ['DELETE', 'posts/{postId}/comments/{commentId}'],
+  ['POST', 'posts/{postId}/comments/{commentId}/likes'],
+  ['DELETE', 'posts/{postId}/comments/{commentId}/likes'],
+  ['POST', 'files'],
+  ['POST', 'images'],
+];
+
+const ALLOW_RULES = ALLOWLIST.map(([method, pattern]) => ({ method, segs: pattern.split('/') }));
+
+function isAllowedApiPath(method: string, segments: string[]): boolean {
+  return ALLOW_RULES.some(
+    (rule) =>
+      rule.method === method &&
+      rule.segs.length === segments.length &&
+      rule.segs.every((s, i) => s.startsWith('{') || s === segments[i]),
+  );
+}
 
 async function handle(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
   const { path } = await ctx.params;
 
   if (!path?.length || path.some((s) => s === '' || s === '.' || s === '..')) {
     return NextResponse.json({ message: 'Invalid path' }, { status: 400 });
+  }
+
+  if (!isAllowedApiPath(req.method, path)) {
+    return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
   const joined = path.join('/');

@@ -1,4 +1,4 @@
-import instance from '@/src/api/axiosInstance';
+import instance from '@/src/api/client-fetcher';
 import type { UserProfile, CheckNicknameResponse, UpdateMeBody, ChangePasswordBody } from '@/src/types/user';
 import type { MessageResponse } from '@/src/types/common';
 
