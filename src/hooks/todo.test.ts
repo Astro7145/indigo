@@ -8,6 +8,7 @@ jest.mock('@/src/api/todo', () => ({
 }));
 import * as todoApi from '@/src/api/todo';
 import { favoriteKeys } from '@/src/api/favorite';
+import { goalKeys } from '@/src/api/goal';
 import { waitFor } from '@testing-library/react';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
 import {
@@ -81,6 +82,7 @@ it('useUpdateTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세
   expect(mocked.patchTodo).toHaveBeenCalledWith(5, { done: true });
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() });
   expect(inv).toHaveBeenCalledWith({ queryKey: favoriteKeys.all });
+  expect(inv).toHaveBeenCalledWith({ queryKey: goalKeys.lists() });
   expect(setData).toHaveBeenCalledWith(todoApi.todoKeys.detail(5), { id: 5 });
 });
 
