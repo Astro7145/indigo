@@ -6,6 +6,7 @@ jest.mock('@/src/api/note', () => ({
 import { fireEvent, screen } from '@testing-library/react';
 
 import * as noteApi from '@/src/api/note';
+import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import NoteCard from '@/src/components/note/NoteCard';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Note } from '@/src/types/note';
@@ -60,4 +61,36 @@ it('onMore 제공 시 더보기 클릭으로 onMore를 호출하고 카드 onCli
   fireEvent.click(screen.getByLabelText('더보기 메뉴'));
   expect(onMore).toHaveBeenCalledTimes(1);
   expect(onClick).not.toHaveBeenCalled();
+});
+
+it('menu 제공 시 케밥 클릭으로 드롭다운이 열리고 카드 onClick은 호출되지 않는다', async () => {
+  const onClick = jest.fn();
+  mocked.getNote.mockResolvedValue(note);
+  renderWithClient(
+    <NoteCard
+      noteId={1}
+      onClick={onClick}
+      menu={
+        <Dropdown.Menu size="small" placement="bottom-end">
+          <Dropdown.Item>수정하기</Dropdown.Item>
+          <Dropdown.Item>삭제하기</Dropdown.Item>
+        </Dropdown.Menu>
+      }
+    />,
+  );
+  const kebab = await screen.findByRole('button', { name: '더보기 메뉴' });
+  fireEvent.click(kebab);
+  expect(screen.getByText('수정하기')).toBeInTheDocument();
+  expect(onClick).not.toHaveBeenCalled();
+});
+
+it('note prop을 주면 재조회 없이 그대로 렌더한다', async () => {
+  const directNote: Note = {
+    ...note,
+    id: 1,
+    title: '직접 렌더',
+  };
+  renderWithClient(<NoteCard noteId={1} note={directNote} />);
+  expect(await screen.findByText('직접 렌더')).toBeInTheDocument();
+  expect(mocked.getNote).not.toHaveBeenCalled();
 });

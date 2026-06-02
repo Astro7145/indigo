@@ -19,6 +19,9 @@ const config: Config = {
   // tsconfig paths를 jest.mock() 호이스팅에서도 인식하도록 매핑
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
+    // isomorphic-dompurify는 jsdom(ESM-only 의존) 경유라 Jest에서 파싱 실패.
+    // 테스트 환경(jsdom)에서는 window가 이미 있으므로 browser용 dompurify로 대체.
+    '^isomorphic-dompurify$': '<rootDir>/node_modules/dompurify/dist/purify.cjs.js',
   },
 };
 
