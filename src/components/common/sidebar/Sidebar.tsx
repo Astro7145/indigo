@@ -81,7 +81,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="hidden md:contents">
+    <div className="hidden sm:contents">
       <AnimatePresence>
         {isTablet && !collapsed && (
           <motion.div
@@ -129,7 +129,7 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col gap-y-8">
-              <TodoAddButton />
+              <TodoAddButton onClick={() => console.log('add todo')} />
               <div className="flex gap-x-2">
                 <SidebarProfileButton />
                 <SidebarNotificationButton />

@@ -3,6 +3,7 @@
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { usePageTitle } from '@/src/hooks/usePageTitle';
 import { IcBell, LogoFull } from '../icons';
 import SidebarGoalRow from './SidebarGoalRow';
 import SidebarNotificationButton from './SidebarNotificationButton';
@@ -15,6 +16,7 @@ const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Topbar() {
+  const title = usePageTitle();
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const height = useMotionValue(COLLAPSED_HEIGHT);
@@ -68,7 +70,7 @@ export default function Topbar() {
 
       <motion.div
         style={{ height }}
-        className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] md:hidden"
+        className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
       >
         {/* 접힘 상태: 인사말 + 알림 */}
         <motion.div
@@ -76,7 +78,7 @@ export default function Topbar() {
           aria-hidden={expanded}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
-          <span className="text-base font-semibold text-slate-50">체다치즈님의 대시보드</span>
+          <span className="text-base font-semibold text-slate-50">{title}</span>
           <IcBell state="read" className="size-5 text-slate-50" />
         </motion.div>
 

@@ -7,7 +7,7 @@ import Topbar from '@/src/components/common/sidebar/Topbar';
  */
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full bg-slate-100">
+    <div className="flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
       <Topbar />
       <Sidebar />
       <main className="flex-1 overflow-y-auto px-4 py-6">{children}</main>
