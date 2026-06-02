@@ -27,14 +27,14 @@ export interface NoteCardProps {
 
 /**
  * 반응형 클래스 — 그리드 열이 폭을 제어하므로 카드는 w-full로 채움.
- * 모바일=small 디자인, md(≥768px)부터 large 디자인으로 전환.
+ * 모바일=small 디자인, sm(≥640px)부터 large 디자인으로 전환.
  */
-const rootClass = 'flex w-full flex-col gap-3 md:gap-4 md:px-[38px] md:pt-[28px] md:pb-[32px]';
-const iconBoxClass = 'shrink-0 size-8 rounded-lg md:size-10 md:rounded';
-const titleClass = 'text-sm leading-5 font-semibold md:text-xl md:leading-[30px]';
-const headerGapClass = 'gap-2 md:gap-4';
-const kebabClass = 'size-4 md:size-6';
-const todoTextClass = 'text-xs leading-4 md:text-sm md:leading-5';
+const rootClass = 'flex w-full flex-col gap-3 sm:gap-4 sm:px-[38px] sm:pt-[28px] sm:pb-[32px] cursor-pointer';
+const iconBoxClass = 'shrink-0 size-8 rounded-lg sm:size-10 sm:rounded';
+const titleClass = 'text-sm leading-5 font-semibold sm:text-xl sm:leading-[30px]';
+const headerGapClass = 'gap-2 sm:gap-4';
+const kebabClass = 'size-4 sm:size-6';
+const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 
 // 고정 타임존(Asia/Seoul) 포맷터 — SSR(UTC)/CSR 타임존 차이로 인한
 // 하이드레이션 미스매치를 방지하기 위해 new Date()의 로컬 메서드 대신 사용
@@ -86,7 +86,7 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
           {menu ? (
             <Dropdown>
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기 메뉴" onClick={(e) => e.stopPropagation()}>
+                <IconButton aria-label="더보기 메뉴" className="rounded-full" onClick={(e) => e.stopPropagation()}>
                   <IcKebab className={kebabClass} />
                 </IconButton>
               </Dropdown.Trigger>
@@ -95,6 +95,7 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
           ) : onMore ? (
             <IconButton
               aria-label="더보기 메뉴"
+              className="rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
                 onMore();
@@ -111,9 +112,7 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Chip type={resolved.todo.done ? 'done' : 'todo'} />
-          <span className={cn('text-slate-700', todoTextClass, resolved.todo.done && 'text-slate-400 line-through')}>
-            {resolved.todo.title}
-          </span>
+          <span className={cn('text-slate-700', todoTextClass)}>{resolved.todo.title}</span>
         </div>
         <span className="text-xs leading-4 text-slate-400">{formatDate(resolved.createdAt)}</span>
       </div>

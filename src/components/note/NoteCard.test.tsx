@@ -43,13 +43,13 @@ it('noteId로 노트를 받아 제목·연결된 할일·링크 아이콘을 렌
   expect(mocked.getNote).toHaveBeenCalledWith(3);
 });
 
-it('todo.done=true이면 line-through를 적용한다', async () => {
+it('todo.done=true여도 제목에 취소선을 적용하지 않는다', async () => {
   mocked.getNote.mockResolvedValue({
     ...note,
     todo: { ...note.todo, done: true },
   });
   renderWithClient(<NoteCard noteId={3} />);
-  expect(await screen.findByText('연결된 할일')).toHaveClass('line-through');
+  expect(await screen.findByText('연결된 할일')).not.toHaveClass('line-through');
 });
 
 it('onMore 제공 시 더보기 클릭으로 onMore를 호출하고 카드 onClick으로 버블링하지 않는다', async () => {
