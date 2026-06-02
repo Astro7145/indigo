@@ -108,7 +108,7 @@ export default function TodoFormUI({
       </div>
       <form
         noValidate
-        className="scrollbar-slate -mr-4 flex min-h-0 flex-1 scrollbar-gutter-stable flex-col overflow-y-auto py-4 pr-4 pl-1 sm:-mr-8 sm:pr-8"
+        className="scrollbar-slate -mr-8 flex min-h-0 flex-1 scrollbar-gutter-stable flex-col overflow-y-auto py-4 pr-8 pl-1"
       >
         {/* 상태 — 수정 폼에서만 표시 */}
         {showStatusField && (

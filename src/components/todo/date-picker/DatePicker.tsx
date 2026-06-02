@@ -55,7 +55,7 @@ export default function DatePicker(props: DatePickerProps) {
           isOpen ? 'border border-indigo-500' : 'border border-slate-300 hover:border-slate-400',
         )}
       >
-        <IcCalendarOutline className="shrink-0" />
+        <IcCalendarOutline className="size-5 shrink-0 sm:size-6" />
         {formatDate(isOpen ? pendingDate : props.value)}
       </button>
 

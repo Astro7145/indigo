@@ -50,7 +50,7 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
             >
               <div className="h-1 w-9 rounded-[2px] bg-slate-300" />
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-4 pb-8 sm:px-8">{children}</div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-8 pt-4 pb-8">{children}</div>
           </motion.div>
         </>
       )}
