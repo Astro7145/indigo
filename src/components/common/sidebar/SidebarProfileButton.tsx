@@ -27,11 +27,11 @@ export default function SidebarProfileButton() {
       ) : (
         <span aria-hidden className="size-9 shrink-0 rounded-full bg-indigo-600" />
       )}
-      <span className="flex flex-col items-start">
+      <span className="flex max-w-30 flex-col items-start">
         {isLoading ? (
           <span aria-hidden className="h-4 w-16 animate-pulse rounded-xs bg-indigo-800" />
         ) : (
-          <span className="flex max-w-30 items-center gap-x-1">
+          <span className="flex w-full items-center gap-x-1">
             <span className="truncate text-sm font-medium text-slate-50">{data?.name}</span>
             <IcChevron direction="right" className="size-4 text-white" />
           </span>
@@ -39,7 +39,7 @@ export default function SidebarProfileButton() {
         {isLoading ? (
           <span aria-hidden className="mt-2 h-4 w-32 animate-pulse rounded-xs bg-indigo-800" />
         ) : (
-          <span className="text-sm font-normal text-slate-400">{data?.email}</span>
+          <span className="w-full truncate text-sm font-normal text-slate-400">{data?.email}</span>
         )}
       </span>
     </Link>
