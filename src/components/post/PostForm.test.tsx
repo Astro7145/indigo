@@ -12,6 +12,7 @@ jest.mock('@/src/api/post', () => ({
 jest.mock('@/src/api/upload', () => ({
   ...jest.requireActual('@/src/api/upload'),
   createImageUploadUrl: jest.fn(),
+  uploadToPresignedUrl: jest.fn(),
 }));
 
 // 단위 테스트 격리: PostEditor 자체는 별도 테스트 — 여기서는 wiring만 검증
@@ -47,7 +48,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 
 import { createPost, getPost, patchPost } from '@/src/api/post';
-import { createImageUploadUrl } from '@/src/api/upload';
+import { createImageUploadUrl, uploadToPresignedUrl } from '@/src/api/upload';
 import PostForm from '@/src/components/post/PostForm';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 
@@ -178,8 +179,6 @@ it('이미지 삭제 버튼 클릭 시 이미지 카드가 사라진다', async 
 });
 
 it('이미지 파일 선택만으로는 업로드가 일어나지 않고 미리보기만 표시된다', async () => {
-  global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
-
   const { container } = renderWithClient(<PostForm mode="create" />);
 
   const file = new File(['x'], 'photo.png', { type: 'image/png' });
@@ -187,7 +186,7 @@ it('이미지 파일 선택만으로는 업로드가 일어나지 않고 미리�
 
   await waitFor(() => expect(container.querySelector('img')).toBeInTheDocument());
   expect(createImageUploadUrl).not.toHaveBeenCalled();
-  expect(global.fetch).not.toHaveBeenCalled();
+  expect(uploadToPresignedUrl).not.toHaveBeenCalled();
 });
 
 it('등록 클릭 시점에 이미지가 업로드되고 createPost에 업로드된 URL이 전달된다', async () => {
@@ -195,8 +194,8 @@ it('등록 클릭 시점에 이미지가 업로드되고 createPost에 업로드
     uploadUrl: 'https://signed.url/upload',
     url: 'https://cdn.url/final.png',
   });
+  (uploadToPresignedUrl as jest.Mock).mockResolvedValue(undefined);
   (createPost as jest.Mock).mockResolvedValue({ id: 42 });
-  global.fetch = jest.fn().mockResolvedValue({ ok: true }) as unknown as typeof fetch;
   const push = jest.fn();
   (useRouter as jest.Mock).mockReturnValue({ push, back: jest.fn() });
 
@@ -210,9 +209,7 @@ it('등록 클릭 시점에 이미지가 업로드되고 createPost에 업로드
   fireEvent.click(screen.getByRole('button', { name: '등록하기' }));
 
   await waitFor(() => expect(createImageUploadUrl).toHaveBeenCalledWith({ fileName: 'photo.png' }));
-  await waitFor(() =>
-    expect(global.fetch).toHaveBeenCalledWith('https://signed.url/upload', expect.objectContaining({ method: 'PUT' })),
-  );
+  await waitFor(() => expect(uploadToPresignedUrl).toHaveBeenCalledWith('https://signed.url/upload', expect.any(File)));
   await waitFor(() =>
     expect(createPost).toHaveBeenCalledWith(
       expect.objectContaining({ title: '제목', content: '<p>본문</p>', image: 'https://cdn.url/final.png' }),

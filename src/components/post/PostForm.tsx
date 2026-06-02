@@ -8,13 +8,23 @@ import Modal from '@/src/components/common/modal/Modal';
 import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
-import { useCreateImageUploadUrl } from '@/src/hooks/upload';
+import { useCreateImageUploadUrl, useUploadToPresignedUrl } from '@/src/hooks/upload';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
-// Tiptap은 시각적으로 비어 있어도 <p></p> 같은 래퍼를 뱉어서 문자열 비교로는 빈 상태 판별 불가
+// Tiptap이 만드는 HTML에는 &nbsp; 등 엔티티가 남을 수 있어 태그만 벗기면 "비어있음" 판정에 실패한다.
+// 주요 엔티티를 실제 문자로 환원한 뒤 trim해야 한다 (글자수 계산과 같은 텍스트 추출 로직 사용)
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
 function isHtmlEmpty(html: string) {
-  return html.replace(/<[^>]*>/g, '').trim() === '';
+  return htmlToPlainText(html).trim() === '';
 }
 
 export default function PostForm(props: PostFormProps) {
@@ -24,6 +34,7 @@ export default function PostForm(props: PostFormProps) {
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
+  const { mutateAsync: uploadToPresignedUrl } = useUploadToPresignedUrl();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -91,7 +102,7 @@ export default function PostForm(props: PostFormProps) {
     let finalImage: string | null = image;
     if (imageFile) {
       const { uploadUrl, url } = await createImageUploadUrl({ fileName: imageFile.name });
-      await fetch(uploadUrl, { method: 'PUT', body: imageFile });
+      await uploadToPresignedUrl({ uploadUrl, file: imageFile });
       finalImage = url;
     }
     if (props.mode === 'edit') {
@@ -107,7 +118,7 @@ export default function PostForm(props: PostFormProps) {
   const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
   const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
 
-  const contentText = content.replace(/<[^>]*>/g, '');
+  const contentText = htmlToPlainText(content);
   const contentCharCount = contentText.length;
   const contentNoSpaceCount = contentText.replace(/\s/g, '').length;
 
