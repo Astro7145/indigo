@@ -60,7 +60,7 @@ export default function PostForm(props: PostFormProps) {
   // 수정 모드에서 데이터 도착까지 로딩 표시
   if (props.mode === 'edit' && !initialPost) {
     return (
-      <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white md:min-h-[calc(100vh-100px)] md:max-w-[636px] lg:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
+      <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:min-h-[calc(100vh-100px)] sm:max-w-[636px] xl:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -112,9 +112,9 @@ export default function PostForm(props: PostFormProps) {
   const contentNoSpaceCount = contentText.replace(/\s/g, '').length;
 
   return (
-    <div className="mx-auto w-full max-w-[343px] md:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-between gap-3 md:mb-3">
-        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 md:text-2xl">
+    <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
+      <header className="mb-4 flex h-10 items-center justify-between gap-3 sm:mb-3">
+        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
           {headingText}
         </h1>
         <div className="flex shrink-0 gap-2">
@@ -122,7 +122,7 @@ export default function PostForm(props: PostFormProps) {
             variant="tertiary"
             size="small"
             onClick={handleCancel}
-            className="md:h-10 md:w-[106px] md:px-0 md:py-0 md:text-base"
+            className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
             취소
           </Button>
@@ -131,7 +131,7 @@ export default function PostForm(props: PostFormProps) {
             size="small"
             disabled={!isValid}
             onClick={handleSubmit}
-            className="md:h-10 md:w-[106px] md:px-0 md:py-0 md:text-base"
+            className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
             {submitText}
           </Button>
@@ -144,7 +144,7 @@ export default function PostForm(props: PostFormProps) {
           if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
           editorRef.current?.focus();
         }}
-        className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 md:min-h-[calc(100vh-100px)] md:px-[30px] md:py-8 lg:min-h-[calc(100vh-212px)] xl:px-[34px]"
+        className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 sm:min-h-[calc(100vh-100px)] sm:px-[30px] sm:py-8 xl:min-h-[calc(100vh-212px)] xl:px-[34px]"
       >
         <PostEditor
           ref={editorRef}
@@ -153,10 +153,10 @@ export default function PostForm(props: PostFormProps) {
           onImageClick={handleImageClick}
           placeholder="이 곳을 통해 내용을 작성해주세요"
           // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
-          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 md:min-h-[600px] md:pt-5 md:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 sm:min-h-[600px] sm:pt-5 sm:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
             <div className="pt-[29px]">
-              <div className="flex items-end justify-between gap-3 pb-4 md:gap-4 md:pb-6 xl:pb-7">
+              <div className="flex items-end justify-between gap-3 pb-4 sm:gap-4 sm:pb-6 xl:pb-7">
                 <input
                   type="text"
                   value={title}
@@ -164,9 +164,9 @@ export default function PostForm(props: PostFormProps) {
                   maxLength={30}
                   placeholder="게시물의 제목을 입력해주세요"
                   aria-label="제목"
-                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 md:text-2xl"
+                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
                 />
-                <span className="shrink-0 text-xs text-slate-400 md:text-sm">{title.length}/30</span>
+                <span className="shrink-0 text-xs text-slate-400 sm:text-sm">{title.length}/30</span>
               </div>
               <div className="border-b border-slate-200" />
             </div>
@@ -174,7 +174,7 @@ export default function PostForm(props: PostFormProps) {
         />
 
         {image && (
-          <div className="pt-4 md:pt-6">
+          <div className="pt-4 sm:pt-6">
             <PostImageAttachment
               src={image}
               onDelete={() => {
@@ -185,7 +185,7 @@ export default function PostForm(props: PostFormProps) {
           </div>
         )}
 
-        <div className="mt-auto pt-4 text-right text-xs text-slate-400 md:text-sm">
+        <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
           공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
         </div>
       </div>
