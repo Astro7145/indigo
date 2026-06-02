@@ -98,11 +98,14 @@ export default function Sidebar() {
       {isTablet && <span className="w-15" />}
       <motion.aside
         style={{ width }}
-        className={cn('top-0 left-0 z-50 flex h-screen overflow-hidden bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
+        className={cn(
+          'scrollbar-slate top-0 left-0 z-50 flex h-screen overflow-x-hidden overflow-y-auto bg-[#1A1B2E]',
+          isTablet ? 'fixed' : 'sticky',
+        )}
       >
         <div
           className={cn(
-            'flex flex-1 flex-col justify-between',
+            'flex flex-1 flex-col justify-between gap-y-4',
             collapsed ? (isTablet ? 'py-8 pl-2.5' : 'py-8 pr-1 pl-3') : 'pt-8 pr-4 pb-16 pl-8',
           )}
         >

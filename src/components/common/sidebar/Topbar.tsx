@@ -38,7 +38,7 @@ export default function Topbar() {
     return () => window.removeEventListener('resize', update);
   }, [height]);
 
-  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
+  // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
   useEffect(() => {
     if (!expanded) return;
     const previousOverflow = document.body.style.overflow;
@@ -69,8 +69,17 @@ export default function Topbar() {
 
   const handleDragEnd = () => {
     if (!expandedHeight) return;
-    if (height.get() > (COLLAPSED_HEIGHT + expandedHeight) / 2) expand();
-    else collapse();
+    const range = expandedHeight - COLLAPSED_HEIGHT;
+    const currentHeight = height.get();
+    if (!expanded) {
+      // collapsed 기준: 전체 범위의 25% 이상 아래로 드래그하면 expand
+      if (currentHeight >= COLLAPSED_HEIGHT + range * 0.25) expand();
+      else collapse();
+    } else {
+      // expanded 기준: 전체 범위의 25% 이상 위로 드래그하면 collapse
+      if (currentHeight <= expandedHeight - range * 0.25) collapse();
+      else expand();
+    }
   };
 
   return (
