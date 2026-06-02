@@ -15,6 +15,13 @@ const SAMPLE_GOALS = [
   { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
   { id: 2, title: '디자인 시스템 강의 듣기' },
   { id: 3, title: '알고리즘 문제 매일 풀기' },
+  { id: 4, title: '알고리즘 문제 매일 풀기' },
+  { id: 5, title: '알고리즘 문제 매일 풀기' },
+  { id: 6, title: '알고리즘 문제 매일 풀기' },
+  { id: 7, title: '알고리즘 문제 매일 풀기' },
+  { id: 8, title: '알고리즘 문제 매일 풀기' },
+  { id: 9, title: '알고리즘 문제 매일 풀기' },
+  { id: 10, title: '알고리즘 문제 매일 풀기' },
 ];
 
 const EXPANDED_WIDTH = 360;

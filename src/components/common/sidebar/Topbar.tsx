@@ -9,6 +9,20 @@ import SidebarGoalRow from './SidebarGoalRow';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
+import TodoAddButton from './TodoAddButton';
+
+const SAMPLE_GOALS = [
+  { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
+  { id: 2, title: '디자인 시스템 강의 듣기' },
+  { id: 3, title: '알고리즘 문제 매일 풀기' },
+  { id: 4, title: '알고리즘 문제 매일 풀기' },
+  { id: 5, title: '알고리즘 문제 매일 풀기' },
+  { id: 6, title: '알고리즘 문제 매일 풀기' },
+  { id: 7, title: '알고리즘 문제 매일 풀기' },
+  { id: 8, title: '알고리즘 문제 매일 풀기' },
+  { id: 9, title: '알고리즘 문제 매일 풀기' },
+  { id: 10, title: '알고리즘 문제 매일 풀기' },
+];
 
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
@@ -18,7 +32,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 export default function Topbar() {
   const title = usePageTitle();
   const [expandedHeight, setExpandedHeight] = useState(0);
-  const [expanded, setExpanded] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const height = useMotionValue(COLLAPSED_HEIGHT);
   const dragStartHeight = useRef(COLLAPSED_HEIGHT);
 
@@ -40,21 +54,21 @@ export default function Topbar() {
 
   // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
   useEffect(() => {
-    if (!expanded) return;
+    if (collapsed) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [expanded]);
+  }, [collapsed]);
 
   const expand = () => {
-    setExpanded(true);
+    setCollapsed(false);
     animate(height, expandedHeight, SPRING);
   };
 
   const collapse = () => {
-    setExpanded(false);
+    setCollapsed(true);
     animate(height, COLLAPSED_HEIGHT, SPRING);
   };
 
@@ -71,7 +85,7 @@ export default function Topbar() {
     if (!expandedHeight) return;
     const range = expandedHeight - COLLAPSED_HEIGHT;
     const currentHeight = height.get();
-    if (!expanded) {
+    if (collapsed) {
       // collapsed 기준: 전체 범위의 25% 이상 아래로 드래그하면 expand
       if (currentHeight >= COLLAPSED_HEIGHT + range * 0.25) expand();
       else collapse();
@@ -94,7 +108,7 @@ export default function Topbar() {
         {/* 접힘 상태: 인사말 + 알림 */}
         <motion.div
           style={{ opacity: barOpacity }}
-          aria-hidden={expanded}
+          aria-hidden={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
           <span className="text-base font-semibold text-slate-50">{title}</span>
@@ -104,16 +118,9 @@ export default function Topbar() {
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
           style={{ opacity: menuOpacity }}
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
-          aria-hidden={!expanded}
-          className={`flex h-full min-h-0 flex-col justify-between overflow-y-hidden px-5 pt-4 pb-12 ${
-            expanded ? 'pointer-events-auto' : 'pointer-events-none'
+          aria-hidden={collapsed}
+          className={`flex h-full min-h-0 flex-col justify-between overflow-y-auto px-5 pt-4 pb-12 ${
+            !collapsed ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
         >
           <div className="flex flex-col gap-y-8">
@@ -124,7 +131,7 @@ export default function Topbar() {
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text="대쉬보드" />
               </Link>
-              <SidebarGoalRow />
+              <SidebarGoalRow goals={SAMPLE_GOALS} />
               <Link href="/calendar" className="group" onClick={collapse}>
                 <SidebarRow type="calendar" text="캘린더" />
               </Link>
@@ -141,9 +148,12 @@ export default function Topbar() {
             </div>
           </div>
 
-          <div className="flex gap-x-2">
-            <SidebarProfileButton />
-            <SidebarNotificationButton />
+          <div className="flex flex-col gap-y-4">
+            <TodoAddButton onClick={() => console.log('add todo')} />
+            <div className="flex gap-x-2">
+              <SidebarProfileButton />
+              <SidebarNotificationButton />
+            </div>
           </div>
         </motion.div>
 
@@ -158,9 +168,9 @@ export default function Topbar() {
           onDragEnd={handleDragEnd}
           role="separator"
           aria-orientation="horizontal"
-          className="absolute inset-0 flex h-full cursor-ns-resize touch-none items-end justify-center pb-2 hover:bg-indigo-600/10"
+          className="absolute inset-x-0 bottom-0 flex h-19 cursor-grab touch-none items-end justify-center pb-2"
         >
-          {!expanded && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
+          {collapsed && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
         </motion.div>
       </motion.div>
     </>
