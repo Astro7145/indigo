@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Button from '@/src/components/common/buttons/Button';
-import { IcPencil } from '@/src/components/common/icons/IcPencil';
 import Input from '@/src/components/common/inputs/Input';
 import PasswordInput from '@/src/components/common/inputs/PasswordInput';
+import ProfileImageInput from '@/src/components/user/ProfileImageInput';
 
 export const metadata: Metadata = {
   title: '내 정보 관리 | INdigo',
@@ -19,18 +19,7 @@ export default function Page() {
         aria-label="내 정보 관리 폼"
         className="flex flex-col items-center gap-12 rounded-lg border border-slate-200 bg-white px-5 py-10 shadow-[0_2px_4px_rgba(0,0,0,0.04)] sm:px-8"
       >
-        {/* 프로필 이미지 */}
-        <div className="relative size-33">
-          {/* 실제 이미지가 없으므로 indigo-600으로 대체 */}
-          <div role="img" aria-label="프로필 사진" className="size-full rounded-full bg-indigo-600" />
-          <button
-            type="button"
-            aria-label="프로필 사진 변경"
-            className="absolute right-0 bottom-0 flex size-9 cursor-pointer items-center justify-center rounded-full bg-indigo-500 transition-colors hover:bg-indigo-600"
-          >
-            <IcPencil className="size-5 text-white" />
-          </button>
-        </div>
+        <ProfileImageInput />
 
         {/* 정보 수정 폼 */}
         <form className="flex w-full flex-col gap-12">
@@ -59,8 +48,8 @@ export default function Page() {
             </div>
 
             {/* 비밀번호 변경 */}
-            <fieldset className="flex flex-col gap-2">
-              <legend className="pl-1 text-base font-semibold text-slate-700">비밀번호 변경</legend>
+            <fieldset>
+              <legend className="mb-2 pl-1 text-base font-semibold text-slate-700">비밀번호 변경</legend>
               <div className="flex flex-col gap-3">
                 <PasswordInput
                   id="currentPassword"
