@@ -27,7 +27,7 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
           />
 
           <motion.div
-            className="fixed bottom-0 left-0 z-50 w-full rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
+            className="fixed bottom-0 left-0 z-50 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
             onKeyDown={(e) => e.key === 'Escape' && onClose()}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -40,10 +40,10 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
               if (info.offset.y > 80 || info.velocity.y > 500) onClose();
             }}
           >
-            <div className="flex justify-center pt-[10px]">
+            <div className="flex shrink-0 justify-center pt-[10px]">
               <div className="h-1 w-9 rounded-[2px] bg-slate-300" />
             </div>
-            {children}
+            <div className="flex flex-1 flex-col overflow-hidden px-4 pt-6 pb-8 sm:px-8">{children}</div>
           </motion.div>
         </>
       )}

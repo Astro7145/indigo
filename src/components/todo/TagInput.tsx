@@ -32,7 +32,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 rounded-sm border border-slate-300 p-4 focus-within:border-indigo-500">
+    <div className="flex flex-wrap items-center gap-1.5 rounded-sm border border-slate-300 p-3 focus-within:border-indigo-500 sm:p-4">
       {value.map((tag) => (
         <Badge key={tag.text} color={tag.color} onDelete={() => onChange(value.filter((t) => t.text !== tag.text))}>
           {tag.text}
@@ -44,7 +44,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="입력 후 Enter"
-        className="min-w-0 flex-1 text-base text-slate-700 outline-none placeholder:text-slate-500"
+        className="min-w-0 flex-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base"
       />
     </div>
   );

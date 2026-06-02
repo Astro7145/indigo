@@ -5,12 +5,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import Button from '@/src/components/common/buttons/Button';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
-import { IcChevron } from '@/src/components/common/icons';
+import { IcChevron, IcDelete } from '@/src/components/common/icons';
 import ImageInput from '@/src/components/common/inputs/ImageInput';
 import Input from '@/src/components/common/inputs/Input';
 import LinkInput from '@/src/components/common/inputs/LinkInput';
-import Modal from '@/src/components/common/modal/Modal';
 import StatusField from '@/src/components/todo/StatusField';
 import DatePicker from '@/src/components/todo/date-picker/DatePicker';
 import TagInput, { type Tag } from '@/src/components/todo/TagInput';
@@ -100,7 +100,12 @@ export default function TodoFormUI({
 
   return (
     <>
-      <Modal.Title className="mb-4">{title}</Modal.Title>
+      <div className="flex shrink-0 items-center justify-between">
+        <h2 className="text-xl font-semibold text-slate-800">{title}</h2>
+        <button type="button" onClick={onClose} aria-label="닫기">
+          <IcDelete className="size-6 text-slate-400" />
+        </button>
+      </div>
       <form
         noValidate
         className="scrollbar-slate -mr-4 flex min-h-0 flex-1 scrollbar-gutter-stable flex-col overflow-y-auto py-4 pr-4 pl-1 sm:-mr-8 sm:pr-8"
@@ -119,7 +124,7 @@ export default function TodoFormUI({
 
         {/* 제목 */}
         <div className="flex flex-col gap-2">
-          <label className="px-1 text-base font-semibold text-slate-700">
+          <label className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
             제목 <span className="text-destructive">*</span>
           </label>
           <Input
@@ -134,15 +139,15 @@ export default function TodoFormUI({
 
         {/* 목표 */}
         <div className="flex flex-col gap-2 pb-8">
-          <span className="px-1 text-base font-semibold text-slate-700">목표</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">목표</span>
           <Dropdown>
             <Dropdown.Trigger asChild>
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-sm border border-slate-300 p-4 text-base text-slate-700 focus:border-indigo-500 focus:outline-none"
+                className="flex w-full items-center justify-between rounded-sm border border-slate-300 p-3 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base"
               >
                 {selectedGoal?.title ?? '목표를 선택해주세요'}
-                <IcChevron direction="down" className="size-4 shrink-0 text-slate-400" />
+                <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
@@ -158,7 +163,7 @@ export default function TodoFormUI({
 
         {/* 마감기한 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-base font-semibold text-slate-700">
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
             마감기한 <span className="text-destructive">*</span>
           </span>
           <DatePicker
@@ -176,13 +181,13 @@ export default function TodoFormUI({
 
         {/* 태그 */}
         <div className="flex flex-col gap-2 pb-8">
-          <span className="px-1 text-base font-semibold text-slate-700">태그</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">태그</span>
           <TagInput value={tags} onChange={setTags} />
         </div>
 
         {/* 링크 */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="link-input" className="px-1 text-base font-semibold text-slate-700">
+          <label htmlFor="link-input" className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
             링크
           </label>
           <LinkInput
@@ -198,17 +203,25 @@ export default function TodoFormUI({
 
         {/* 이미지 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-base font-semibold text-slate-700">이미지</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">이미지</span>
           <ImageInput onFileChange={setImageFile} initialUrl={fileUrl} onInitialUrlRemove={() => setFileUrl(null)} />
           <p className="text-sm font-medium text-slate-400">이미지는 최대 1개만 첨부할 수 있습니다.</p>
         </div>
       </form>
-      <Modal.Actions className="mt-4">
-        <Modal.Cancel onClick={onClose}>취소</Modal.Cancel>
-        <Modal.Confirm onClick={handleSubmit_} disabled={disableSubmitUntilValid && !canSubmit}>
+      <div className="mt-10 flex w-full shrink-0 items-center gap-2 sm:gap-3 [&>*]:flex-1">
+        <Button variant="tertiary" size="small" className="py-3 text-base sm:py-[14px] sm:text-lg" onClick={onClose}>
+          취소
+        </Button>
+        <Button
+          variant="primary"
+          size="small"
+          className="py-3 text-base sm:py-[14px] sm:text-lg"
+          onClick={handleSubmit_}
+          disabled={disableSubmitUntilValid && !canSubmit}
+        >
           {submitLabel}
-        </Modal.Confirm>
-      </Modal.Actions>
+        </Button>
+      </div>
     </>
   );
 }
