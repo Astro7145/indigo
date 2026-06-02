@@ -1,3 +1,5 @@
+jest.mock('@/src/hooks/useIsMobile', () => ({ useIsMobile: () => false }));
+
 jest.mock('@/src/api/todo', () => ({
   ...jest.requireActual('@/src/api/todo'),
   getTodos: jest.fn(),
