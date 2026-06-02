@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${pretendard.className} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-slate-100">
+      <body className="flex min-h-full bg-slate-100">
         <Providers>
           <Toast />
           {children}
