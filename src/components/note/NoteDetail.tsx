@@ -11,7 +11,6 @@ import { IcTask } from '@/src/components/common/icons/IcTask';
 import { useNote } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
 
-import NoteContent from './NoteContent';
 import NoteLinkEmbed from './NoteLinkEmbed';
 
 // Asia/Seoul 고정 포맷터 — SSR/CSR 타임존 차이로 인한 하이드레이션 미스매치 방지(NoteCard와 동일 패턴)
@@ -40,7 +39,6 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
   if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>;
   if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>;
 
-  const content = typeof note.content === 'string' ? note.content : '';
   const tags = note.todo.tags ?? [];
   const hasLink = !!note.linkUrl;
 
@@ -101,8 +99,6 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
           <span className="min-w-0 truncate text-sm text-slate-600">{note.linkUrl}</span>
         </button>
       )}
-
-      <NoteContent html={content} />
     </div>
   );
 

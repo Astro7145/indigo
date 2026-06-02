@@ -18,7 +18,6 @@ const sample: Note = {
   userId: 1,
   todoId: 9,
   title: '프로그래밍과 데이터 in JavaScript',
-  content: '<p>본문 텍스트</p>',
   linkUrl: 'https://www.codeit.kr/lessons/3480',
   createdAt: '2024-03-20T00:00:00Z',
   updatedAt: '2024-03-25T00:00:00Z',
@@ -36,14 +35,13 @@ const sample: Note = {
 
 beforeEach(() => jest.resetAllMocks());
 
-it('노트 메타와 본문을 렌더한다', async () => {
+it('노트 메타를 렌더한다', async () => {
   noteMock.getNote.mockResolvedValue(sample);
   renderWithClient(<NoteDetail noteId={1} />);
   expect(await screen.findByText('프로그래밍과 데이터 in JavaScript')).toBeInTheDocument();
   expect(screen.getByText('자바스크립트로 웹 서비스 만들기')).toBeInTheDocument();
   expect(screen.getByText('자바스크립트 기초 챕터1 듣기')).toBeInTheDocument();
   expect(screen.getByText('코딩')).toBeInTheDocument();
-  expect(screen.getByText('본문 텍스트')).toBeInTheDocument();
 });
 
 it('링크 카드 클릭 시 임베드를 토글한다', async () => {
