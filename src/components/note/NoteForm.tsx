@@ -177,7 +177,7 @@ export default function NoteForm(props: NoteFormProps) {
           value={content}
           onChange={setContent}
           onLinkInsertClick={handleLinkInsertClick}
-          placeholder="이 곳을 통해 내용을 작성하세요"
+          placeholder="이 곳을 통해 노트 작성을 시작해주세요"
           // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
           contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
@@ -193,7 +193,7 @@ export default function NoteForm(props: NoteFormProps) {
                   aria-label="제목"
                   className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
                 />
-                <span className="shrink-0 text-xs text-slate-400 sm:text-sm">{title.length}/30</span>
+                <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>
               </div>
               <div className="border-b border-slate-200" />
             </div>
