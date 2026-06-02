@@ -129,7 +129,7 @@ export default function Topbar() {
             </button>
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
-                <SidebarRow type="dashboard" text="대쉬보드" />
+                <SidebarRow type="dashboard" text="대시보드" />
               </Link>
               <SidebarGoalRow goals={SAMPLE_GOALS} />
               <Link href="/calendar" className="group" onClick={collapse}>

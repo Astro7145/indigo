@@ -126,7 +126,7 @@ export default function Sidebar() {
               {collapsed ? <Logo size={isTablet ? 'sm' : 'md'} /> : <LogoFull type="white" />}
             </button>
             <ul className="flex flex-col gap-y-3">
-              <SidebarRow type="dashboard" text="대쉬보드" href="/" current={path === '/'} collapsed={collapsed} />
+              <SidebarRow type="dashboard" text="대시보드" href="/" current={path === '/'} collapsed={collapsed} />
               <SidebarGoalRow goals={SAMPLE_GOALS} collapsed={collapsed} onExpand={() => applyCollapsed(false)} />
               <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
               <SidebarRow type="posts" text="소통 게시판" href="/posts" collapsed={collapsed} />
