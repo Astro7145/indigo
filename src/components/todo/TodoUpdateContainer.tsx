@@ -2,25 +2,23 @@
 
 import type { BadgeColor } from '@/src/components/common/badges/Badge';
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
-import { useTodo, useUpdateTodo } from '@/src/hooks/todo';
+import { useUpdateTodo } from '@/src/hooks/todo';
 import { useCreateImageUploadUrl } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
+import type { Todo } from '@/src/types/todo';
 
 const BADGE_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 interface TodoUpdateContainerProps {
-  todoId: number;
+  todo: Todo;
   onClose: () => void;
+  onCancel?: () => void;
 }
 
-export default function TodoUpdateContainer({ todoId, onClose }: TodoUpdateContainerProps) {
-  const { data: todo, isLoading, isError } = useTodo(todoId);
+export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpdateContainerProps) {
   const { mutateAsync: updateTodo } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
-
-  if (isLoading) return <p className="p-4 text-sm text-slate-500">불러오는 중...</p>;
-  if (isError || !todo) return <p className="p-4 text-sm text-red-500">할 일을 찾을 수 없습니다.</p>;
 
   const initialValues: Partial<TodoFormValues> = {
     title: todo.title,
@@ -51,7 +49,7 @@ export default function TodoUpdateContainer({ todoId, onClose }: TodoUpdateConta
 
     await updateTodo(
       {
-        todoId,
+        todoId: todo.id,
         body: {
           title: values.title,
           goalId: values.goalId ?? null,
@@ -78,7 +76,7 @@ export default function TodoUpdateContainer({ todoId, onClose }: TodoUpdateConta
     <TodoFormUI
       initialValues={initialValues}
       onSubmit={handleSubmit}
-      onClose={onClose}
+      onClose={onCancel ?? onClose}
       title="할 일 수정"
       submitLabel="수정"
     />

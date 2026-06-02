@@ -26,6 +26,7 @@ jest.mock('motion/react', () => ({
     },
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useDragControls: () => ({ start: jest.fn() }),
 }));
 
 jest.mock('react-aria', () => ({ usePreventScroll: jest.fn() }));

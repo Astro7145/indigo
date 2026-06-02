@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useDragControls } from 'motion/react';
 import { usePreventScroll } from 'react-aria';
 
 interface BottomSheetProps {
@@ -12,6 +12,7 @@ interface BottomSheetProps {
 
 export default function BottomSheet({ isOpen, onClose, children }: BottomSheetProps) {
   usePreventScroll({ isDisabled: !isOpen });
+  const dragControls = useDragControls();
 
   return (
     <AnimatePresence>
@@ -34,16 +35,22 @@ export default function BottomSheet({ isOpen, onClose, children }: BottomSheetPr
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             drag="y"
+            dragListener={false}
+            dragControls={dragControls}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 1 }}
             onDragEnd={(_, info) => {
               if (info.offset.y > 80 || info.velocity.y > 500) onClose();
             }}
           >
-            <div className="flex shrink-0 justify-center pt-[10px]">
+            <div
+              onPointerDown={(e) => dragControls.start(e)}
+              style={{ touchAction: 'none' }}
+              className="flex shrink-0 cursor-grab justify-center pt-[10px] pb-2 active:cursor-grabbing"
+            >
               <div className="h-1 w-9 rounded-[2px] bg-slate-300" />
             </div>
-            <div className="flex flex-1 flex-col overflow-hidden px-4 pt-6 pb-8 sm:px-8">{children}</div>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pt-4 pb-8 sm:px-8">{children}</div>
           </motion.div>
         </>
       )}
