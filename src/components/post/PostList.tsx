@@ -74,7 +74,11 @@ export default function PostList() {
 
       {/* 목록 또는 빈 상태 */}
       <section className="mx-auto max-w-[1200px]">
-        {!isPending && posts.length === 0 ? (
+        {isPending ? (
+          <div className="flex min-h-[40vh] items-center justify-center">
+            <p className="text-sm text-slate-400">불러오는 중…</p>
+          </div>
+        ) : posts.length === 0 ? (
           <PostListEmpty />
         ) : (
           <>
