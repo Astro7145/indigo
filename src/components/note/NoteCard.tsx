@@ -19,17 +19,17 @@ export interface NoteCardProps {
 }
 
 /**
- * 반응형 클래스 — 폭 343(mobile) → 636(md) → 644(lg).
- * 모바일=small 디자인, md(≥768px)부터 large 디자인으로 전환.
- * md·lg는 같은 large 스타일이며 폭만 636→644로 미세 조정(8px) — 그 외 패딩·아이콘·텍스트는 `md:`에서 한 번만 분기.
+ * 반응형 클래스 — 폭 343(mobile) → 636(sm) → 644(xl).
+ * 모바일=small 디자인, 태블릿(sm, ≥640px)부터 large 디자인으로 전환.
+ * 태블릿(sm)·데스크탑(xl)은 같은 large 스타일이며 폭만 636→644로 미세 조정(8px) — 그 외 패딩·아이콘·텍스트는 `sm:`에서 한 번만 분기.
  */
 const rootClass =
-  'flex flex-col w-[343px] gap-3 md:w-[636px] md:gap-4 md:px-[38px] md:pt-[28px] md:pb-[32px] lg:w-[644px]';
-const iconBoxClass = 'shrink-0 size-8 rounded-lg md:size-10 md:rounded';
-const titleClass = 'text-sm leading-5 font-semibold md:text-xl md:leading-[30px]';
-const headerGapClass = 'gap-2 md:gap-4';
-const kebabClass = 'size-4 md:size-6';
-const todoTextClass = 'text-xs leading-4 md:text-sm md:leading-5';
+  'flex flex-col w-[343px] gap-3 sm:w-[636px] sm:gap-4 sm:px-[38px] sm:pt-[28px] sm:pb-[32px] xl:w-[644px]';
+const iconBoxClass = 'shrink-0 size-8 rounded-lg sm:size-10 sm:rounded';
+const titleClass = 'text-sm leading-5 font-semibold sm:text-xl sm:leading-[30px]';
+const headerGapClass = 'gap-2 sm:gap-4';
+const kebabClass = 'size-4 sm:size-6';
+const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 
 /**
  * 노트 카드 — `Note` 도메인 객체를 받아 공통 Card 표면 위에 합성.
