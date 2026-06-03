@@ -38,7 +38,10 @@ export default function PostSearchBar() {
 
   return (
     <div className="flex w-full items-center justify-between gap-4">
-      <div className="flex-1 sm:w-[432px] sm:flex-none">
+      {/* `<input>`의 기본 intrinsic min-width(size=20) 때문에 좁은 모바일 폭에서 wrapper를 못 줄여 아이콘이 튀어나간다.
+          본래는 공통 SearchInput/Input의 inner <input>에 min-w-0이 들어가야 할 보정이지만, 공통 컴포넌트 변경 합의 전까지
+          여기서 임의 variant로 descendant input에 주입해 PostSearchBar만 안전하게 만든다. */}
+      <div className="min-w-0 flex-1 sm:w-[432px] sm:flex-none [&_input]:min-w-0">
         <SearchInput
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -49,7 +52,7 @@ export default function PostSearchBar() {
       </div>
 
       <Dropdown>
-        <Dropdown.Trigger className="inline-flex items-center gap-1 text-sm text-slate-700 sm:gap-3 sm:text-base">
+        <Dropdown.Trigger className="inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-slate-700 sm:gap-3 sm:text-base">
           {currentLabel}
           <IcFilter className="size-5 text-slate-500" />
         </Dropdown.Trigger>
