@@ -148,11 +148,11 @@ function Trigger({ asChild, className, children }: TriggerProps) {
         }
       },
       // asChild 자식이 이벤트를 전달하지 않고 onClick을 호출할 수 있어(e 없음) 옵셔널 처리.
-      // 그 경우 전파 차단은 자식이 책임진다.
+      // 그 경우 전파 차단은 자식이 책임진다. e가 없어도 자식의 원래 onClick은 항상 호출한다.
       onClick: (e?: React.MouseEvent<HTMLElement>) => {
         e?.stopPropagation();
         toggle();
-        if (e) child.props.onClick?.(e);
+        child.props.onClick?.(e as React.MouseEvent<HTMLElement>);
       },
     });
   }
