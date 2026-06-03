@@ -1,6 +1,7 @@
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
 import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite';
 import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
+import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
 import { formatDate } from '@/src/utils/date';
 
 export interface NoteMetaInfoProps {
@@ -12,16 +13,10 @@ export interface NoteMetaInfoProps {
 }
 
 // 태그 id로 안정적으로 색을 회전시킴 (서버가 색을 주지 않음)
-const TAG_PALETTE = [
-  'bg-emerald-50 text-emerald-600',
-  'bg-amber-50 text-amber-600',
-  'bg-rose-50 text-rose-600',
-  'bg-sky-50 text-sky-600',
-  'bg-indigo-50 text-indigo-600',
-];
+const TAG_COLORS: BadgeColor[] = ['purple', 'green', 'yellow', 'red', 'gray'];
 
-function tagColor(id: number): string {
-  return TAG_PALETTE[id % TAG_PALETTE.length];
+function tagColor(id: number): BadgeColor {
+  return TAG_COLORS[id % TAG_COLORS.length];
 }
 
 export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, createdAt }: NoteMetaInfoProps) {
@@ -69,9 +64,9 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
           </dt>
           <dd className="flex flex-wrap gap-1">
             {tags.map((tag) => (
-              <span key={tag.id} className={`rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${tagColor(tag.id)}`}>
+              <Badge key={tag.id} color={tagColor(tag.id)} className="py-0.5 text-[10px] sm:text-xs">
                 {tag.name}
-              </span>
+              </Badge>
             ))}
           </dd>
         </div>
