@@ -17,7 +17,7 @@ export default function CommentSection({ postId, comments, currentUserId }: Comm
 
   return (
     <section className="mt-6">
-      <h2 className="mb-4 text-base font-semibold text-slate-800 md:text-lg">
+      <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
         댓글 <span className="text-indigo-500">{comments.length}</span>
       </h2>
       <CommentInput onSubmit={(content) => createComment({ content })} />

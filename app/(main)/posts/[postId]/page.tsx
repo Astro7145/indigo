@@ -34,7 +34,7 @@ export default function PostDetailPage() {
 
   if (postPending || !post) {
     return (
-      <div className="mx-auto flex min-h-[calc(100vh-104px)] w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm md:min-h-[calc(100vh-48px)] md:max-w-[636px] md:p-10 lg:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
+      <div className="mx-auto flex min-h-[calc(100vh-104px)] w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:min-h-[calc(100vh-48px)] sm:max-w-[636px] sm:p-10 xl:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -42,9 +42,9 @@ export default function PostDetailPage() {
 
   return (
     <>
-      <article className="mx-auto min-h-[calc(100vh-104px)] w-full max-w-[343px] rounded bg-white p-4 shadow-sm md:min-h-[calc(100vh-48px)] md:max-w-[636px] md:p-10 lg:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
+      <article className="mx-auto min-h-[calc(100vh-104px)] w-full max-w-[343px] rounded bg-white p-4 shadow-sm sm:min-h-[calc(100vh-48px)] sm:max-w-[636px] sm:p-10 xl:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h1 className="text-lg font-bold text-slate-900 md:text-2xl">{post.title}</h1>
+          <h1 className="text-lg font-bold text-slate-900 sm:text-2xl">{post.title}</h1>
           {me?.id === post.writer.id && (
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
@@ -68,14 +68,14 @@ export default function PostDetailPage() {
           {post.writer.image ? (
             <Image src={post.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
           ) : (
-            <IcProfileYellow className="size-5 md:size-6" />
+            <IcProfileYellow className="size-5 sm:size-6" />
           )}
           <span className="text-sm text-slate-700">{post.writer.name}</span>
         </div>
 
         {/* 본문 — 에디터 HTML을 그대로 렌더. SSR/빌드 시점엔 window가 없으므로 빈 문자열 */}
         <div
-          className="mb-6 text-sm text-slate-800 md:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
+          className="mb-6 text-sm text-slate-800 sm:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
           dangerouslySetInnerHTML={{
             __html: typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : '',
           }}
@@ -83,7 +83,7 @@ export default function PostDetailPage() {
 
         {/* 이미지 */}
         {post.image && (
-          <div className="relative mb-6 size-[150px] overflow-hidden rounded border border-slate-200 md:size-[232px]">
+          <div className="relative mb-6 size-[150px] overflow-hidden rounded border border-slate-200 sm:size-[232px]">
             <Image src={post.image} alt="" fill className="object-cover" />
           </div>
         )}

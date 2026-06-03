@@ -51,9 +51,9 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
             {comment.writer.image ? (
               <Image src={comment.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
             ) : (
-              <IcProfileYellow className="size-5 md:size-6" />
+              <IcProfileYellow className="size-5 sm:size-6" />
             )}
-            <span className="text-sm text-slate-700 md:text-base">{comment.writer.name}</span>
+            <span className="text-sm text-slate-700 sm:text-base">{comment.writer.name}</span>
             {isMine && (
               <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
                 내 댓글
@@ -84,7 +84,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               aria-label="댓글 수정"
-              className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none md:px-4 md:py-2.5"
+              className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
             <div className="flex items-center justify-between gap-2">
@@ -101,7 +101,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
           </form>
         ) : (
           <>
-            <p className="text-sm text-slate-700 md:text-base">{comment.content}</p>
+            <p className="text-sm text-slate-700 sm:text-base">{comment.content}</p>
             <div className="text-xs text-slate-400">{formattedDate}</div>
           </>
         )}

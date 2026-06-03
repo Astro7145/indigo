@@ -38,7 +38,7 @@ export default function PostSearchBar() {
 
   return (
     <div className="flex w-full items-center justify-between gap-4">
-      <div className="flex-1 md:w-[432px] md:flex-none">
+      <div className="flex-1 sm:w-[432px] sm:flex-none">
         <SearchInput
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -49,7 +49,7 @@ export default function PostSearchBar() {
       </div>
 
       <Dropdown>
-        <Dropdown.Trigger className="inline-flex items-center gap-1 text-sm text-slate-700 md:gap-3 md:text-base">
+        <Dropdown.Trigger className="inline-flex items-center gap-1 text-sm text-slate-700 sm:gap-3 sm:text-base">
           {currentLabel}
           <IcFilter className="size-5 text-slate-500" />
         </Dropdown.Trigger>

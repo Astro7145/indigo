@@ -57,7 +57,7 @@ export default function PostList() {
           데이터 도착 후 0개면 영역 자체를 숨긴다. 모바일: 가로 스크롤 / md+: 3열 grid. */}
       {(isBestPending || bestPosts.length > 0) && (
         <section className="mx-auto mb-6 max-w-[1200px]">
-          <div className="-mx-4 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 [-ms-overflow-style:none] md:mx-0 md:gap-6 md:px-0 xl:grid xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
+          <div className="-mx-4 flex [scrollbar-width:none] gap-3 overflow-x-auto px-4 [-ms-overflow-style:none] sm:mx-0 sm:gap-6 sm:px-0 xl:grid xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
             {isBestPending
               ? Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
               : bestPosts.map((post) => (
@@ -100,9 +100,9 @@ export default function PostList() {
         size="large"
         startIcon={<IcPlus />}
         onClick={() => router.push('/posts/write')}
-        className="fixed right-4 bottom-4 p-[13px] md:right-8 md:bottom-16 md:min-w-[190px] md:px-[18px] md:py-[13px]"
+        className="fixed right-4 bottom-4 p-[13px] sm:right-8 sm:bottom-16 sm:min-w-[190px] sm:px-[18px] sm:py-[13px]"
       >
-        <span className="hidden md:inline">게시물 작성하기</span>
+        <span className="hidden sm:inline">게시물 작성하기</span>
       </Button>
     </>
   );
