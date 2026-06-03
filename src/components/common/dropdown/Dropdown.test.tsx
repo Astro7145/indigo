@@ -1,7 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import Dropdown from '@/src/components/common/dropdown/Dropdown';
+import Dropdown, { computeMenuPosition } from '@/src/components/common/dropdown/Dropdown';
+
+const triggerRect = {
+  top: 100,
+  bottom: 130,
+  left: 50,
+  right: 250,
+  width: 200,
+  height: 30,
+  x: 50,
+  y: 100,
+  toJSON: () => ({}),
+} as DOMRect;
 
 describe('Dropdown root', () => {
   it('children을 렌더한다', () => {
@@ -137,28 +149,53 @@ describe('Dropdown.Menu', () => {
     expect(screen.getByRole('menu')).toBeInTheDocument();
   });
 
-  it('placement="bottom-end"이면 right-0 클래스가 적용된다', () => {
+  it('document.body에 포털로 렌더된다', () => {
     render(
       <Dropdown open>
-        <Dropdown.Menu placement="bottom-end">
+        <Dropdown.Menu>
           <Dropdown.Item>아이템</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>,
     );
-    expect(screen.getByRole('menu')).toHaveClass('right-0');
+    expect(screen.getByRole('menu').parentElement).toBe(document.body);
   });
 
-  it('placement="bottom-center"이면 left-1/2, -translate-x-1/2 클래스가 적용된다', () => {
+  it('fixed로 위치한다', () => {
     render(
       <Dropdown open>
-        <Dropdown.Menu placement="bottom-center">
+        <Dropdown.Menu>
           <Dropdown.Item>아이템</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>,
     );
-    const menu = screen.getByRole('menu');
-    expect(menu).toHaveClass('left-1/2');
-    expect(menu).toHaveClass('-translate-x-1/2');
+    expect(screen.getByRole('menu')).toHaveClass('fixed');
+  });
+});
+
+describe('computeMenuPosition', () => {
+  it('bottom-start는 트리거 왼쪽 모서리에 정렬한다', () => {
+    expect(computeMenuPosition(triggerRect, 'bottom-start', 'large').left).toBe(50);
+  });
+
+  it('bottom-end는 트리거 오른쪽 모서리에 정렬한다', () => {
+    expect(computeMenuPosition(triggerRect, 'bottom-end', 'large').left).toBe(250 - 400);
+  });
+
+  it('bottom-center는 트리거 중앙에 정렬한다', () => {
+    // 중앙 x = 50 + 200/2 = 150, left = 150 - 400/2 = -50
+    expect(computeMenuPosition(triggerRect, 'bottom-center', 'large').left).toBe(-50);
+  });
+
+  it('메뉴는 트리거 바로 아래(+4px)에 위치한다', () => {
+    expect(computeMenuPosition(triggerRect, 'bottom-start', 'large').top).toBe(134);
+  });
+
+  it('full 사이즈는 트리거 너비를 따른다', () => {
+    expect(computeMenuPosition(triggerRect, 'bottom-start', 'full').width).toBe(200);
+  });
+
+  it('small 사이즈는 고정 너비 102를 쓴다', () => {
+    expect(computeMenuPosition(triggerRect, 'bottom-start', 'small').width).toBe(102);
   });
 });
 

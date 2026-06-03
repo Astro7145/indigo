@@ -1,9 +1,22 @@
 'use client';
 
-import { createContext, use, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import {
+  createContext,
+  use,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '@/src/utils/cn';
+
+// SSR에서 useLayoutEffect 경고를 피하기 위한 동형(isomorphic) 레이아웃 이펙트
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 // ── DropdownContext ───────────────────────────────────────────────────────────
 
@@ -151,21 +164,40 @@ function Trigger({ asChild, className, children }: TriggerProps) {
   );
 }
 
-const placementClasses: Record<Placement, string> = {
-  'bottom-start': 'left-0',
-  'bottom-end': 'right-0',
-  'bottom-center': 'left-1/2 -translate-x-1/2',
+const SIZE_WIDTH: Record<Exclude<MenuSize, 'full'>, number> = {
+  small: 102,
+  large: 400,
 };
 
-const sizeClasses: Record<MenuSize, string> = {
-  small: 'w-[102px]',
-  large: 'w-[400px]',
-  full: 'w-full',
-};
+export interface MenuPosition {
+  top: number;
+  left: number;
+  width: number;
+}
+
+// 트리거 사각형 기준으로 포털 메뉴의 fixed 좌표를 계산한다.
+// 폭은 size별 결정적(full=트리거 너비), top은 트리거 바로 아래 +4px(mt-1).
+export function computeMenuPosition(rect: DOMRect, placement: Placement, size: MenuSize): MenuPosition {
+  const width = size === 'full' ? rect.width : SIZE_WIDTH[size];
+  const top = rect.bottom + 4;
+  let left: number;
+  switch (placement) {
+    case 'bottom-end':
+      left = rect.right - width;
+      break;
+    case 'bottom-center':
+      left = rect.left + rect.width / 2 - width / 2;
+      break;
+    default:
+      left = rect.left;
+  }
+  return { top, left, width };
+}
 
 function Menu({ placement = 'bottom-start', size = 'large', className, children }: MenuProps) {
   const { isOpen, close, triggerRef } = useDropdownContext();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<MenuPosition | null>(null);
 
   // 외부 클릭 시 닫힘 (트리거 클릭은 toggle이 처리하므로 제외)
   useEffect(() => {
@@ -191,6 +223,22 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, close, triggerRef]);
+
+  // 트리거 기준으로 메뉴 좌표 계산 (열린 동안 스크롤·리사이즈에 추종)
+  useIsomorphicLayoutEffect(() => {
+    if (!isOpen) return;
+    const update = () => {
+      const trigger = triggerRef.current;
+      if (trigger) setPosition(computeMenuPosition(trigger.getBoundingClientRect(), placement, size));
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [isOpen, placement, size, triggerRef]);
 
   // 열릴 때 selected 아이템 우선, 없으면 첫 번째 활성 아이템 자동 포커스
   useEffect(() => {
@@ -223,22 +271,19 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
     triggerRef.current?.focus();
   };
 
-  return (
+  return createPortal(
     <MenuContext value={{ size, close: closeAndFocusTrigger }}>
       <div
         ref={menuRef}
         role="menu"
         onKeyDown={handleArrowKey}
-        className={cn(
-          'absolute top-full z-50 mt-1 rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]',
-          placementClasses[placement],
-          sizeClasses[size],
-          className,
-        )}
+        style={position ? { top: position.top, left: position.left, width: position.width } : undefined}
+        className={cn('fixed z-50 rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]', className)}
       >
         {children}
       </div>
-    </MenuContext>
+    </MenuContext>,
+    document.body,
   );
 }
 
