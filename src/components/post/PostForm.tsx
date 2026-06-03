@@ -42,6 +42,8 @@ export default function PostForm(props: PostFormProps) {
   // 파일은 선택 시점이 아니라 등록/수정 시점에 업로드하므로 File 자체를 들고 있다가 submit 때 PUT 한다
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  // 비동기 업로드/등록 진행 중 중복 클릭 방지용. submit 종료(성공/실패) 시 false로 복원해 재시도 허용
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<PostEditorHandle>(null);
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
@@ -97,22 +99,28 @@ export default function PostForm(props: PostFormProps) {
   };
 
   const handleSubmit = async () => {
-    if (!isValid) return;
-    // 새로 선택한 파일이 있을 때만 이 시점에 업로드. 취소 시 트래픽·스토리지 낭비 방지
-    let finalImage: string | null = image;
-    if (imageFile) {
-      const { uploadUrl, url } = await createImageUploadUrl({ fileName: imageFile.name });
-      await uploadToPresignedUrl({ uploadUrl, file: imageFile });
-      finalImage = url;
+    if (!isValid || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      // 새로 선택한 파일이 있을 때만 이 시점에 업로드. 취소 시 트래픽·스토리지 낭비 방지
+      let finalImage: string | null = image;
+      if (imageFile) {
+        const { uploadUrl, url } = await createImageUploadUrl({ fileName: imageFile.name });
+        await uploadToPresignedUrl({ uploadUrl, file: imageFile });
+        finalImage = url;
+      }
+      if (props.mode === 'edit') {
+        // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
+        await updatePost({ postId: props.postId, body: { title, content, image: finalImage } });
+        router.push(`/posts/${props.postId}`);
+        return;
+      }
+      const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
+      router.push(`/posts/${post.id}`);
+    } finally {
+      // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
+      setIsSubmitting(false);
     }
-    if (props.mode === 'edit') {
-      // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
-      await updatePost({ postId: props.postId, body: { title, content, image: finalImage } });
-      router.push(`/posts/${props.postId}`);
-      return;
-    }
-    const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
-    router.push(`/posts/${post.id}`);
   };
 
   const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
@@ -140,7 +148,7 @@ export default function PostForm(props: PostFormProps) {
           <Button
             variant="primary"
             size="small"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             onClick={handleSubmit}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
