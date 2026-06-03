@@ -31,9 +31,10 @@ export default function TodoDetailSheet({ isOpen, onClose, todo, notes, onNoteCl
     );
   }
 
-  // Modal 기본 패딩(센터형 pt-12…)을 디자인의 p-40으로 덮어쓴다. cn(twMerge)이 p-10으로 방향 패딩을 override.
+  // Modal 기본 패딩을 디자인의 p-40(상하좌우 균일)으로 덮어쓴다.
+  // Modal은 base(pt-12…)와 sm:(sm:pt-16…) 두 변형을 모두 가지므로, base+sm 둘 다 override해야 한다(p-10 sm:p-10).
   return (
-    <Modal open={isOpen} onClose={onClose} className="p-10">
+    <Modal open={isOpen} onClose={onClose} className="p-10 sm:p-10">
       {content}
     </Modal>
   );

@@ -95,10 +95,15 @@ export default function TodoDetailContent({ todo, notes, onClose, onNoteClick }:
           <h3 className={sectionTitleClass}>첨부자료</h3>
           <div className="flex flex-col gap-3">
             {todo.linkUrl && (
-              <div className="flex w-full items-start gap-1">
+              <a
+                href={todo.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-start gap-1 hover:underline"
+              >
                 <IcLink aria-hidden className="size-6 shrink-0 text-slate-500" />
-                <p className="min-w-0 flex-1 text-base break-all text-slate-700">{todo.linkUrl}</p>
-              </div>
+                <span className="min-w-0 flex-1 text-base break-all text-slate-700">{todo.linkUrl}</span>
+              </a>
             )}
             {todo.fileUrl && (
               <div className="relative aspect-[408/223] w-full overflow-hidden rounded-[4px] border border-slate-200">
