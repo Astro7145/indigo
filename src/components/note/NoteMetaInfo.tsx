@@ -1,6 +1,7 @@
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
 import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite';
 import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
+import { formatDate } from '@/src/utils/date';
 
 export interface NoteMetaInfoProps {
   goalTitle: string;
@@ -21,12 +22,6 @@ const TAG_PALETTE = [
 
 function tagColor(id: number): string {
   return TAG_PALETTE[id % TAG_PALETTE.length];
-}
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')}`;
 }
 
 export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, createdAt }: NoteMetaInfoProps) {
