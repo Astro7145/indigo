@@ -12,6 +12,7 @@ export { IcDelete } from './IcDelete';
 export { IcDoubleArrow } from './IcDoubleArrow';
 export { IcEye } from './IcEye';
 export { IcEyeOff } from './IcEyeOff';
+export { IcFavorites } from './IcFavorites';
 export { IcFilter } from './IcFilter';
 export { IcFlagFill } from './IcFlagFill';
 export { IcFlagOutline } from './IcFlagOutline';
