@@ -138,3 +138,34 @@ it('컨텍스트 밖에서 서브컴포넌트를 쓰면 에러를 던진다', ()
   expect(() => render(<TodoList.StarAction onClick={() => {}} />)).toThrow();
   spy.mockRestore();
 });
+
+it('행을 클릭하면 onClick을 호출한다', () => {
+  const onClick = jest.fn();
+  render(<TodoList title="자바스크립트 듣기" onClick={onClick} />);
+  fireEvent.click(screen.getByText('자바스크립트 듣기'));
+  expect(onClick).toHaveBeenCalledTimes(1);
+});
+
+it('체크박스를 클릭하면 토글만 되고 행 onClick은 호출되지 않는다', () => {
+  const onClick = jest.fn();
+  const onCheckedChange = jest.fn();
+  render(<TodoList title="할일" onClick={onClick} onCheckedChange={onCheckedChange} />);
+  fireEvent.click(screen.getByRole('checkbox'));
+  expect(onCheckedChange).toHaveBeenCalled();
+  expect(onClick).not.toHaveBeenCalled();
+});
+
+it('우측 액션 버튼을 클릭하면 행 onClick은 호출되지 않는다', () => {
+  const onClick = jest.fn();
+  const onStar = jest.fn();
+  render(
+    <TodoList title="할일" onClick={onClick}>
+      <TodoList.Actions>
+        <TodoList.StarAction onClick={onStar} />
+      </TodoList.Actions>
+    </TodoList>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: '즐겨찾기' }));
+  expect(onStar).toHaveBeenCalledTimes(1);
+  expect(onClick).not.toHaveBeenCalled();
+});

@@ -2,26 +2,27 @@
 
 import BottomSheet from '@/src/components/common/BottomSheet';
 import Modal from '@/src/components/common/modal/Modal';
-import TodoDetailContent, { type TodoNoteRef } from '@/src/components/todo/TodoDetailContent';
+import TodoDetailContent from '@/src/components/todo/TodoDetailContent';
 import { useIsMobile } from '@/src/hooks/useIsMobile';
 import type { Todo } from '@/src/types/todo';
 
 interface TodoDetailSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  todo: Todo;
-  notes: TodoNoteRef[];
-  onNoteClick: (noteId: number) => void;
+  todo: Todo | null;
 }
 
 /**
  * 할일 상세를 데스크탑은 모달, 모바일은 바텀시트로 표시하는 반응형 셸.
- * 데이터·동작은 주입 전용이며 내부에서 데이터를 페칭하지 않는다.
+ *
+ * 셸은 상시 마운트하고 `isOpen`만 토글한다(TodoFormSheet와 동일). 닫는 동안(todo=null)
+ * content는 null이 되지만, 바텀시트의 exit는 AnimatePresence가 직전 subtree를 보존해 재생한다.
+ * 노트 페치는 내부 TodoDetailContent가 담당한다.
  */
-export default function TodoDetailSheet({ isOpen, onClose, todo, notes, onNoteClick }: TodoDetailSheetProps) {
+export default function TodoDetailSheet({ isOpen, onClose, todo }: TodoDetailSheetProps) {
   const isMobile = useIsMobile();
 
-  const content = <TodoDetailContent todo={todo} notes={notes} onClose={onClose} onNoteClick={onNoteClick} />;
+  const content = todo ? <TodoDetailContent todo={todo} onClose={onClose} /> : null;
 
   if (isMobile) {
     return (

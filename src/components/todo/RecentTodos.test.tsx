@@ -20,7 +20,7 @@ import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo } from '@/src/types/todo';
 
 const renderRecent = (overrides?: Partial<ComponentProps<typeof RecentTodos>>) =>
-  renderWithClient(<RecentTodos onEditTodo={() => {}} {...overrides} />);
+  renderWithClient(<RecentTodos onEditTodo={() => {}} onSelectTodo={() => {}} {...overrides} />);
 
 const mocked = todoApi as jest.Mocked<typeof todoApi>;
 const mockedFav = favoriteApi as jest.Mocked<typeof favoriteApi>;
@@ -96,4 +96,18 @@ it('useTodoList를 limit: 4로 호출해 최신 4개를 요청한다', async () 
   renderRecent();
   await screen.findByText('할일 A');
   expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ sort: 'latest', limit: 4 }));
+});
+
+it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
+  mocked.getTodos.mockResolvedValue({
+    todos: [makeTodo(1, '자바스크립트 듣기')],
+    nextCursor: null,
+    totalCount: 1,
+  } as never);
+  const onSelectTodo = jest.fn();
+  renderRecent({ onSelectTodo });
+  const title = await screen.findByText('자바스크립트 듣기');
+  fireEvent.click(title);
+  expect(onSelectTodo).toHaveBeenCalledTimes(1);
+  expect(onSelectTodo.mock.calls[0][0]).toMatchObject({ id: 1, title: '자바스크립트 듣기' });
 });

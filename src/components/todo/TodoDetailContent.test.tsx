@@ -1,7 +1,20 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+jest.mock('@/src/api/note', () => ({
+  ...jest.requireActual('@/src/api/note'),
+  getNotes: jest.fn(),
+}));
 
+import { screen, waitFor } from '@testing-library/react';
+
+import * as noteApi from '@/src/api/note';
 import TodoDetailContent from '@/src/components/todo/TodoDetailContent';
+import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo } from '@/src/types/todo';
+
+const mocked = noteApi as jest.Mocked<typeof noteApi>;
+
+beforeEach(() => {
+  jest.resetAllMocks();
+});
 
 const baseTodo: Todo = {
   id: 1,
@@ -24,7 +37,7 @@ const baseTodo: Todo = {
 const noop = () => {};
 
 function renderContent(overrides: Partial<Parameters<typeof TodoDetailContent>[0]> = {}) {
-  return render(<TodoDetailContent todo={baseTodo} notes={[]} onClose={noop} onNoteClick={noop} {...overrides} />);
+  return renderWithClient(<TodoDetailContent todo={baseTodo} onClose={noop} {...overrides} />);
 }
 
 it('완료 전이면 TO DO 칩을 보여준다', () => {
@@ -88,21 +101,26 @@ it('태그를 인덱스 순서대로 색상 매핑한다', () => {
   expect(screen.getByText('공부')).toHaveClass('bg-badge-red-bg');
 });
 
-it('노트가 없으면 작성된 노트 섹션을 표시하지 않는다', () => {
-  renderContent();
+it('noteIds가 비어 있으면 노트를 요청하지 않고 작성된 노트 섹션을 표시하지 않는다', () => {
+  renderContent({ todo: { ...baseTodo, noteIds: [] } });
   expect(screen.queryByText('작성된 노트')).not.toBeInTheDocument();
+  expect(mocked.getNotes).not.toHaveBeenCalled();
 });
 
-it('노트 제목을 클릭하면 해당 노트 id로 onNoteClick을 호출한다', () => {
-  const onNoteClick = jest.fn();
-  renderContent({ notes: [{ id: 7, title: '프로그래밍과 데이터 in JavaScript' }], onNoteClick });
-  fireEvent.click(screen.getByText('프로그래밍과 데이터 in JavaScript'));
-  expect(onNoteClick).toHaveBeenCalledWith(7);
+it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한다', async () => {
+  mocked.getNotes.mockResolvedValue({
+    notes: [{ id: 7, title: '프로그래밍과 데이터 in JavaScript' }],
+    nextCursor: null,
+    totalCount: 1,
+  } as never);
+  renderContent({ todo: { ...baseTodo, id: 3, noteIds: [7] } });
+  await waitFor(() => expect(screen.getByText('프로그래밍과 데이터 in JavaScript')).toBeInTheDocument());
+  expect(mocked.getNotes).toHaveBeenCalledWith({ todoId: 3 });
 });
 
 it('닫기 버튼을 누르면 onClose를 호출한다', () => {
   const onClose = jest.fn();
   renderContent({ onClose });
-  fireEvent.click(screen.getByRole('button', { name: '닫기' }));
+  screen.getByRole('button', { name: '닫기' }).click();
   expect(onClose).toHaveBeenCalledTimes(1);
 });

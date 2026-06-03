@@ -6,19 +6,14 @@ import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Chip from '@/src/components/common/chips/Chip';
 import { IcCalendarOutline, IcDelete, IcFlagOutline, IcLink, IcSpringNote } from '@/src/components/common/icons';
+import { useNoteList } from '@/src/hooks/note';
 import type { Todo } from '@/src/types/todo';
 import { formatDotDate } from '@/src/utils/date';
 
-export interface TodoNoteRef {
-  id: number;
-  title: string;
-}
-
 export interface TodoDetailContentProps {
+  /** 표시할 할일. 시트가 열린 동안만 마운트되므로 non-null. */
   todo: Todo;
-  notes: TodoNoteRef[];
   onClose: () => void;
-  onNoteClick: (noteId: number) => void;
 }
 
 // 태그 색상 팔레트 — 생성 폼(TagInput)과 동일 순서. 저장된 태그엔 색상이 없어 인덱스로 순환 매핑한다.
@@ -31,9 +26,14 @@ const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700';
 /** 섹션 제목 스타일 (모바일 sm → 데스크탑 base) */
 const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base';
 
-export default function TodoDetailContent({ todo, notes, onClose, onNoteClick }: TodoDetailContentProps) {
+export default function TodoDetailContent({ todo, onClose }: TodoDetailContentProps) {
   const dueDate = formatDotDate(todo.dueDate);
   const hasAttachment = Boolean(todo.linkUrl || todo.fileUrl);
+
+  // 타입상 noteIds는 number[]지만 백엔드 누락/null 방어. 노트가 없으면 요청도 생략.
+  const hasNotes = (todo.noteIds?.length ?? 0) > 0;
+  const { data } = useNoteList({ todoId: todo.id }, { enabled: hasNotes });
+  const notes = data?.notes.map((n) => ({ id: n.id, title: n.title })) ?? [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -123,7 +123,8 @@ export default function TodoDetailContent({ todo, notes, onClose, onNoteClick }:
               <li key={note.id}>
                 <button
                   type="button"
-                  onClick={() => onNoteClick(note.id)}
+                  // 노트 수정 라우트 미정 — 라우트 생기면 router.push(`/notes/${note.id}`)로 연결.
+                  onClick={() => {}}
                   className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
                 >
                   <IcSpringNote aria-hidden className="size-8 shrink-0" />
