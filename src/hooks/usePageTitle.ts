@@ -9,6 +9,7 @@ type RouteKey =
   | 'dashboard'
   | 'todos'
   | 'notes-write'
+  | 'notes-edit'
   | 'goal'
   | 'goal-notes'
   | 'posts'
@@ -22,6 +23,7 @@ function matchRoute(pathname: string): RouteKey | null {
   if (pathname === '/') return 'dashboard';
   if (pathname === '/todos') return 'todos';
   if (/^\/todos\/[^/]+\/notes\/write$/.test(pathname)) return 'notes-write';
+  if (/^\/todos\/[^/]+\/notes\/edit$/.test(pathname)) return 'notes-edit';
   if (/^\/goals\/[^/]+\/notes$/.test(pathname)) return 'goal-notes';
   if (/^\/goals\/[^/]+$/.test(pathname)) return 'goal';
   if (pathname === '/posts/write') return 'posts-write';
@@ -50,6 +52,8 @@ export function usePageTitle(): string {
       return todoData ? `모든 할일 ${todoData.totalCount}` : '모든 할일';
     case 'notes-write':
       return '노트 작성하기';
+    case 'notes-edit':
+      return '노트 수정하기';
     case 'goal':
       return `${name}님의 목표`;
     case 'goal-notes':
