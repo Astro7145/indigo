@@ -66,6 +66,8 @@ interface MenuProps {
 interface ItemProps {
   onClick?: () => void;
   disabled?: boolean;
+  /** 현재 선택된 값 — 메뉴가 열릴 때 이 아이템으로 초기 포커스가 간다 */
+  selected?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -190,11 +192,14 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, close, triggerRef]);
 
-  // 열릴 때 첫 번째 활성 아이템 자동 포커스
+  // 열릴 때 selected 아이템 우선, 없으면 첫 번째 활성 아이템 자동 포커스
   useEffect(() => {
     if (!isOpen || !menuRef.current) return;
-    const firstItem = menuRef.current.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])');
-    firstItem?.focus();
+    const target =
+      menuRef.current.querySelector<HTMLElement>(
+        '[role="menuitem"][data-selected="true"]:not([aria-disabled="true"])',
+      ) ?? menuRef.current.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])');
+    target?.focus();
   }, [isOpen]);
 
   const handleArrowKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -237,7 +242,7 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
   );
 }
 
-function Item({ onClick, disabled = false, className, children }: ItemProps) {
+function Item({ onClick, disabled = false, selected = false, className, children }: ItemProps) {
   const { size, close } = useMenuContext();
 
   const outerPadding = size === 'small' ? 'p-[5px]' : 'p-[6px]';
@@ -265,6 +270,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
         role="menuitem"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
+        data-selected={selected || undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseEnter={(e) => {

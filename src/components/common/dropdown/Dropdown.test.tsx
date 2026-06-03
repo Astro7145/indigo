@@ -316,6 +316,22 @@ describe('포커스 관리', () => {
     expect(screen.getByRole('menuitem', { name: '첫번째' })).toHaveFocus();
   });
 
+  it('selected 아이템이 있으면 열릴 때 그 아이템에 포커스가 간다', async () => {
+    const user = userEvent.setup();
+    render(
+      <Dropdown>
+        <Dropdown.Trigger>열기</Dropdown.Trigger>
+        <Dropdown.Menu>
+          <Dropdown.Item>첫번째</Dropdown.Item>
+          <Dropdown.Item selected>두번째</Dropdown.Item>
+          <Dropdown.Item>세번째</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>,
+    );
+    await user.click(screen.getByRole('button', { name: '열기' }));
+    expect(screen.getByRole('menuitem', { name: '두번째' })).toHaveFocus();
+  });
+
   it('첫 번째 아이템이 disabled면 두 번째 아이템에 포커스가 간다', async () => {
     const user = userEvent.setup();
     render(
