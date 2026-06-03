@@ -1,5 +1,5 @@
 import { CalendarDate } from '@internationalized/date';
-import { isoToCalendarDate, calendarDateToIso } from './date';
+import { isoToCalendarDate, calendarDateToIso, formatDotDate } from './date';
 
 describe('isoToCalendarDate', () => {
   it('DB의 ISO 문자열을 해당 날짜로 변환한다', () => {
@@ -33,5 +33,19 @@ describe('isoToCalendarDate ↔ calendarDateToIso', () => {
   it('변환 후 되돌리면 원래 ISO 문자열이 된다', () => {
     const iso = '2026-02-20T00:00:00.000Z';
     expect(calendarDateToIso(isoToCalendarDate(iso))).toBe(iso);
+  });
+});
+
+describe('formatDotDate', () => {
+  it('ISO 문자열을 yyyy. mm. dd 형식으로 변환한다', () => {
+    expect(formatDotDate('2024-04-29T00:00:00.000Z')).toBe('2024. 04. 29');
+  });
+
+  it('한 자리 월·일을 0으로 채운다', () => {
+    expect(formatDotDate('2024-01-05T00:00:00.000Z')).toBe('2024. 01. 05');
+  });
+
+  it('마감기한이 없으면(null) null을 반환한다', () => {
+    expect(formatDotDate(null)).toBeNull();
   });
 });
