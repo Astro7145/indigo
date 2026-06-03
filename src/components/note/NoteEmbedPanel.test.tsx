@@ -14,12 +14,18 @@ it('open=true이면 aria-hidden=false로 렌더된다', () => {
   expect(screen.getByLabelText('링크 임베드 패널')).toHaveAttribute('aria-hidden', 'false');
 });
 
-it('닫기 버튼 클릭 시 onClose가 호출된다', () => {
-  const onClose = jest.fn();
-  render(<NoteEmbedPanel open={true} onClose={onClose} />);
+it('확장 토글 버튼 클릭 시 onToggleExpand가 호출된다', () => {
+  const onToggleExpand = jest.fn();
+  render(<NoteEmbedPanel open={true} onClose={() => {}} onToggleExpand={onToggleExpand} />);
 
-  fireEvent.click(screen.getByRole('button', { name: '패널 닫기' }));
-  expect(onClose).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole('button', { name: '패널 확장' }));
+  expect(onToggleExpand).toHaveBeenCalledTimes(1);
+});
+
+it('expanded=true이면 축소 라벨로 토글 버튼이 렌더된다', () => {
+  render(<NoteEmbedPanel open={true} onClose={() => {}} expanded onToggleExpand={() => {}} />);
+
+  expect(screen.getByRole('button', { name: '패널 축소' })).toBeInTheDocument();
 });
 
 it('data가 없으면 placeholder 문구를 표시한다', () => {
@@ -55,4 +61,24 @@ it('data.type=metadata이면 OG 정보와 링크를 표시한다', () => {
   expect(screen.getByText('예시 페이지')).toBeInTheDocument();
   expect(screen.getByText('설명입니다')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'https://example.com' })).toBeInTheDocument();
+});
+
+it('expanded=false이면 쉐브론에 rotate-90 xl:rotate-0 클래스가 적용된다', () => {
+  const { container } = render(<NoteEmbedPanel open={true} onClose={() => {}} expanded={false} />);
+  const svg = container.querySelector('svg');
+  expect(svg).toHaveClass('rotate-90', 'xl:rotate-0');
+});
+
+it('expanded=true이면 쉐브론에 -rotate-90 xl:rotate-180 클래스가 적용된다', () => {
+  const { container } = render(<NoteEmbedPanel open={true} onClose={() => {}} expanded={true} />);
+  const svg = container.querySelector('svg');
+  expect(svg).toHaveClass('-rotate-90', 'xl:rotate-180');
+});
+
+it('닫기 버튼 클릭 시 onClose가 호출된다', () => {
+  const onClose = jest.fn();
+  render(<NoteEmbedPanel open={true} onClose={onClose} />);
+
+  fireEvent.click(screen.getByRole('button', { name: '패널 닫기' }));
+  expect(onClose).toHaveBeenCalledTimes(1);
 });

@@ -55,6 +55,7 @@ export default function NoteForm(props: NoteFormProps) {
   const [isLinkInputOpen, setIsLinkInputOpen] = useState(false);
   const [linkInput, setLinkInput] = useState('');
   const [isEmbedOpen, setIsEmbedOpen] = useState(false);
+  const [isEmbedExpanded, setIsEmbedExpanded] = useState(false);
   const editorRef = useRef<NoteEditorHandle>(null);
 
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
@@ -137,10 +138,13 @@ export default function NoteForm(props: NoteFormProps) {
   const createdAt = initialNote?.createdAt ?? new Date().toISOString();
 
   return (
-    // 데스크탑 임베드 패널은 우측 오버레이, 모바일/태블릿은 bottom drawer 오버레이라 카드는 reflow하지 않음.
-    // Figma 1920 기준에서는 사이드바+카드+패널이 자연스럽게 나란히 보이지만, 1280-1919 구간은 패널이 카드 위에 겹쳐 표시된다.
-    <div>
-      <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
+    // 데스크탑(xl+)에서 패널이 열리면 form과 패널이 flex-row로 나란히 reflow. 모바일/태블릿(xl 미만)에선 패널이 bottom drawer로 오버레이.
+    <div className={`flex flex-col ${isEmbedOpen ? 'xl:flex-row xl:items-stretch xl:gap-6' : ''}`}>
+      <div
+        className={`mx-auto w-full max-w-[343px] sm:max-w-[636px] ${
+          isEmbedOpen ? 'xl:mx-0 xl:max-w-[768px] xl:flex-1' : 'xl:max-w-[768px]'
+        }`}
+      >
         <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
           {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
           <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
@@ -227,52 +231,59 @@ export default function NoteForm(props: NoteFormProps) {
             공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
           </div>
         </div>
-
-        <NoteEmbedPanel
-          open={isEmbedOpen}
-          onClose={() => setIsEmbedOpen(false)}
-          // TODO(@<wiring>): linkUrl로부터 iframe 가능 여부 판별 + 가능하면 type:'iframe', 아니면 OG fetch 결과로 type:'metadata' 전달
-          data={linkUrl ? { type: 'iframe', url: linkUrl } : undefined}
-        />
-
-        {/* 링크 업로드 모달 — Figma: 343×180 (모바일) / 456×260 (sm+). Modal 기본 width와 일치, 높이만 지정. */}
-        <Modal open={isLinkInputOpen} onClose={() => setIsLinkInputOpen(false)} className="h-[180px] sm:h-[260px]">
-          <Modal.Title className="text-left text-base sm:text-xl">링크 업로드</Modal.Title>
-          <input
-            type="url"
-            value={linkInput}
-            onChange={(e) => setLinkInput(e.target.value)}
-            placeholder="링크를 입력해주세요"
-            aria-label="링크 URL"
-            className="mt-4 w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-500 sm:mt-6 sm:text-base"
-          />
-          <Modal.Actions>
-            <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm}>
-              확인
-            </Modal.Confirm>
-          </Modal.Actions>
-        </Modal>
-
-        {/* 작성 취소 모달 */}
-        <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-          <Modal.Title className="text-center text-base sm:text-xl">노트 작성을 취소하시겠어요?</Modal.Title>
-          <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
-            <span
-              aria-hidden
-              className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
-            >
-              !
-            </span>
-            작성하신 모든 내용이 사라집니다.
-          </p>
-          <Modal.Actions>
-            <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
-            <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
-              확인
-            </Modal.Confirm>
-          </Modal.Actions>
-        </Modal>
       </div>
+
+      <NoteEmbedPanel
+        open={isEmbedOpen}
+        onClose={() => setIsEmbedOpen(false)}
+        expanded={isEmbedExpanded}
+        onToggleExpand={() => setIsEmbedExpanded((v) => !v)}
+        // TODO(@<wiring>): linkUrl로부터 iframe 가능 여부 판별 + 가능하면 type:'iframe', 아니면 OG fetch 결과로 type:'metadata' 전달
+        data={linkUrl ? { type: 'iframe', url: linkUrl } : undefined}
+      />
+
+      {/* 링크 업로드 모달 — Figma: 343×180 (모바일) / 456×260 (sm+). Modal 기본 width와 일치, 높이만 지정. */}
+      <Modal
+        open={isLinkInputOpen}
+        onClose={() => setIsLinkInputOpen(false)}
+        showCloseButton
+        className="h-[180px] sm:h-[260px]"
+      >
+        <Modal.Title className="text-left text-base sm:text-xl">링크 업로드</Modal.Title>
+        <input
+          type="url"
+          value={linkInput}
+          onChange={(e) => setLinkInput(e.target.value)}
+          placeholder="링크를 입력해주세요"
+          aria-label="링크 URL"
+          className="mt-4 h-10 w-full rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-indigo-500 sm:mt-6 sm:h-14 sm:text-base"
+        />
+        <Modal.Actions className="mt-auto">
+          <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm}>
+            확인
+          </Modal.Confirm>
+        </Modal.Actions>
+      </Modal>
+
+      {/* 작성 취소 모달 */}
+      <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
+        <Modal.Title className="text-center text-base sm:text-xl">노트 작성을 취소하시겠어요?</Modal.Title>
+        <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
+          <span
+            aria-hidden
+            className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
+          >
+            !
+          </span>
+          작성하신 모든 내용이 사라집니다.
+        </p>
+        <Modal.Actions>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
+            확인
+          </Modal.Confirm>
+        </Modal.Actions>
+      </Modal>
     </div>
   );
 }
