@@ -132,8 +132,9 @@ export default function PostForm(props: PostFormProps) {
 
   return (
     <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-between gap-3 sm:mb-3">
-        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
+      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
+        {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
+        <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
           {headingText}
         </h1>
         <div className="flex shrink-0 gap-2">
