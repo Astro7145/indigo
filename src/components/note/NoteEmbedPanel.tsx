@@ -14,15 +14,20 @@ export interface NoteEmbedPanelProps {
 }
 
 export default function NoteEmbedPanel({ open, onClose, data }: NoteEmbedPanelProps) {
+  // 모바일/태블릿(<xl): 하단 drawer (full-width, translate-y로 슬라이드 업)
+  // 데스크탑(xl+): 우측 column 734px (translate-x로 슬라이드 좌측)
+  const positionClass =
+    'fixed inset-x-0 bottom-0 h-[60vh] xl:top-0 xl:right-0 xl:bottom-auto xl:left-auto xl:h-full xl:w-[734px]';
+  const slideClass = open ? 'translate-y-0 xl:translate-x-0' : 'translate-y-full xl:translate-y-0 xl:translate-x-full';
+
   return (
     <aside
       aria-hidden={!open}
       aria-label="링크 임베드 패널"
-      className={`fixed top-0 right-0 z-30 h-full w-full bg-white shadow-xl transition-transform duration-300 sm:w-[420px] xl:w-[520px] ${
-        open ? 'translate-x-0' : 'translate-x-full'
-      }`}
+      className={`z-30 bg-white shadow-xl transition-transform duration-300 ${positionClass} ${slideClass}`}
     >
-      <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+      {/* 닫기 chevron — 모바일/태블릿은 상단 중앙(드래그 핸들 자리), 데스크탑은 좌측 상단(패널 안쪽) */}
+      <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3 xl:flex-row-reverse">
         <h2 className="text-sm font-medium text-slate-800 sm:text-base">링크 미리보기</h2>
         <IconButton aria-label="패널 닫기" onClick={onClose}>
           <IcChevron />

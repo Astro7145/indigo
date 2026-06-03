@@ -137,139 +137,142 @@ export default function NoteForm(props: NoteFormProps) {
   const createdAt = initialNote?.createdAt ?? new Date().toISOString();
 
   return (
-    <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-        {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
-        <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
-          {headingText}
-        </h1>
-        <div className="flex shrink-0 gap-2">
-          <Button
-            variant="tertiary"
-            size="small"
-            onClick={handleDraft}
-            disabled={!isValid}
-            className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-          >
-            임시저장
-          </Button>
-          <Button
-            variant="primary"
-            size="small"
-            disabled={!isValid}
-            onClick={handleSubmit}
-            className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-          >
-            {submitText}
-          </Button>
-        </div>
-      </header>
+    // 데스크탑 임베드 패널은 우측 오버레이, 모바일/태블릿은 bottom drawer 오버레이라 카드는 reflow하지 않음.
+    // Figma 1920 기준에서는 사이드바+카드+패널이 자연스럽게 나란히 보이지만, 1280-1919 구간은 패널이 카드 위에 겹쳐 표시된다.
+    <div>
+      <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
+        <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
+          {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
+          <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
+            {headingText}
+          </h1>
+          <div className="flex shrink-0 gap-2">
+            <Button
+              variant="tertiary"
+              size="small"
+              onClick={handleDraft}
+              disabled={!isValid}
+              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
+            >
+              임시저장
+            </Button>
+            <Button
+              variant="primary"
+              size="small"
+              disabled={!isValid}
+              onClick={handleSubmit}
+              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
+            >
+              {submitText}
+            </Button>
+          </div>
+        </header>
 
-      <div
-        // 카드 내 빈 영역을 눌러도 커서가 에디터로 들어가게 함. 인터랙티브 요소는 자기 동작 유지
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
-          editorRef.current?.focus();
-        }}
-        className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 sm:min-h-[calc(100vh-100px)] sm:px-[30px] sm:py-8 xl:min-h-[calc(100vh-212px)] xl:px-[34px]"
-      >
-        <NoteEditor
-          ref={editorRef}
-          value={content}
-          onChange={setContent}
-          onLinkInsertClick={handleLinkInsertClick}
-          placeholder="이 곳을 통해 노트 작성을 시작해주세요"
-          // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
-          contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
-          titleSlot={
-            <div className="pt-[29px]">
-              <div className="flex items-center gap-2 pb-3 sm:gap-3 sm:pb-4">
-                <IcSpringNote className="size-8 shrink-0 sm:size-10" />
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  maxLength={30}
-                  placeholder="노트의 제목을 입력해주세요"
-                  aria-label="제목"
-                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
-                />
-                <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>
-              </div>
-              <div className="border-b border-slate-200" />
-            </div>
-          }
-          attachmentSlot={
-            <>
-              <div className="pt-3 sm:pt-4">
-                <NoteMetaInfo
-                  goalTitle={goalTitle}
-                  todoTitle={todoTitle}
-                  todoDone={todoDone}
-                  tags={tags}
-                  createdAt={createdAt}
-                />
-              </div>
-              {linkUrl && (
-                <div className="pt-3 sm:pt-4">
-                  <NoteLinkCard url={linkUrl} onClick={() => setIsEmbedOpen(true)} onDelete={handleLinkDelete} />
+        <div
+          // 카드 내 빈 영역을 눌러도 커서가 에디터로 들어가게 함. 인터랙티브 요소는 자기 동작 유지
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
+            editorRef.current?.focus();
+          }}
+          className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 sm:min-h-[calc(100vh-100px)] sm:px-[30px] sm:py-8 xl:min-h-[calc(100vh-212px)] xl:px-[34px]"
+        >
+          <NoteEditor
+            ref={editorRef}
+            value={content}
+            onChange={setContent}
+            onLinkInsertClick={handleLinkInsertClick}
+            placeholder="이 곳을 통해 노트 작성을 시작해주세요"
+            // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
+            contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+            titleSlot={
+              <div className="pt-[29px]">
+                <div className="flex items-center gap-2 pb-3 sm:gap-3 sm:pb-4">
+                  <IcSpringNote className="size-8 shrink-0 sm:size-10" />
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    maxLength={30}
+                    placeholder="노트의 제목을 입력해주세요"
+                    aria-label="제목"
+                    className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
+                  />
+                  <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>
                 </div>
-              )}
-              <div className="border-b border-slate-200 pt-3 sm:pt-4" />
-            </>
-          }
-        />
+                <div className="border-b border-slate-200" />
+              </div>
+            }
+            attachmentSlot={
+              <>
+                <div className="pt-3 sm:pt-4">
+                  <NoteMetaInfo
+                    goalTitle={goalTitle}
+                    todoTitle={todoTitle}
+                    todoDone={todoDone}
+                    tags={tags}
+                    createdAt={createdAt}
+                  />
+                </div>
+                {linkUrl && (
+                  <div className="pt-3 sm:pt-4">
+                    <NoteLinkCard url={linkUrl} onClick={() => setIsEmbedOpen(true)} onDelete={handleLinkDelete} />
+                  </div>
+                )}
+                <div className="border-b border-slate-200 pt-3 sm:pt-4" />
+              </>
+            }
+          />
 
-        <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-          공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
+            공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+          </div>
         </div>
-      </div>
 
-      <NoteEmbedPanel
-        open={isEmbedOpen}
-        onClose={() => setIsEmbedOpen(false)}
-        // TODO(@<wiring>): linkUrl로부터 iframe 가능 여부 판별 + 가능하면 type:'iframe', 아니면 OG fetch 결과로 type:'metadata' 전달
-        data={linkUrl ? { type: 'iframe', url: linkUrl } : undefined}
-      />
-
-      {/* 링크 입력 모달 */}
-      <Modal open={isLinkInputOpen} onClose={() => setIsLinkInputOpen(false)} className="h-[200px] sm:h-[260px]">
-        <Modal.Title className="text-center text-base sm:text-xl">링크 추가</Modal.Title>
-        <input
-          type="url"
-          value={linkInput}
-          onChange={(e) => setLinkInput(e.target.value)}
-          placeholder="https://"
-          aria-label="링크 URL"
-          className="mt-4 w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-500 sm:mt-6 sm:text-base"
+        <NoteEmbedPanel
+          open={isEmbedOpen}
+          onClose={() => setIsEmbedOpen(false)}
+          // TODO(@<wiring>): linkUrl로부터 iframe 가능 여부 판별 + 가능하면 type:'iframe', 아니면 OG fetch 결과로 type:'metadata' 전달
+          data={linkUrl ? { type: 'iframe', url: linkUrl } : undefined}
         />
-        <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
-          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={handleLinkConfirm}>
-            확인
-          </Modal.Confirm>
-        </Modal.Actions>
-      </Modal>
 
-      {/* 작성 취소 모달 */}
-      <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">노트 작성을 취소하시겠어요?</Modal.Title>
-        <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
-          <span
-            aria-hidden
-            className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
-          >
-            !
-          </span>
-          작성하신 모든 내용이 사라집니다.
-        </p>
-        <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
-          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
-            확인
-          </Modal.Confirm>
-        </Modal.Actions>
-      </Modal>
+        {/* 링크 업로드 모달 — Figma: 343×180 (모바일) / 456×260 (sm+). Modal 기본 width와 일치, 높이만 지정. */}
+        <Modal open={isLinkInputOpen} onClose={() => setIsLinkInputOpen(false)} className="h-[180px] sm:h-[260px]">
+          <Modal.Title className="text-left text-base sm:text-xl">링크 업로드</Modal.Title>
+          <input
+            type="url"
+            value={linkInput}
+            onChange={(e) => setLinkInput(e.target.value)}
+            placeholder="링크를 입력해주세요"
+            aria-label="링크 URL"
+            className="mt-4 w-full rounded-md border border-slate-200 px-3 py-2 text-sm outline-none focus:border-indigo-500 sm:mt-6 sm:text-base"
+          />
+          <Modal.Actions>
+            <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm}>
+              확인
+            </Modal.Confirm>
+          </Modal.Actions>
+        </Modal>
+
+        {/* 작성 취소 모달 */}
+        <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
+          <Modal.Title className="text-center text-base sm:text-xl">노트 작성을 취소하시겠어요?</Modal.Title>
+          <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
+            <span
+              aria-hidden
+              className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
+            >
+              !
+            </span>
+            작성하신 모든 내용이 사라집니다.
+          </p>
+          <Modal.Actions>
+            <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+            <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
+              확인
+            </Modal.Confirm>
+          </Modal.Actions>
+        </Modal>
+      </div>
     </div>
   );
 }
