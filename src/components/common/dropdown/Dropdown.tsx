@@ -101,9 +101,14 @@ function Dropdown({ open: controlledOpen, onOpenChange, className, children }: D
 function Trigger({ asChild, className, children }: TriggerProps) {
   const { toggle, isOpen, triggerRef } = useDropdownContext();
 
+  const handleTriggerClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    toggle();
+  };
+
   const injectedProps = {
     ref: triggerRef as React.Ref<HTMLButtonElement>,
-    onClick: toggle,
+    onClick: handleTriggerClick,
     'aria-haspopup': true as const,
     'aria-expanded': isOpen,
   };
@@ -127,9 +132,12 @@ function Trigger({ asChild, className, children }: TriggerProps) {
           (childRef as React.RefObject<HTMLElement | null>).current = node;
         }
       },
-      onClick: (e: React.MouseEvent<HTMLElement>) => {
+      // asChild 자식이 이벤트를 전달하지 않고 onClick을 호출할 수 있어(e 없음) 옵셔널 처리.
+      // 그 경우 전파 차단은 자식이 책임진다.
+      onClick: (e?: React.MouseEvent<HTMLElement>) => {
+        e?.stopPropagation();
         toggle();
-        child.props.onClick?.(e);
+        if (e) child.props.onClick?.(e);
       },
     });
   }
@@ -237,7 +245,8 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
   const innerRadius = size === 'small' ? 'rounded-lg' : 'rounded';
   const textSize = size === 'small' ? 'text-sm' : 'text-base';
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
     if (disabled) return;
     onClick?.();
     close();
@@ -246,7 +255,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick();
+      handleClick(e);
     }
   };
 
@@ -266,7 +275,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
           textSize,
           innerPadding,
           innerRadius,
-          !disabled && 'bg-white hover:bg-indigo-300 focus:bg-indigo-300 focus:outline-none',
+          !disabled && 'bg-white hover:bg-indigo-300 focus-visible:bg-indigo-300 focus-visible:outline-none',
           disabled && 'cursor-not-allowed bg-white opacity-40',
           className,
         )}

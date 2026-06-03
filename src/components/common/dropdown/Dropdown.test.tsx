@@ -260,6 +260,46 @@ describe('닫힘 동작', () => {
   });
 });
 
+describe('클릭 전파 차단', () => {
+  it('트리거를 클릭해도 바깥 카드의 클릭이 실행되지 않는다', async () => {
+    const user = userEvent.setup();
+    const handleCardClick = jest.fn();
+    render(
+      <div onClick={handleCardClick}>
+        <Dropdown>
+          <Dropdown.Trigger>열기</Dropdown.Trigger>
+          <Dropdown.Menu>
+            <Dropdown.Item>아이템</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>,
+    );
+    await user.click(screen.getByRole('button', { name: '열기' }));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(handleCardClick).not.toHaveBeenCalled();
+  });
+
+  it('아이템을 선택해도 바깥 카드의 클릭이 실행되지 않는다', async () => {
+    const user = userEvent.setup();
+    const handleCardClick = jest.fn();
+    const handleItemClick = jest.fn();
+    render(
+      <div onClick={handleCardClick}>
+        <Dropdown>
+          <Dropdown.Trigger>열기</Dropdown.Trigger>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={handleItemClick}>아이템</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>,
+    );
+    await user.click(screen.getByRole('button', { name: '열기' }));
+    await user.click(screen.getByRole('menuitem', { name: '아이템' }));
+    expect(handleItemClick).toHaveBeenCalledTimes(1);
+    expect(handleCardClick).not.toHaveBeenCalled();
+  });
+});
+
 describe('포커스 관리', () => {
   it('메뉴가 열리면 첫 번째 활성 아이템에 포커스가 간다', async () => {
     const user = userEvent.setup();
