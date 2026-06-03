@@ -33,7 +33,7 @@ export default function DashboardPage() {
         <RecentTodos onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
         <ProgressCard />
       </div>
-      <GoalTodoSection onEditTodo={setEditingTodo} onAddTodo={setCreatingForGoalId} />
+      <GoalTodoSection onEditTodo={setEditingTodo} onAddTodo={setCreatingForGoalId} onSelectTodo={setSelectedTodo} />
       <TodoFormSheet
         mode="update"
         isOpen={editingTodo !== null}
