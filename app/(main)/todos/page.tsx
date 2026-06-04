@@ -27,7 +27,7 @@ const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
 
 /**
  * /todos — 모든 할 일 페이지
- * 전체/To Do/Done 탭으로 `done` 파라미터 매핑, 40개씩 무한 스크롤, 행 등장 애니메이션.
+ * ALL/TO DO/DONE 탭으로 `done` 파라미터 매핑, 40개씩 무한 스크롤, 행 등장 애니메이션.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function TodosPage() {
@@ -76,9 +76,9 @@ export default function TodosPage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 px-2">
-            <CategoryTab label="전체" isActive={tab === 'all'} onClick={() => setTab('all')} />
-            <CategoryTab label="To Do" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
-            <CategoryTab label="Done" isActive={tab === 'done'} onClick={() => setTab('done')} />
+            <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => setTab('all')} />
+            <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
+            <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
           </div>
           {/* 스텁: 모달 작업은 별도 이슈 (기획 SSOT) */}
           <Button variant="tertiary" size="small" startIcon={<IcPlus className="size-5 text-slate-500" />}>

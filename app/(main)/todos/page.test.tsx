@@ -105,22 +105,22 @@ it('초기 호출은 done 미지정·sort=latest·limit=40으로 한다', async 
   expect(calledWith.done).toBeUndefined();
 });
 
-it('To Do 탭 클릭 시 done=false 파라미터로 다시 조회한다', async () => {
+it('TO DO 탭 클릭 시 done=false 파라미터로 다시 조회한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
   renderWithClient(<TodosPage />);
   await screen.findByText('할일 A');
-  fireEvent.click(screen.getByRole('button', { name: 'To Do' }));
+  fireEvent.click(screen.getByRole('button', { name: 'TO DO' }));
   await waitFor(() => {
     const lastArgs = mocked.getTodos.mock.calls.at(-1)?.[0] as TodoListParams;
     expect(lastArgs.done).toBe('false');
   });
 });
 
-it('Done 탭 클릭 시 done=true 파라미터로 다시 조회한다', async () => {
+it('DONE 탭 클릭 시 done=true 파라미터로 다시 조회한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
   renderWithClient(<TodosPage />);
   await screen.findByText('할일 A');
-  fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+  fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
   await waitFor(() => {
     const lastArgs = mocked.getTodos.mock.calls.at(-1)?.[0] as TodoListParams;
     expect(lastArgs.done).toBe('true');
