@@ -27,7 +27,8 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
       aria-label="링크 임베드 패널"
       className={cn(
         'fixed inset-x-0 bottom-0 bg-white shadow-xl transition-transform duration-300',
-        expanded ? 'z-[60] h-[100dvh]' : 'z-30 h-[60vh]',
+        // sm 이상에서 사이드바 collapsed 폭(60px)만큼 left 비워 chevron이 사이드바에 안 가리게 함. expanded는 풀스크린이라 미적용
+        expanded ? 'z-[60] h-[100dvh]' : 'z-30 h-[230px] sm:left-15 sm:h-[417px]',
         open ? 'translate-y-0' : 'translate-y-full',
         'xl:shrink-0 xl:translate-y-0',
         expanded
