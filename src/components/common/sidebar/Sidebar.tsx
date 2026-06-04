@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
+import LogoutButton from './LogoutButton';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
@@ -139,7 +140,7 @@ export default function Sidebar() {
             </ul>
             <ul className="flex flex-col">
               <SidebarRow type="settings" text="설정" href="/settings" collapsed={collapsed} />
-              <SidebarRow type="logout" text="로그아웃" collapsed={collapsed} />
+              <LogoutButton collapsed={collapsed} />
             </ul>
           </div>
           {!collapsed && (

@@ -8,11 +8,12 @@ interface SidebarRowProps {
   type: SidebarRowType;
   text: string;
   href?: string;
+  onClick?: () => void;
   current?: boolean;
   collapsed?: boolean;
 }
 
-export default function SidebarRow({ type, text, href, current = false, collapsed = false }: SidebarRowProps) {
+export default function SidebarRow({ type, text, href, onClick, current = false, collapsed = false }: SidebarRowProps) {
   const state = current ? 'active' : 'default';
 
   const icon: Record<SidebarRowType, React.ReactNode> = {
@@ -44,6 +45,10 @@ export default function SidebarRow({ type, text, href, current = false, collapse
         <Link href={href} className="group block">
           {row}
         </Link>
+      ) : onClick ? (
+        <button type="button" onClick={onClick} className="group block w-full">
+          {row}
+        </button>
       ) : (
         row
       )}
