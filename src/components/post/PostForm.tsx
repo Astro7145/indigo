@@ -73,7 +73,7 @@ export default function PostForm(props: PostFormProps) {
   // 수정 모드에서 데이터 도착까지 로딩 표시
   if (props.mode === 'edit' && !initialPost) {
     return (
-      <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:min-h-[calc(100vh-100px)] sm:max-w-[636px] xl:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -111,11 +111,15 @@ export default function PostForm(props: PostFormProps) {
       }
       if (props.mode === 'edit') {
         // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
-        await updatePost({ postId: props.postId, body: { title, content, image: finalImage } });
+        const body = { title, content, image: finalImage };
+        console.log('[PostForm] PATCH body', body);
+        await updatePost({ postId: props.postId, body });
         router.push(`/posts/${props.postId}`);
         return;
       }
-      const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
+      const body = { title, content, ...(finalImage ? { image: finalImage } : {}) };
+      console.log('[PostForm] POST body', body);
+      const post = await createPost(body);
       router.push(`/posts/${post.id}`);
     } finally {
       // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
@@ -131,7 +135,7 @@ export default function PostForm(props: PostFormProps) {
   const contentNoSpaceCount = contentText.replace(/\s/g, '').length;
 
   return (
-    <div className="mx-auto w-full max-w-[343px] sm:max-w-[636px] xl:max-w-[768px]">
+    <div className="mx-auto flex min-h-full w-full max-w-[343px] flex-col sm:max-w-[636px] xl:max-w-[768px]">
       <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
         {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
         <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
@@ -164,7 +168,7 @@ export default function PostForm(props: PostFormProps) {
           if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
           editorRef.current?.focus();
         }}
-        className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 sm:min-h-[calc(100vh-100px)] sm:px-[30px] sm:py-8 xl:min-h-[calc(100vh-212px)] xl:px-[34px]"
+        className="flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
       >
         <PostEditor
           ref={editorRef}
