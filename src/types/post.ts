@@ -1,0 +1,44 @@
+export interface PostWriter {
+  id: number;
+  name: string;
+  image: string | null;
+}
+
+export interface Post {
+  id: number;
+  teamId: string;
+  userId: number;
+  title: string;
+  content: string;
+  image: string | null;
+  viewCount: number;
+  createdAt: string;
+  updatedAt: string;
+  writer: PostWriter;
+  commentCount: number;
+}
+
+export interface PostListParams {
+  cursor?: string;
+  limit?: number;
+  type?: 'all' | 'best';
+  search?: string;
+}
+
+export interface PostListResponse {
+  posts: Post[];
+  nextCursor: string | null;
+  totalCount: number;
+}
+
+export interface CreatePostBody {
+  title: string;
+  content: string;
+  image?: string;
+}
+
+export interface UpdatePostBody {
+  title?: string;
+  content?: string;
+  image?: string | null;
+}

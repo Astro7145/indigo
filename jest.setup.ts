@@ -4,4 +4,17 @@
 // 2. 코드 중복 방지: 각 테스트 파일마다 동일한 import문을 반복하지 않아도 됩니다.
 // 3. 일관성 유지: 모든 테스트에 동일한 확장 기능이 적용되므로 테스트 코드가 일관성을 유지합니다.
 // 4. 설정 집중화: 테스트 환경 설정을 한 곳에서 관리할 수 있어 나중에 변경이 필요할 때 편리합니다.
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
+
+// Tiptap v3 Placeholder가 document.elementFromPoint를 호출하는데 jsdom이 미지원
+if (typeof document !== 'undefined' && typeof document.elementFromPoint !== 'function') {
+  document.elementFromPoint = () => null;
+}
+
+// jsdom은 URL.createObjectURL/revokeObjectURL을 미지원. 파일 미리보기 로직이 호출만 가능하도록 no-op으로 채워둠
+if (typeof URL !== 'undefined' && typeof URL.createObjectURL !== 'function') {
+  URL.createObjectURL = () => 'blob:mock-url';
+}
+if (typeof URL !== 'undefined' && typeof URL.revokeObjectURL !== 'function') {
+  URL.revokeObjectURL = () => {};
+}

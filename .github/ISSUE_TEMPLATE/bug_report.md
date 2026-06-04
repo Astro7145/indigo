@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: "[BUG] "
+title: '[BUG] '
 labels: 'bug'
 assignees: ''
-
 ---
 
 **어떤 버그인가요?**
@@ -12,7 +11,8 @@ assignees: ''
 
 **어떤 상황에서 발생하나요?**
 버그를 발생 시키는 절차를 설명해주세요.
-ex) 
+ex)
+
 1. OO 화면으로 이동
 2. OO 버튼 클릭
 3. OO 입력
@@ -24,9 +24,10 @@ ex)
 버그가 발생한 결과에 대해서 설명해주세요.(혹은 스크린샷 첨부)
 
 실행 환경(선택)
-- OS: 
-- Browser: 
-- Version: 
+
+- OS:
+- Browser:
+- Version:
 
 그 외 추가 사항(선택)
 기타 사항을 적어주세요.
