@@ -77,7 +77,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
               onChange={(e) => setInput(e.target.value)}
             />
           </div>
-          <Dropdown className="shrink-0">
+          <Dropdown className="w-20 shrink-0">
             <Dropdown.Trigger asChild>
               <button
                 type="button"
