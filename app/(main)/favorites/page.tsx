@@ -33,7 +33,6 @@ export default function FavoritesPage() {
   const reduce = useReducedMotion();
 
   const favorites = data?.favorites ?? [];
-  const totalCount = data?.totalCount ?? 0;
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -56,8 +55,8 @@ export default function FavoritesPage() {
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:61509) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">찜한 할 일</h1>
-        {/* aria-label 미부착 — 스크린리더가 h1 "찜한 할 일" + 숫자 텍스트를 그대로 이어 읽도록 둔다 */}
-        <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{totalCount}</span>
+        {/* 카운트는 현재 보이는(필터된) 찜 개수 — 탭·목표 필터에 따라 갱신. aria-label 미부착으로 h1+숫자를 이어 읽힘 */}
+        <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{visible.length}</span>
       </div>
 
       <div className="flex flex-col gap-3">

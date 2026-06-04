@@ -99,12 +99,14 @@ beforeEach(() => {
   goal.getGoals.mockResolvedValue(goalPage([]));
 });
 
-it('헤더에 "찜한 할 일" 제목과 totalCount를 렌더한다', async () => {
+it('헤더 숫자는 현재 보이는 찜 개수를 렌더한다(전체 totalCount가 아님)', async () => {
+  // 1개만 보이지만 totalCount는 42 — 클라이언트 필터 기준이라 헤더는 보이는 개수(1)를 따른다.
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')], 42));
   renderWithClient(<FavoritesPage />);
   expect(await screen.findByText('찜 A')).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: '찜한 할 일' })).toBeInTheDocument();
-  expect(screen.getByText('42')).toBeInTheDocument();
+  expect(screen.getByText('1')).toBeInTheDocument();
+  expect(screen.queryByText('42')).not.toBeInTheDocument();
 });
 
 it('찜한 할 일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
@@ -133,6 +135,17 @@ it('DONE 탭 클릭 시 완료된 항목만 보인다(클라이언트 필터)', 
   fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
   await waitFor(() => expect(screen.queryByText('미완료 A')).not.toBeInTheDocument());
   expect(screen.getByText('완료 B')).toBeInTheDocument();
+});
+
+it('탭으로 거르면 헤더 숫자도 그 개수로 바뀐다', async () => {
+  fav.getFavoriteTodos.mockResolvedValue(
+    favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '미완료 B', false), makeFav(3, 103, '완료 C', true)]),
+  );
+  renderWithClient(<FavoritesPage />);
+  await screen.findByText('미완료 A');
+  expect(screen.getByText('3')).toBeInTheDocument(); // ALL
+  fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
+  expect(await screen.findByText('1')).toBeInTheDocument(); // DONE → 1개
 });
 
 it('목표를 선택하면 해당 목표의 항목만 보인다(클라이언트 필터)', async () => {
