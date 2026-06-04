@@ -17,7 +17,7 @@ export interface PostCardProps {
 
 // 스켈레톤이 동일 외곽을 재사용하도록 export — 카드가 채워질 영역의 크기 점프(layout shift) 방지.
 export const postCardRootClass =
-  'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden sm:h-auto sm:w-[384px] sm:p-8 sm:gap-4 xl:w-full';
+  'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden sm:h-[280px] sm:w-[384px] sm:p-8 sm:gap-4 xl:w-full';
 
 export default function PostCard({ post, onClick, className }: PostCardProps) {
   return (

@@ -10,8 +10,9 @@ export default function PostCardSkeleton() {
         <div className="h-5 w-full rounded bg-slate-100" />
         <div className="h-5 w-2/3 rounded bg-slate-100" />
       </div>
-      <div className="h-10 rounded bg-slate-100" />
-      <div className="mt-auto h-6 w-1/2 rounded bg-slate-100" />
+      {/* sm+에서 카드 고정 높이를 자연스럽게 채우도록 가운데 블록을 늘림. 모바일은 기존 h-10 유지 */}
+      <div className="h-10 rounded bg-slate-100 sm:h-auto sm:flex-1" />
+      <div className="h-6 w-1/2 rounded bg-slate-100" />
     </Card>
   );
 }
