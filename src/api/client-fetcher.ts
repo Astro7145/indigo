@@ -27,7 +27,7 @@ function toApiError(error: AxiosError): ApiError {
 // - /auth/* (로그인·회원가입 등)의 401은 폼에서 인라인 처리하므로 제외
 // - 이미 /login이면 리다이렉트 루프 방지
 export function shouldRedirectToLogin(error: AxiosError<ErrorBody>): boolean {
-  if (error.response?.data.code === 'INVALID_CREDENTIALS') return false;
+  if (error.response?.data?.code === 'INVALID_CREDENTIALS') return false;
   if (typeof window === 'undefined') return false;
   if (/(^|\/)auth\//.test(error.config?.url ?? '')) return false;
   return window.location.pathname !== '/login';
