@@ -2,6 +2,11 @@
 // 클라이언트 코드에서 import 금지 — 서버 라우트 핸들러 전용.
 import axios from 'axios';
 import { NextResponse, type NextRequest } from 'next/server';
+import { COOKIE } from '@/src/api/server/auth-cookies';
+
+// 쿠키 이름 상수는 의존성 없는 auth-cookies 모듈에 둔다 (middleware와 공유).
+// 기존 import 경로(@/src/api/server/server-fetcher) 호환을 위해 re-export.
+export { COOKIE };
 
 export type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE' | 'PUT';
 
@@ -11,11 +16,6 @@ export class ApiPathError extends Error {
     this.name = 'ApiPathError';
   }
 }
-
-export const COOKIE = {
-  ACCESS: 'access_token',
-  REFRESH: 'refresh_token',
-} as const;
 
 const REFRESH_MAX_AGE = 60 * 60 * 24 * 7; // 7d — SlidTodo refresh 토큰 실제 TTL(관측 ≈7일)에 정렬
 
