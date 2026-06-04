@@ -68,4 +68,29 @@ describe('TagInput', () => {
     fireEvent.keyDown(screen.getByPlaceholderText(PLACEHOLDER), { key: ' ' });
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('추가 버튼을 누르면 입력값이 새 태그로 추가된다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[]} onChange={onChange} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    fireEvent.click(screen.getByLabelText('태그 추가'));
+    expect(onChange).toHaveBeenCalledWith([{ text: '운동', color: 'green' }]);
+  });
+
+  it('입력값이 없으면 추가 버튼이 비활성화된다', () => {
+    render(<TagInput value={[]} onChange={jest.fn()} />);
+    expect(screen.getByLabelText('태그 추가')).toBeDisabled();
+  });
+
+  it('입력값이 있으면 추가 버튼이 활성화된다', () => {
+    render(<TagInput value={[]} onChange={jest.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    expect(screen.getByLabelText('태그 추가')).toBeEnabled();
+  });
+
+  it('이미 존재하는 태그와 같은 값이면 추가 버튼이 비활성화된다', () => {
+    render(<TagInput value={[{ text: '운동', color: 'green' }]} onChange={jest.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    expect(screen.getByLabelText('태그 추가')).toBeDisabled();
+  });
 });
