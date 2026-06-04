@@ -36,6 +36,8 @@ interface TodoFormUIProps {
   title: string;
   submitLabel: string;
   disableSubmitUntilValid?: boolean;
+  /** mutation 진행 중 여부 — 제출 버튼 중복 클릭 방지 */
+  isPending?: boolean;
 }
 
 export default function TodoFormUI({
@@ -45,6 +47,7 @@ export default function TodoFormUI({
   title,
   submitLabel,
   disableSubmitUntilValid,
+  isPending,
 }: TodoFormUIProps) {
   const {
     register,
@@ -52,7 +55,7 @@ export default function TodoFormUI({
     setValue,
     watch,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<TodoCreateValues>({
     resolver: zodResolver(todoCreateSchema),
     mode: 'onChange',
@@ -64,7 +67,7 @@ export default function TodoFormUI({
     },
   });
 
-  const { data: goalData } = useGoalList();
+  const { data: goalData } = useGoalList({ limit: 100 });
   const watchedGoalId = watch('goalId');
   const watchedLinkUrl = watch('linkUrl');
   const selectedGoal = goalData?.goals.find((g) => g.id === watchedGoalId);
@@ -80,6 +83,7 @@ export default function TodoFormUI({
 
   const showStatusField = initialValues?.done !== undefined;
   const canSubmit = isValid && (!showStatusField || done !== undefined);
+  const submitting = isSubmitting || isPending;
 
   const handleSubmit_ = handleSubmit(async (data) => {
     if (showStatusField && done === undefined) {
@@ -151,7 +155,7 @@ export default function TodoFormUI({
                 <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
               </button>
             </Dropdown.Trigger>
-            <Dropdown.Menu size="full">
+            <Dropdown.Menu size="full" className="scrollbar-slate max-h-60 overflow-y-auto">
               <Dropdown.Item onClick={() => setValue('goalId', undefined)}>목표 없음</Dropdown.Item>
               {goalData?.goals.map((goal) => (
                 <Dropdown.Item key={goal.id} onClick={() => setValue('goalId', goal.id)}>
@@ -181,7 +185,7 @@ export default function TodoFormUI({
         </div>
 
         {/* 태그 */}
-        <div className="flex flex-col gap-2 pb-8">
+        <div className="flex flex-col gap-2">
           <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">태그</span>
           <TagInput value={tags} onChange={setTags} />
         </div>
@@ -218,7 +222,7 @@ export default function TodoFormUI({
           size="small"
           className="py-3 text-base sm:py-[14px] sm:text-lg"
           onClick={handleSubmit_}
-          disabled={disableSubmitUntilValid && !canSubmit}
+          disabled={(disableSubmitUntilValid && !canSubmit) || submitting}
         >
           {submitLabel}
         </Button>

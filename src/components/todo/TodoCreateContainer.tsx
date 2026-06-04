@@ -14,7 +14,7 @@ interface TodoCreateContainerProps {
 }
 
 export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }: TodoCreateContainerProps) {
-  const { mutate: createTodo } = useCreateTodo();
+  const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
@@ -62,6 +62,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
       submitLabel="확인"
       initialValues={{ goalId: defaultGoalId }}
       disableSubmitUntilValid
+      isPending={isPending}
     />
   );
 }

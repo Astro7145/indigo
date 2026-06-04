@@ -111,6 +111,23 @@ describe('TodoFormUI', () => {
     });
   });
 
+  it('isPending이 true면 제출 버튼이 비활성화된다', () => {
+    renderWithClient(
+      <TodoFormUI onSubmit={jest.fn()} onClose={jest.fn()} title="할 일 생성" submitLabel="확인" isPending />,
+    );
+    expect(screen.getByRole('button', { name: '확인' })).toBeDisabled();
+  });
+
+  it('제출 처리가 진행 중인 동안 제출 버튼이 비활성화된다', async () => {
+    let resolveSubmit: () => void = () => {};
+    const onSubmit = jest.fn(() => new Promise<void>((resolve) => (resolveSubmit = resolve)));
+    renderWithClient(<TodoFormUI onSubmit={onSubmit} onClose={jest.fn()} title="할 일 생성" submitLabel="확인" />);
+    fillRequiredFields();
+    fireEvent.click(screen.getByRole('button', { name: '확인' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: '확인' })).toBeDisabled());
+    resolveSubmit();
+  });
+
   it('헤더의 닫기 버튼을 누르면 onClose가 호출된다', () => {
     const onClose = jest.fn();
     renderWithClient(<TodoFormUI onSubmit={jest.fn()} onClose={onClose} title="할 일 생성" submitLabel="확인" />);

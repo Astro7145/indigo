@@ -3,10 +3,11 @@ import { noteKeys, getNotes, getNote, createNote, patchNote, deleteNote } from '
 import type { Note, NoteListParams, NoteListResponse, CreateNoteBody, UpdateNoteBody } from '@/src/types/note';
 import type { ApiError } from '@/src/types/common';
 
-export function useNoteList(params: NoteListParams = {}) {
+export function useNoteList(params: NoteListParams = {}, options?: { enabled?: boolean }) {
   return useQuery<NoteListResponse, ApiError>({
     queryKey: noteKeys.list(params),
     queryFn: () => getNotes(params),
+    enabled: options?.enabled,
   });
 }
 

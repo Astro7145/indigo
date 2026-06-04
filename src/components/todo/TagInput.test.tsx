@@ -68,4 +68,57 @@ describe('TagInput', () => {
     fireEvent.keyDown(screen.getByPlaceholderText(PLACEHOLDER), { key: ' ' });
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('추가 버튼을 누르면 입력값이 새 태그로 추가된다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[]} onChange={onChange} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    fireEvent.click(screen.getByLabelText('태그 추가'));
+    expect(onChange).toHaveBeenCalledWith([{ text: '운동', color: 'green' }]);
+  });
+
+  it('입력값이 없으면 추가 버튼이 비활성화된다', () => {
+    render(<TagInput value={[]} onChange={jest.fn()} />);
+    expect(screen.getByLabelText('태그 추가')).toBeDisabled();
+  });
+
+  it('입력값이 있으면 추가 버튼이 활성화된다', () => {
+    render(<TagInput value={[]} onChange={jest.fn()} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    expect(screen.getByLabelText('태그 추가')).toBeEnabled();
+  });
+
+  it('중복된 태그를 추가하려 하면 경고가 보이고 추가되지 않는다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[{ text: '운동', color: 'green' }]} onChange={onChange} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '운동' } });
+    fireEvent.click(screen.getByLabelText('태그 추가'));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('이미 추가된 태그예요');
+  });
+
+  it('태그가 10개면 더 추가하려 할 때 경고가 보이고 추가되지 않는다', () => {
+    const onChange = jest.fn();
+    const tenTags: Tag[] = Array.from({ length: 10 }, (_, i) => ({ text: `태그${i}`, color: 'green' }));
+    render(<TagInput value={tenTags} onChange={onChange} />);
+    fireEvent.change(screen.getByPlaceholderText(PLACEHOLDER), { target: { value: '새태그' } });
+    fireEvent.click(screen.getByLabelText('태그 추가'));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('태그는 최대 10개까지 추가할 수 있어요');
+  });
+
+  it('태그는 50자를 초과해 입력할 수 없다', () => {
+    render(<TagInput value={[]} onChange={jest.fn()} />);
+    expect(screen.getByPlaceholderText(PLACEHOLDER)).toHaveAttribute('maxLength', '50');
+  });
+
+  it('경고가 보인 뒤 입력값을 고치면 경고가 사라진다', () => {
+    render(<TagInput value={[{ text: '운동', color: 'green' }]} onChange={jest.fn()} />);
+    const input = screen.getByPlaceholderText(PLACEHOLDER);
+    fireEvent.change(input, { target: { value: '운동' } });
+    fireEvent.click(screen.getByLabelText('태그 추가'));
+    expect(screen.getByRole('alert')).toHaveTextContent('이미 추가된 태그예요');
+    fireEvent.change(input, { target: { value: '운동2' } });
+    expect(screen.getByRole('alert')).toHaveTextContent('');
+  });
 });
