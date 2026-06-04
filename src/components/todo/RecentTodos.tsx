@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
 import TodoList from '@/src/components/common/todo-list/TodoList';
+import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
@@ -34,6 +36,8 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
+  // 삭제 확인 모달 대상 — null이면 닫힘.
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
   const todos = data?.todos ?? [];
 
   const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
@@ -88,7 +92,11 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
                       {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
                       {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
                       {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction hoverOnly onEdit={() => onEditTodo(t)} />
+                      <TodoList.KebabAction
+                        hoverOnly
+                        onEdit={() => onEditTodo(t)}
+                        onDelete={() => setDeletingTodo(t)}
+                      />
                       <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                     </TodoList.Actions>
                   </TodoList>
@@ -98,6 +106,7 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
           </ul>
         )}
       </Card>
+      <TodoDeleteConfirm open={deletingTodo !== null} todo={deletingTodo} onClose={() => setDeletingTodo(null)} />
     </div>
   );
 }

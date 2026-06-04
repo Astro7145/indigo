@@ -98,6 +98,15 @@ it('useTodoList를 limit: 4로 호출해 최신 4개를 요청한다', async () 
   expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ sort: 'latest', limit: 4 }));
 });
 
+it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
+  renderRecent();
+  await screen.findByText('할일 A');
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('삭제하기'));
+  expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
+});
+
 it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
   mocked.getTodos.mockResolvedValue({
     todos: [makeTodo(1, '자바스크립트 듣기')],

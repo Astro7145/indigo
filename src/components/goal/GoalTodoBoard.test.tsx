@@ -173,6 +173,15 @@ it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', a
   expect(mockPush).not.toHaveBeenCalled();
 });
 
+it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일')]));
+  renderBoard();
+  await screen.findByText('미완료 할일');
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('삭제하기'));
+  expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
+});
+
 it('이미 즐겨찾기된 별 클릭 시 removeTodoFavorite를 호출한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([{ ...makeTodo(1, '할일 A'), isFavorite: true }]));
   (favoriteApi.removeTodoFavorite as jest.Mock).mockResolvedValue(undefined);
