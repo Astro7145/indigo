@@ -21,7 +21,7 @@ export default function ProfileForm() {
     register,
     handleSubmit,
     reset,
-    formState: { isSubmitting, isSubmitted, errors, isValid },
+    formState: { isSubmitting, isSubmitted, errors, isValid, isDirty },
   } = useForm<MeFields>({
     resolver: zodResolver(meSchema),
     defaultValues: {
@@ -37,10 +37,10 @@ export default function ProfileForm() {
 
   // 서버에서 내 정보를 불러오면 이름 필드를 채운다 (비밀번호 필드는 빈 값 유지).
   useEffect(() => {
-    if (me) {
+    if (me && !isDirty) {
       reset({ name: me.name, currentPassword: '', password: '', passwordConfirm: '' });
     }
-  }, [me, reset]);
+  }, [me, reset, isDirty]);
 
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { mutateAsync: uploadImage } = useUploadImageToS3();
