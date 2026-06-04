@@ -140,7 +140,8 @@ export default function SidebarGoalRow({
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleCreate();
+                  // 한글 등 IME 조합 중 Enter는 "조합 확정"이므로 제출로 보지 않는다(마지막 글자 중복 생성 방지)
+                  if (e.key === 'Enter' && !e.nativeEvent.isComposing) handleCreate();
                 }}
                 placeholder="새 목표를 입력하세요"
                 aria-label="새 목표 입력"

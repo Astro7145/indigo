@@ -59,3 +59,13 @@ it('목표 추가 입력에 Enter 시 onCreateGoal을 호출한다', () => {
   fireEvent.keyDown(input, { key: 'Enter' });
   expect(onCreateGoal).toHaveBeenCalledWith('새 목표');
 });
+
+it('IME 조합 중 Enter(한글 마지막 글자 확정)에는 onCreateGoal을 호출하지 않는다', () => {
+  const onCreateGoal = jest.fn();
+  render(<SidebarGoalRow goals={[]} onCreateGoal={onCreateGoal} />);
+  fireEvent.click(screen.getByRole('button', { name: '목표 추가' }));
+  const input = screen.getByLabelText('새 목표 입력');
+  fireEvent.change(input, { target: { value: '새 목표' } });
+  fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+  expect(onCreateGoal).not.toHaveBeenCalled();
+});
