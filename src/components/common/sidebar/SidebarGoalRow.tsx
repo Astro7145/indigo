@@ -147,7 +147,13 @@ export default function SidebarGoalRow({
                 aria-label="새 목표 입력"
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white placeholder:text-slate-400 focus:outline-none"
               />
-              <span className="shrink-0 text-sm font-semibold text-indigo-400">Enter</span>
+              <button
+                type="button"
+                onClick={handleCreate}
+                className="shrink-0 cursor-pointer text-sm font-semibold text-indigo-400 transition-colors hover:text-indigo-300"
+              >
+                Enter
+              </button>
             </div>
           </motion.div>
         )}
