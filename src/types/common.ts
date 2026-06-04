@@ -1,3 +1,5 @@
+import { ApiErrorCode } from '../const/api';
+
 /** 커서 기반 페이지네이션 공통 쿼리 파라미터. 응답 envelope는 도메인마다 키가 다르므로 도메인 타입에서 개별 정의한다. */
 export interface CursorParams {
   cursor?: number;
@@ -34,5 +36,5 @@ export interface MessageResponse {
 
 export interface ErrorBody {
   message?: string;
-  code?: string;
+  code?: ApiErrorCode;
 }

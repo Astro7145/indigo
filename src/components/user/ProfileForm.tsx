@@ -70,7 +70,7 @@ export default function ProfileForm() {
           await changePassword({ currentPassword: data.currentPassword, newPassword: data.password });
         } catch (error) {
           // 401: 현재 비밀번호 불일치 → 인라인 토스트로 안내하고 종료한다.
-          if (error instanceof ApiError && error.status === 401) {
+          if (error instanceof ApiError && error.code === 'INVALID_CREDENTIALS') {
             showToast('현재 비밀번호가 일치하지 않습니다.', 'error');
             return;
           }
