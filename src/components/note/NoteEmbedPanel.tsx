@@ -53,7 +53,8 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
           </div>
         )}
 
-        {data?.type === 'iframe' && (
+        {/* 사용자 입력 URL은 javascript: 등 임의 프로토콜이 올 수 있어 http(s)만 허용한다 (XSS 방지) */}
+        {data?.type === 'iframe' && /^https?:\/\//i.test(data.url) && (
           <iframe
             src={data.url}
             title="링크 미리보기"
@@ -67,14 +68,18 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
             {data.ogImage && <img src={data.ogImage} alt="" className="w-full rounded-lg object-cover" />}
             {data.title && <h3 className="text-base font-semibold text-slate-800">{data.title}</h3>}
             {data.description && <p className="text-sm text-slate-600">{data.description}</p>}
-            <a
-              href={data.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="truncate text-xs text-indigo-600 underline"
-            >
-              {data.url}
-            </a>
+            {/^https?:\/\//i.test(data.url) ? (
+              <a
+                href={data.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="truncate text-xs text-indigo-600 underline"
+              >
+                {data.url}
+              </a>
+            ) : (
+              <span className="truncate text-xs text-slate-400">{data.url}</span>
+            )}
           </article>
         )}
       </div>
