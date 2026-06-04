@@ -8,7 +8,7 @@ import Modal from '@/src/components/common/modal/Modal';
 import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
-import { useCreateImageUploadUrl, useUploadToPresignedUrl } from '@/src/hooks/upload';
+import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -34,7 +34,7 @@ export default function PostForm(props: PostFormProps) {
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
-  const { mutateAsync: uploadToPresignedUrl } = useUploadToPresignedUrl();
+  const { mutateAsync: uploadImageToS3 } = useUploadImageToS3();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -106,7 +106,7 @@ export default function PostForm(props: PostFormProps) {
       let finalImage: string | null = image;
       if (imageFile) {
         const { uploadUrl, url } = await createImageUploadUrl({ fileName: imageFile.name });
-        await uploadToPresignedUrl({ uploadUrl, file: imageFile });
+        await uploadImageToS3({ uploadUrl, file: imageFile });
         finalImage = url;
       }
       if (props.mode === 'edit') {

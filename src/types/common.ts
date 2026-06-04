@@ -1,3 +1,5 @@
+import { ApiErrorCode } from '../const/api';
+
 /** 커서 기반 페이지네이션 공통 쿼리 파라미터. 응답 envelope는 도메인마다 키가 다르므로 도메인 타입에서 개별 정의한다. */
 export interface CursorParams {
   cursor?: number;
@@ -30,4 +32,9 @@ export class ApiError extends Error {
 /** 단순 메시지 응답 (logout, 비밀번호 변경 등 본문이 메시지만 있는 엔드포인트). */
 export interface MessageResponse {
   message: string;
+}
+
+export interface ErrorBody {
+  message?: string;
+  code?: ApiErrorCode;
 }
