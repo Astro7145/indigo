@@ -73,6 +73,15 @@ it('useCreateTodo는 성공 시 목록을 무효화한다', async () => {
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() });
 });
 
+it('할 일을 생성하면 해당 목표의 진행도가 갱신된다', async () => {
+  mocked.createTodo.mockResolvedValue({ id: 1, goalId: 9 } as never);
+  const { result, client } = renderHookWithClient(() => useCreateTodo());
+  const inv = jest.spyOn(client, 'invalidateQueries');
+  await result.current.mutateAsync({ title: 'x', goalId: 9 });
+  expect(inv).toHaveBeenCalledWith({ queryKey: goalKeys.lists() });
+  expect(inv).toHaveBeenCalledWith({ queryKey: goalKeys.detail(9) });
+});
+
 it('useUpdateTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세 캐시에 기록한다', async () => {
   mocked.patchTodo.mockResolvedValue({ id: 5 } as never);
   const { result, client } = renderHookWithClient(() => useUpdateTodo());
@@ -116,4 +125,12 @@ it('useDeleteTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세
   expect(inv).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.lists() });
   expect(rm).toHaveBeenCalledWith({ queryKey: todoApi.todoKeys.detail(5) });
   expect(inv).toHaveBeenCalledWith({ queryKey: favoriteKeys.all });
+});
+
+it('할 일을 삭제하면 목표의 진행도가 갱신된다', async () => {
+  mocked.deleteTodo.mockResolvedValue(undefined as never);
+  const { result, client } = renderHookWithClient(() => useDeleteTodo());
+  const inv = jest.spyOn(client, 'invalidateQueries');
+  await result.current.mutateAsync(5);
+  expect(inv).toHaveBeenCalledWith({ queryKey: goalKeys.all });
 });
