@@ -36,6 +36,8 @@ interface TodoFormUIProps {
   title: string;
   submitLabel: string;
   disableSubmitUntilValid?: boolean;
+  /** mutation 진행 중 여부 — 제출 버튼 중복 클릭 방지 */
+  isPending?: boolean;
 }
 
 export default function TodoFormUI({
@@ -45,6 +47,7 @@ export default function TodoFormUI({
   title,
   submitLabel,
   disableSubmitUntilValid,
+  isPending,
 }: TodoFormUIProps) {
   const {
     register,
@@ -52,7 +55,7 @@ export default function TodoFormUI({
     setValue,
     watch,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<TodoCreateValues>({
     resolver: zodResolver(todoCreateSchema),
     mode: 'onChange',
@@ -80,6 +83,7 @@ export default function TodoFormUI({
 
   const showStatusField = initialValues?.done !== undefined;
   const canSubmit = isValid && (!showStatusField || done !== undefined);
+  const submitting = isSubmitting || isPending;
 
   const handleSubmit_ = handleSubmit(async (data) => {
     if (showStatusField && done === undefined) {
@@ -218,7 +222,7 @@ export default function TodoFormUI({
           size="small"
           className="py-3 text-base sm:py-[14px] sm:text-lg"
           onClick={handleSubmit_}
-          disabled={disableSubmitUntilValid && !canSubmit}
+          disabled={(disableSubmitUntilValid && !canSubmit) || submitting}
         >
           {submitLabel}
         </Button>

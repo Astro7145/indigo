@@ -16,7 +16,7 @@ interface TodoUpdateContainerProps {
 }
 
 export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpdateContainerProps) {
-  const { mutate: updateTodo } = useUpdateTodo();
+  const { mutate: updateTodo, isPending } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
@@ -79,6 +79,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
       onClose={onCancel ?? onClose}
       title="할 일 수정"
       submitLabel="수정"
+      isPending={isPending}
     />
   );
 }
