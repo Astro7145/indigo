@@ -130,7 +130,7 @@ export default function Modal({
           aria-labelledby={titleId}
           tabIndex={-1}
           className={cn(
-            'relative flex max-w-[calc(100vw-2rem)] flex-col rounded bg-white shadow-xl',
+            'relative flex max-h-[90dvh] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded bg-white shadow-xl',
             // 크기는 반응형: 모바일=small(343px) / 데스크탑(sm:≥640px)=large(456px)
             'w-[343px] sm:w-[456px]',
             // padding: 센터 메시지(확인 popup) 비대칭 / 헤더형(제목+X) 대칭, 둘 다 모바일→데스크탑 반응형

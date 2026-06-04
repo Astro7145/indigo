@@ -41,13 +41,21 @@ test.describe('대시보드', () => {
       await expect(section.getByRole('progressbar').first()).toBeVisible({ timeout: 15_000 });
       const initial = await section.getByRole('progressbar').count();
 
-      // 스크롤 컨테이너는 <main>(overflow-y-auto). window 스크롤은 noop이라 <main>을 직접 스크롤한다.
-      // IO root는 기본(viewport)이지만, <main> 내부 스크롤이 sentinel과 viewport 간 교차 위치를 이동시켜 정상 발화한다.
-      // 페이지가 길어질 수 있어 toPass로 재시도.
+      // 스크롤 컨테이너는 <main>(overflow-y-auto). webkit headless에선 프로그램적 scrollTo만으론
+      // IntersectionObserver(sentinel)가 안정적으로 발화하지 않으므로 실제 스크롤 제스처를 섞어 반복한다:
+      // 마지막 목표 카드를 뷰로 들이고(native scroll) 휠로 한 번 더 민 뒤 <main> 바닥까지 보낸다.
+      // 페이지가 길어질 수 있어 toPass로 재시도(여유 타임아웃).
       await expect(async () => {
+        await section
+          .getByRole('progressbar')
+          .last()
+          .scrollIntoViewIfNeeded()
+          .catch(() => {}); // 재렌더로 일시 분리되면 다음 회차에 재시도
+        await page.mouse.move(800, 200);
+        await page.mouse.wheel(0, 1500);
         await page.locator('main').evaluate((el) => el.scrollTo(0, el.scrollHeight));
         expect(await section.getByRole('progressbar').count()).toBeGreaterThan(initial);
-      }).toPass({ timeout: 10_000 });
+      }).toPass({ timeout: 20_000 });
     });
   });
 });

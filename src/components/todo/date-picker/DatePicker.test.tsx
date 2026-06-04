@@ -6,10 +6,14 @@ import Calendar from '@/src/components/common/calendar/Calendar';
 import DatePicker from '@/src/components/todo/date-picker/DatePicker';
 
 jest.mock('@/src/components/common/calendar/Calendar');
-jest.mock('@/src/components/todo/BottomSheet');
+jest.mock('@/src/components/common/BottomSheet');
 jest.mock('@/src/hooks/useIsMobile', () => ({
   useIsMobile: jest.fn().mockReturnValue(false),
 }));
+
+beforeEach(() => {
+  HTMLElement.prototype.scrollIntoView = jest.fn();
+});
 
 (Calendar as jest.Mock).mockImplementation(({ onChange }: ComponentProps<typeof Calendar>) => (
   <button type="button" onClick={() => onChange?.(new CalendarDate(2024, 6, 20))}>
