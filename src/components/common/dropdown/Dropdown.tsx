@@ -1,9 +1,22 @@
 'use client';
 
-import { createContext, use, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import {
+  createContext,
+  use,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '@/src/utils/cn';
+
+// SSR에서 useLayoutEffect 경고를 피하기 위한 동형(isomorphic) 레이아웃 이펙트
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 // ── DropdownContext ───────────────────────────────────────────────────────────
 
@@ -66,6 +79,8 @@ interface MenuProps {
 interface ItemProps {
   onClick?: () => void;
   disabled?: boolean;
+  /** 현재 선택된 값 — 메뉴가 열릴 때 이 아이템으로 초기 포커스가 간다 */
+  selected?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -101,9 +116,14 @@ function Dropdown({ open: controlledOpen, onOpenChange, className, children }: D
 function Trigger({ asChild, className, children }: TriggerProps) {
   const { toggle, isOpen, triggerRef } = useDropdownContext();
 
+  const handleTriggerClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    toggle();
+  };
+
   const injectedProps = {
     ref: triggerRef as React.Ref<HTMLButtonElement>,
-    onClick: toggle,
+    onClick: handleTriggerClick,
     'aria-haspopup': true as const,
     'aria-expanded': isOpen,
   };
@@ -127,9 +147,12 @@ function Trigger({ asChild, className, children }: TriggerProps) {
           (childRef as React.RefObject<HTMLElement | null>).current = node;
         }
       },
-      onClick: (e: React.MouseEvent<HTMLElement>) => {
+      // asChild 자식이 이벤트를 전달하지 않고 onClick을 호출할 수 있어(e 없음) 옵셔널 처리.
+      // 그 경우 전파 차단은 자식이 책임진다. e가 없어도 자식의 원래 onClick은 항상 호출한다.
+      onClick: (e?: React.MouseEvent<HTMLElement>) => {
+        e?.stopPropagation();
         toggle();
-        child.props.onClick?.(e);
+        child.props.onClick?.(e as React.MouseEvent<HTMLElement>);
       },
     });
   }
@@ -141,21 +164,40 @@ function Trigger({ asChild, className, children }: TriggerProps) {
   );
 }
 
-const placementClasses: Record<Placement, string> = {
-  'bottom-start': 'left-0',
-  'bottom-end': 'right-0',
-  'bottom-center': 'left-1/2 -translate-x-1/2',
+const SIZE_WIDTH: Record<Exclude<MenuSize, 'full'>, number> = {
+  small: 102,
+  large: 400,
 };
 
-const sizeClasses: Record<MenuSize, string> = {
-  small: 'w-[102px]',
-  large: 'w-[400px]',
-  full: 'w-full',
-};
+export interface MenuPosition {
+  top: number;
+  left: number;
+  width: number;
+}
+
+// 트리거 사각형 기준으로 포털 메뉴의 fixed 좌표를 계산한다.
+// 폭은 size별 결정적(full=트리거 너비), top은 트리거 바로 아래 +4px(mt-1).
+export function computeMenuPosition(rect: DOMRect, placement: Placement, size: MenuSize): MenuPosition {
+  const width = size === 'full' ? rect.width : SIZE_WIDTH[size];
+  const top = rect.bottom + 4;
+  let left: number;
+  switch (placement) {
+    case 'bottom-end':
+      left = rect.right - width;
+      break;
+    case 'bottom-center':
+      left = rect.left + rect.width / 2 - width / 2;
+      break;
+    default:
+      left = rect.left;
+  }
+  return { top, left, width };
+}
 
 function Menu({ placement = 'bottom-start', size = 'large', className, children }: MenuProps) {
   const { isOpen, close, triggerRef } = useDropdownContext();
   const menuRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<MenuPosition | null>(null);
 
   // 외부 클릭 시 닫힘 (트리거 클릭은 toggle이 처리하므로 제외)
   useEffect(() => {
@@ -182,11 +224,30 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, close, triggerRef]);
 
-  // 열릴 때 첫 번째 활성 아이템 자동 포커스
+  // 트리거 기준으로 메뉴 좌표 계산 (열린 동안 스크롤·리사이즈에 추종)
+  useIsomorphicLayoutEffect(() => {
+    if (!isOpen) return;
+    const update = () => {
+      const trigger = triggerRef.current;
+      if (trigger) setPosition(computeMenuPosition(trigger.getBoundingClientRect(), placement, size));
+    };
+    update();
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [isOpen, placement, size, triggerRef]);
+
+  // 열릴 때 selected 아이템 우선, 없으면 첫 번째 활성 아이템 자동 포커스
   useEffect(() => {
     if (!isOpen || !menuRef.current) return;
-    const firstItem = menuRef.current.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])');
-    firstItem?.focus();
+    const target =
+      menuRef.current.querySelector<HTMLElement>(
+        '[role="menuitem"][data-selected="true"]:not([aria-disabled="true"])',
+      ) ?? menuRef.current.querySelector<HTMLElement>('[role="menuitem"]:not([aria-disabled="true"])');
+    target?.focus();
   }, [isOpen]);
 
   const handleArrowKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -210,26 +271,23 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
     triggerRef.current?.focus();
   };
 
-  return (
+  return createPortal(
     <MenuContext value={{ size, close: closeAndFocusTrigger }}>
       <div
         ref={menuRef}
         role="menu"
         onKeyDown={handleArrowKey}
-        className={cn(
-          'absolute top-full z-50 mt-1 rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]',
-          placementClasses[placement],
-          sizeClasses[size],
-          className,
-        )}
+        style={position ? { top: position.top, left: position.left, width: position.width } : undefined}
+        className={cn('fixed z-50 rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]', className)}
       >
         {children}
       </div>
-    </MenuContext>
+    </MenuContext>,
+    document.body,
   );
 }
 
-function Item({ onClick, disabled = false, className, children }: ItemProps) {
+function Item({ onClick, disabled = false, selected = false, className, children }: ItemProps) {
   const { size, close } = useMenuContext();
 
   const outerPadding = size === 'small' ? 'p-[5px]' : 'p-[6px]';
@@ -237,7 +295,8 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
   const innerRadius = size === 'small' ? 'rounded-lg' : 'rounded';
   const textSize = size === 'small' ? 'text-sm' : 'text-base';
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
     if (disabled) return;
     onClick?.();
     close();
@@ -246,7 +305,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      handleClick();
+      handleClick(e);
     }
   };
 
@@ -256,6 +315,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
         role="menuitem"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined}
+        data-selected={selected || undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseEnter={(e) => {
@@ -266,7 +326,7 @@ function Item({ onClick, disabled = false, className, children }: ItemProps) {
           textSize,
           innerPadding,
           innerRadius,
-          !disabled && 'bg-white hover:bg-indigo-300 focus:bg-indigo-300 focus:outline-none',
+          !disabled && 'bg-white hover:bg-indigo-300 focus-visible:bg-indigo-300 focus-visible:outline-none',
           disabled && 'cursor-not-allowed bg-white opacity-40',
           className,
         )}
