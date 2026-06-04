@@ -34,7 +34,7 @@ export default function PostDetailPage() {
 
   if (postPending || !post) {
     return (
-      <div className="mx-auto flex min-h-[calc(100vh-104px)] w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:min-h-[calc(100vh-48px)] sm:max-w-[636px] sm:p-10 xl:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -42,7 +42,7 @@ export default function PostDetailPage() {
 
   return (
     <>
-      <article className="mx-auto min-h-[calc(100vh-104px)] w-full max-w-[343px] rounded bg-white p-4 shadow-sm sm:min-h-[calc(100vh-48px)] sm:max-w-[636px] sm:p-10 xl:min-h-[calc(100vh-160px)] xl:max-w-[768px] xl:p-14">
+      <article className="mx-auto min-h-full w-full max-w-[343px] rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
           <h1 className="text-lg font-bold text-slate-900 sm:text-2xl">{post.title}</h1>
           {me?.id === post.writer.id && (
