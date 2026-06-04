@@ -31,7 +31,7 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-328 flex-col gap-8 sm:my-5">
+    <div className="mx-auto flex w-full max-w-328 flex-col gap-8">
       {/* 모바일(<sm)은 GNB가 타이틀을 담당 → sm+에서 노출. 로드 전후 레이아웃 시프트 방지로 h-8 예약 */}
       <div className="hidden h-8 sm:block">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{`${me?.name ?? ''}님의 목표`}</h1>
