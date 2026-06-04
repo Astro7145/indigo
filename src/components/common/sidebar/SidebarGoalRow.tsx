@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
 import { IcChevron, IcFlagFill, IcPlus } from '../icons';
 
@@ -17,6 +17,11 @@ interface SidebarGoalRowProps {
   onCreateGoal?: (title: string) => void;
   onSelectGoal?: (id: number) => void;
   onExpand?: () => void;
+  hasNextPage?: boolean;
+  onLoadMore?: () => void;
+  isLoading?: boolean;
+  isError?: boolean;
+  currentGoalId?: number;
 }
 
 export default function SidebarGoalRow({
@@ -26,10 +31,33 @@ export default function SidebarGoalRow({
   onCreateGoal,
   onSelectGoal,
   onExpand,
+  hasNextPage = false,
+  onLoadMore,
+  isLoading = false,
+  isError = false,
+  currentGoalId,
 }: SidebarGoalRowProps) {
   const [open, setOpen] = useState(false);
   const [inputOpen, setInputOpen] = useState(false);
   const [value, setValue] = useState('');
+
+  const listRef = useRef<HTMLUListElement>(null);
+  const sentinelRef = useRef<HTMLLIElement>(null);
+
+  // 목록을 펼친 상태에서 sentinel이 보이면 다음 페이지를 요청한다(기존 GoalTodoColumn 패턴).
+  useEffect(() => {
+    const el = sentinelRef.current;
+    const root = listRef.current;
+    if (!el || !root || !open || !hasNextPage) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) onLoadMore?.();
+      },
+      { root, rootMargin: '80px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [open, hasNextPage, onLoadMore, goals.length]);
 
   if (collapsed) {
     return (
@@ -134,20 +162,36 @@ export default function SidebarGoalRow({
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <ul className="scrollbar-slate flex max-h-45 flex-col overflow-y-auto">
-              {goals.map((goal) => (
-                <li key={goal.id} className="w-full list-none">
-                  <button
-                    type="button"
-                    onClick={() => onSelectGoal?.(goal.id)}
-                    className="flex w-full cursor-pointer items-center px-6 py-2 hover:bg-white/5"
-                  >
-                    <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-white">
-                      {goal.title}
-                    </span>
-                  </button>
-                </li>
-              ))}
+            <ul ref={listRef} className="scrollbar-slate flex max-h-45 flex-col overflow-y-auto">
+              {isLoading ? (
+                <li className="list-none px-6 py-2 text-sm text-slate-400">불러오는 중…</li>
+              ) : isError ? (
+                <li className="list-none px-6 py-2 text-sm text-slate-400">불러오지 못했어요</li>
+              ) : goals.length === 0 ? (
+                <li className="list-none px-6 py-2 text-sm text-slate-400">목표가 없어요</li>
+              ) : (
+                <>
+                  {goals.map((goal) => (
+                    <li key={goal.id} className="w-full list-none">
+                      <button
+                        type="button"
+                        onClick={() => onSelectGoal?.(goal.id)}
+                        className="flex w-full cursor-pointer items-center px-6 py-2 hover:bg-white/5"
+                      >
+                        <span
+                          className={cn(
+                            'min-w-0 flex-1 truncate text-left text-sm font-semibold text-white',
+                            goal.id === currentGoalId && 'text-indigo-300',
+                          )}
+                        >
+                          {goal.title}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                  {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0 list-none" />}
+                </>
+              )}
             </ul>
           </motion.div>
         )}
