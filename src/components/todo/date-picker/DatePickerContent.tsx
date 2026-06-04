@@ -30,10 +30,10 @@ export default function DatePickerContent({
         />
       </div>
       <div className="flex gap-3 px-4 pb-4">
-        <Button variant="tertiary" size="small" className="flex-1" onClick={onCancel}>
+        <Button type="button" variant="tertiary" size="small" className="flex-1" onClick={onCancel}>
           취소
         </Button>
-        <Button variant="primary" size="small" className="flex-1" onClick={onConfirm}>
+        <Button type="button" variant="primary" size="small" className="flex-1" onClick={onConfirm}>
           확인
         </Button>
       </div>

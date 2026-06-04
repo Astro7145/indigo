@@ -8,10 +8,12 @@ import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface RecentTodosProps {
   className?: string;
+  onEditTodo: (todo: Todo) => void;
 }
 
 // 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — sm+ 2열, 모바일 1열.
@@ -26,7 +28,7 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
  * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ className }: RecentTodosProps) {
+export default function RecentTodos({ className, onEditTodo }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest', limit: 4 });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
@@ -80,7 +82,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
                       {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
                       {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
                       {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction hoverOnly />
+                      <TodoList.KebabAction hoverOnly onEdit={() => onEditTodo(t)} />
                       <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                     </TodoList.Actions>
                   </TodoList>
