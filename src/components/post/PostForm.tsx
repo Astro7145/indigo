@@ -111,15 +111,11 @@ export default function PostForm(props: PostFormProps) {
       }
       if (props.mode === 'edit') {
         // PATCH는 image를 항상 포함해야 한다. null 전송이 "이미지 제거" 의미라 빠지면 기존 이미지가 그대로 남는다 (Swagger: image nullable)
-        const body = { title, content, image: finalImage };
-        console.log('[PostForm] PATCH body', body);
-        await updatePost({ postId: props.postId, body });
+        await updatePost({ postId: props.postId, body: { title, content, image: finalImage } });
         router.push(`/posts/${props.postId}`);
         return;
       }
-      const body = { title, content, ...(finalImage ? { image: finalImage } : {}) };
-      console.log('[PostForm] POST body', body);
-      const post = await createPost(body);
+      const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
       router.push(`/posts/${post.id}`);
     } finally {
       // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
