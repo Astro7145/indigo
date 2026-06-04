@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { IcBell, LogoFull } from '../icons';
+import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
@@ -131,7 +132,7 @@ export default function Topbar() {
             </ul>
             <div className="flex flex-col">
               <SidebarRow type="settings" text="설정" />
-              <SidebarRow type="logout" text="로그아웃" />
+              <LogoutButton />
             </div>
           </div>
 

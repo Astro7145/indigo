@@ -15,7 +15,7 @@ type LoginFields = {
   password: string;
 };
 
-export default function LoginForm() {
+export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const router = useRouter();
 
   const {
@@ -35,7 +35,9 @@ export default function LoginForm() {
   const handleLoginBehavior = (data: LoginFields) => {
     const { email, password } = data;
 
-    mutate({ email, password }, { onSuccess: () => router.push('/') });
+    // 오픈 리다이렉트 방지: 내부 경로(/...)만 허용. //로 시작하는 프로토콜-상대 URL·절대 URL은 차단.
+    const target = callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//') ? callbackUrl : '/';
+    mutate({ email, password }, { onSuccess: () => router.push(target) });
   };
 
   return (
