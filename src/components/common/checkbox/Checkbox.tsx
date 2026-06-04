@@ -52,7 +52,7 @@ export default function Checkbox({
     <label
       style={style}
       className={cn(
-        'inline-flex items-center gap-2 text-sm text-slate-700 select-none',
+        'relative inline-flex items-center gap-2 text-sm text-slate-700 select-none',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
         className,
       )}

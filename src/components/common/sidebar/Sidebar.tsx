@@ -3,26 +3,13 @@
 import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
+import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
-import SidebarGoalRow from './SidebarGoalRow';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import TodoAddButton from './TodoAddButton';
 import { usePathname } from 'next/navigation';
-
-const SAMPLE_GOALS = [
-  { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
-  { id: 2, title: '디자인 시스템 강의 듣기' },
-  { id: 3, title: '알고리즘 문제 매일 풀기' },
-  { id: 4, title: '알고리즘 문제 매일 풀기' },
-  { id: 5, title: '알고리즘 문제 매일 풀기' },
-  { id: 6, title: '알고리즘 문제 매일 풀기' },
-  { id: 7, title: '알고리즘 문제 매일 풀기' },
-  { id: 8, title: '알고리즘 문제 매일 풀기' },
-  { id: 9, title: '알고리즘 문제 매일 풀기' },
-  { id: 10, title: '알고리즘 문제 매일 풀기' },
-];
 
 const EXPANDED_WIDTH = 360;
 const COLLAPSED_WIDTH = 96;
@@ -127,7 +114,13 @@ export default function Sidebar() {
             </button>
             <ul className="flex flex-col gap-y-3">
               <SidebarRow type="dashboard" text="대시보드" href="/" current={path === '/'} collapsed={collapsed} />
-              <SidebarGoalRow goals={SAMPLE_GOALS} collapsed={collapsed} onExpand={() => applyCollapsed(false)} />
+              <GoalSidebarList
+                collapsed={collapsed}
+                onExpand={() => applyCollapsed(false)}
+                onSelected={() => {
+                  if (isTablet) applyCollapsed(true);
+                }}
+              />
               <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
               <SidebarRow type="posts" text="소통 게시판" href="/posts" collapsed={collapsed} />
               <SidebarRow
