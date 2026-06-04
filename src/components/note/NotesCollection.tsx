@@ -97,7 +97,9 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
 
       <div className="flex items-center gap-3 rounded bg-indigo-100 px-6 py-5 xl:gap-6 xl:px-10 xl:py-10">
         <IcGoal aria-hidden className="size-10 shrink-0" />
-        <h2 className="min-w-0 truncate text-xl font-semibold text-slate-800">{goal?.title ?? ''}</h2>
+        <h2 className="min-w-0 truncate text-base font-semibold text-slate-800 sm:text-xl xl:text-2xl">
+          {goal?.title ?? ''}
+        </h2>
       </div>
 
       {isLoading ? (
