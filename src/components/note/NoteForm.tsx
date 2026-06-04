@@ -41,7 +41,7 @@ function countText(node: JSONContent, acc = { total: 0, nonSpace: 0 }): { total:
 export default function NoteForm(props: NoteFormProps) {
   const router = useRouter();
   // note는 todo와 1:1이라 todoId로 첫 노트를 잡아서 edit 모드의 initial 데이터로 사용한다
-  const { data: noteListData } = useNoteList({ todoId: props.todoId });
+  const { data: noteListData, isLoading: isNoteLoading } = useNoteList({ todoId: props.todoId });
   const { data: todo } = useTodo(props.todoId);
   const { mutateAsync: createNote, isPending: isCreating } = useCreateNote();
   const { mutateAsync: updateNote, isPending: isUpdating } = useUpdateNote();
@@ -75,11 +75,18 @@ export default function NoteForm(props: NoteFormProps) {
   const isDirty = title !== initialTitle || linkUrl !== initialLinkUrl || !isSameJSON(content, initialContent);
   const isValid = title.trim().length > 0 && hasText(content);
 
-  // 수정 모드에서 데이터 도착까지 로딩 표시
-  if (props.mode === 'edit' && !initialNote) {
+  // 수정 모드: 로딩 중과 "노트 없음"을 구분 — 후자는 가드 없으면 무한 로딩 메시지가 됨
+  if (props.mode === 'edit' && isNoteLoading) {
     return (
       <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
         <p className="text-sm text-slate-400">불러오는 중…</p>
+      </div>
+    );
+  }
+  if (props.mode === 'edit' && !initialNote) {
+    return (
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400">수정할 노트를 찾을 수 없어요</p>
       </div>
     );
   }
@@ -96,10 +103,13 @@ export default function NoteForm(props: NoteFormProps) {
     setLinkInput(linkUrl ?? '');
     setIsLinkInputOpen(true);
   };
+  // 사용자 입력 URL은 javascript: 같은 임의 프로토콜이 올 수 있어 http(s)만 허용한다 (NoteEmbedPanel의 렌더 가드와 짝)
+  const trimmedLink = linkInput.trim();
+  const isLinkValid = /^https?:\/\//i.test(trimmedLink);
+  const showLinkError = trimmedLink.length > 0 && !isLinkValid;
   const handleLinkConfirm = () => {
-    const trimmed = linkInput.trim();
-    if (!trimmed) return;
-    setLinkUrl(trimmed);
+    if (!isLinkValid) return;
+    setLinkUrl(trimmedLink);
     setIsLinkInputOpen(false);
   };
   const handleLinkDelete = () => {
@@ -259,10 +269,19 @@ export default function NoteForm(props: NoteFormProps) {
           onChange={(e) => setLinkInput(e.target.value)}
           placeholder="링크를 입력해주세요"
           aria-label="링크 URL"
-          className="mt-4 h-10 w-full rounded-md border border-slate-200 px-3 text-sm outline-none focus:border-indigo-500 sm:mt-6 sm:h-14 sm:text-base"
+          aria-invalid={showLinkError || undefined}
+          aria-describedby={showLinkError ? 'link-input-error' : undefined}
+          className={`mt-4 h-10 w-full rounded-md border px-3 text-sm outline-none sm:mt-6 sm:h-14 sm:text-base ${
+            showLinkError ? 'border-red-500' : 'border-slate-200 focus:border-indigo-500'
+          }`}
         />
+        {showLinkError && (
+          <p id="link-input-error" className="mt-1 text-xs text-red-500 sm:text-sm">
+            http:// 또는 https://로 시작해야 해요
+          </p>
+        )}
         <Modal.Actions className="mt-auto">
-          <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm}>
+          <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm} disabled={!isLinkValid}>
             확인
           </Modal.Confirm>
         </Modal.Actions>
