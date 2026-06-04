@@ -130,7 +130,13 @@ export default function Sidebar() {
               <SidebarGoalRow goals={SAMPLE_GOALS} collapsed={collapsed} onExpand={() => applyCollapsed(false)} />
               <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
               <SidebarRow type="posts" text="소통 게시판" href="/posts" collapsed={collapsed} />
-              <SidebarRow type="favorites" text="찜한 할일" href="/favorites" collapsed={collapsed} />
+              <SidebarRow
+                type="favorites"
+                text="찜한 할일"
+                href="/favorites"
+                current={path === '/favorites'}
+                collapsed={collapsed}
+              />
             </ul>
             <ul className="flex flex-col">
               <SidebarRow type="settings" text="설정" href="/settings" collapsed={collapsed} />
