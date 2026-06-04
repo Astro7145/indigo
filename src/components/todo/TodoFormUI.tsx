@@ -67,7 +67,7 @@ export default function TodoFormUI({
     },
   });
 
-  const { data: goalData } = useGoalList();
+  const { data: goalData } = useGoalList({ limit: 100 });
   const watchedGoalId = watch('goalId');
   const watchedLinkUrl = watch('linkUrl');
   const selectedGoal = goalData?.goals.find((g) => g.id === watchedGoalId);
@@ -155,7 +155,7 @@ export default function TodoFormUI({
                 <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
               </button>
             </Dropdown.Trigger>
-            <Dropdown.Menu size="full">
+            <Dropdown.Menu size="full" className="scrollbar-slate max-h-60 overflow-y-auto">
               <Dropdown.Item onClick={() => setValue('goalId', undefined)}>목표 없음</Dropdown.Item>
               {goalData?.goals.map((goal) => (
                 <Dropdown.Item key={goal.id} onClick={() => setValue('goalId', goal.id)}>
