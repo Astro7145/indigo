@@ -77,7 +77,7 @@ export default function NoteForm(props: NoteFormProps) {
   // 수정 모드에서 데이터 도착까지 로딩 표시
   if (props.mode === 'edit' && !initialNote) {
     return (
-      <div className="mx-auto flex min-h-[calc(100vh-156px)] w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:min-h-[calc(100vh-100px)] sm:max-w-[636px] xl:min-h-[calc(100vh-212px)] xl:max-w-[768px]">
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -139,10 +139,10 @@ export default function NoteForm(props: NoteFormProps) {
 
   return (
     // 데스크탑(xl+)에서 패널이 열리면 form과 패널이 flex-row로 나란히 reflow. 모바일/태블릿(xl 미만)에선 패널이 bottom drawer로 오버레이.
-    <div className={`flex flex-col ${isEmbedOpen ? 'xl:flex-row xl:items-stretch xl:gap-6' : ''}`}>
+    <div className={`flex min-h-full flex-col ${isEmbedOpen ? 'xl:flex-row xl:items-stretch xl:gap-6' : ''}`}>
       <div
-        className={`mx-auto w-full max-w-[343px] sm:max-w-[636px] ${
-          isEmbedOpen ? 'xl:mx-0 xl:max-w-[768px] xl:flex-1' : 'xl:max-w-[768px]'
+        className={`mx-auto flex w-full max-w-[343px] flex-1 flex-col sm:max-w-[636px] ${
+          isEmbedOpen ? 'xl:mx-0 xl:max-w-[768px]' : 'xl:max-w-[768px]'
         }`}
       >
         <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
@@ -178,7 +178,7 @@ export default function NoteForm(props: NoteFormProps) {
             if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
             editorRef.current?.focus();
           }}
-          className="flex min-h-[calc(100vh-156px)] flex-col rounded-lg bg-white px-4 py-4 sm:min-h-[calc(100vh-100px)] sm:px-[30px] sm:py-8 xl:min-h-[calc(100vh-212px)] xl:px-[34px]"
+          className="flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
         >
           <NoteEditor
             ref={editorRef}
