@@ -1,7 +1,7 @@
 import { SVGProps } from 'react';
 import { cn } from '@/src/utils/cn';
 
-type BadgeColor = 'gray' | 'purple' | 'red' | 'yellow' | 'green';
+type BadgeColor = 'gray' | 'purple' | 'red' | 'yellow' | 'green' | 'white';
 
 interface IcBadgeCloseProps extends SVGProps<SVGSVGElement> {
   color?: BadgeColor;
@@ -13,6 +13,7 @@ const strokeMap: Record<BadgeColor, string> = {
   red: '#F97066',
   yellow: '#FDB022',
   green: '#47CD89',
+  white: '#FFFFFF',
 };
 
 export function IcBadgeClose({ color = 'gray', className, ...rest }: IcBadgeCloseProps) {

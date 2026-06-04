@@ -31,3 +31,8 @@ export class ApiError extends Error {
 export interface MessageResponse {
   message: string;
 }
+
+export interface ErrorBody {
+  message?: string;
+  code?: string;
+}
