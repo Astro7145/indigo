@@ -61,7 +61,12 @@ export default function PostList() {
             {isBestPending
               ? Array.from({ length: 3 }).map((_, i) => <PostCardSkeleton key={i} />)
               : bestPosts.map((post) => (
-                  <PostCard key={post.id} post={post} onClick={() => router.push(`/posts/${post.id}`)} />
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    onClick={() => router.push(`/posts/${post.id}`)}
+                    className="cursor-pointer"
+                  />
                 ))}
           </div>
         </section>
