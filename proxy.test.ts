@@ -11,9 +11,14 @@ function req(pathname: string, cookie?: string) {
 
 const LOGGED_IN = `${COOKIE.REFRESH}=abc`;
 
-it('비로그인 상태로 보호 페이지 접근 시 /login으로 리다이렉트한다', () => {
+it('비로그인 상태로 보호 페이지 접근 시 /login으로 리다이렉트하며 callbackUrl을 붙인다', () => {
   const res = proxy(req('/'));
-  expect(res.headers.get('location')).toBe('http://localhost/login');
+  expect(res.headers.get('location')).toBe('http://localhost/login?callbackUrl=%2F');
+});
+
+it('callbackUrl에 원래 경로와 쿼리를 보존한다', () => {
+  const res = proxy(req('/dashboard?tab=goals'));
+  expect(res.headers.get('location')).toBe('http://localhost/login?callbackUrl=%2Fdashboard%3Ftab%3Dgoals');
 });
 
 it('비로그인 상태에서 인증 페이지(/login)는 통과시킨다', () => {

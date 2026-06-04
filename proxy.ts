@@ -19,18 +19,18 @@ export function proxy(req: NextRequest) {
   const isAuthed = Boolean(req.cookies.get(COOKIE.REFRESH)?.value);
   const isAuthPage = AUTH_PAGES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
-  // 비로그인 + 보호 페이지 → 로그인으로
+  // 비로그인 + 보호 페이지 → 로그인으로.
+  // 원래 가려던 경로(쿼리 포함)를 callbackUrl로 넘겨 로그인 후 복귀시킨다.
+  // clone()은 기존 쿼리를 전부 복사하므로, new URL로 깨끗한 /login을 만든다.
   if (!isAuthed && !isAuthPage) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/login';
+    const url = new URL('/login', req.url);
+    url.searchParams.set('callbackUrl', pathname + req.nextUrl.search);
     return NextResponse.redirect(url);
   }
 
   // 로그인 + 인증 페이지 → 홈으로 (역방향)
   if (isAuthed && isAuthPage) {
-    const url = req.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   return NextResponse.next();
