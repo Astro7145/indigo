@@ -26,6 +26,15 @@ export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
     return () => document.removeEventListener('keydown', onKey);
   }, [router]);
 
+  // 드로어가 열린 동안 배경 문서 스크롤을 잠근다(Modal과 동일 패턴). 인터셉트 시에만 마운트되므로 마운트=열림.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/30" aria-hidden onClick={close} />

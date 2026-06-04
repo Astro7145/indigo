@@ -5,7 +5,7 @@ jest.mock('@/src/api/note', () => ({
   getNote: jest.fn(),
 }));
 
-import { fireEvent, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen } from '@testing-library/react';
 
 import * as noteApi from '@/src/api/note';
 import NoteDetailDrawer from '@/src/components/note/NoteDetailDrawer';
@@ -28,4 +28,12 @@ it('Escape 키로 닫힌다', () => {
   renderWithClient(<NoteDetailDrawer noteId={1} />);
   fireEvent.keyDown(document, { key: 'Escape' });
   expect(back).toHaveBeenCalledTimes(1);
+});
+
+it('열려 있는 동안 배경(body) 스크롤을 잠그고, 닫히면 복원한다', () => {
+  expect(document.body.style.overflow).toBe('');
+  renderWithClient(<NoteDetailDrawer noteId={1} />);
+  expect(document.body.style.overflow).toBe('hidden');
+  cleanup();
+  expect(document.body.style.overflow).toBe('');
 });
