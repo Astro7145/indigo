@@ -6,7 +6,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { useEffect, useImperativeHandle, type ReactNode, type Ref } from 'react';
+import { useEffect, useImperativeHandle, useRef, type ReactNode, type Ref } from 'react';
 
 import EditorToolbar from '@/src/components/common/editor/EditorToolbar';
 
@@ -39,6 +39,9 @@ export default function NoteEditor({
   contentClassName,
   ref,
 }: NoteEditorProps) {
+  // 마지막으로 동기화된 JSON 문자열을 캐시 — 매 키 입력마다 editor.getJSON() 트리 순회를 피한다
+  const lastContentRef = useRef<string>(JSON.stringify(value));
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -48,14 +51,20 @@ export default function NoteEditor({
     ],
     content: value,
     immediatelyRender: false,
-    onUpdate: ({ editor }) => onChange(editor.getJSON()),
+    onUpdate: ({ editor }) => {
+      const json = editor.getJSON();
+      lastContentRef.current = JSON.stringify(json);
+      onChange(json);
+    },
   });
 
   // useEditor.content는 마운트 시점에만 소비되므로, 수정 페이지처럼 value가 비동기로 도착하면 직접 주입해야 한다.
-  // stringify 비교 가드로 사용자 타이핑 중 커서 리셋을 방지 (PostEditor의 getHTML 가드와 동일 의도)
+  // ref 캐시 비교 가드로 사용자 타이핑 중 커서 리셋을 방지 (PostEditor의 getHTML 가드와 동일 의도)
   useEffect(() => {
     if (!editor) return;
-    if (JSON.stringify(editor.getJSON()) === JSON.stringify(value)) return;
+    const valueStr = JSON.stringify(value);
+    if (valueStr === lastContentRef.current) return;
+    lastContentRef.current = valueStr;
     editor.commands.setContent(value, { emitUpdate: false });
   }, [editor, value]);
 
