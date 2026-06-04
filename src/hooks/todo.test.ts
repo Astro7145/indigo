@@ -86,6 +86,26 @@ it('useUpdateTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세
   expect(setData).toHaveBeenCalledWith(todoApi.todoKeys.detail(5), { id: 5 });
 });
 
+it('useUpdateTodo는 완료 토글 후 해당 목표 상세(진행도)를 무효화한다', async () => {
+  mocked.patchTodo.mockResolvedValue({ id: 5, goalId: 9 } as never);
+  const { result, client } = renderHookWithClient(() => useUpdateTodo());
+  const inv = jest.spyOn(client, 'invalidateQueries');
+  await result.current.mutateAsync({ todoId: 5, body: { done: true } });
+  expect(inv).toHaveBeenCalledWith({ queryKey: goalKeys.detail(9) });
+});
+
+it('useUpdateTodo는 목표 없는 할 일(goalId null)이면 목표 상세를 무효화하지 않는다', async () => {
+  mocked.patchTodo.mockResolvedValue({ id: 5, goalId: null } as never);
+  const { result, client } = renderHookWithClient(() => useUpdateTodo());
+  const inv = jest.spyOn(client, 'invalidateQueries');
+  await result.current.mutateAsync({ todoId: 5, body: { done: true } });
+  const invalidatedGoalDetail = inv.mock.calls.some(([arg]) => {
+    const key = (arg as { queryKey: unknown[] }).queryKey;
+    return Array.isArray(key) && key[0] === 'goal' && key[1] === 'detail';
+  });
+  expect(invalidatedGoalDetail).toBe(false);
+});
+
 it('useDeleteTodo는 성공 시 목록과 즐겨찾기를 무효화하고 상세 캐시를 제거한다', async () => {
   mocked.deleteTodo.mockResolvedValue(undefined as never);
   const { result, client } = renderHookWithClient(() => useDeleteTodo());
