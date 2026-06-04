@@ -35,6 +35,7 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
       <button
         {...buttonProps}
         ref={ref}
+        type="button"
         tabIndex={isOutsideVisibleRange ? -1 : buttonProps.tabIndex}
         className={cn(
           'group relative flex h-10 w-full cursor-pointer items-center justify-center outline-none disabled:cursor-not-allowed',

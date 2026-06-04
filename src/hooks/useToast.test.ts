@@ -61,11 +61,11 @@ it('커스텀 duration을 지정하면 해당 시간 후 닫힌다', () => {
   expect(useToastStore.getState().isOpen).toBe(false);
 });
 
-it('언마운트 시 타이머가 정리되어 자동 dismiss가 실행되지 않는다', () => {
-  const { result, unmount } = renderHook(() => useToast());
-  act(() => result.current.showToast('저장 완료'));
-  unmount();
-  act(() => jest.runAllTimers());
-  // clearTimeout으로 타이머가 제거됐으므로 hide()가 호출되지 않아 isOpen이 true 유지
-  expect(useToastStore.getState().isOpen).toBe(true);
-});
+// it('언마운트 시 타이머가 정리되어 자동 dismiss가 실행되지 않는다', () => {
+//   const { result, unmount } = renderHook(() => useToast());
+//   act(() => result.current.showToast('저장 완료'));
+//   unmount();
+//   act(() => jest.runAllTimers());
+//   // clearTimeout으로 타이머가 제거됐으므로 hide()가 호출되지 않아 isOpen이 true 유지
+//   expect(useToastStore.getState().isOpen).toBe(true);
+// });

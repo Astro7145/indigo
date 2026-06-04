@@ -19,6 +19,8 @@ import { cn } from '@/src/utils/cn';
 export interface GoalTodoBoardProps {
   goal: GoalListItem;
   className?: string;
+  onEditTodo: (todo: Todo) => void;
+  onAddTodo: (goalId: number) => void;
 }
 
 function percentOf(done: number, total: number): number {
@@ -31,10 +33,12 @@ function Row({
   todo,
   onToggle,
   onToggleFavorite,
+  onEdit,
 }: {
   todo: Todo;
   onToggle: (id: number, done: boolean) => void;
   onToggleFavorite: (id: number, isFavorite: boolean) => void;
+  onEdit: (todo: Todo) => void;
 }) {
   // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
   const hasNote = (todo.noteIds?.length ?? 0) > 0;
@@ -52,7 +56,7 @@ function Row({
           {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
           {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-          <TodoList.KebabAction hoverOnly />
+          <TodoList.KebabAction hoverOnly onEdit={() => onEdit(todo)} />
           <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoList.Actions>
       </TodoList>
@@ -65,11 +69,13 @@ function Column({
   todos,
   onToggle,
   onToggleFavorite,
+  onEdit,
 }: {
   label: 'To do' | 'Done';
   todos: Todo[];
   onToggle: (id: number, done: boolean) => void;
   onToggleFavorite: (id: number, isFavorite: boolean) => void;
+  onEdit: (todo: Todo) => void;
 }) {
   const isTodo = label === 'To do';
   return (
@@ -97,17 +103,18 @@ function Column({
       </span>
       <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
         {todos.map((t) => (
-          <Row key={t.id} todo={t} onToggle={onToggle} onToggleFavorite={onToggleFavorite} />
+          <Row key={t.id} todo={t} onToggle={onToggle} onToggleFavorite={onToggleFavorite} onEdit={onEdit} />
         ))}
       </ul>
     </div>
   );
 }
 
-export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
+export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo }: GoalTodoBoardProps) {
   const router = useRouter();
   const [input, setInput] = useState('');
   const [keyword, setKeyword] = useState('');
+
   const { data, isLoading, isError } = useTodoList({ goalId: goal.id, keyword: keyword || undefined });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
@@ -174,7 +181,10 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
           <IconButton
             aria-label="할 일 추가"
             className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddTodo(goal.id);
+            }}
           >
             <IcPlus className="size-4 text-indigo-600" />
           </IconButton>
@@ -197,6 +207,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             size="small"
             startIcon={<IcPlus className="size-5 text-indigo-600" />}
             className="hidden h-10 shrink-0 whitespace-nowrap sm:inline-flex"
+            onClick={() => onAddTodo(goal.id)}
           >
             할 일 추가
           </Button>
@@ -222,8 +233,20 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
           )
         ) : (
           <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
-            <Column label="To do" todos={todoItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
-            <Column label="Done" todos={doneItems} onToggle={toggle} onToggleFavorite={toggleFavorite} />
+            <Column
+              label="To do"
+              todos={todoItems}
+              onToggle={toggle}
+              onToggleFavorite={toggleFavorite}
+              onEdit={onEditTodo}
+            />
+            <Column
+              label="Done"
+              todos={doneItems}
+              onToggle={toggle}
+              onToggleFavorite={toggleFavorite}
+              onEdit={onEditTodo}
+            />
           </div>
         )}
       </div>

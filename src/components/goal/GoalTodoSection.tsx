@@ -6,17 +6,20 @@ import GoalTodoBoard from '@/src/components/goal/GoalTodoBoard';
 import Card from '@/src/components/common/cards/Card';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import { useInfiniteGoalList } from '@/src/hooks/goal';
+import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface GoalTodoSectionProps {
   className?: string;
+  onEditTodo: (todo: Todo) => void;
+  onAddTodo: (goalId: number) => void;
 }
 
 /**
  * "목표 별 할일" 섹션. 목표를 2개씩 무한 스크롤로 불러와 GoalTodoBoard로 렌더한다.
  * 목표가 0개면 섹션 헤더와 함께 "등록한 목표가 없어요" 안내를 표시한다(일러스트 없음).
  */
-export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
+export default function GoalTodoSection({ className, onEditTodo, onAddTodo }: GoalTodoSectionProps) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
     useInfiniteGoalList({ limit: 2 });
   const goals = data?.pages.flatMap((p) => p.goals) ?? [];
@@ -56,7 +59,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
         <>
           <div className="flex flex-col gap-6 xl:gap-8">
             {goals.map((goal) => (
-              <GoalTodoBoard key={goal.id} goal={goal} />
+              <GoalTodoBoard key={goal.id} goal={goal} onEditTodo={onEditTodo} onAddTodo={onAddTodo} />
             ))}
           </div>
           {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
