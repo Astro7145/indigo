@@ -14,7 +14,7 @@ type RouteKey =
   | 'goal-notes'
   | 'posts'
   | 'posts-write'
-  | 'post-edit'
+  | 'posts-edit'
   | 'favorites'
   | 'calendar'
   | 'me';
@@ -27,7 +27,7 @@ function matchRoute(pathname: string): RouteKey | null {
   if (/^\/goals\/[^/]+\/notes$/.test(pathname)) return 'goal-notes';
   if (/^\/goals\/[^/]+$/.test(pathname)) return 'goal';
   if (pathname === '/posts/write') return 'posts-write';
-  if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'post-edit';
+  if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'posts-edit';
   if (pathname === '/posts') return 'posts';
   if (pathname === '/favorites') return 'favorites';
   if (pathname === '/calendar') return 'calendar';
@@ -60,7 +60,7 @@ export function usePageTitle(): string {
       return '노트 모아보기';
     case 'posts-write':
       return '게시물 작성하기';
-    case 'post-edit':
+    case 'posts-edit':
       return '게시물 수정하기';
     case 'posts':
       return '소통 게시판';
