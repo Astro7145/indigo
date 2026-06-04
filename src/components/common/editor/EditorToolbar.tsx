@@ -32,6 +32,8 @@ interface EditorToolbarProps {
   onBulletList?: () => void;
   onImageUpload?: () => void;
   onLink?: () => void;
+  showImageUpload?: boolean;
+  showLink?: boolean;
   className?: string;
 }
 
@@ -46,6 +48,8 @@ export default function EditorToolbar({
   onBulletList,
   onImageUpload,
   onLink,
+  showImageUpload = true,
+  showLink = true,
   className,
 }: EditorToolbarProps) {
   return (
@@ -75,13 +79,17 @@ export default function EditorToolbar({
         <IcTextDotPoints state={state.isBulletList ? 'active' : 'default'} />
       </IconButton>
 
-      <IconButton aria-label="이미지 삽입" title="이미지 삽입" onClick={onImageUpload}>
-        <IcTextInsertImage />
-      </IconButton>
+      {showImageUpload && (
+        <IconButton aria-label="이미지 삽입" title="이미지 삽입" onClick={onImageUpload}>
+          <IcTextInsertImage />
+        </IconButton>
+      )}
 
-      <IconButton aria-label="링크 삽입" title="링크 삽입" hover={!state.isLink} onClick={onLink}>
-        <IcTextLink state={state.isLink ? 'active' : 'default'} />
-      </IconButton>
+      {showLink && (
+        <IconButton aria-label="링크 삽입" title="링크 삽입" hover={!state.isLink} onClick={onLink}>
+          <IcTextLink state={state.isLink ? 'active' : 'default'} />
+        </IconButton>
+      )}
     </div>
   );
 }
