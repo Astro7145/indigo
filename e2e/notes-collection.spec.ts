@@ -36,7 +36,7 @@ async function navigateToNotesCollection(
   await expect(page).toHaveURL(/\/goals\/\d+$/, { timeout: 10_000 });
 
   // 목표 상세 페이지에서 "노트 모아보기" 카드를 클릭한다
-  const notesCard = page.getByRole('button', { name: /노트 모아보기/ });
+  const notesCard = page.getByRole('link', { name: /노트 모아보기/ });
   await expect(notesCard).toBeVisible({ timeout: 10_000 });
   await notesCard.click();
 
@@ -77,7 +77,7 @@ test.describe('노트 모아보기', () => {
       // 노트 카드가 있는지 확인 — 없으면 드로어 검증 불가(스킵)
       // 로딩 완료 대기 (로딩 스피너 텍스트가 사라질 때까지)
       await expect(page.getByText('불러오는 중…')).toBeHidden({ timeout: 10_000 });
-      const noteListItems = page.locator('ul li');
+      const noteListItems = page.locator('main ul li');
       const noteCount = await noteListItems.count();
       if (noteCount === 0) {
         test.skip(true, '이 목표에 노트가 없어 드로어 테스트 불가 — 노트가 있는 목표 필요');
@@ -119,7 +119,7 @@ test.describe('노트 모아보기', () => {
 
       // 노트 카드가 있는지 확인
       await expect(page.getByText('불러오는 중…')).toBeHidden({ timeout: 10_000 });
-      const noteListItems = page.locator('ul li');
+      const noteListItems = page.locator('main ul li');
       const noteCount = await noteListItems.count();
       if (noteCount === 0) {
         test.skip(true, '이 목표에 노트가 없어 standalone 테스트 불가 — 노트가 있는 목표 필요');
