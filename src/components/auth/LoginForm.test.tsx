@@ -105,6 +105,48 @@ describe('LoginForm', () => {
     });
   });
 
+  it('callbackUrl prop이 있으면 로그인 성공 시 해당 경로로 push 한다', async () => {
+    mockMutate.mockImplementation((_data: unknown, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.();
+    });
+    renderWithClient(<LoginForm callbackUrl="/dashboard?tab=goals" />);
+
+    fireEvent.change(screen.getByPlaceholderText('이메일을 입력해주세요'), { target: { value: 'user@example.com' } });
+    fireEvent.blur(screen.getByPlaceholderText('이메일을 입력해주세요'));
+    fireEvent.change(screen.getByPlaceholderText('비밀번호를 입력해주세요'), { target: { value: 'password' } });
+    fireEvent.blur(screen.getByPlaceholderText('비밀번호를 입력해주세요'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByRole('button', { name: '로그인하기' }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/dashboard?tab=goals');
+    });
+  });
+
+  it('callbackUrl이 외부 URL이면 오픈 리다이렉트를 막고 "/"로 push 한다', async () => {
+    mockMutate.mockImplementation((_data: unknown, options?: { onSuccess?: () => void }) => {
+      options?.onSuccess?.();
+    });
+    renderWithClient(<LoginForm callbackUrl="//evil.com" />);
+
+    fireEvent.change(screen.getByPlaceholderText('이메일을 입력해주세요'), { target: { value: 'user@example.com' } });
+    fireEvent.blur(screen.getByPlaceholderText('이메일을 입력해주세요'));
+    fireEvent.change(screen.getByPlaceholderText('비밀번호를 입력해주세요'), { target: { value: 'password' } });
+    fireEvent.blur(screen.getByPlaceholderText('비밀번호를 입력해주세요'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
+    });
+    fireEvent.click(screen.getByRole('button', { name: '로그인하기' }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/');
+    });
+  });
+
   describe('이메일 필드', () => {
     it('잘못된 이메일 입력 후 blur 시 에러 메시지가 표시된다', async () => {
       renderWithClient(<LoginForm />);

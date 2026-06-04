@@ -10,6 +10,7 @@ jest.mock('@/src/api/favorite', () => ({
   removeTodoFavorite: jest.fn(),
 }));
 
+import type { ComponentProps } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import * as favoriteApi from '@/src/api/favorite';
@@ -17,6 +18,9 @@ import * as todoApi from '@/src/api/todo';
 import RecentTodos from '@/src/components/todo/RecentTodos';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo } from '@/src/types/todo';
+
+const renderRecent = (overrides?: Partial<ComponentProps<typeof RecentTodos>>) =>
+  renderWithClient(<RecentTodos onEditTodo={() => {}} onSelectTodo={() => {}} {...overrides} />);
 
 const mocked = todoApi as jest.Mocked<typeof todoApi>;
 const mockedFav = favoriteApi as jest.Mocked<typeof favoriteApi>;
@@ -49,21 +53,21 @@ beforeEach(() => jest.resetAllMocks());
 
 it('useTodoList 결과의 할일 제목을 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A'), makeTodo(2, '할일 B', true)]));
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   expect(await screen.findByText('할일 A')).toBeInTheDocument();
   expect(screen.getByText('할일 B')).toBeInTheDocument();
 });
 
 it('할일이 없으면 빈 상태를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   expect(await screen.findByText('최근에 등록한 할 일이 없어요')).toBeInTheDocument();
 });
 
 it('체크박스를 클릭하면 patchTodo로 done을 토글한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A', false)]));
   mocked.patchTodo.mockResolvedValue(makeTodo(1, '할일 A', true));
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByRole('checkbox'));
   await waitFor(() => expect(mocked.patchTodo).toHaveBeenCalledWith(1, { done: true }));
@@ -74,7 +78,7 @@ it('별을 클릭하면 addTodoFavorite를 호출한다', async () => {
   mockedFav.addTodoFavorite.mockResolvedValue({
     todo: makeTodo(1, '할일 A'),
   } as never);
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByLabelText('즐겨찾기'));
   await waitFor(() => expect(mockedFav.addTodoFavorite).toHaveBeenCalledWith(1));
@@ -82,14 +86,37 @@ it('별을 클릭하면 addTodoFavorite를 호출한다', async () => {
 
 it('"모두 보기"는 /todos로 가는 링크다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   await screen.findByText('할일 A');
   expect(screen.getByRole('link', { name: '모두 보기' })).toHaveAttribute('href', '/todos');
 });
 
 it('useTodoList를 limit: 4로 호출해 최신 4개를 요청한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
-  renderWithClient(<RecentTodos />);
+  renderRecent();
   await screen.findByText('할일 A');
   expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ sort: 'latest', limit: 4 }));
+});
+
+it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '할일 A')]));
+  renderRecent();
+  await screen.findByText('할일 A');
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('삭제하기'));
+  expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
+});
+
+it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
+  mocked.getTodos.mockResolvedValue({
+    todos: [makeTodo(1, '자바스크립트 듣기')],
+    nextCursor: null,
+    totalCount: 1,
+  } as never);
+  const onSelectTodo = jest.fn();
+  renderRecent({ onSelectTodo });
+  const title = await screen.findByText('자바스크립트 듣기');
+  fireEvent.click(title);
+  expect(onSelectTodo).toHaveBeenCalledTimes(1);
+  expect(onSelectTodo.mock.calls[0][0]).toMatchObject({ id: 1, title: '자바스크립트 듣기' });
 });

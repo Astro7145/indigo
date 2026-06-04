@@ -1,6 +1,6 @@
 'use client';
 
-import { useImperativeHandle, useRef, useState } from 'react';
+import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { CalendarDate } from '@internationalized/date';
 import { AriaCalendarGridProps, useButton, useDialog, useOverlay } from 'react-aria';
 
@@ -20,6 +20,12 @@ export function useDatePicker({ value, onChange, onBlur, ref, firstDayOfWeek = '
   const popupRef = useRef<HTMLDivElement>(null);
 
   useImperativeHandle(ref ?? null, () => triggerRef.current!);
+
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isOpen]);
 
   const handleToggle = () => {
     if (!isOpen) setPendingDate(value ?? null);

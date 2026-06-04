@@ -1,14 +1,29 @@
 jest.mock('@/src/hooks/goal', () => ({ useInfiniteGoalList: jest.fn() }));
 jest.mock('@/src/components/goal/GoalTodoBoard', () => ({
   __esModule: true,
-  default: ({ goal }: { goal: { id: number; title: string } }) => <div data-testid="board">{goal.title}</div>,
+  default: ({
+    goal,
+    onSelectTodo,
+  }: {
+    goal: { id: number; title: string };
+    onSelectTodo: (todo: { id: number }) => void;
+  }) => (
+    <div data-testid="board">
+      {goal.title}
+      <button onClick={() => onSelectTodo({ id: goal.id })}>select-{goal.id}</button>
+    </div>
+  ),
 }));
 
-import { render, screen } from '@testing-library/react';
+import type { ComponentProps } from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 import { useInfiniteGoalList } from '@/src/hooks/goal';
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import type { GoalListItem } from '@/src/types/goal';
+
+const renderSection = (overrides?: Partial<ComponentProps<typeof GoalTodoSection>>) =>
+  render(<GoalTodoSection onEditTodo={() => {}} onAddTodo={() => {}} onSelectTodo={() => {}} {...overrides} />);
 
 const makeGoal = (id: number, title: string): GoalListItem => ({
   id,
@@ -45,14 +60,21 @@ beforeEach(() => {
 });
 
 it('목표마다 GoalTodoBoard를 렌더한다', () => {
-  render(<GoalTodoSection />);
+  renderSection();
   expect(screen.getAllByTestId('board')).toHaveLength(2);
   expect(screen.getByText('목표1')).toBeInTheDocument();
 });
 
+it('GoalTodoBoard의 할일 선택을 onSelectTodo로 전달한다', () => {
+  const onSelectTodo = jest.fn();
+  renderSection({ onSelectTodo });
+  fireEvent.click(screen.getByText('select-1'));
+  expect(onSelectTodo).toHaveBeenCalledWith({ id: 1 });
+});
+
 it('목표가 0개면 섹션 헤더와 빈 안내를 렌더한다', () => {
   setHook({ goals: [] });
-  render(<GoalTodoSection />);
+  renderSection();
   expect(screen.getByRole('region', { name: '목표 별 할일' })).toBeInTheDocument();
   expect(screen.getByText('등록한 목표가 없어요')).toBeInTheDocument();
   expect(screen.queryByTestId('board')).not.toBeInTheDocument();
@@ -63,6 +85,6 @@ it('목표가 0개면 섹션 헤더와 빈 안내를 렌더한다', () => {
 
 it('다음 페이지 로딩 중이면 로딩 표시를 렌더한다', () => {
   setHook({ hasNextPage: true, isFetchingNextPage: true });
-  render(<GoalTodoSection />);
+  renderSection();
   expect(screen.getByText('불러오는 중…')).toBeInTheDocument();
 });

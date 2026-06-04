@@ -1,17 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 
 import TodoList from '@/src/components/common/todo-list/TodoList';
+import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface RecentTodosProps {
   className?: string;
+  onEditTodo: (todo: Todo) => void;
+  onSelectTodo: (todo: Todo) => void;
 }
 
 // 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — sm+ 2열, 모바일 1열.
@@ -26,11 +31,13 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
  * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ className }: RecentTodosProps) {
+export default function RecentTodos({ className, onEditTodo, onSelectTodo }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest', limit: 4 });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
+  // 삭제 확인 모달 대상 — null이면 닫힘.
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
   const todos = data?.todos ?? [];
 
   const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
@@ -73,14 +80,23 @@ export default function RecentTodos({ className }: RecentTodosProps) {
               const hasNote = (t.noteIds?.length ?? 0) > 0;
               return (
                 <li key={t.id}>
-                  <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
+                  <TodoList
+                    title={t.title}
+                    checked={t.done}
+                    onCheckedChange={(done) => toggle(t.id, done)}
+                    onClick={() => onSelectTodo(t)}
+                  >
                     <TodoList.Actions>
                       {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
                       {hasNote && <TodoList.NoteAction onClick={() => {}} />}
                       {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
                       {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
                       {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction hoverOnly />
+                      <TodoList.KebabAction
+                        hoverOnly
+                        onEdit={() => onEditTodo(t)}
+                        onDelete={() => setDeletingTodo(t)}
+                      />
                       <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                     </TodoList.Actions>
                   </TodoList>
@@ -90,6 +106,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           </ul>
         )}
       </Card>
+      <TodoDeleteConfirm open={deletingTodo !== null} todo={deletingTodo} onClose={() => setDeletingTodo(null)} />
     </div>
   );
 }

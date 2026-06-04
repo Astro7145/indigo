@@ -4,25 +4,13 @@ import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'mot
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
+import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { IcBell, LogoFull } from '../icons';
-import SidebarGoalRow from './SidebarGoalRow';
+import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
-
-const SAMPLE_GOALS = [
-  { id: 1, title: '자바스크립트로 웹 서비스 만들기' },
-  { id: 2, title: '디자인 시스템 강의 듣기' },
-  { id: 3, title: '알고리즘 문제 매일 풀기' },
-  { id: 4, title: '알고리즘 문제 매일 풀기' },
-  { id: 5, title: '알고리즘 문제 매일 풀기' },
-  { id: 6, title: '알고리즘 문제 매일 풀기' },
-  { id: 7, title: '알고리즘 문제 매일 풀기' },
-  { id: 8, title: '알고리즘 문제 매일 풀기' },
-  { id: 9, title: '알고리즘 문제 매일 풀기' },
-  { id: 10, title: '알고리즘 문제 매일 풀기' },
-];
 
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
@@ -131,7 +119,7 @@ export default function Topbar() {
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text="대시보드" />
               </Link>
-              <SidebarGoalRow goals={SAMPLE_GOALS} />
+              <GoalSidebarList onSelected={collapse} />
               <Link href="/calendar" className="group" onClick={collapse}>
                 <SidebarRow type="calendar" text="캘린더" />
               </Link>
@@ -144,7 +132,7 @@ export default function Topbar() {
             </ul>
             <div className="flex flex-col">
               <SidebarRow type="settings" text="설정" />
-              <SidebarRow type="logout" text="로그아웃" />
+              <LogoutButton />
             </div>
           </div>
 

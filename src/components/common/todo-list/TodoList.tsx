@@ -6,6 +6,7 @@ import {
   useState,
   type ButtonHTMLAttributes,
   type ChangeEvent,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
   type Ref,
@@ -65,6 +66,8 @@ export interface TodoListProps {
   /** React 19 ref-as-prop — 행 컨테이너에 부착 */
   ref?: Ref<HTMLDivElement>;
   className?: string;
+  /** 행 클릭 핸들러. 지정 시 행이 버튼처럼 동작(내부 체크박스/액션 클릭은 제외) */
+  onClick?: () => void;
 }
 
 /**
@@ -93,6 +96,7 @@ function TodoList({
   children,
   ref,
   className,
+  onClick,
 }: TodoListProps) {
   const titleClass = cn(
     'min-w-0 flex-1 truncate',
@@ -105,10 +109,32 @@ function TodoList({
         ),
   );
 
+  // 행 전체를 클릭 영역으로. 단 내부 인터랙티브(체크박스 label/input, 액션·케밥 버튼, 링크) 클릭은 제외해
+  // 토글·액션·메뉴 동작이 상세 열기로 새지 않게 한다.
+  const handleRowClick = onClick
+    ? (e: MouseEvent<HTMLDivElement>) => {
+        if ((e.target as HTMLElement).closest('button, a, label, input')) return;
+        onClick();
+      }
+    : undefined;
+  const handleRowKeyDown = onClick
+    ? (e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget) return; // 내부 컨트롤의 키 입력은 무시
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }
+    : undefined;
+
   return (
     <TodoListContext.Provider value={{ checked, size, variant }}>
       <div
         ref={ref}
+        onClick={handleRowClick}
+        onKeyDown={handleRowKeyDown}
+        role={onClick ? 'button' : undefined}
+        tabIndex={onClick ? 0 : undefined}
         className={cn(
           'group flex w-full cursor-pointer items-center rounded',
           ROW_SIZE[size],

@@ -8,6 +8,14 @@ jest.mock('@/src/components/goal/GoalTodoSection', () => ({
   __esModule: true,
   default: () => <div>goal-section</div>,
 }));
+jest.mock('@/src/components/todo/TodoFormSheet', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 import { render, screen } from '@testing-library/react';
 
 import { useMe } from '@/src/hooks/user';
