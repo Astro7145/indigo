@@ -1,4 +1,4 @@
-import type { TodoGoalRef } from '@/src/types/todo';
+import type { Todo } from '@/src/types/todo';
 
 export interface FavoriteTodo {
   id: number;
@@ -6,13 +6,7 @@ export interface FavoriteTodo {
   userId: number;
   todoId: number;
   createdAt: string;
-  todo: {
-    id: number;
-    title: string;
-    done: boolean;
-    goal: TodoGoalRef | null;
-    noteIds: number[];
-  };
+  todo: Todo;
 }
 
 export interface FavoriteTodoListResponse {

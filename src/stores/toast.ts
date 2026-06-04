@@ -1,9 +1,12 @@
 import { create } from 'zustand';
 
+export type ToastVariant = 'success' | 'error';
+
 interface ToastState {
   isOpen: boolean;
   message: string;
-  show: (message: string) => void;
+  variant: ToastVariant;
+  show: (message: string, variant?: ToastVariant) => void;
   hide: () => void;
 }
 
@@ -11,6 +14,7 @@ interface ToastState {
 export const useToastStore = create<ToastState>((set) => ({
   isOpen: false,
   message: '',
-  show: (message) => set({ isOpen: true, message }),
+  variant: 'success',
+  show: (message, variant = 'success') => set({ isOpen: true, message, variant }),
   hide: () => set({ isOpen: false }),
 }));
