@@ -43,8 +43,9 @@ export default function NoteForm(props: NoteFormProps) {
   // note는 todo와 1:1이라 todoId로 첫 노트를 잡아서 edit 모드의 initial 데이터로 사용한다
   const { data: noteListData } = useNoteList({ todoId: props.todoId });
   const { data: todo } = useTodo(props.todoId);
-  const { mutateAsync: createNote } = useCreateNote();
-  const { mutateAsync: updateNote } = useUpdateNote();
+  const { mutateAsync: createNote, isPending: isCreating } = useCreateNote();
+  const { mutateAsync: updateNote, isPending: isUpdating } = useUpdateNote();
+  const isSubmitting = isCreating || isUpdating;
 
   const initialNote = props.mode === 'edit' ? noteListData?.notes[0] : undefined;
 
@@ -157,7 +158,7 @@ export default function NoteForm(props: NoteFormProps) {
               variant="tertiary"
               size="small"
               onClick={handleDraft}
-              disabled={!isValid}
+              disabled={!isValid || isSubmitting}
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
               임시저장
@@ -165,7 +166,7 @@ export default function NoteForm(props: NoteFormProps) {
             <Button
               variant="primary"
               size="small"
-              disabled={!isValid}
+              disabled={!isValid || isSubmitting}
               onClick={handleSubmit}
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
