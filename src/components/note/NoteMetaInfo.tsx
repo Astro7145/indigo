@@ -2,6 +2,7 @@ import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutli
 import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite';
 import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
+import Chip from '@/src/components/common/chips/Chip';
 import { formatDate } from '@/src/utils/date';
 
 export interface NoteMetaInfoProps {
@@ -12,12 +13,8 @@ export interface NoteMetaInfoProps {
   createdAt: string;
 }
 
-// 태그 id로 안정적으로 색을 회전시킴 (서버가 색을 주지 않음)
-const TAG_COLORS: BadgeColor[] = ['purple', 'green', 'yellow', 'red', 'gray'];
-
-function tagColor(id: number): BadgeColor {
-  return TAG_COLORS[id % TAG_COLORS.length];
-}
+// 태그를 배열 순서대로 초·노·빨·보라·그레이 순환 (서버가 색을 안 주고 디자인이 위치 기반)
+const TAG_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, createdAt }: NoteMetaInfoProps) {
   return (
@@ -38,13 +35,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
         </dt>
         <dd className="flex min-w-0 items-center gap-2">
           <span className="truncate text-slate-800">{todoTitle}</span>
-          <span
-            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] sm:text-xs ${
-              todoDone ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'
-            }`}
-          >
-            {todoDone ? 'DONE' : 'TO DO'}
-          </span>
+          <Chip type={todoDone ? 'done' : 'todo'} />
         </dd>
       </div>
 
@@ -63,8 +54,8 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
             <span>태그</span>
           </dt>
           <dd className="flex flex-wrap gap-1">
-            {tags.map((tag) => (
-              <Badge key={tag.id} color={tagColor(tag.id)} className="py-0.5 text-[10px] sm:text-xs">
+            {tags.map((tag, idx) => (
+              <Badge key={tag.id} color={TAG_COLORS[idx % TAG_COLORS.length]} className="py-0.5 text-[10px] sm:text-xs">
                 {tag.name}
               </Badge>
             ))}
