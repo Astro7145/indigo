@@ -185,7 +185,7 @@ export default function TodoFormUI({
         </div>
 
         {/* 태그 */}
-        <div className="flex flex-col gap-2 pb-8">
+        <div className="flex flex-col gap-2">
           <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">태그</span>
           <TagInput value={tags} onChange={setTags} />
         </div>
