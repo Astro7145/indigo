@@ -139,7 +139,9 @@ export default function NoteForm(props: NoteFormProps) {
 
   return (
     // 데스크탑(xl+)에서 패널이 열리면 form과 패널이 flex-row로 나란히 reflow. 모바일/태블릿(xl 미만)에선 패널이 bottom drawer로 오버레이.
-    <div className={`flex min-h-full flex-col ${isEmbedOpen ? 'xl:flex-row xl:items-stretch xl:gap-6' : ''}`}>
+    <div
+      className={`flex min-h-full flex-col ${isEmbedOpen ? 'xl:flex-row xl:items-stretch xl:justify-center xl:gap-6' : ''}`}
+    >
       <div
         className={`mx-auto flex w-full max-w-[343px] flex-1 flex-col sm:max-w-[636px] ${
           isEmbedOpen ? 'xl:mx-0 xl:max-w-[768px]' : 'xl:max-w-[768px]'
