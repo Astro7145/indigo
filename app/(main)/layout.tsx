@@ -10,7 +10,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
       <Topbar />
       <Sidebar />
-      <main className="flex-1 overflow-y-auto px-4 py-6">{children}</main>
+      <main className="flex-1 overflow-y-auto px-4 pt-6 pb-6 sm:px-6 sm:pt-12 xl:px-10 xl:pt-20">{children}</main>
     </div>
   );
 }

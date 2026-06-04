@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const { data: me } = useMe();
 
   return (
-    <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:my-3 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:gap-8">
       {/* 모바일(<sm)은 GNB가 타이틀을 담당 → sm+ 에서 노출. me.name 로드 전후 grid가 밀려나지 않도록 h-8(text-2xl 줄높이) 예약 */}
       <div className="hidden h-8 sm:block">
         <h1 className="pl-1 text-2xl font-semibold text-slate-800">
