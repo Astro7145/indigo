@@ -7,7 +7,7 @@ jest.mock('@/src/api/favorite', () => ({
 }));
 jest.mock('@/src/api/goal', () => ({
   ...jest.requireActual('@/src/api/goal'),
-  getGoals: jest.fn(),
+  getAllGoals: jest.fn(),
 }));
 
 // motion: 등장 애니메이션은 시각 효과 → 테스트에선 단순 li로 통과시키고 motion 전용 prop은 DOM에 새지 않게 제거.
@@ -96,7 +96,7 @@ const goalPage = (goals: GoalListItem[]): GoalListResponse => ({ goals, nextCurs
 beforeEach(() => {
   jest.resetAllMocks();
   // 기본값: 목표 목록은 비어 있음.
-  goal.getGoals.mockResolvedValue(goalPage([]));
+  goal.getAllGoals.mockResolvedValue(goalPage([]));
 });
 
 it('헤더 숫자는 현재 보이는 찜 개수를 렌더한다(전체 totalCount가 아님)', async () => {
@@ -155,7 +155,7 @@ it('목표를 선택하면 해당 목표의 항목만 보인다(클라이언트 
       makeFav(2, 102, '목표2 할일', false, { id: 2, title: '목표2' }),
     ]),
   );
-  goal.getGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1'), makeGoal(2, '목표2')]));
+  goal.getAllGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1'), makeGoal(2, '목표2')]));
   renderWithClient(<FavoritesPage />);
   await screen.findByText('목표1 할일');
   // 목표 드롭다운 열기 → "목표1" 선택

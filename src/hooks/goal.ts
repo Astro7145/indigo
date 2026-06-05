@@ -1,12 +1,13 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
-import { goalKeys, getGoals, getGoal, createGoal, patchGoal, deleteGoal } from '@/src/api/goal';
+import { goalKeys, getGoals, getAllGoals, getGoal, createGoal, patchGoal, deleteGoal } from '@/src/api/goal';
 import type { Goal, GoalDetail, GoalListResponse, CreateGoalBody, UpdateGoalBody } from '@/src/types/goal';
 import type { CursorParams, ApiError } from '@/src/types/common';
 
+/** 전체 goal 목록을 커서 끝까지 한 번에 불러온다(일부 페이지/무한스크롤이 필요하면 useInfiniteGoalList). params.limit은 요청당 페이지 크기. */
 export function useGoalList(params: CursorParams = {}) {
   return useQuery<GoalListResponse, ApiError>({
     queryKey: goalKeys.list(params),
-    queryFn: () => getGoals(params),
+    queryFn: () => getAllGoals(params.limit),
   });
 }
 
