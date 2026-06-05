@@ -29,6 +29,7 @@ export default function PostList() {
     isFetchingNextPage,
     isFetchNextPageError,
     isPending,
+    isError: isListError,
   } = useInfinitePostList({ search, type });
   const posts = listData?.pages.flatMap((page) => page.posts) ?? [];
 
@@ -78,10 +79,15 @@ export default function PostList() {
       </section>
 
       {/* 목록 또는 빈 상태 */}
+      {/* isError 분기는 빈 상태("게시물 없음")보다 먼저 와야 한다 — 실패도 posts.length === 0이라 빈 상태로 오인된다. */}
       <section className="mx-auto max-w-[1200px]">
         {isPending ? (
           <div className="flex min-h-[40vh] items-center justify-center">
             <p className="text-sm text-slate-400">불러오는 중…</p>
+          </div>
+        ) : isListError ? (
+          <div className="flex min-h-[40vh] items-center justify-center">
+            <p className="text-sm text-slate-500">게시물을 불러오지 못했어요.</p>
           </div>
         ) : posts.length === 0 ? (
           <PostListEmpty />
@@ -95,6 +101,7 @@ export default function PostList() {
               ))}
             </ul>
             <div ref={sentinelRef} aria-hidden className="h-4 w-full" />
+            {isFetchNextPageError && <p className="py-4 text-center text-sm text-slate-500">더 불러오지 못했어요.</p>}
           </>
         )}
       </section>
