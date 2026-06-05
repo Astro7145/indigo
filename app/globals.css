@@ -93,6 +93,10 @@
     --tw-ring-color: var(--color-indigo-500);
     outline-color: var(--color-indigo-500);
   }
+
+  html {
+    scrollbar-gutter: stable;
+  }
 }
 
 /* 커스텀 스크롤바 유틸리티 */
