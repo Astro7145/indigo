@@ -13,6 +13,7 @@ import Modal from '@/src/components/common/modal/Modal';
 import CommentSection from '@/src/components/post/CommentSection';
 import { useComments } from '@/src/hooks/comment';
 import { useDeletePost, usePost } from '@/src/hooks/post';
+import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
 
 export default function PostDetailPage() {
@@ -24,12 +25,16 @@ export default function PostDetailPage() {
   const { data: commentsData } = useComments(id);
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
+  const { showToast } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const comments = commentsData?.comments ?? [];
 
   const handleDelete = () => {
-    deletePost(id, { onSuccess: () => router.push('/posts') });
+    deletePost(id, {
+      onSuccess: () => router.push('/posts'),
+      onError: () => showToast('게시물 삭제에 실패했어요.', 'error'),
+    });
   };
 
   if (postPending || !post) {
