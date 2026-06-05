@@ -33,7 +33,7 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
               alt=""
               width={24}
               height={24}
-              className="size-5 shrink-0 rounded-full sm:size-6"
+              className="size-5 shrink-0 rounded-full object-cover sm:size-6"
             />
           ) : (
             <IcProfileYellow className="size-5 shrink-0 sm:size-6" />
