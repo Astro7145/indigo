@@ -9,11 +9,12 @@ type RouteKey =
   | 'dashboard'
   | 'todos'
   | 'notes-write'
+  | 'notes-edit'
   | 'goal'
   | 'goal-notes'
   | 'posts'
   | 'posts-write'
-  | 'post-edit'
+  | 'posts-edit'
   | 'favorites'
   | 'calendar'
   | 'me';
@@ -22,10 +23,11 @@ function matchRoute(pathname: string): RouteKey | null {
   if (pathname === '/') return 'dashboard';
   if (pathname === '/todos') return 'todos';
   if (/^\/todos\/[^/]+\/notes\/write$/.test(pathname)) return 'notes-write';
+  if (/^\/todos\/[^/]+\/notes\/edit$/.test(pathname)) return 'notes-edit';
   if (/^\/goals\/[^/]+\/notes$/.test(pathname)) return 'goal-notes';
   if (/^\/goals\/[^/]+$/.test(pathname)) return 'goal';
   if (pathname === '/posts/write') return 'posts-write';
-  if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'post-edit';
+  if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'posts-edit';
   if (pathname === '/posts') return 'posts';
   if (pathname === '/favorites') return 'favorites';
   if (pathname === '/calendar') return 'calendar';
@@ -50,13 +52,15 @@ export function usePageTitle(): string {
       return todoData ? `모든 할일 ${todoData.totalCount}` : '모든 할일';
     case 'notes-write':
       return '노트 작성하기';
+    case 'notes-edit':
+      return '노트 수정하기';
     case 'goal':
       return `${name}님의 목표`;
     case 'goal-notes':
       return '노트 모아보기';
     case 'posts-write':
       return '게시물 작성하기';
-    case 'post-edit':
+    case 'posts-edit':
       return '게시물 수정하기';
     case 'posts':
       return '소통 게시판';

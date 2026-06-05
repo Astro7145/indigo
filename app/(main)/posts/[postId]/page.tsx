@@ -66,7 +66,13 @@ export default function PostDetailPage() {
         {/* 작성자 */}
         <div className="mb-6 flex items-center gap-2 border-b border-slate-200 pb-4">
           {post.writer.image ? (
-            <Image src={post.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
+            <Image
+              src={post.writer.image}
+              alt=""
+              width={24}
+              height={24}
+              className="size-6 shrink-0 rounded-full object-cover"
+            />
           ) : (
             <IcProfileYellow className="size-5 sm:size-6" />
           )}

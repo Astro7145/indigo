@@ -39,7 +39,13 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
       <div className="mt-auto flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2 text-base text-slate-500">
           {post.writer.image ? (
-            <Image src={post.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
+            <Image
+              src={post.writer.image}
+              alt=""
+              width={24}
+              height={24}
+              className="size-6 shrink-0 rounded-full object-cover"
+            />
           ) : (
             <IcProfileYellow className="size-6 shrink-0" />
           )}
