@@ -97,6 +97,10 @@
   html {
     scrollbar-gutter: stable;
   }
+
+  html.scroll-locked {
+    background: rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* 커스텀 스크롤바 유틸리티 */
