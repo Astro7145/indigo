@@ -133,6 +133,27 @@ it('열리면 body 스크롤을 잠그고 닫히면 해제한다', () => {
   expect(document.body.style.overflow).toBe('');
 });
 
+it('겹쳐 열린 모달이 모두 닫히면 body 스크롤이 복원된다', () => {
+  // 폼 모달 위에 확인 모달이 겹쳐 열렸다가 둘 다 닫히는 흐름(TodoFormSheet)을 재현한다.
+  const Stack = ({ form, confirm }: { form: boolean; confirm: boolean }) => (
+    <>
+      <Modal open={form} onClose={() => {}}>
+        <p>폼</p>
+      </Modal>
+      <Modal open={confirm} onClose={() => {}}>
+        <p>확인</p>
+      </Modal>
+    </>
+  );
+
+  const { rerender } = render(<Stack form={false} confirm={false} />);
+  rerender(<Stack form confirm={false} />);
+  rerender(<Stack form confirm />);
+  rerender(<Stack form={false} confirm={false} />);
+
+  expect(document.body.style.overflow).toBe('');
+});
+
 it('열릴 때 모달 내부 첫 포커서블로 포커스를 이동한다', () => {
   render(
     <Modal open onClose={() => {}}>

@@ -17,6 +17,7 @@ import Button, { type ButtonProps } from '@/src/components/common/buttons/Button
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons';
 import { cn } from '@/src/utils/cn';
+import { lockScroll, unlockScroll } from '@/src/utils/scrollLock';
 
 interface ModalContextValue {
   close: () => void;
@@ -60,11 +61,8 @@ export default function Modal({
 
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    lockScroll();
+    return () => unlockScroll();
   }, [open]);
 
   useEffect(() => {
