@@ -10,6 +10,7 @@ import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import TodoAddButton from './TodoAddButton';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { usePathname } from 'next/navigation';
 
 const EXPANDED_WIDTH = 360;
@@ -25,6 +26,8 @@ export default function Sidebar() {
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  // 새 할일 생성 폼(시트) 열림 상태 — 사이드바가 소유.
+  const [createOpen, setCreateOpen] = useState(false);
   const width = useMotionValue(EXPANDED_WIDTH);
   const dragStartWidth = useRef(EXPANDED_WIDTH);
 
@@ -145,7 +148,13 @@ export default function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col gap-y-8">
-              <TodoAddButton onClick={() => console.log('add todo')} />
+              <TodoAddButton
+                onClick={() => {
+                  setCreateOpen(true);
+                  // 태블릿 오버레이 사이드바는 폼을 가리지 않도록 함께 접는다 (목표 선택과 동일 동작)
+                  if (isTablet) applyCollapsed(true);
+                }}
+              />
               <div className="flex gap-x-2">
                 <SidebarProfileButton />
                 <SidebarNotificationButton />
@@ -166,6 +175,7 @@ export default function Sidebar() {
           className="flex w-4 shrink-0 cursor-ew-resize items-center justify-center transition-colors after:h-15 after:w-1 after:rounded-full after:bg-indigo-800 hover:bg-indigo-600/10"
         />
       </motion.aside>
+      <TodoFormSheet mode="create" isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
   );
 }
