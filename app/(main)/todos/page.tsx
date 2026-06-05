@@ -8,9 +8,12 @@ import Card from '@/src/components/common/cards/Card';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
+import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
-import type { TodoListParams } from '@/src/types/todo';
+import type { Todo, TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 const EMPTY_MSG_BY_TAP = {
@@ -39,6 +42,13 @@ export default function TodosPage() {
   const removeFavorite = useRemoveTodoFavorite();
   const reduce = useReducedMotion();
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // 단일 리스트라 시트 상태를 페이지가 직접 소유한다(목표 상세의 GoalDetail과 동일 패턴).
+  // 삭제 확인은 deletingTodo가 있을 때만 마운트해 useDeleteTodo/useToast 인스턴스를 단일 유지.
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
 
   const todos = data?.pages.flatMap((p) => p.todos) ?? [];
   const totalCount = data?.pages[0]?.totalCount ?? 0;
@@ -80,8 +90,12 @@ export default function TodosPage() {
             <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
             <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
           </div>
-          {/* 스텁: 모달 작업은 별도 이슈 (기획 SSOT) */}
-          <Button variant="tertiary" size="small" startIcon={<IcPlus className="size-5 text-slate-500" />}>
+          <Button
+            variant="tertiary"
+            size="small"
+            startIcon={<IcPlus className="size-5 text-slate-500" />}
+            onClick={() => setCreating(true)}
+          >
             할 일 추가
           </Button>
         </div>
@@ -107,12 +121,21 @@ export default function TodosPage() {
                     transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min((idx % 40) * 0.015, 0.3) }}
                     className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
                   >
-                    <TodoList title={t.title} checked={t.done} onCheckedChange={(done) => toggle(t.id, done)}>
+                    <TodoList
+                      title={t.title}
+                      checked={t.done}
+                      onCheckedChange={(done) => toggle(t.id, done)}
+                      onClick={() => setSelectedTodo(t)}
+                    >
                       <TodoList.Actions>
                         {hasNote && <TodoList.NoteAction />}
                         {t.linkUrl && <TodoList.LinkAction />}
                         {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                        <TodoList.KebabAction hoverOnly />
+                        <TodoList.KebabAction
+                          hoverOnly
+                          onEdit={() => setEditingTodo(t)}
+                          onDelete={() => setDeletingTodo(t)}
+                        />
                         <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
                       </TodoList.Actions>
                     </TodoList>
@@ -125,6 +148,17 @@ export default function TodosPage() {
           {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
         </Card>
       </div>
+
+      {/* 모든 할 일은 폼에서 목표를 선택하므로 생성 시트에 defaultGoalId를 넘기지 않는다. */}
+      <TodoFormSheet
+        mode="update"
+        isOpen={editingTodo !== null}
+        onClose={() => setEditingTodo(null)}
+        todo={editingTodo}
+      />
+      <TodoFormSheet mode="create" isOpen={creating} onClose={() => setCreating(false)} />
+      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
+      {deletingTodo && <TodoDeleteConfirm open todo={deletingTodo} onClose={() => setDeletingTodo(null)} />}
     </section>
   );
 }

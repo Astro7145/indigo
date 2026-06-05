@@ -9,6 +9,7 @@ import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEdi
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
 import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
+import { useToast } from '@/src/hooks/useToast';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -35,6 +36,7 @@ export default function PostForm(props: PostFormProps) {
   const { mutateAsync: updatePost } = useUpdatePost();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { mutateAsync: uploadImageToS3 } = useUploadImageToS3();
+  const { showToast } = useToast();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -117,6 +119,9 @@ export default function PostForm(props: PostFormProps) {
       }
       const post = await createPost({ title, content, ...(finalImage ? { image: finalImage } : {}) });
       router.push(`/posts/${post.id}`);
+    } catch {
+      // 이미지 업로드·게시글 등록/수정 어느 단계에서 실패해도 사용자에게 일관된 안내를 띄운다
+      showToast(props.mode === 'edit' ? '게시물 수정에 실패했어요.' : '게시물 등록에 실패했어요.', 'error');
     } finally {
       // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
       setIsSubmitting(false);

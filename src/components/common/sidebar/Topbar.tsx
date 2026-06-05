@@ -11,6 +11,7 @@ import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
@@ -21,6 +22,8 @@ export default function Topbar() {
   const title = usePageTitle();
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
+  // 새 할일 생성 폼(시트) 열림 상태 — 탑바가 소유.
+  const [createOpen, setCreateOpen] = useState(false);
   const height = useMotionValue(COLLAPSED_HEIGHT);
   const dragStartHeight = useRef(COLLAPSED_HEIGHT);
 
@@ -137,7 +140,13 @@ export default function Topbar() {
           </div>
 
           <div className="flex flex-col gap-y-4">
-            <TodoAddButton onClick={() => console.log('add todo')} />
+            <TodoAddButton
+              onClick={() => {
+                // 전체화면 메뉴를 접어 폼(바텀시트)이 그 위로 올라오게 한다
+                collapse();
+                setCreateOpen(true);
+              }}
+            />
             <div className="flex gap-x-2">
               <SidebarProfileButton />
               <SidebarNotificationButton />
@@ -161,6 +170,7 @@ export default function Topbar() {
           {collapsed && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
         </motion.div>
       </motion.div>
+      <TodoFormSheet mode="create" isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </>
   );
 }

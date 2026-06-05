@@ -1,6 +1,6 @@
 jest.mock('@/src/api/goal', () => ({
   ...jest.requireActual('@/src/api/goal'),
-  getGoals: jest.fn(),
+  getAllGoals: jest.fn(),
   getGoal: jest.fn(),
 }));
 jest.mock('@/src/api/user', () => ({
@@ -59,7 +59,7 @@ it('goalId 없으면 전체 goal 집계로 진행도를 계산한다 (3/4 → 75
     nextCursor: null,
     totalCount: 2,
   };
-  goalMock.getGoals.mockResolvedValue(list);
+  goalMock.getAllGoals.mockResolvedValue(list);
   userMock.getMe.mockResolvedValue(me);
   renderWithClient(<ProgressCard />);
   const bar = (await screen.findAllByRole('progressbar'))[0];
@@ -87,7 +87,7 @@ it('goalId 있으면 해당 goal todos로 진행도를 계산한다 (1/2 → 50)
 });
 
 it('전체 변형은 이름을 넣어 본문을 만든다', async () => {
-  goalMock.getGoals.mockResolvedValue({
+  goalMock.getAllGoals.mockResolvedValue({
     goals: [],
     nextCursor: null,
     totalCount: 0,

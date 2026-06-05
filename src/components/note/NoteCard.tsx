@@ -12,6 +12,7 @@ import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { useNote } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
 import type { Note } from '@/src/types/note';
+import { formatDate } from '@/src/utils/date';
 
 export interface NoteCardProps {
   noteId: number;
@@ -35,24 +36,6 @@ const titleClass = 'text-sm leading-5 font-semibold sm:text-xl sm:leading-[30px]
 const headerGapClass = 'gap-2 sm:gap-4';
 const kebabClass = 'size-4 sm:size-6';
 const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
-
-// 고정 타임존(Asia/Seoul) 포맷터 — SSR(UTC)/CSR 타임존 차이로 인한
-// 하이드레이션 미스매치를 방지하기 위해 new Date()의 로컬 메서드 대신 사용
-const dateFormatter = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Asia/Seoul',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-
-/** YYYY. MM. DD 포맷 (Figma 디자인 정렬, Asia/Seoul 고정) */
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  // 잘못된 날짜 문자열이면 Intl.format이 RangeError를 던지므로 원문 그대로 반환
-  if (isNaN(date.getTime())) return iso;
-  // en-CA는 YYYY-MM-DD → "YYYY. MM. DD"로 변환
-  return dateFormatter.format(date).replace(/-/g, '. ');
-}
 
 /**
  * 노트 카드 — `Note` 도메인 객체를 받아 공통 Card 표면 위에 합성.

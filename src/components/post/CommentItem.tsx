@@ -10,6 +10,7 @@ import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import Modal from '@/src/components/common/modal/Modal';
 import { useDeleteComment, useUpdateComment } from '@/src/hooks/comment';
+import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
 
 interface CommentItemProps {
@@ -24,6 +25,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
   const [deleteOpen, setDeleteOpen] = useState(false);
   const { mutate: updateComment } = useUpdateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
+  const { showToast } = useToast();
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -32,7 +34,13 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
 
   const handleSave = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateComment({ commentId: comment.id, body: { content: draft } }, { onSuccess: () => setIsEditing(false) });
+    updateComment(
+      { commentId: comment.id, body: { content: draft } },
+      {
+        onSuccess: () => setIsEditing(false),
+        onError: () => showToast('댓글 수정에 실패했어요.', 'error'),
+      },
+    );
   };
 
   // 수정 진입 시 현재 댓글 내용으로 draft를 동기화 (mount 이후 외부에서 comment가 갱신된 경우 대비)
@@ -49,7 +57,13 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {comment.writer.image ? (
-              <Image src={comment.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
+              <Image
+                src={comment.writer.image}
+                alt=""
+                width={24}
+                height={24}
+                className="size-6 shrink-0 rounded-full object-cover"
+              />
             ) : (
               <IcProfileYellow className="size-5 sm:size-6" />
             )}
@@ -115,7 +129,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
           <Modal.Cancel>취소</Modal.Cancel>
           <Modal.Confirm
             onClick={() => {
-              deleteComment(comment.id);
+              deleteComment(comment.id, { onError: () => showToast('댓글 삭제에 실패했어요.', 'error') });
               setDeleteOpen(false);
             }}
           >
