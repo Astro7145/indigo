@@ -41,8 +41,12 @@ export function useCreateTodo() {
   const qc = useQueryClient();
   return useMutation<Todo, ApiError, CreateTodoBody>({
     mutationFn: (body) => createTodo(body),
-    onSuccess: () => {
+    // 리스트와 목표 진척도(completedCount/todoCount) 동기화. 목표 상세(goalKeys.detail)도 무효화해
+    // 목표 상세 페이지 진행도(useGoal.todos 기반)가 생성 즉시 갱신되게 한다. 목표 미연결(goalId null)은 제외.
+    onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: todoKeys.lists() });
+      qc.invalidateQueries({ queryKey: goalKeys.lists() });
+      if (data?.goalId != null) qc.invalidateQueries({ queryKey: goalKeys.detail(data.goalId) });
     },
   });
 }
@@ -100,6 +104,9 @@ export function useDeleteTodo() {
       qc.removeQueries({ queryKey: todoKeys.detail(todoId) });
       // 삭제된 todo가 favorites 목록에 남지 않도록 함께 무효화.
       qc.invalidateQueries({ queryKey: favoriteKeys.all });
+      // 목표 진척도 동기화 — 삭제 응답엔 goalId가 없어 어느 목표인지 알 수 없으므로
+      // goalKeys.all(목록+모든 상세)을 무효화해 목표 상세 페이지 진행도가 삭제 즉시 갱신되게 한다.
+      qc.invalidateQueries({ queryKey: goalKeys.all });
     },
   });
 }
