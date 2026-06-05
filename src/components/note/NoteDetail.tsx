@@ -11,21 +11,9 @@ import { IcLink } from '@/src/components/common/icons/IcLink';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import { useNote } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
+import { formatDate } from '@/src/utils/date';
 
 import NoteLinkEmbed from './NoteLinkEmbed';
-
-// Asia/Seoul 고정 포맷터 — SSR/CSR 타임존 차이로 인한 하이드레이션 미스매치 방지(NoteCard와 동일 패턴)
-const dateFormatter = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Asia/Seoul',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-});
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return iso;
-  return dateFormatter.format(d).replace(/-/g, '. ');
-}
 
 export interface NoteDetailProps {
   noteId: number;
