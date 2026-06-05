@@ -1,6 +1,7 @@
 jest.mock('@/src/api/goal', () => ({
   ...jest.requireActual('@/src/api/goal'),
   getGoals: jest.fn(),
+  getAllGoals: jest.fn(),
   getGoal: jest.fn(),
   createGoal: jest.fn(),
   patchGoal: jest.fn(),
@@ -24,15 +25,16 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-it('useGoalList는 params와 함께 getGoals를 호출한다', async () => {
-  mocked.getGoals.mockResolvedValue({
-    goals: [],
+it('useGoalList는 getAllGoals로 전체 goal을 불러온다', async () => {
+  mocked.getAllGoals.mockResolvedValue({
+    goals: [{ id: 1 }, { id: 2 }],
     nextCursor: null,
-    totalCount: 0,
+    totalCount: 2,
   } as never);
-  const { result } = renderHookWithClient(() => useGoalList({ limit: 10 }));
+  const { result } = renderHookWithClient(() => useGoalList({ limit: 100 }));
   await waitFor(() => expect(result.current.isSuccess).toBe(true));
-  expect(mocked.getGoals).toHaveBeenCalledWith({ limit: 10 });
+  expect(mocked.getAllGoals).toHaveBeenCalledWith(100);
+  expect(result.current.data?.goals).toHaveLength(2);
 });
 
 it('useGoal은 id가 undefined이면 비활성화된다', () => {
