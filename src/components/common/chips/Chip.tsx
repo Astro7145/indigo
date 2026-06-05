@@ -13,8 +13,8 @@ interface ChipProps {
 }
 
 const typeStyles: Record<ChipType, string> = {
-  todo: 'bg-indigo-300 text-indigo-700',
-  done: 'bg-slate-300 text-white',
+  todo: 'bg-indigo-100 text-indigo-600',
+  done: 'bg-slate-100 text-slate-400',
 };
 
 const typeLabels: Record<ChipType, string> = {
