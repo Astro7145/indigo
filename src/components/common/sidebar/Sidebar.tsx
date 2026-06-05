@@ -125,7 +125,13 @@ export default function Sidebar() {
                   if (isTablet) applyCollapsed(true);
                 }}
               />
-              <SidebarRow type="calendar" text="캘린더" href="/calendar" collapsed={collapsed} />
+              <SidebarRow
+                type="calendar"
+                text="캘린더"
+                href="/calendar"
+                current={path === '/calendar'}
+                collapsed={collapsed}
+              />
               <SidebarRow
                 type="posts"
                 text="소통 게시판"
@@ -142,7 +148,13 @@ export default function Sidebar() {
               />
             </ul>
             <ul className="flex flex-col">
-              <SidebarRow type="settings" text="설정" href="/settings" collapsed={collapsed} />
+              <SidebarRow
+                type="settings"
+                text="설정"
+                href="/settings"
+                current={path === '/settings'}
+                collapsed={collapsed}
+              />
               <LogoutButton collapsed={collapsed} />
             </ul>
           </div>
