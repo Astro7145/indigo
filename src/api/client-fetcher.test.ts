@@ -8,9 +8,13 @@ afterEach(() => {
   window.history.pushState({}, '', '/');
 });
 
-// shouldRedirectToLogin 판정용 최소 AxiosError. 리다이렉트는 응답 본문 code가 401 코드 중 하나일 때 트리거된다.
-function err(code: string | undefined, url: string): AxiosError<ErrorBody> {
-  return { isAxiosError: true, config: { url }, response: { data: { code } } } as unknown as AxiosError<ErrorBody>;
+// shouldRedirectToLogin 판정용 최소 AxiosError. 리다이렉트는 status === 401에서만 트리거되므로 기본값을 401로 둔다.
+function err(code: string | undefined, url: string, status: number = 401): AxiosError<ErrorBody> {
+  return {
+    isAxiosError: true,
+    config: { url },
+    response: { data: { code }, status },
+  } as unknown as AxiosError<ErrorBody>;
 }
 
 it('same-origin BFF 프록시 baseURL을 사용한다', () => {
@@ -68,4 +72,18 @@ it('INVALID_CREDENTIALS 코드는 리다이렉트하지 않는다', () => {
   // auth 경로가 아닌 곳에서 판정해 code 기반 제외 자체가 검증되도록 한다
   window.history.pushState({}, '', '/dashboard');
   expect(shouldRedirectToLogin(err('INVALID_CREDENTIALS', '/todos/1'))).toBe(false);
+});
+
+it('401이 아닌 응답(400/404 등)은 code와 무관하게 리다이렉트하지 않는다', () => {
+  // 인증과 무관한 4xx가 자동 로그인 리다이렉트로 흘러들어가지 않도록 한다 — 각 도메인의 onError가 처리한다
+  window.history.pushState({}, '', '/dashboard');
+  expect(shouldRedirectToLogin(err('VALIDATION_FAILED', '/posts/1/comments', 400))).toBe(false);
+  expect(shouldRedirectToLogin(err('NOT_FOUND', '/posts/1', 404))).toBe(false);
+  expect(shouldRedirectToLogin(err(undefined, '/posts/1', 500))).toBe(false);
+});
+
+it('응답이 없는 네트워크 에러는 리다이렉트하지 않는다', () => {
+  window.history.pushState({}, '', '/dashboard');
+  const networkErr = { isAxiosError: true, config: { url: '/todos/1' } } as unknown as AxiosError<ErrorBody>;
+  expect(shouldRedirectToLogin(networkErr)).toBe(false);
 });

@@ -23,10 +23,12 @@ function toApiError(error: AxiosError): ApiError {
 }
 
 // 인가 실패(401)면 로그인 페이지로 보낼지 판단한다.
+// - 401 status가 아니면 모두 통과시켜 mutation/query의 onError로 흘려보낸다 (4xx·5xx는 각 도메인이 처리)
 // - 브라우저 환경에서만 (SSR·노드 테스트 환경 제외)
 // - /auth/* (로그인·회원가입 등)의 401은 폼에서 인라인 처리하므로 제외
 // - 이미 /login이면 리다이렉트 루프 방지
 export function shouldRedirectToLogin(error: AxiosError<ErrorBody>): boolean {
+  if (error.response?.status !== 401) return false;
   if (error.response?.data?.code === 'INVALID_CREDENTIALS') return false;
   if (typeof window === 'undefined') return false;
   if (/(^|\/)auth\//.test(error.config?.url ?? '')) return false;
