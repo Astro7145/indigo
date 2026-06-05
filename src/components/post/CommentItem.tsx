@@ -49,7 +49,13 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {comment.writer.image ? (
-              <Image src={comment.writer.image} alt="" width={24} height={24} className="shrink-0 rounded-full" />
+              <Image
+                src={comment.writer.image}
+                alt=""
+                width={24}
+                height={24}
+                className="size-6 shrink-0 rounded-full object-cover"
+              />
             ) : (
               <IcProfileYellow className="size-5 sm:size-6" />
             )}
