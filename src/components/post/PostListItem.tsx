@@ -27,7 +27,17 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
           </p>
         </div>
         <div className="flex items-center gap-1 text-xs text-slate-500 sm:gap-2 sm:text-base">
-          <IcProfileYellow className="size-5 shrink-0 sm:size-6" />
+          {post.writer.image ? (
+            <Image
+              src={post.writer.image}
+              alt=""
+              width={24}
+              height={24}
+              className="size-5 shrink-0 rounded-full sm:size-6"
+            />
+          ) : (
+            <IcProfileYellow className="size-5 shrink-0 sm:size-6" />
+          )}
           <div className="flex items-center gap-0.5 whitespace-nowrap sm:gap-1">
             <span>{post.writer.name}</span>
             <span aria-hidden>·</span>
