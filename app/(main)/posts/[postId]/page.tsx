@@ -11,7 +11,7 @@ import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import Modal from '@/src/components/common/modal/Modal';
 import CommentSection from '@/src/components/post/CommentSection';
-import { useComments } from '@/src/hooks/comment';
+import { useInfiniteComments } from '@/src/hooks/comment';
 import { useDeletePost, usePost } from '@/src/hooks/post';
 import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
@@ -23,13 +23,21 @@ export default function PostDetailPage() {
 
   const { data: post, isPending: postPending } = usePost(id);
   // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
-  const { data: commentsData } = useComments(id, { parentId: 'null' });
+  const {
+    data: commentsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteComments(id, { parentId: 'null' });
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
   const { showToast } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const comments = commentsData?.comments ?? [];
+  // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
+  const comments = [...(commentsData?.pages.flatMap((p) => p.comments) ?? [])].sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt),
+  );
 
   const handleDelete = () => {
     deletePost(id, {
@@ -105,7 +113,15 @@ export default function PostDetailPage() {
           {post.createdAt.slice(0, 10).replace(/-/g, '.')} · 조회 {post.viewCount}
         </div>
 
-        <CommentSection postId={id} comments={comments} currentUserId={me?.id} />
+        <CommentSection
+          postId={id}
+          comments={comments}
+          totalCount={post.commentCount}
+          currentUserId={me?.id}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </article>
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>

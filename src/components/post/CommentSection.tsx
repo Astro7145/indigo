@@ -12,10 +12,24 @@ import CommentItem from './CommentItem';
 interface CommentSectionProps {
   postId: number;
   comments: Comment[];
+  // post.commentCount(부모+답글 전체)와 일관되게 헤더 카운트로 사용
+  totalCount: number;
   currentUserId: number | undefined;
+  // useInfiniteQuery에서 끌어온 페이지네이션 신호
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
+  isFetchingNextPage?: boolean;
 }
 
-export default function CommentSection({ postId, comments, currentUserId }: CommentSectionProps) {
+export default function CommentSection({
+  postId,
+  comments,
+  totalCount,
+  currentUserId,
+  hasNextPage,
+  fetchNextPage,
+  isFetchingNextPage,
+}: CommentSectionProps) {
   const { mutate: createComment } = useCreateComment(postId);
   const { showToast } = useToast();
   // 댓글 id → 답글 영역 펼침 여부. 각 CommentItem이 자기 상태를 들지 않고 상위에서 통합 관리
@@ -56,7 +70,7 @@ export default function CommentSection({ postId, comments, currentUserId }: Comm
   return (
     <section className="mt-6">
       <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
-        댓글 <span className="text-indigo-500">{comments.length}</span>
+        댓글 <span className="text-indigo-500">{totalCount}</span>
       </h2>
       <CommentInput
         inputRef={inputRef}
@@ -84,6 +98,18 @@ export default function CommentSection({ postId, comments, currentUserId }: Comm
             </li>
           ))}
         </ul>
+      )}
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => fetchNextPage?.()}
+            disabled={isFetchingNextPage}
+            className="cursor-pointer rounded border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isFetchingNextPage ? '불러오는 중…' : '이전 댓글 보기'}
+          </button>
+        </div>
       )}
     </section>
   );
