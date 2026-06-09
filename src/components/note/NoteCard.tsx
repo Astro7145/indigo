@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
@@ -39,33 +40,56 @@ const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 
 /**
  * 노트 카드 — `Note` 도메인 객체를 받아 공통 Card 표면 위에 합성.
- * 상단: 노트 아이콘 + 제목 (+ linkUrl 있을 때 link icon)
- * 하단: TODO 칩 + 연결된 todo title + 작성일
- * 사이즈는 외부 prop이 아니라 뷰포트 반응형(md)으로 자동 결정.
+ * `note` prop이 있으면(리스트가 이미 조회) 그대로 렌더하고, 없으면 `noteId`로 조회한다.
+ * 조회 경로는 Suspense 경계(AsyncBoundary)가 로딩/에러를 처리한다.
  */
 export default function NoteCard({ noteId, note, onClick, onMore, menu, className }: NoteCardProps) {
-  const query = useNote(note ? undefined : noteId);
-  const resolved = note ?? query.data;
-  const isLoading = !note && query.isLoading;
-  const isError = !note && query.isError;
-
-  if (isLoading || !resolved) {
-    return (
-      <Card className={cn(rootClass, className)}>
-        <p className="text-sm text-slate-400">{isError ? '불러오지 못했어요' : '불러오는 중…'}</p>
-      </Card>
-    );
+  if (note) {
+    return <NoteCardView note={note} onClick={onClick} onMore={onMore} menu={menu} className={className} />;
   }
+  return (
+    <AsyncBoundary
+      fallback={
+        <Card className={cn(rootClass, className)}>
+          <p className="text-sm text-slate-400">불러오는 중…</p>
+        </Card>
+      }
+      errorFallback={
+        <Card className={cn(rootClass, className)}>
+          <p className="text-sm text-slate-400">불러오지 못했어요</p>
+        </Card>
+      }
+    >
+      <NoteCardFetcher noteId={noteId} onClick={onClick} onMore={onMore} menu={menu} className={className} />
+    </AsyncBoundary>
+  );
+}
 
+function NoteCardFetcher({ noteId, ...rest }: Omit<NoteCardProps, 'note'>) {
+  const { data } = useNote(noteId);
+  return <NoteCardView note={data} {...rest} />;
+}
+
+/**
+ * 표시 전용 — 상단: 노트 아이콘 + 제목 (+ linkUrl 있을 때 link icon)
+ * 하단: TODO 칩 + 연결된 todo title + 작성일. 사이즈는 뷰포트 반응형(md)으로 자동 결정.
+ */
+function NoteCardView({
+  note,
+  onClick,
+  onMore,
+  menu,
+  className,
+}: { note: Note } & Pick<NoteCardProps, 'onClick' | 'onMore' | 'menu' | 'className'>) {
   return (
     <Card className={cn(rootClass, className)} onClick={onClick}>
       <div className="flex items-center justify-between">
         <div className={cn('flex items-center', headerGapClass)}>
           <IcSpringNote aria-hidden className={iconBoxClass} />
-          <h3 className={cn('text-slate-800', titleClass)}>{resolved.title}</h3>
+          <h3 className={cn('text-slate-800', titleClass)}>{note.title}</h3>
         </div>
         <div className="flex items-center gap-2">
-          {resolved.linkUrl && <IcLink aria-label="첨부 링크" />}
+          {note.linkUrl && <IcLink aria-label="첨부 링크" />}
           {menu ? (
             <Dropdown>
               <Dropdown.Trigger asChild>
@@ -94,10 +118,10 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Chip type={resolved.todo.done ? 'done' : 'todo'} />
-          <span className={cn('text-slate-700', todoTextClass)}>{resolved.todo.title}</span>
+          <Chip type={note.todo.done ? 'done' : 'todo'} />
+          <span className={cn('text-slate-700', todoTextClass)}>{note.todo.title}</span>
         </div>
-        <span className="text-xs leading-4 text-slate-400">{formatDate(resolved.createdAt)}</span>
+        <span className="text-xs leading-4 text-slate-400">{formatDate(note.createdAt)}</span>
       </div>
     </Card>
   );

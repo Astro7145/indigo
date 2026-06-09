@@ -1,4 +1,10 @@
-import { useQuery, useSuspenseInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
+import {
+  useQuery,
+  useSuspenseQuery,
+  useSuspenseInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { noteKeys, getNotes, getNote, createNote, patchNote, deleteNote } from '@/src/api/note';
 import type { Note, NoteListParams, NoteListResponse, CreateNoteBody, UpdateNoteBody } from '@/src/types/note';
 import type { ApiError } from '@/src/types/common';
@@ -20,10 +26,10 @@ export function useInfiniteNoteList(params: Omit<NoteListParams, 'cursor'> = {})
   });
 }
 
-export function useNote(id: number | undefined) {
-  return useQuery<Note, ApiError>({
-    queryKey: id == null ? [...noteKeys.details(), 'pending'] : noteKeys.detail(id),
-    queryFn: id == null ? skipToken : () => getNote(id),
+export function useNote(id: number) {
+  return useSuspenseQuery<Note, ApiError>({
+    queryKey: noteKeys.detail(id),
+    queryFn: () => getNote(id),
   });
 }
 
