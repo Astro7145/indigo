@@ -1,5 +1,6 @@
 import {
   useQuery,
+  useSuspenseQuery,
   useInfiniteQuery,
   useSuspenseInfiniteQuery,
   useMutation,
@@ -43,6 +44,15 @@ export function useInfiniteGoalListSuspense(params: Omit<CursorParams, 'cursor'>
 
 export function useGoal(id: number) {
   return useQuery<GoalDetail, ApiError>({
+    queryKey: goalKeys.detail(id),
+    queryFn: () => getGoal(id),
+  });
+}
+
+// Suspense 변형 — 경계가 로딩/에러를 처리하는 GoalDetail 상단 섹션에서 쓴다.
+// ProgressCard·NotesCollection은 optional-chain으로 쓰므로 기존 useGoal을 유지한다.
+export function useGoalSuspense(id: number) {
+  return useSuspenseQuery<GoalDetail, ApiError>({
     queryKey: goalKeys.detail(id),
     queryFn: () => getGoal(id),
   });
