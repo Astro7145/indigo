@@ -1,7 +1,7 @@
 import {
   useQuery,
   useSuspenseQuery,
-  useInfiniteQuery,
+  useSuspenseInfiniteQuery,
   useMutation,
   useQueryClient,
   skipToken,
@@ -22,7 +22,7 @@ export function useTodoList(params: TodoListParams = {}) {
 }
 
 export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {}) {
-  return useInfiniteQuery<TodoListResponse, ApiError>({
+  return useSuspenseInfiniteQuery<TodoListResponse, ApiError>({
     queryKey: [...todoKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => getTodos({ ...params, cursor: pageParam as number | undefined }),
     initialPageParam: undefined as number | undefined,
