@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
 import Card from '@/src/components/common/cards/Card';
@@ -32,20 +33,6 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
  * 각 행은 공통 `TodoList`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
 export default function RecentTodos({ className, onEditTodo, onSelectTodo }: RecentTodosProps) {
-  const { data, isLoading, isError } = useTodoList({ sort: 'latest', limit: 4 });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
-  // 삭제 확인 모달 대상 — null이면 닫힘.
-  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
-  const todos = data?.todos ?? [];
-
-  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
-  const toggleFavorite = (todoId: number, isFavorite: boolean) => {
-    if (isFavorite) removeFavorite.mutate(todoId);
-    else addFavorite.mutate(todoId);
-  };
-
   return (
     <div className={cn(rootClass, className)}>
       {/* 좁은 폭(2열 셀이 ~260px대로 떨어지는 sm 구간)에서 제목·모두보기가 둘 다 wrap돼 카드가 밀리는 걸 방지:
@@ -66,47 +53,66 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
         </Link>
       </div>
       <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)]">
-        {isLoading ? (
-          <p className={statusMessageClass}>불러오는 중…</p>
-        ) : isError ? (
-          <p className={statusMessageClass}>불러오지 못했어요</p>
-        ) : todos.length === 0 ? (
-          // figma: 빈 상태는 카드 정중앙에 안내 문구
-          <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>
-        ) : (
-          <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto">
-            {todos.map((t) => {
-              // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-              const hasNote = (t.noteIds?.length ?? 0) > 0;
-              return (
-                <li key={t.id}>
-                  <TodoList
-                    title={t.title}
-                    checked={t.done}
-                    onCheckedChange={(done) => toggle(t.id, done)}
-                    onClick={() => onSelectTodo(t)}
-                  >
-                    <TodoList.Actions>
-                      {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-                      {hasNote && <TodoList.NoteAction onClick={() => {}} />}
-                      {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
-                      {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-                      {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-                      <TodoList.KebabAction
-                        hoverOnly
-                        onEdit={() => onEditTodo(t)}
-                        onDelete={() => setDeletingTodo(t)}
-                      />
-                      <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
-                    </TodoList.Actions>
-                  </TodoList>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <AsyncBoundary
+          fallback={<p className={statusMessageClass}>불러오는 중…</p>}
+          errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
+        >
+          <RecentTodosBody onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+        </AsyncBoundary>
       </Card>
-      <TodoDeleteConfirm open={deletingTodo !== null} todo={deletingTodo} onClose={() => setDeletingTodo(null)} />
     </div>
+  );
+}
+
+function RecentTodosBody({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps, 'onEditTodo' | 'onSelectTodo'>) {
+  const { data } = useTodoList({ sort: 'latest', limit: 4 });
+  const update = useUpdateTodo();
+  const addFavorite = useAddTodoFavorite();
+  const removeFavorite = useRemoveTodoFavorite();
+  // 삭제 확인 모달 대상 — null이면 닫힘.
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
+  const todos = data.todos;
+
+  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
+  const toggleFavorite = (todoId: number, isFavorite: boolean) => {
+    if (isFavorite) removeFavorite.mutate(todoId);
+    else addFavorite.mutate(todoId);
+  };
+
+  return (
+    <>
+      {todos.length === 0 ? (
+        // figma: 빈 상태는 카드 정중앙에 안내 문구
+        <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>
+      ) : (
+        <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto">
+          {todos.map((t) => {
+            // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
+            const hasNote = (t.noteIds?.length ?? 0) > 0;
+            return (
+              <li key={t.id}>
+                <TodoList
+                  title={t.title}
+                  checked={t.done}
+                  onCheckedChange={(done) => toggle(t.id, done)}
+                  onClick={() => onSelectTodo(t)}
+                >
+                  <TodoList.Actions>
+                    {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
+                    {hasNote && <TodoList.NoteAction onClick={() => {}} />}
+                    {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
+                    {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
+                    {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
+                    <TodoList.KebabAction hoverOnly onEdit={() => onEditTodo(t)} onDelete={() => setDeletingTodo(t)} />
+                    <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                  </TodoList.Actions>
+                </TodoList>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <TodoDeleteConfirm open={deletingTodo !== null} todo={deletingTodo} onClose={() => setDeletingTodo(null)} />
+    </>
   );
 }

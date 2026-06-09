@@ -1,5 +1,6 @@
 import {
   useQuery,
+  useSuspenseQuery,
   useInfiniteQuery,
   useMutation,
   useQueryClient,
@@ -13,11 +14,10 @@ import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 import type { ApiError } from '@/src/types/common';
 
-export function useTodoList(params: TodoListParams = {}, enabled = true) {
-  return useQuery<TodoListResponse, ApiError>({
+export function useTodoList(params: TodoListParams = {}) {
+  return useSuspenseQuery<TodoListResponse, ApiError>({
     queryKey: todoKeys.list(params),
     queryFn: () => getTodos(params),
-    enabled,
   });
 }
 

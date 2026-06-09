@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
@@ -134,21 +135,9 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
   const [input, setInput] = useState('');
   const [keyword, setKeyword] = useState('');
 
-  const { data, isLoading, isError } = useTodoList({ goalId: goal.id, keyword: keyword || undefined });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
-
   const reduce = useReducedMotion();
 
-  const todos = data?.todos ?? [];
-  const todoItems = todos.filter((t) => !t.done);
-  const doneItems = todos.filter((t) => t.done);
   const percent = percentOf(goal.completedCount, goal.todoCount);
-
-  const toggle = (id: number, done: boolean) => update.mutate({ todoId: id, body: { done } });
-  const toggleFavorite = (id: number, isFavorite: boolean) =>
-    isFavorite ? removeFavorite.mutate(id) : addFavorite.mutate(id);
 
   return (
     <Card
@@ -240,37 +229,67 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
         것을 막고 레이아웃 시프트도 방지한다.
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
-        {isLoading ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
-        ) : isError ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>
-        ) : todos.length === 0 ? (
-          keyword ? (
-            <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
-          )
-        ) : (
-          <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
-            <Column
-              label="To do"
-              todos={todoItems}
-              onToggle={toggle}
-              onToggleFavorite={toggleFavorite}
-              onEdit={onEditTodo}
-              onSelect={onSelectTodo}
-            />
-            <Column
-              label="Done"
-              todos={doneItems}
-              onToggle={toggle}
-              onToggleFavorite={toggleFavorite}
-              onEdit={onEditTodo}
-              onSelect={onSelectTodo}
-            />
-          </div>
-        )}
+        <AsyncBoundary
+          fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
+          errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+        >
+          <GoalTodoBoardBody goalId={goal.id} keyword={keyword} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+        </AsyncBoundary>
       </div>
     </Card>
+  );
+}
+
+function GoalTodoBoardBody({
+  goalId,
+  keyword,
+  onEditTodo,
+  onSelectTodo,
+}: {
+  goalId: number;
+  keyword: string;
+  onEditTodo: (todo: Todo) => void;
+  onSelectTodo: (todo: Todo) => void;
+}) {
+  const { data } = useTodoList({ goalId, keyword: keyword || undefined });
+  const update = useUpdateTodo();
+  const addFavorite = useAddTodoFavorite();
+  const removeFavorite = useRemoveTodoFavorite();
+
+  const todos = data.todos;
+  const todoItems = todos.filter((t) => !t.done);
+  const doneItems = todos.filter((t) => t.done);
+
+  const toggle = (id: number, done: boolean) => update.mutate({ todoId: id, body: { done } });
+  const toggleFavorite = (id: number, isFavorite: boolean) =>
+    isFavorite ? removeFavorite.mutate(id) : addFavorite.mutate(id);
+
+  if (todos.length === 0) {
+    return keyword ? (
+      <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
+    ) : (
+      <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
+      <Column
+        label="To do"
+        todos={todoItems}
+        onToggle={toggle}
+        onToggleFavorite={toggleFavorite}
+        onEdit={onEditTodo}
+        onSelect={onSelectTodo}
+      />
+      <Column
+        label="Done"
+        todos={doneItems}
+        onToggle={toggle}
+        onToggleFavorite={toggleFavorite}
+        onEdit={onEditTodo}
+        onSelect={onSelectTodo}
+      />
+    </div>
   );
 }
