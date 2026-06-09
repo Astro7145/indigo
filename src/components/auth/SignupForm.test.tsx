@@ -124,11 +124,12 @@ describe('SignupForm', () => {
       expect(await screen.findByText('이미 사용 중인 닉네임입니다.')).toBeInTheDocument();
     });
 
-    it('이미 사용 중인 닉네임이면 회원가입 버튼이 비활성화된다', async () => {
+    it('유효한 폼이어도 이미 사용 중인 닉네임이면 회원가입 버튼이 비활성화된다', async () => {
       mockedUseCheckNickname.mockReturnValue({ data: { available: false } } as unknown as ReturnType<
         typeof userHooks.useCheckNickname
       >);
       renderWithClient(<SignupForm />);
+      fillValidForm();
       await screen.findByText('이미 사용 중인 닉네임입니다.');
       expect(screen.getByRole('button', { name: '회원가입 하기' })).toBeDisabled();
     });

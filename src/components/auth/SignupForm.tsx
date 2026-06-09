@@ -47,6 +47,10 @@ export default function SignupForm() {
   const debouncedName = useDebounce(name ?? '');
   const { data: nicknameCheck } = useCheckNickname(debouncedName);
 
+  // 중복 닉네임은 schema 밖(서버 검증)이라 zodResolver 기반 isValid를 못 뒤집는다.
+  // 제출 버튼을 명시적으로 막아 "이미 사용 중" 상태에서 회원가입을 차단한다.
+  const nicknameTaken = nicknameCheck?.available === false;
+
   useEffect(() => {
     if (!nicknameCheck) return;
     if (!nicknameCheck.available) {
@@ -127,7 +131,7 @@ export default function SignupForm() {
 
       {/* 로그인 버튼 & 회원가입 링크 */}
       <div className="flex flex-col gap-6">
-        <Button type="submit" className="w-full" disabled={isSubmitting || !isValid}>
+        <Button type="submit" className="w-full" disabled={isSubmitting || !isValid || nicknameTaken}>
           {isSubmitting ? '처리중...' : '회원가입 하기'}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
