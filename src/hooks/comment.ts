@@ -20,10 +20,15 @@ import type {
 import type { ApiError } from '@/src/types/common';
 
 export function useComments(postId: number | undefined, params: CommentListParams = {}) {
-  return useQuery<CommentListResponse, ApiError>({
+  return useQuery<CommentListResponse, ApiError, CommentListResponse>({
     queryKey:
       postId == null ? [...postKeys.details(), 'pending', 'comments', params] : commentKeys.list(postId, params),
     queryFn: postId == null ? skipToken : () => getComments(postId, params),
+    // API에 sort 옵션이 없고 최신순으로 응답이 오므로 작성순(오래된 것이 위)으로 오도록 추가
+    select: (data) => ({
+      ...data,
+      comments: [...data.comments].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+    }),
   });
 }
 
