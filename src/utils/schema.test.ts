@@ -65,6 +65,20 @@ describe('signupSchema', () => {
         expect(fieldErrors.name?.[0]).toBe('이름을 입력해주세요.');
       }
     });
+
+    it('20자를 초과하면 에러를 반환한다', () => {
+      const result = signupSchema.safeParse({ ...validSignup, name: 'a'.repeat(21) });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const { fieldErrors } = result.error.flatten();
+        expect(fieldErrors.name?.[0]).toBe('이름은 20자 이하로 입력해주세요.');
+      }
+    });
+
+    it('정확히 20자면 통과한다', () => {
+      const result = signupSchema.safeParse({ ...validSignup, name: 'a'.repeat(20) });
+      expect(result.success).toBe(true);
+    });
   });
 
   describe('email 필드', () => {
