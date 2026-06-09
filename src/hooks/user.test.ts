@@ -35,6 +35,11 @@ it('useCheckNickname은 name이 공백뿐이면 비활성화된다', () => {
   expect(mocked.checkNickname).not.toHaveBeenCalled();
 });
 
+it('useCheckNickname은 name이 20자를 초과하면 비활성화된다', () => {
+  renderHookWithClient(() => useCheckNickname('a'.repeat(21)));
+  expect(mocked.checkNickname).not.toHaveBeenCalled();
+});
+
 it('useCheckNickname은 name이 주어지면 checkNickname을 호출한다', async () => {
   mocked.checkNickname.mockResolvedValue({ available: true } as never);
   const { result } = renderHookWithClient(() => useCheckNickname('foo'));

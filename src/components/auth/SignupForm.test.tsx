@@ -15,7 +15,7 @@ jest.mock('@/src/components/common/icons', () => ({
   IcEyeOff: () => <svg data-testid="ic-eye-off" />,
 }));
 
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, act } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 
 import * as authHooks from '@/src/hooks/auth';
@@ -124,11 +124,12 @@ describe('SignupForm', () => {
       expect(await screen.findByText('이미 사용 중인 닉네임입니다.')).toBeInTheDocument();
     });
 
-    it('이미 사용 중인 닉네임이면 회원가입 버튼이 비활성화된다', async () => {
+    it('유효한 폼이어도 이미 사용 중인 닉네임이면 회원가입 버튼이 비활성화된다', async () => {
       mockedUseCheckNickname.mockReturnValue({ data: { available: false } } as unknown as ReturnType<
         typeof userHooks.useCheckNickname
       >);
       renderWithClient(<SignupForm />);
+      fillValidForm();
       await screen.findByText('이미 사용 중인 닉네임입니다.');
       expect(screen.getByRole('button', { name: '회원가입 하기' })).toBeDisabled();
     });
@@ -136,6 +137,23 @@ describe('SignupForm', () => {
     it('사용 가능한 닉네임이면 에러 메시지가 표시되지 않는다', () => {
       renderWithClient(<SignupForm />);
       expect(screen.queryByText('이미 사용 중인 닉네임입니다.')).not.toBeInTheDocument();
+    });
+
+    it('중복 닉네임이면 이름 input을 blur해도 에러 메시지가 유지된다', async () => {
+      mockedUseCheckNickname.mockReturnValue({ data: { available: false } } as unknown as ReturnType<
+        typeof userHooks.useCheckNickname
+      >);
+      renderWithClient(<SignupForm />);
+      fireEvent.change(screen.getByLabelText('이름'), { target: { value: '홍길동' } });
+      expect(await screen.findByText('이미 사용 중인 닉네임입니다.')).toBeInTheDocument();
+
+      fireEvent.blur(screen.getByLabelText('이름'));
+      // mode:'onBlur' 재검증(zodResolver)이 끝나도 schema 밖 검증이므로 메시지가 유지되어야 한다
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+      expect(screen.getByText('이미 사용 중인 닉네임입니다.')).toBeInTheDocument();
     });
   });
 
