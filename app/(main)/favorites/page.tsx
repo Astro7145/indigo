@@ -53,6 +53,7 @@ export default function FavoritesPage() {
         <AsyncBoundary
           fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
           errorFallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
+          resetKeys={[tab, goalId]}
         >
           <FavoritesCount tab={tab} goalId={goalId} />
         </AsyncBoundary>
@@ -95,6 +96,7 @@ export default function FavoritesPage() {
           <AsyncBoundary
             fallback={<p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>}
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+            resetKeys={[tab, goalId]}
           >
             <FavoritesList tab={tab} goalId={goalId} />
           </AsyncBoundary>

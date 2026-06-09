@@ -40,3 +40,23 @@ it('자식이 throw하면 errorFallback을 렌더한다', () => {
   );
   expect(screen.getByText('에러')).toBeInTheDocument();
 });
+
+it('resetKeys가 바뀌면 에러 상태를 초기화한다', () => {
+  function Conditional({ shouldThrow }: { shouldThrow: boolean }) {
+    if (shouldThrow) throw new Error('boom');
+    return <span>복구됨</span>;
+  }
+  const { rerender } = render(
+    <AsyncBoundary fallback={<span>로딩</span>} errorFallback={<span>에러</span>} resetKeys={[1]}>
+      <Conditional shouldThrow />
+    </AsyncBoundary>,
+  );
+  expect(screen.getByText('에러')).toBeInTheDocument();
+
+  rerender(
+    <AsyncBoundary fallback={<span>로딩</span>} errorFallback={<span>에러</span>} resetKeys={[2]}>
+      <Conditional shouldThrow={false} />
+    </AsyncBoundary>,
+  );
+  expect(screen.getByText('복구됨')).toBeInTheDocument();
+});

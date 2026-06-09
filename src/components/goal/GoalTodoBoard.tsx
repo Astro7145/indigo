@@ -232,6 +232,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
         <AsyncBoundary
           fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
           errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+          resetKeys={[keyword]}
         >
           <GoalTodoBoardBody goalId={goal.id} keyword={keyword} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
         </AsyncBoundary>

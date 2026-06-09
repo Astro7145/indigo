@@ -76,6 +76,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
       <AsyncBoundary
         fallback={<p className="py-16 text-center text-sm text-slate-400">불러오는 중…</p>}
         errorFallback={<p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+        resetKeys={[search, sort]}
       >
         <NotesCollectionBody goalId={goalId} search={search} sort={sort} />
       </AsyncBoundary>
