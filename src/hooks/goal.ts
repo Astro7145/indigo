@@ -5,7 +5,6 @@ import {
   useSuspenseInfiniteQuery,
   useMutation,
   useQueryClient,
-  skipToken,
 } from '@tanstack/react-query';
 import { goalKeys, getGoals, getAllGoals, getGoal, createGoal, patchGoal, deleteGoal } from '@/src/api/goal';
 import type { Goal, GoalDetail, GoalListResponse, CreateGoalBody, UpdateGoalBody } from '@/src/types/goal';
