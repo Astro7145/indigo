@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useCreateComment } from '@/src/hooks/comment';
 import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
@@ -16,6 +18,8 @@ interface CommentSectionProps {
 export default function CommentSection({ postId, comments, currentUserId }: CommentSectionProps) {
   const { mutate: createComment } = useCreateComment(postId);
   const { showToast } = useToast();
+  // 댓글 id → 답글 영역 펼침 여부. 각 CommentItem이 자기 상태를 들지 않고 상위에서 통합 관리
+  const [openReplies, setOpenReplies] = useState<Record<number, boolean>>({});
 
   return (
     <section className="mt-6">
@@ -35,7 +39,13 @@ export default function CommentSection({ postId, comments, currentUserId }: Comm
         <ul className="mt-6 space-y-4">
           {comments.map((c) => (
             <li key={c.id}>
-              <CommentItem comment={c} postId={postId} isMine={c.userId === currentUserId} />
+              <CommentItem
+                comment={c}
+                postId={postId}
+                isMine={c.userId === currentUserId}
+                repliesOpen={!!openReplies[c.id]}
+                onRepliesOpenChange={(open) => setOpenReplies((prev) => ({ ...prev, [c.id]: open }))}
+              />
             </li>
           ))}
         </ul>

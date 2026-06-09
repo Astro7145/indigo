@@ -22,7 +22,8 @@ export default function PostDetailPage() {
   const id = Number(postId);
 
   const { data: post, isPending: postPending } = usePost(id);
-  const { data: commentsData } = useComments(id);
+  // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
+  const { data: commentsData } = useComments(id, { parentId: 'null' });
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
   const { showToast } = useToast();
