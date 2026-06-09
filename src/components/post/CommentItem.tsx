@@ -24,6 +24,9 @@ interface CommentItemProps {
   isReply?: boolean;
   repliesOpen?: boolean;
   onRepliesOpenChange?: (open: boolean) => void;
+  onReplyClick?: (commentId: number, writerName: string) => void;
+  // 하단 입력창이 현재 답글 작성 중인 대상 댓글 id. 자기 id와 같으면 "답글 달기" 버튼 강조
+  activeReplyTargetId?: number | null;
 }
 
 export default function CommentItem({
@@ -33,6 +36,8 @@ export default function CommentItem({
   isReply = false,
   repliesOpen = false,
   onRepliesOpenChange,
+  onReplyClick,
+  activeReplyTargetId = null,
 }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
@@ -163,15 +168,29 @@ export default function CommentItem({
                 />
                 <span>{comment.likeCount}</span>
               </button>
-              {/* 자식(대댓글)에는 답글 보기 버튼 미노출 — 깊이 1단계 제한 */}
-              {!isReply && comment.replyCount != null && comment.replyCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => onRepliesOpenChange?.(!repliesOpen)}
-                  className="cursor-pointer hover:text-slate-600"
-                >
-                  {repliesOpen ? '답글 숨기기' : `답글 ${comment.replyCount}개 보기`}
-                </button>
+              {/* 자식(대댓글)에는 답글 달기/보기 미노출 — 깊이 1단계 제한 */}
+              {!isReply && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onReplyClick?.(comment.id, comment.writer.name)}
+                    className={cn(
+                      'cursor-pointer hover:text-slate-600',
+                      activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
+                    )}
+                  >
+                    답글 달기
+                  </button>
+                  {comment.replyCount != null && comment.replyCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => onRepliesOpenChange?.(!repliesOpen)}
+                      className="cursor-pointer hover:text-slate-600"
+                    >
+                      {repliesOpen ? '답글 숨기기' : `답글 ${comment.replyCount}개 보기`}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </>
