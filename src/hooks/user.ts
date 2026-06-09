@@ -12,7 +12,7 @@ export function useMe() {
 
 export function useCheckNickname(name: string) {
   const trimmedName = name.trim();
-  return useQuery<CheckNicknameResponse, ApiError>({
+  return useQuery<CheckNicknameResponse, Error>({
     queryKey: userKeys.nickname(trimmedName),
     queryFn: () => checkNickname(trimmedName),
     enabled: trimmedName.length >= 1,
