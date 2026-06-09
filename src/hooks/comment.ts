@@ -88,10 +88,18 @@ export function useDeleteComment(postId: number) {
   });
 }
 
+// useInfiniteComments(최상위 댓글)가 만드는 InfiniteData 캐시 구조 — useQuery 일반 구조와 분기 필요
+type InfiniteCommentData = { pages: CommentListResponse[]; pageParams: unknown[] };
+
+function isInfiniteData(data: unknown): data is InfiniteCommentData {
+  return typeof data === 'object' && data !== null && Array.isArray((data as { pages?: unknown }).pages);
+}
+
 // 실패 시 이전 캐시로 롤백할 수 있도록 스냅샷을 들고 다니는 컨텍스트
-type LikeMutationContext = { previous: Array<[QueryKey, CommentListResponse | undefined]> };
+type LikeMutationContext = { previous: Array<[QueryKey, unknown]> };
 
 // 매칭 댓글의 isLiked/likeCount를 즉시 토글. delta=+1(like)/-1(unlike)
+// commentKeys.lists prefix 아래엔 useComments(일반)와 useInfiniteComments(InfiniteData) 두 종류가 공존하므로 둘 다 처리
 async function applyOptimisticLike(
   qc: ReturnType<typeof useQueryClient>,
   postId: number,
@@ -100,9 +108,22 @@ async function applyOptimisticLike(
   delta: 1 | -1,
 ): Promise<LikeMutationContext> {
   await qc.cancelQueries({ queryKey: commentKeys.lists(postId) });
-  const previous = qc.getQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) });
-  qc.setQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) }, (old) => {
+  const previous = qc.getQueriesData({ queryKey: commentKeys.lists(postId) });
+  qc.setQueriesData<CommentListResponse | InfiniteCommentData>({ queryKey: commentKeys.lists(postId) }, (old) => {
     if (!old) return old;
+    if (isInfiniteData(old)) {
+      return {
+        ...old,
+        pages: old.pages.map((page) => ({
+          ...page,
+          comments: page.comments.map((c) =>
+            c.id === commentId && c.isLiked !== targetLiked
+              ? { ...c, isLiked: targetLiked, likeCount: c.likeCount + delta }
+              : c,
+          ),
+        })),
+      };
+    }
     return {
       ...old,
       comments: old.comments.map((c) =>
@@ -127,8 +148,19 @@ function syncLikeFromServer(
   commentId: number,
   data: CommentLikeResponse,
 ) {
-  qc.setQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) }, (old) => {
+  qc.setQueriesData<CommentListResponse | InfiniteCommentData>({ queryKey: commentKeys.lists(postId) }, (old) => {
     if (!old) return old;
+    if (isInfiniteData(old)) {
+      return {
+        ...old,
+        pages: old.pages.map((page) => ({
+          ...page,
+          comments: page.comments.map((c) =>
+            c.id === commentId ? { ...c, isLiked: data.isLiked, likeCount: data.likeCount } : c,
+          ),
+        })),
+      };
+    }
     return {
       ...old,
       comments: old.comments.map((c) =>
