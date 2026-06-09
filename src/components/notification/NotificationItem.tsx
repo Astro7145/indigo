@@ -2,13 +2,12 @@
 
 import type { Notification } from '@/src/types/notification';
 import { cn } from '@/src/utils/cn';
+import Image from 'next/image';
 
 export interface NotificationItemProps {
   notification: Notification;
   /** 댓글 등 부가 내용 (한 줄 말줄임 표시) */
   subtext?: string;
-  /** 알림 발생 사용자 아바타 URL. 없으면 빈 원형 플레이스홀더 표시 */
-  avatarUrl?: string;
   onClick?: (notification: Notification) => void;
 }
 
@@ -33,8 +32,8 @@ function formatRelativeTime(dateStr: string): string {
  * NotificationPanel 내부에서 사용되며, isRead 상태에 따라 인디케이터 점 표시 여부를 결정합니다.
  * 클릭 시 onClick 콜백을 호출하며, 키보드(Enter/Space)로도 동작합니다.
  */
-export default function NotificationItem({ notification, subtext, avatarUrl, onClick }: NotificationItemProps) {
-  const { isRead, message, createdAt } = notification;
+export default function NotificationItem({ notification, subtext, onClick }: NotificationItemProps) {
+  const { isRead, message, createdAt, data } = notification;
   const isInteractive = Boolean(onClick);
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -80,10 +79,9 @@ export default function NotificationItem({ notification, subtext, avatarUrl, onC
           aria-hidden="true"
           className="relative size-10 shrink-0 overflow-hidden rounded-full border border-slate-200"
         >
-          {avatarUrl ? (
-            // 아바타 URL의 외부 도메인이 런타임에 결정되므로 next/image remotePatterns 대신 img 사용
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl} alt="" className="size-full object-cover" />
+          {data?.userImage ? (
+            // 아바타 외부 도메인은 가변적 — next.config images.remotePatterns에서 https 전체 허용
+            <Image src={data.userImage} alt="알림 프로필 이미지" fill sizes="40px" className="object-cover" />
           ) : (
             <div className="size-full bg-slate-100" />
           )}
