@@ -33,6 +33,7 @@
     "react": "19.2.4",
     "react-aria": "^3.48.0",
     "react-dom": "19.2.4",
+    "react-error-boundary": "^6.1.2",
     "react-hook-form": "^7.76.0",
     "react-stately": "^3.46.0",
     "tailwind-merge": "^3.6.0",
