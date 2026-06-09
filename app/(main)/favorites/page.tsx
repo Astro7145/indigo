@@ -12,8 +12,9 @@ import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useUpdateTodo } from '@/src/hooks/todo';
+import { useHashTab } from '@/src/hooks/useHashTab';
 
-type Tab = 'all' | 'todo' | 'done';
+const TABS = ['all', 'todo', 'done'] as const;
 
 /**
  * /favorites — 찜한 할 일 페이지
@@ -24,7 +25,7 @@ type Tab = 'all' | 'todo' | 'done';
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesPage() {
-  const [tab, setTab] = useState<Tab>('all');
+  const [tab, setTab] = useHashTab(TABS, 'all');
   const [goalId, setGoalId] = useState<number | null>(null);
 
   const { data, isLoading, isError } = useFavoriteTodoList({ limit: 100 });

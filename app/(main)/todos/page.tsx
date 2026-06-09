@@ -13,9 +13,11 @@ import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import { useHashTab } from '@/src/hooks/useHashTab';
 import type { Todo, TodoListParams } from '@/src/types/todo';
 
-type Tab = 'all' | 'todo' | 'done';
+const TABS = ['all', 'todo', 'done'] as const;
+type Tab = (typeof TABS)[number];
 const EMPTY_MSG_BY_TAP = {
   all: '아직 등록한 할 일이 없어요',
   todo: '해야할 일이 아직 없어요',
@@ -34,7 +36,7 @@ const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function TodosPage() {
-  const [tab, setTab] = useState<Tab>('all');
+  const [tab, setTab] = useHashTab(TABS, 'all');
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
     useInfiniteTodoList({ sort: 'latest', limit: 40, done: DONE_PARAM[tab] });
   const update = useUpdateTodo();

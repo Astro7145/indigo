@@ -95,6 +95,8 @@ const goalPage = (goals: GoalListItem[]): GoalListResponse => ({ goals, nextCurs
 
 beforeEach(() => {
   jest.resetAllMocks();
+  // 탭이 URL 해시를 쓰므로(useHashTab) 테스트 간 해시 누수를 막는다.
+  window.history.replaceState(null, '', '/');
   // 기본값: 목표 목록은 비어 있음.
   goal.getAllGoals.mockResolvedValue(goalPage([]));
 });
