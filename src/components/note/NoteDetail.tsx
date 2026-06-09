@@ -28,12 +28,12 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
       fallback={<p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>}
       errorFallback={<p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>}
     >
-      <NoteDetailBody noteId={noteId} className={className} />
+      <NoteDetailContent noteId={noteId} className={className} />
     </AsyncBoundary>
   );
 }
 
-function NoteDetailBody({ noteId, className }: NoteDetailProps) {
+function NoteDetailContent({ noteId, className }: NoteDetailProps) {
   const { data: note } = useNote(noteId);
   const [embedOpen, setEmbedOpen] = useState(false);
 

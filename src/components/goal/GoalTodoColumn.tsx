@@ -135,14 +135,14 @@ export default function GoalTodoColumn({
             </p>
           }
         >
-          <GoalTodoColumnBody goalId={goalId} done={done} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+          <GoalTodoColumnContent goalId={goalId} done={done} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
         </AsyncBoundary>
       </div>
     </section>
   );
 }
 
-function GoalTodoColumnBody({
+function GoalTodoColumnContent({
   goalId,
   done,
   onEditTodo,

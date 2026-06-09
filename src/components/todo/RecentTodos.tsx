@@ -57,14 +57,14 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
           fallback={<p className={statusMessageClass}>불러오는 중…</p>}
           errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
         >
-          <RecentTodosBody onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+          <RecentTodosContent onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
         </AsyncBoundary>
       </Card>
     </div>
   );
 }
 
-function RecentTodosBody({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps, 'onEditTodo' | 'onSelectTodo'>) {
+function RecentTodosContent({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps, 'onEditTodo' | 'onSelectTodo'>) {
   const { data } = useTodoList({ sort: 'latest', limit: 4 });
   const update = useUpdateTodo();
   const addFavorite = useAddTodoFavorite();

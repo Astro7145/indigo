@@ -72,7 +72,9 @@ props `fallback`/`errorFallback`/`children`)로 로딩·에러를 **선언적으
 
 작성 규칙:
 
-- chrome(헤더·탭·버튼)은 경계 **밖**, 데이터 본문만 inner 컴포넌트로 분리해 감싼다(self-wrap → 공개 API 유지).
+- chrome(헤더·탭·버튼)은 경계 **밖**, 데이터 본문만 **콘텐츠 컴포넌트(`XxxContent`)** 로 분리해 감싼다.
+  콘텐츠를 별도 컴포넌트로 빼는 건 React 규칙(`useSuspenseQuery` 호출부는 `<Suspense>`보다 아래여야 함)상
+  필수다 — 임의 분리가 아니라 "카드 프레임 + 콘텐츠"의 최소 분해이며 공개 API는 유지된다.
 - 무한쿼리는 **초기 로드만** 경계로. `fetchNextPage`·`isFetchingNextPage`·`isFetchNextPageError`는 인라인 유지.
 - fallback/errorFallback은 그 자리의 로딩/에러 JSX를 그대로 넣는다(UX 무변화).
 - 공유 훅에 비-suspense consumer가 남으면 `useXxxSuspense` 변형을 추가하고, consumer가 전부 전환되면 in-place로 바꾼다.
@@ -83,12 +85,12 @@ function RecentTodos(props) {
   return (
     <Card>
       <AsyncBoundary fallback={<p>불러오는 중…</p>} errorFallback={<p>불러오지 못했어요</p>}>
-        <RecentTodosBody {...props} />
+        <RecentTodosContent {...props} />
       </AsyncBoundary>
     </Card>
   );
 }
-function RecentTodosBody(props) {
+function RecentTodosContent(props) {
   const { data } = useTodoList({ sort: 'latest', limit: 4 }); // useSuspenseQuery → data 항상 정의됨
   return /* happy path만 */;
 }

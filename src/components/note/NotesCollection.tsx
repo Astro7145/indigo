@@ -78,13 +78,13 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
         errorFallback={<p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>}
         resetKeys={[search, sort]}
       >
-        <NotesCollectionBody goalId={goalId} search={search} sort={sort} />
+        <NotesCollectionContent goalId={goalId} search={search} sort={sort} />
       </AsyncBoundary>
     </div>
   );
 }
 
-function NotesCollectionBody({ goalId, search, sort }: { goalId: number; search: string; sort: Sort }) {
+function NotesCollectionContent({ goalId, search, sort }: { goalId: number; search: string; sort: Sort }) {
   const router = useRouter();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteNoteList({
     goalId,

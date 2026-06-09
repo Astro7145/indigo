@@ -32,13 +32,13 @@ export default function GoalTodoSection({ className, onEditTodo, onAddTodo, onSe
         fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
         errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
       >
-        <GoalTodoSectionBody onEditTodo={onEditTodo} onAddTodo={onAddTodo} onSelectTodo={onSelectTodo} />
+        <GoalTodoSectionContent onEditTodo={onEditTodo} onAddTodo={onAddTodo} onSelectTodo={onSelectTodo} />
       </AsyncBoundary>
     </section>
   );
 }
 
-function GoalTodoSectionBody({ onEditTodo, onAddTodo, onSelectTodo }: Omit<GoalTodoSectionProps, 'className'>) {
+function GoalTodoSectionContent({ onEditTodo, onAddTodo, onSelectTodo }: Omit<GoalTodoSectionProps, 'className'>) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteGoalListSuspense({
     limit: 2,
   });

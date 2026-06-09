@@ -234,14 +234,19 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
           errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
           resetKeys={[keyword]}
         >
-          <GoalTodoBoardBody goalId={goal.id} keyword={keyword} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+          <GoalTodoBoardContent
+            goalId={goal.id}
+            keyword={keyword}
+            onEditTodo={onEditTodo}
+            onSelectTodo={onSelectTodo}
+          />
         </AsyncBoundary>
       </div>
     </Card>
   );
 }
 
-function GoalTodoBoardBody({
+function GoalTodoBoardContent({
   goalId,
   keyword,
   onEditTodo,
