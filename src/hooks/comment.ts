@@ -1,4 +1,5 @@
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
+import type { QueryKey } from '@tanstack/react-query';
 import { postKeys } from '@/src/api/post';
 import {
   commentKeys,
@@ -87,22 +88,72 @@ export function useDeleteComment(postId: number) {
   });
 }
 
+// 실패 시 이전 캐시로 롤백할 수 있도록 스냅샷을 들고 다니는 컨텍스트
+type LikeMutationContext = { previous: Array<[QueryKey, CommentListResponse | undefined]> };
+
+// 매칭 댓글의 isLiked/likeCount를 즉시 토글. delta=+1(like)/-1(unlike)
+async function applyOptimisticLike(
+  qc: ReturnType<typeof useQueryClient>,
+  postId: number,
+  commentId: number,
+  targetLiked: boolean,
+  delta: 1 | -1,
+): Promise<LikeMutationContext> {
+  await qc.cancelQueries({ queryKey: commentKeys.lists(postId) });
+  const previous = qc.getQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) });
+  qc.setQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) }, (old) => {
+    if (!old) return old;
+    return {
+      ...old,
+      comments: old.comments.map((c) =>
+        c.id === commentId && c.isLiked !== targetLiked
+          ? { ...c, isLiked: targetLiked, likeCount: c.likeCount + delta }
+          : c,
+      ),
+    };
+  });
+  return { previous };
+}
+
+function rollbackLike(qc: ReturnType<typeof useQueryClient>, context: LikeMutationContext | undefined) {
+  if (!context) return;
+  context.previous.forEach(([key, data]) => qc.setQueryData(key, data));
+}
+
+// 서버 응답으로 정확값 동기화 — 낙관적 값과 어긋났을 때 보정
+function syncLikeFromServer(
+  qc: ReturnType<typeof useQueryClient>,
+  postId: number,
+  commentId: number,
+  data: CommentLikeResponse,
+) {
+  qc.setQueriesData<CommentListResponse>({ queryKey: commentKeys.lists(postId) }, (old) => {
+    if (!old) return old;
+    return {
+      ...old,
+      comments: old.comments.map((c) =>
+        c.id === commentId ? { ...c, isLiked: data.isLiked, likeCount: data.likeCount } : c,
+      ),
+    };
+  });
+}
+
 export function useLikeComment(postId: number) {
   const qc = useQueryClient();
-  return useMutation<CommentLikeResponse, ApiError, number>({
+  return useMutation<CommentLikeResponse, ApiError, number, LikeMutationContext>({
     mutationFn: (commentId) => likeComment(postId, commentId),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentKeys.lists(postId) });
-    },
+    onMutate: (commentId) => applyOptimisticLike(qc, postId, commentId, true, 1),
+    onError: (_err, _commentId, context) => rollbackLike(qc, context),
+    onSuccess: (data, commentId) => syncLikeFromServer(qc, postId, commentId, data),
   });
 }
 
 export function useUnlikeComment(postId: number) {
   const qc = useQueryClient();
-  return useMutation<CommentLikeResponse, ApiError, number>({
+  return useMutation<CommentLikeResponse, ApiError, number, LikeMutationContext>({
     mutationFn: (commentId) => unlikeComment(postId, commentId),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: commentKeys.lists(postId) });
-    },
+    onMutate: (commentId) => applyOptimisticLike(qc, postId, commentId, false, -1),
+    onError: (_err, _commentId, context) => rollbackLike(qc, context),
+    onSuccess: (data, commentId) => syncLikeFromServer(qc, postId, commentId, data),
   });
 }

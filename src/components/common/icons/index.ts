@@ -54,6 +54,7 @@ export { IcTextInsertImage } from './IcTextInsertImage';
 export { IcTextItalic } from './IcTextItalic';
 export { IcTextLink } from './IcTextLink';
 export { IcTextUnderline } from './IcTextUnderline';
+export { IcThumbUp } from './IcThumbUp';
 export { IcUpload } from './IcUpload';
 export { Logo } from './Logo';
 export { LogoFull } from './LogoFull';

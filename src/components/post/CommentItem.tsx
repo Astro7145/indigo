@@ -8,10 +8,12 @@ import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
+import { IcThumbUp } from '@/src/components/common/icons/IcThumbUp';
 import Modal from '@/src/components/common/modal/Modal';
-import { useDeleteComment, useUpdateComment } from '@/src/hooks/comment';
+import { useDeleteComment, useLikeComment, useUnlikeComment, useUpdateComment } from '@/src/hooks/comment';
 import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
+import { cn } from '@/src/utils/cn';
 
 interface CommentItemProps {
   comment: Comment;
@@ -25,7 +27,18 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
   const [deleteOpen, setDeleteOpen] = useState(false);
   const { mutate: updateComment } = useUpdateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
+  const { mutate: likeComment } = useLikeComment(postId);
+  const { mutate: unlikeComment } = useUnlikeComment(postId);
   const { showToast } = useToast();
+
+  // 현재 isLiked 상태에 따라 like/unlike로 분기. 즉시 토글은 훅의 onMutate에서 처리
+  const handleLikeToggle = () => {
+    if (comment.isLiked) {
+      unlikeComment(comment.id, { onError: () => showToast('좋아요 취소에 실패했어요.', 'error') });
+    } else {
+      likeComment(comment.id, { onError: () => showToast('좋아요에 실패했어요.', 'error') });
+    }
+  };
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -116,7 +129,22 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
         ) : (
           <>
             <p className="text-sm text-slate-700 sm:text-base">{comment.content}</p>
-            <div className="text-xs text-slate-400">{formattedDate}</div>
+            <div className="flex items-center gap-3 text-xs text-slate-400">
+              <span>{formattedDate}</span>
+              <button
+                type="button"
+                onClick={handleLikeToggle}
+                aria-pressed={comment.isLiked}
+                aria-label={comment.isLiked ? '좋아요 취소' : '좋아요'}
+                className="flex cursor-pointer items-center gap-1"
+              >
+                <IcThumbUp
+                  filled={comment.isLiked}
+                  className={cn('size-4', comment.isLiked ? 'text-indigo-500' : 'text-slate-400')}
+                />
+                <span>{comment.likeCount}</span>
+              </button>
+            </div>
           </>
         )}
       </div>
