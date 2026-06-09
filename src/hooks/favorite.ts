@@ -1,15 +1,14 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
+import { useSuspenseQuery, useInfiniteQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { todoKeys } from '@/src/api/todo';
 import { patchTodoInCaches } from '@/src/hooks/todo';
 import { favoriteKeys, addTodoFavorite, removeTodoFavorite, getFavoriteTodos } from '@/src/api/favorite';
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { CursorParams, ApiError } from '@/src/types/common';
 
-export function useFavoriteTodoList(params: CursorParams = {}, enabled = true) {
-  return useQuery<FavoriteTodoListResponse, ApiError>({
+export function useFavoriteTodoList(params: CursorParams = {}) {
+  return useSuspenseQuery<FavoriteTodoListResponse, ApiError>({
     queryKey: favoriteKeys.list(params),
     queryFn: () => getFavoriteTodos(params),
-    enabled,
   });
 }
 
