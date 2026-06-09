@@ -12,10 +12,11 @@ export function useMe() {
 
 export function useCheckNickname(name: string) {
   const trimmedName = name.trim();
-  return useQuery<CheckNicknameResponse, ApiError>({
+  return useQuery<CheckNicknameResponse, Error>({
     queryKey: userKeys.nickname(trimmedName),
     queryFn: () => checkNickname(trimmedName),
-    enabled: trimmedName.length >= 1,
+    // 백엔드가 name max 20자(zod)라 초과 시 400 → 헛된 호출을 막는다 (길이 검증은 signupSchema가 담당).
+    enabled: trimmedName.length >= 1 && trimmedName.length <= 20,
   });
 }
 

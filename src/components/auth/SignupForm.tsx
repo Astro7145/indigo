@@ -6,7 +6,7 @@ import { useCheckNickname } from '@/src/hooks/user';
 import { signupSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useEffect, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
 import Button from '../common/buttons/Button';
 import Input from '../common/inputs/Input';
@@ -27,8 +27,6 @@ export default function SignupForm() {
     register,
     handleSubmit,
     control,
-    setError,
-    clearErrors,
     formState: { isSubmitting, isSubmitted, errors, isValid },
   } = useForm<SignupFields>({
     resolver: zodResolver(signupSchema),
@@ -47,14 +45,10 @@ export default function SignupForm() {
   const debouncedName = useDebounce(name ?? '');
   const { data: nicknameCheck } = useCheckNickname(debouncedName);
 
-  useEffect(() => {
-    if (!nicknameCheck) return;
-    if (!nicknameCheck.available) {
-      setError('name', { type: 'manual', message: '이미 사용 중인 닉네임입니다.' });
-    } else {
-      clearErrors('name');
-    }
-  }, [nicknameCheck, setError, clearErrors]);
+  // React-Hook-Form errors와 무관하게 표시(nameError)·submit 차단(nicknameTaken)한다.
+  const nicknameTaken = nicknameCheck?.available === false;
+  const nameError: FieldError | undefined =
+    errors.name ?? (nicknameTaken ? { type: 'manual', message: '이미 사용 중인 닉네임입니다.' } : undefined);
 
   const handleSignupBehavior = (data: SignupFields) => {
     const { email, name, password } = data;
@@ -75,14 +69,14 @@ export default function SignupForm() {
       {/* 입력 필드 */}
       <div className="flex flex-col gap-4">
         {/* 이름 */}
-        <InputSection label="이름" htmlFor="name" error={errors.name}>
+        <InputSection label="이름" htmlFor="name" error={nameError}>
           <Input
             id="name"
             type="text"
             placeholder="이름을 입력해주세요"
             className="w-full"
-            variant={errors.name ? 'error' : 'default'}
-            aria-invalid={isSubmitted ? (errors.name ? 'true' : 'false') : undefined}
+            variant={nameError ? 'error' : 'default'}
+            aria-invalid={isSubmitted ? (nameError ? 'true' : 'false') : undefined}
             {...register('name')}
           />
         </InputSection>
@@ -127,7 +121,7 @@ export default function SignupForm() {
 
       {/* 로그인 버튼 & 회원가입 링크 */}
       <div className="flex flex-col gap-6">
-        <Button type="submit" className="w-full" disabled={isSubmitting || !isValid}>
+        <Button type="submit" className="w-full" disabled={isSubmitting || !isValid || nicknameTaken}>
           {isSubmitting ? '처리중...' : '회원가입 하기'}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
