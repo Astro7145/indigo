@@ -78,6 +78,19 @@ export default function CommentSection({
         onCancelReply={() => setReplyTarget(null)}
         onSubmit={handleCommentSubmit}
       />
+      {/* 작성순(오래된 것이 위) 정렬이라 다음 페이지가 위에 누적된다. 시선·데이터 추가 위치를 맞추려고 버튼을 목록 위에 둠 */}
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={() => fetchNextPage?.()}
+            disabled={isFetchingNextPage}
+            className="cursor-pointer rounded border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isFetchingNextPage ? '불러오는 중…' : '이전 댓글 보기'}
+          </button>
+        </div>
+      )}
       {comments.length === 0 ? (
         <div className="mt-6 flex h-20 items-center justify-center">
           <p className="text-sm text-slate-400">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>
@@ -98,18 +111,6 @@ export default function CommentSection({
             </li>
           ))}
         </ul>
-      )}
-      {hasNextPage && (
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => fetchNextPage?.()}
-            disabled={isFetchingNextPage}
-            className="cursor-pointer rounded border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isFetchingNextPage ? '불러오는 중…' : '이전 댓글 보기'}
-          </button>
-        </div>
       )}
     </section>
   );
