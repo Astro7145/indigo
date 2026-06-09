@@ -13,7 +13,7 @@
 ## 기술 스택
 
 - **TypeScript** (strict)
-- **React 19.2** — **React Compiler 사용** (자동 메모이제이션)
+- **React 19.2** — **React Compiler 사용**
 - **Next.js 16** (App Router)
 - **Tailwind CSS v4** — `shadcn` 등 컴포넌트 라이브러리 **사용 안 함**, 직접 구현
 - **TanStack Query** — 서버 상태
