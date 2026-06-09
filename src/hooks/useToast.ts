@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useToastStore, type ToastVariant } from '@/src/stores/toast';
 
