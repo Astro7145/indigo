@@ -64,6 +64,7 @@ export default function Topbar() {
     animate(height, COLLAPSED_HEIGHT, SPRING);
   };
 
+  // 추후 사이드바 및 탑 바 드래그 기능 제거 예정
   const handleDragStart = () => {
     dragStartHeight.current = height.get();
   };
@@ -106,7 +107,6 @@ export default function Topbar() {
           <span className="text-base font-semibold text-slate-50">{title}</span>
           <TopbarNotification active={collapsed} />
         </motion.div>
-
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
           style={{ opacity: menuOpacity }}
@@ -154,7 +154,7 @@ export default function Topbar() {
             </div>
           </div>
         </motion.div>
-
+        {/* // 추후 사이드바 및 탑 바 드래그 기능 제거 예정 */}
         {/* 가장자리(하단) 드래그 핸들 — 사이드바의 세로 핸들과 대칭 */}
         {/* <motion.div
           drag="y"
