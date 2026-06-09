@@ -45,9 +45,7 @@ export default function SignupForm() {
   const debouncedName = useDebounce(name ?? '');
   const { data: nicknameCheck } = useCheckNickname(debouncedName);
 
-  // 중복 닉네임은 schema(zodResolver) 밖 서버 검증이라, setError로 RHF errors에 넣으면
-  // onBlur 재검증 때 스키마가 name을 통과시키며 그 에러를 지워버린다(메시지 사라짐).
-  // RHF errors와 무관하게 파생해 표시(nameError)·제출 차단(nicknameTaken)한다.
+  // React-Hook-Form errors와 무관하게 표시(nameError)·submit 차단(nicknameTaken)한다.
   const nicknameTaken = nicknameCheck?.available === false;
   const nameError: FieldError | undefined =
     errors.name ?? (nicknameTaken ? { type: 'manual', message: '이미 사용 중인 닉네임입니다.' } : undefined);
