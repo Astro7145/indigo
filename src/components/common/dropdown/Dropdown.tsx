@@ -278,7 +278,10 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
         role="menu"
         onKeyDown={handleArrowKey}
         style={position ? { top: position.top, left: position.left, width: position.width } : undefined}
-        className={cn('fixed z-50 rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]', className)}
+        className={cn(
+          'scrollbar-slate fixed z-50 max-h-60 overflow-y-auto rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]',
+          className,
+        )}
       >
         {children}
       </div>
