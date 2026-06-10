@@ -29,7 +29,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import * as favoriteApi from '@/src/api/favorite';
 import * as goalApi from '@/src/api/goal';
-import FavoritesPage from '@/app/(main)/favorites/page';
+import FavoritesPage from '@/app/[locale]/(main)/favorites/page';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { Todo, TodoGoalRef } from '@/src/types/todo';

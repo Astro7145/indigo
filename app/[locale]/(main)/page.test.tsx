@@ -19,7 +19,7 @@ jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
 import { render, screen } from '@testing-library/react';
 
 import { useMe } from '@/src/hooks/user';
-import DashboardPage from '@/app/(main)/page';
+import DashboardPage from '@/app/[locale]/(main)/page';
 
 beforeEach(() => {
   jest.resetAllMocks();

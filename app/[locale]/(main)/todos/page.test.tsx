@@ -36,7 +36,7 @@ jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 
 import * as todoApi from '@/src/api/todo';
-import TodosPage from '@/app/(main)/todos/page';
+import TodosPage from '@/app/[locale]/(main)/todos/page';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo, TodoListParams, TodoListResponse } from '@/src/types/todo';
 
