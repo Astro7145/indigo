@@ -22,46 +22,46 @@ import { IcPencil } from '@/src/components/common/icons/IcPencil';
 import { IcStar } from '@/src/components/common/icons/IcStar';
 import { cn } from '@/src/utils/cn';
 
-export type TodoListSize = 'large' | 'small' | 'responsive';
-export type TodoListVariant = 'default' | 'onDark';
+export type TodoItemSize = 'large' | 'small' | 'responsive';
+export type TodoItemVariant = 'default' | 'onDark';
 
-const TITLE_SIZE: Record<TodoListSize, string> = {
+const TITLE_SIZE: Record<TodoItemSize, string> = {
   large: 'text-sm xl:text-base leading-6',
   small: 'text-sm leading-5',
   responsive: 'text-sm leading-5 xl:text-base xl:leading-6',
 };
-const ROW_SIZE: Record<TodoListSize, string> = {
+const ROW_SIZE: Record<TodoItemSize, string> = {
   large: 'gap-2 px-2 py-2.5',
   small: 'gap-1.5 px-1 py-1.5',
   responsive: 'gap-1.5 px-1 py-1.5 xl:gap-2 xl:px-2 xl:py-2.5',
 };
-const ACTIONS_GAP: Record<TodoListSize, string> = {
+const ACTIONS_GAP: Record<TodoItemSize, string> = {
   large: 'gap-2',
   small: 'gap-1.5',
   responsive: 'gap-1.5 xl:gap-2',
 };
 
-interface TodoListContextValue {
+interface TodoItemContextValue {
   checked: boolean;
-  size: TodoListSize;
-  variant: TodoListVariant;
+  size: TodoItemSize;
+  variant: TodoItemVariant;
 }
 
-const TodoListContext = createContext<TodoListContextValue | null>(null);
+const TodoItemContext = createContext<TodoItemContextValue | null>(null);
 
-function useTodoListContext(): TodoListContextValue {
-  const ctx = use(TodoListContext);
-  if (!ctx) throw new Error('TodoList.* 서브컴포넌트는 <TodoList> 안에서만 사용할 수 있습니다.');
+function useTodoItemContext(): TodoItemContextValue {
+  const ctx = use(TodoItemContext);
+  if (!ctx) throw new Error('TodoItem.* 서브컴포넌트는 <TodoItem> 안에서만 사용할 수 있습니다.');
   return ctx;
 }
 
-export interface TodoListProps {
+export interface TodoItemProps {
   title: string;
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  size?: TodoListSize;
-  variant?: TodoListVariant;
-  /** 우측 액션 그룹 — `<TodoList.Actions>` */
+  size?: TodoItemSize;
+  variant?: TodoItemVariant;
+  /** 우측 액션 그룹 — `<TodoItem.Actions>` */
   children?: ReactNode;
   /** React 19 ref-as-prop — 행 컨테이너에 부착 */
   ref?: Ref<HTMLDivElement>;
@@ -73,21 +73,21 @@ export interface TodoListProps {
 /**
  * 도메인 무관 "체크박스 + 타이틀 + 우측 액션" 행 프리미티브 (compound component).
  *
- * Context를 Root가 제공하고 서브컴포넌트는 `use(TodoListContext)`로 `checked`/`size`/`variant`를
+ * Context를 Root가 제공하고 서브컴포넌트는 `use(TodoItemContext)`로 `checked`/`size`/`variant`를
  * 직접 소비한다 — 액션 노출 prop·단일 콜백 폭발 제거. Figma `21209:59947`.
  *
  * Star는 항상, Note/Link는 데이터가 있을 때 상시 표시(인디케이터), Edit/Kebab은 `hoverOnly`로 hover 시에만 노출.
  *
  * @example
- * <TodoList title={todo.title} checked={todo.done} onCheckedChange={onToggle}>
- *   <TodoList.Actions>
- *     {todo.linkUrl && <TodoList.LinkAction onClick={openLink} />}
- *     <TodoList.EditAction onClick={openEdit} hoverOnly />
- *     <TodoList.StarAction onClick={toggleFavorite} />
- *   </TodoList.Actions>
- * </TodoList>
+ * <TodoItem title={todo.title} checked={todo.done} onCheckedChange={onToggle}>
+ *   <TodoItem.Actions>
+ *     {todo.linkUrl && <TodoItem.LinkAction onClick={openLink} />}
+ *     <TodoItem.EditAction onClick={openEdit} hoverOnly />
+ *     <TodoItem.StarAction onClick={toggleFavorite} />
+ *   </TodoItem.Actions>
+ * </TodoItem>
  */
-function TodoList({
+function TodoItem({
   title,
   checked = false,
   onCheckedChange,
@@ -97,7 +97,7 @@ function TodoList({
   ref,
   className,
   onClick,
-}: TodoListProps) {
+}: TodoItemProps) {
   const titleClass = cn(
     'min-w-0 flex-1 truncate',
     TITLE_SIZE[size],
@@ -128,7 +128,7 @@ function TodoList({
     : undefined;
 
   return (
-    <TodoListContext.Provider value={{ checked, size, variant }}>
+    <TodoItemContext.Provider value={{ checked, size, variant }}>
       <div
         ref={ref}
         onClick={handleRowClick}
@@ -154,12 +154,12 @@ function TodoList({
         <span className={titleClass}>{title}</span>
         {children}
       </div>
-    </TodoListContext.Provider>
+    </TodoItemContext.Provider>
   );
 }
 
 function Actions({ children, className }: { children?: ReactNode; className?: string }) {
-  const { size } = useTodoListContext();
+  const { size } = useTodoItemContext();
   return <div className={cn('flex shrink-0 items-center', ACTIONS_GAP[size], className)}>{children}</div>;
 }
 
@@ -214,7 +214,7 @@ interface ActionProps {
 }
 
 function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
-  useTodoListContext();
+  useTodoItemContext();
   return (
     <ActionButton
       label={rest['aria-label'] ?? '노트'}
@@ -228,7 +228,7 @@ function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
 }
 
 function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
-  useTodoListContext();
+  useTodoItemContext();
   return (
     <ActionButton
       label={rest['aria-label'] ?? '링크'}
@@ -242,7 +242,7 @@ function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
 }
 
 function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
-  useTodoListContext();
+  useTodoItemContext();
   return (
     <ActionButton
       label={rest['aria-label'] ?? '수정'}
@@ -271,7 +271,7 @@ interface KebabActionProps {
 // Actions flex에 빈 슬롯(gap)이 생기지 않게 한다. 메뉴가 열린 동안엔 hover와 무관하게 트리거를
 // 유지(!open)해야 absolute 메뉴 위치가 어긋나지 않는다.
 function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ariaLabel }: KebabActionProps) {
-  useTodoListContext();
+  useTodoItemContext();
   const [open, setOpen] = useState(false);
   return (
     <Dropdown
@@ -304,7 +304,7 @@ interface StarActionProps {
 
 // active(채운 별)는 외부 상태(즐겨찾기)로 제어 — 낙관적 업데이트 시 호출 측이 동기화. checked(done)와 독립.
 function StarAction({ onClick, active = false, className, ...rest }: StarActionProps) {
-  useTodoListContext(); // <TodoList> 밖 사용 방지
+  useTodoItemContext(); // <TodoItem> 밖 사용 방지
   const label = rest['aria-label'] ?? (active ? '즐겨찾기 해제' : '즐겨찾기');
   return (
     <ActionButton label={label} onClick={onClick} className={className}>
@@ -313,11 +313,11 @@ function StarAction({ onClick, active = false, className, ...rest }: StarActionP
   );
 }
 
-TodoList.Actions = Actions;
-TodoList.NoteAction = NoteAction;
-TodoList.LinkAction = LinkAction;
-TodoList.EditAction = EditAction;
-TodoList.KebabAction = KebabAction;
-TodoList.StarAction = StarAction;
+TodoItem.Actions = Actions;
+TodoItem.NoteAction = NoteAction;
+TodoItem.LinkAction = LinkAction;
+TodoItem.EditAction = EditAction;
+TodoItem.KebabAction = KebabAction;
+TodoItem.StarAction = StarAction;
 
-export default TodoList;
+export default TodoItem;

@@ -3,7 +3,7 @@ jest.mock('@/src/hooks/useToast', () => ({ useToast: jest.fn() }));
 
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import * as todoHooks from '@/src/hooks/todo';
 import * as toastHook from '@/src/hooks/useToast';
 import type { Todo } from '@/src/types/todo';

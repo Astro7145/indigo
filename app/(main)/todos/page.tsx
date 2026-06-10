@@ -7,9 +7,9 @@ import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
 import Card from '@/src/components/common/cards/Card';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import TodoList from '@/src/components/common/todo-list/TodoList';
+import TodoItem from '@/src/components/common/todo-list/TodoItem';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
@@ -176,20 +176,20 @@ function TodosList({
               transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min((idx % 40) * 0.015, 0.3) }}
               className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
             >
-              <TodoList
+              <TodoItem
                 title={t.title}
                 checked={t.done}
                 onCheckedChange={(done) => toggle(t.id, done)}
                 onClick={() => onSelectTodo(t)}
               >
-                <TodoList.Actions>
-                  {hasNote && <TodoList.NoteAction />}
-                  {t.linkUrl && <TodoList.LinkAction />}
-                  {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                  <TodoList.KebabAction hoverOnly onEdit={() => onEditTodo(t)} onDelete={() => onDeleteTodo(t)} />
-                  <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
-                </TodoList.Actions>
-              </TodoList>
+                <TodoItem.Actions>
+                  {hasNote && <TodoItem.NoteAction />}
+                  {t.linkUrl && <TodoItem.LinkAction />}
+                  {!hasNote && <TodoItem.EditAction hoverOnly aria-label="노트 작성" />}
+                  <TodoItem.KebabAction hoverOnly onEdit={() => onEditTodo(t)} onDelete={() => onDeleteTodo(t)} />
+                  <TodoItem.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                </TodoItem.Actions>
+              </TodoItem>
             </motion.li>
           );
         })}

@@ -9,8 +9,7 @@ import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
-import TodoList from '@/src/components/common/todo-list/TodoList';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoRow from '@/src/components/common/todo-list/TodoRow';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
@@ -30,49 +29,6 @@ function percentOf(done: number, total: number): number {
   if (total <= 0) return 0;
   // 데이터 이상(done>total 등)에도 진행바 width가 100%를 넘지 않도록 clamp
   return Math.max(0, Math.min(100, Math.round((done / total) * 100)));
-}
-
-function Row({
-  todo,
-  onToggle,
-  onToggleFavorite,
-  onEdit,
-  onSelect,
-}: {
-  todo: Todo;
-  onToggle: (id: number, done: boolean) => void;
-  onToggleFavorite: (id: number, isFavorite: boolean) => void;
-  onEdit: (todo: Todo) => void;
-  onSelect: (todo: Todo) => void;
-}) {
-  // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-  const hasNote = (todo.noteIds?.length ?? 0) > 0;
-  // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  return (
-    <li>
-      <TodoList
-        size="responsive"
-        title={todo.title}
-        checked={todo.done}
-        onCheckedChange={(done) => onToggle(todo.id, done)}
-        onClick={() => onSelect(todo)}
-      >
-        <TodoList.Actions>
-          {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-          {hasNote && <TodoList.NoteAction onClick={() => {}} />}
-          {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
-          {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-          {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-          <TodoList.KebabAction hoverOnly onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
-          <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
-        </TodoList.Actions>
-      </TodoList>
-      {/* 닫혀 있을 땐 마운트하지 않아 행마다 useDeleteTodo/useToast 인스턴스가 쌓이지 않게 한다. */}
-      {confirmOpen && <TodoDeleteConfirm open todo={todo} onClose={() => setConfirmOpen(false)} />}
-    </li>
-  );
 }
 
 function Column({
@@ -116,8 +72,9 @@ function Column({
       </span>
       <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
         {todos.map((t) => (
-          <Row
+          <TodoRow
             key={t.id}
+            size="responsive"
             todo={t}
             onToggle={onToggle}
             onToggleFavorite={onToggleFavorite}

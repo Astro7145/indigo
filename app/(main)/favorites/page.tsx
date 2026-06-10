@@ -8,7 +8,7 @@ import Card from '@/src/components/common/cards/Card';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
-import TodoList from '@/src/components/common/todo-list/TodoList';
+import TodoItem from '@/src/components/common/todo-list/TodoItem';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
@@ -141,15 +141,15 @@ function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
             transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min(idx * 0.015, 0.3) }}
             className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
           >
-            <TodoList title={f.todo.title} checked={f.todo.done} onCheckedChange={(done) => toggle(f.todoId, done)}>
-              <TodoList.Actions>
-                {hasNote && <TodoList.NoteAction />}
-                {hasLink && <TodoList.LinkAction />}
-                {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                <TodoList.KebabAction hoverOnly />
-                <TodoList.StarAction active onClick={() => unfavorite(f.todoId)} />
-              </TodoList.Actions>
-            </TodoList>
+            <TodoItem title={f.todo.title} checked={f.todo.done} onCheckedChange={(done) => toggle(f.todoId, done)}>
+              <TodoItem.Actions>
+                {hasNote && <TodoItem.NoteAction />}
+                {hasLink && <TodoItem.LinkAction />}
+                {!hasNote && <TodoItem.EditAction hoverOnly aria-label="노트 작성" />}
+                <TodoItem.KebabAction hoverOnly />
+                <TodoItem.StarAction active onClick={() => unfavorite(f.todoId)} />
+              </TodoItem.Actions>
+            </TodoItem>
           </motion.li>
         );
       })}
