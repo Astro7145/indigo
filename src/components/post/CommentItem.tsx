@@ -175,7 +175,7 @@ export default function CommentItem({
                     type="button"
                     onClick={() => onReplyClick?.(comment.id, comment.writer.name)}
                     className={cn(
-                      'cursor-pointer hover:text-slate-600',
+                      'cursor-pointer transition-colors hover:text-indigo-500 focus-visible:text-indigo-500 focus-visible:outline-none active:text-indigo-500',
                       activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
                     )}
                   >
@@ -196,20 +196,26 @@ export default function CommentItem({
           </>
         )}
 
-        {!isReply && repliesOpen && replies && (
-          <ul className="mt-3 space-y-3 border-l-2 border-slate-200 pl-4">
-            {replies.comments.map((reply) => (
-              <li key={reply.id}>
-                <CommentItem
-                  comment={reply}
-                  postId={postId}
-                  currentUserId={currentUserId}
-                  isMine={reply.userId === currentUserId}
-                  isReply
-                />
-              </li>
-            ))}
-          </ul>
+        {!isReply && repliesOpen && (
+          <div className="mt-3 border-l-2 border-slate-200 pl-4">
+            {!replies ? (
+              <p className="text-xs text-slate-400">답글을 불러오는 중…</p>
+            ) : (
+              <ul className="space-y-3">
+                {replies.comments.map((reply) => (
+                  <li key={reply.id}>
+                    <CommentItem
+                      comment={reply}
+                      postId={postId}
+                      currentUserId={currentUserId}
+                      isMine={reply.userId === currentUserId}
+                      isReply
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
 
