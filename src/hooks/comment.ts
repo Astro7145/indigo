@@ -22,8 +22,8 @@ import type { ApiError } from '@/src/types/common';
 
 export function useComments(postId: number | undefined, params: CommentListParams = {}) {
   return useQuery<CommentListResponse, ApiError, CommentListResponse>({
-    queryKey:
-      postId == null ? [...postKeys.details(), 'pending', 'comments', params] : commentKeys.list(postId, params),
+    // postId 미정일 땐 어차피 skipToken이라 params별 캐시 분리가 의미 없음. 고정 키로 묶어 캐시 파편화 방지
+    queryKey: postId == null ? [...postKeys.details(), 'pending', 'comments'] : commentKeys.list(postId, params),
     queryFn: postId == null ? skipToken : () => getComments(postId, params),
     // API에 sort 옵션이 없고 최신순으로 응답이 오므로 작성순(오래된 것이 위)으로 오도록 추가
     select: (data) => ({
@@ -37,7 +37,7 @@ export function useInfiniteComments(postId: number | undefined, params: Omit<Com
   return useInfiniteQuery<CommentListResponse, ApiError>({
     queryKey:
       postId == null
-        ? [...postKeys.details(), 'pending', 'comments', params, 'infinite']
+        ? [...postKeys.details(), 'pending', 'comments', 'infinite']
         : [...commentKeys.list(postId, params), 'infinite'],
     queryFn:
       postId == null

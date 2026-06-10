@@ -35,7 +35,7 @@ export default function PostDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
-  const comments = [...(commentsData?.pages.flatMap((p) => p.comments) ?? [])].sort((a, b) =>
+  const comments = (commentsData?.pages.flatMap((p) => p.comments) ?? []).sort((a, b) =>
     a.createdAt.localeCompare(b.createdAt),
   );
 

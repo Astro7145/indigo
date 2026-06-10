@@ -6,7 +6,8 @@ import Button from '@/src/components/common/buttons/Button';
 import { IcDelete } from '@/src/components/common/icons';
 
 interface CommentInputProps {
-  onSubmit?: (text: string) => void;
+  // 등록 성공/실패는 상위가 알기에, 비움 타이밍을 상위가 결정하도록 clearInput 콜백을 함께 전달한다
+  onSubmit?: (text: string, clearInput: () => void) => void;
   // 답글 작성 모드 — 대상 닉네임이 있으면 입력창 위에 배지를 보여주고 placeholder도 답글용으로 바꿈
   replyToName?: string | null;
   onCancelReply?: () => void;
@@ -20,8 +21,7 @@ export default function CommentInput({ onSubmit, replyToName, onCancelReply, inp
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isEmpty) return;
-    onSubmit?.(text);
-    setText('');
+    onSubmit?.(text, () => setText(''));
   };
 
   return (

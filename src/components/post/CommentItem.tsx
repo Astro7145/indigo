@@ -12,7 +12,6 @@ import { IcThumbUp } from '@/src/components/common/icons/IcThumbUp';
 import Modal from '@/src/components/common/modal/Modal';
 import { useComments, useDeleteComment, useLikeComment, useUnlikeComment, useUpdateComment } from '@/src/hooks/comment';
 import { useToast } from '@/src/hooks/useToast';
-import { useMe } from '@/src/hooks/user';
 import type { Comment } from '@/src/types/comment';
 import { cn } from '@/src/utils/cn';
 
@@ -20,6 +19,8 @@ interface CommentItemProps {
   comment: Comment;
   postId: number;
   isMine?: boolean;
+  // 자식(대댓글)의 isMine 계산용으로 상위에서 주입 — 각 아이템이 useMe()를 따로 구독하지 않게 함
+  currentUserId?: number;
   // 자식(대댓글) 렌더 여부. true면 답글 보기/달기 UI 숨겨서 깊이 1단계로 제한
   isReply?: boolean;
   repliesOpen?: boolean;
@@ -33,6 +34,7 @@ export default function CommentItem({
   comment,
   postId,
   isMine = false,
+  currentUserId,
   isReply = false,
   repliesOpen = false,
   onRepliesOpenChange,
@@ -47,8 +49,6 @@ export default function CommentItem({
   const { mutate: likeComment } = useLikeComment(postId);
   const { mutate: unlikeComment } = useUnlikeComment(postId);
   const { showToast } = useToast();
-  // 자식 댓글의 isMine 계산용. me 쿼리는 캐시 공유라 여기서 호출해도 비용 0
-  const { data: me } = useMe();
   // 자식 댓글 페치 — repliesOpen일 때만 활성화. postId=undefined면 useComments는 skipToken 처리
   const { data: replies } = useComments(repliesOpen ? postId : undefined, {
     parentId: String(comment.id),
@@ -200,7 +200,13 @@ export default function CommentItem({
           <ul className="mt-3 space-y-3 border-l-2 border-slate-200 pl-4">
             {replies.comments.map((reply) => (
               <li key={reply.id}>
-                <CommentItem comment={reply} postId={postId} isMine={reply.userId === me?.id} isReply />
+                <CommentItem
+                  comment={reply}
+                  postId={postId}
+                  currentUserId={currentUserId}
+                  isMine={reply.userId === currentUserId}
+                  isReply
+                />
               </li>
             ))}
           </ul>

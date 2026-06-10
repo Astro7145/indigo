@@ -43,7 +43,8 @@ export default function CommentSection({
     if (replyTarget) inputRef.current?.focus();
   }, [replyTarget]);
 
-  const handleCommentSubmit = (content: string) => {
+  // clearInput은 CommentInput이 전달하는 콜백 — 등록 성공 시점에만 호출해 입력값을 보존(실패 시 재시도 가능)
+  const handleCommentSubmit = (content: string, clearInput: () => void) => {
     if (replyTarget) {
       const parentId = replyTarget.commentId;
       createComment(
@@ -53,12 +54,19 @@ export default function CommentSection({
             // 답글 등록 직후 그 부모의 자식 영역 자동 펼침 — 등록 결과를 즉시 확인
             setOpenReplies((prev) => ({ ...prev, [parentId]: true }));
             setReplyTarget(null);
+            clearInput();
           },
           onError: () => showToast('답글 등록에 실패했어요.', 'error'),
         },
       );
     } else {
-      createComment({ content }, { onError: () => showToast('댓글 등록에 실패했어요.', 'error') });
+      createComment(
+        { content },
+        {
+          onSuccess: () => clearInput(),
+          onError: () => showToast('댓글 등록에 실패했어요.', 'error'),
+        },
+      );
     }
   };
 
@@ -102,6 +110,7 @@ export default function CommentSection({
               <CommentItem
                 comment={c}
                 postId={postId}
+                currentUserId={currentUserId}
                 isMine={c.userId === currentUserId}
                 repliesOpen={!!openReplies[c.id]}
                 onRepliesOpenChange={(open) => setOpenReplies((prev) => ({ ...prev, [c.id]: open }))}
