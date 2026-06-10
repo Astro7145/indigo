@@ -10,10 +10,13 @@ import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import TodoItem from '@/src/components/common/todo-list/TodoItem';
 import CategoryTab from '@/src/components/todo/CategoryTab';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useUpdateTodo } from '@/src/hooks/todo';
 import type { FavoriteTodo } from '@/src/types/favorite';
+import type { Todo } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 
@@ -38,6 +41,10 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
 export default function FavoritesPage() {
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
+
+  // 케밥 수정/삭제 — 단일 시트/모달을 페이지가 소유(/todos 페이지와 동일 패턴).
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -98,10 +105,18 @@ export default function FavoritesPage() {
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
             resetKeys={[tab, goalId]}
           >
-            <FavoritesList tab={tab} goalId={goalId} />
+            <FavoritesList tab={tab} goalId={goalId} onEditTodo={setEditingTodo} onDeleteTodo={setDeletingTodo} />
           </AsyncBoundary>
         </Card>
       </div>
+
+      <TodoFormSheet
+        mode="update"
+        isOpen={editingTodo !== null}
+        onClose={() => setEditingTodo(null)}
+        todo={editingTodo}
+      />
+      {deletingTodo && <TodoDeleteConfirm open todo={deletingTodo} onClose={() => setDeletingTodo(null)} />}
     </section>
   );
 }
@@ -112,7 +127,17 @@ function FavoritesCount({ tab, goalId }: { tab: Tab; goalId: number | null }) {
   return <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{visible.length}</span>;
 }
 
-function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
+function FavoritesList({
+  tab,
+  goalId,
+  onEditTodo,
+  onDeleteTodo,
+}: {
+  tab: Tab;
+  goalId: number | null;
+  onEditTodo: (todo: Todo) => void;
+  onDeleteTodo: (todo: Todo) => void;
+}) {
   const { data } = useFavoriteTodoList({ limit: 100 });
   const update = useUpdateTodo();
   const removeFavorite = useRemoveTodoFavorite();
@@ -146,7 +171,11 @@ function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
                 {hasNote && <TodoItem.NoteAction />}
                 {hasLink && <TodoItem.LinkAction />}
                 {!hasNote && <TodoItem.EditAction hoverOnly aria-label="노트 작성" />}
-                <TodoItem.KebabAction hoverOnly />
+                <TodoItem.KebabAction
+                  hoverOnly
+                  onEdit={() => onEditTodo(f.todo)}
+                  onDelete={() => onDeleteTodo(f.todo)}
+                />
                 <TodoItem.StarAction active onClick={() => unfavorite(f.todoId)} />
               </TodoItem.Actions>
             </TodoItem>
