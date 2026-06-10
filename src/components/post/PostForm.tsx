@@ -6,10 +6,12 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import Button from '@/src/components/common/buttons/Button';
 import Modal from '@/src/components/common/modal/Modal';
 import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
+import PostFormActions from '@/src/components/post/PostFormActions';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
 import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -48,6 +50,8 @@ export default function PostForm(props: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<PostEditorHandle>(null);
+  const setRightSlot = useTopbarSlotStore((s) => s.setRightSlot);
+  const clearRightSlot = useTopbarSlotStore((s) => s.clearRightSlot);
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
   const hydrated = useRef(false);
 
@@ -71,15 +75,6 @@ export default function PostForm(props: PostFormProps) {
   const initialImage = initialPost?.image ?? null;
   const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage; //변경이 있는지
   const isValid = title.trim().length > 0 && !isHtmlEmpty(content);
-
-  // 수정 모드에서 데이터 도착까지 로딩 표시
-  if (props.mode === 'edit' && !initialPost) {
-    return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
-      </div>
-    );
-  }
 
   const handleCancel = () => {
     if (isDirty) {
@@ -128,6 +123,29 @@ export default function PostForm(props: PostFormProps) {
     }
   };
 
+  // 모바일 Topbar 우측 슬롯에 액션 등록. 폼 상태가 바뀔 때마다 새 노드로 갱신, unmount 시 해제
+  useEffect(() => {
+    setRightSlot(
+      <PostFormActions
+        mode={props.mode}
+        isValid={isValid}
+        isSubmitting={isSubmitting}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+      />,
+    );
+    return () => clearRightSlot();
+  }, [props.mode, isValid, isSubmitting, handleSubmit, handleCancel, setRightSlot, clearRightSlot]);
+
+  // 수정 모드에서 데이터 도착까지 로딩 표시 (모든 hook 호출 이후에 위치)
+  if (props.mode === 'edit' && !initialPost) {
+    return (
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400">불러오는 중…</p>
+      </div>
+    );
+  }
+
   const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
   const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
 
@@ -137,9 +155,9 @@ export default function PostForm(props: PostFormProps) {
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[343px] flex-col sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-        {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
-        <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
+      {/* 모바일은 Topbar 우측 슬롯이 액션을 담당하므로 헤더 전체를 sm 이상에서만 노출 */}
+      <header className="hidden h-10 items-center justify-between gap-3 sm:mb-3 sm:flex">
+        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
           {headingText}
         </h1>
         <div className="flex shrink-0 gap-2">

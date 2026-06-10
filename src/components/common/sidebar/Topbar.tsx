@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 import { IcBell, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
@@ -20,6 +21,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Topbar() {
   const title = usePageTitle();
+  const rightSlot = useTopbarSlotStore((s) => s.rightSlot);
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
   // 새 할일 생성 폼(시트) 열림 상태 — 탑바가 소유.
@@ -96,14 +98,21 @@ export default function Topbar() {
         style={{ height }}
         className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
       >
-        {/* 접힘 상태: 인사말 + 알림 */}
+        {/* 접힘 상태: 인사말 + 우측 슬롯(기본 알림, 페이지가 등록 시 액션) */}
         <motion.div
           style={{ opacity: barOpacity }}
           aria-hidden={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
           <span className="text-base font-semibold text-slate-50">{title}</span>
-          <IcBell state="read" className="size-5 text-slate-50" />
+          {rightSlot ? (
+            // 슬롯 내부 버튼은 드래그 핸들과 별개로 클릭 가능해야 함
+            // - pointer-events-auto: 부모의 pointer-events-none 해제
+            // - relative z-10: 같은 부모 내 bottom 드래그 핸들이 JSX 뒤라 stacking 상 위에 깔리는 걸 해제
+            <div className="pointer-events-auto relative z-10">{rightSlot}</div>
+          ) : (
+            <IcBell state="read" className="size-5 text-slate-50" />
+          )}
         </motion.div>
 
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
