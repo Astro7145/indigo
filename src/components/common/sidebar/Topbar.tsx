@@ -6,13 +6,15 @@ import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
-import { IcBell, LogoFull } from '../icons';
+import { LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
+import { useSettingsModalStore } from '@/src/stores/settingsModal';
+import TopbarNotification from './TopbarNotification';
 
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
@@ -22,6 +24,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 export default function Topbar() {
   const title = usePageTitle();
   const rightSlot = useTopbarSlotStore((s) => s.rightSlot);
+  const openSettings = useSettingsModalStore((s) => s.open);
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
   // 새 할일 생성 폼(시트) 열림 상태 — 탑바가 소유.
@@ -65,6 +68,7 @@ export default function Topbar() {
     animate(height, COLLAPSED_HEIGHT, SPRING);
   };
 
+  // 추후 사이드바 및 탑 바 드래그 기능 제거 예정
   const handleDragStart = () => {
     dragStartHeight.current = height.get();
   };
@@ -111,10 +115,9 @@ export default function Topbar() {
             // - relative z-10: 같은 부모 내 bottom 드래그 핸들이 JSX 뒤라 stacking 상 위에 깔리는 걸 해제
             <div className="pointer-events-auto relative z-10">{rightSlot}</div>
           ) : (
-            <IcBell state="read" className="size-5 text-slate-50" />
+            <TopbarNotification active={collapsed} />
           )}
         </motion.div>
-
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
           style={{ opacity: menuOpacity }}
@@ -143,7 +146,14 @@ export default function Topbar() {
               </Link>
             </ul>
             <div className="flex flex-col">
-              <SidebarRow type="settings" text="설정" />
+              <SidebarRow
+                type="settings"
+                text="설정"
+                onClick={() => {
+                  collapse();
+                  openSettings();
+                }}
+              />
               <LogoutButton />
             </div>
           </div>
@@ -162,9 +172,9 @@ export default function Topbar() {
             </div>
           </div>
         </motion.div>
-
+        {/* // 추후 사이드바 및 탑 바 드래그 기능 제거 예정 */}
         {/* 가장자리(하단) 드래그 핸들 — 사이드바의 세로 핸들과 대칭 */}
-        <motion.div
+        {/* <motion.div
           drag="y"
           dragConstraints={{ top: 0, bottom: 0 }}
           dragElastic={0}
@@ -174,11 +184,12 @@ export default function Topbar() {
           onDragEnd={handleDragEnd}
           role="separator"
           aria-orientation="horizontal"
-          className="absolute inset-x-0 bottom-0 flex h-19 cursor-grab touch-none items-end justify-center pb-2"
+          className="absolute inset-x-0 bottom-0 flex h-19 touch-none items-end justify-center pb-2"
         >
           {collapsed && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
-        </motion.div>
+        </motion.div> */}
       </motion.div>
+
       <TodoFormSheet mode="create" isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </>
   );
