@@ -65,35 +65,29 @@ export function useCreateTodo() {
 
 ### 로딩·에러: Suspense + AsyncBoundary
 
-도메인 본문 컴포넌트는 `isLoading`/`isError` 삼항 분기 대신 **`useSuspenseQuery`/`useSuspenseInfiniteQuery`
-+ `AsyncBoundary`**(`src/components/common/AsyncBoundary.tsx` — Suspense + `react-error-boundary` 묶음,
-props `fallback`/`errorFallback`/`children`)로 로딩·에러를 **선언적으로** 처리한다. goal·todo·favorite·note
-도메인에 적용됨(이슈 #137). **새 도메인 본문은 이 패턴을 우선**한다.
+`isLoading`/`isError` 삼항 분기 대신 **`useSuspenseQuery`/`useSuspenseInfiniteQuery` + `AsyncBoundary`**
+(`src/components/common/AsyncBoundary.tsx` — Suspense + `react-error-boundary` 묶음, props
+`fallback`/`errorFallback`/`children`)로 로딩·에러를 **선언적으로** 처리한다. goal·todo·favorite·note
+도메인에 적용됨(이슈 #137). **새 코드는 이 패턴을 우선**한다.
+
+핵심은 **데이터를 쓰는 컴포넌트를 `AsyncBoundary`로 감싸는 것**이다. chrome(헤더·탭·버튼)은 경계 **밖**에 둔다.
 
 작성 규칙:
 
-- chrome(헤더·탭·버튼)은 경계 **밖**, 데이터 본문만 **콘텐츠 컴포넌트(`XxxContent`)** 로 분리해 감싼다.
-  콘텐츠를 별도 컴포넌트로 빼는 건 React 규칙(`useSuspenseQuery` 호출부는 `<Suspense>`보다 아래여야 함)상
-  필수다 — 임의 분리가 아니라 "카드 프레임 + 콘텐츠"의 최소 분해이며 공개 API는 유지된다.
+- `useSuspenseQuery` 호출부는 `<Suspense>`보다 **아래**여야 한다(React 규칙) — `AsyncBoundary`를 렌더하는
+  컴포넌트가 아니라 그 **자식**에서 호출한다. 그 자식은 데이터를 실제로 쓰는 기존 컴포넌트면 충분하다
+  (예: `GoalDetailHeader`가 `useGoalSuspense` 직접 호출). 전용 래퍼로 분리하는 게 목적이 아니다.
 - 무한쿼리는 **초기 로드만** 경계로. `fetchNextPage`·`isFetchingNextPage`·`isFetchNextPageError`는 인라인 유지.
 - fallback/errorFallback은 그 자리의 로딩/에러 JSX를 그대로 넣는다(UX 무변화).
 - 공유 훅에 비-suspense consumer가 남으면 `useXxxSuspense` 변형을 추가하고, consumer가 전부 전환되면 in-place로 바꾼다.
 
 ```tsx
-// 컴포넌트: chrome은 밖, 본문(inner)만 경계로 감싼다
-function RecentTodos(props) {
-  return (
-    <Card>
-      <AsyncBoundary fallback={<p>불러오는 중…</p>} errorFallback={<p>불러오지 못했어요</p>}>
-        <RecentTodosContent {...props} />
-      </AsyncBoundary>
-    </Card>
-  );
-}
-function RecentTodosContent(props) {
-  const { data } = useTodoList({ sort: 'latest', limit: 4 }); // useSuspenseQuery → data 항상 정의됨
-  return /* happy path만 */;
-}
+// chrome은 경계 밖, 데이터 쓰는 자식만 AsyncBoundary로 감싼다.
+<Card>
+  <AsyncBoundary fallback={<p>불러오는 중…</p>} errorFallback={<p>불러오지 못했어요</p>}>
+    <GoalDetailHeader goalId={goalId} /> {/* 이 자식이 useGoalSuspense 호출 → data 항상 정의됨 */}
+  </AsyncBoundary>
+</Card>
 ```
 
 **이 패턴을 쓰지 않는 경우(`isLoading`/`isError` 유지):** 내부 open 상태·조건부 분기·폼 하이드레이션처럼
