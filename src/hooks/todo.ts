@@ -21,6 +21,16 @@ export function useTodoList(params: TodoListParams = {}) {
   });
 }
 
+/** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch). */
+export function useTodoCount(enabled: boolean) {
+  return useQuery<TodoListResponse, ApiError, number>({
+    queryKey: todoKeys.list({}),
+    queryFn: () => getTodos({}),
+    enabled,
+    select: (data) => data.totalCount,
+  });
+}
+
 export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {}) {
   return useSuspenseInfiniteQuery<TodoListResponse, ApiError>({
     queryKey: [...todoKeys.list(params), 'infinite'],
