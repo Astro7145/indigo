@@ -12,6 +12,7 @@ import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
+import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import TopbarNotification from './TopbarNotification';
 
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
@@ -21,6 +22,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Topbar() {
   const title = usePageTitle();
+  const openSettings = useSettingsModalStore((s) => s.open);
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
   // 새 할일 생성 폼(시트) 열림 상태 — 탑바가 소유.
@@ -135,7 +137,14 @@ export default function Topbar() {
               </Link>
             </ul>
             <div className="flex flex-col">
-              <SidebarRow type="settings" text="설정" />
+              <SidebarRow
+                type="settings"
+                text="설정"
+                onClick={() => {
+                  collapse();
+                  openSettings();
+                }}
+              />
               <LogoutButton />
             </div>
           </div>

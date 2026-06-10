@@ -11,6 +11,7 @@ import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotification from './SidebarNotification';
 import TodoAddButton from './TodoAddButton';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
+import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import { usePathname } from 'next/navigation';
 
 const EXPANDED_WIDTH = 360;
@@ -23,6 +24,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Sidebar() {
   const path = usePathname();
+  const openSettings = useSettingsModalStore((s) => s.open);
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -145,13 +147,7 @@ export default function Sidebar() {
               />
             </ul>
             <ul className="flex flex-col">
-              <SidebarRow
-                type="settings"
-                text="설정"
-                href="/settings"
-                current={path === '/settings'}
-                collapsed={collapsed}
-              />
+              <SidebarRow type="settings" text="설정" onClick={openSettings} collapsed={collapsed} />
               <LogoutButton collapsed={collapsed} />
             </ul>
           </div>
