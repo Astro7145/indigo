@@ -9,7 +9,6 @@ import GoalNotesCard from '@/src/components/goal/GoalNotesCard';
 import GoalTodoColumn from '@/src/components/goal/GoalTodoColumn';
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
-import { useGoalSuspense } from '@/src/hooks/goal';
 import { useMe } from '@/src/hooks/user';
 import type { Todo } from '@/src/types/todo';
 
@@ -21,7 +20,6 @@ export interface GoalDetailProps {
  * 목표 상세 페이지 본문 — 상단 3카드(목표 정보 / 진행도 / 노트 모아보기)와
  * 본문 2컬럼(To do / Done) 보드를 조합한다.
  *
- * - 목표명: `useGoalSuspense(goalId)`(상단 섹션 경계 안) / 페이지 타이틀의 유저명: `useMe`
  * - 진행도: `ProgressCard`(goalId 변형 — 해당 목표 todos 완료 비율) 재사용
  * - 반응형: 모바일 세로 스택 → 태블릿(sm) 진행도·노트 2열 → 데스크톱(xl) 전체 가로 배치
  */
@@ -40,15 +38,22 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{`${me?.name ?? ''}님의 목표`}</h1>
       </div>
 
-      {/* 상단 3카드 — 목표 객체에 의존하는 영역만 경계로 감싼다(컬럼은 각자 경계로 독립 로딩).
-          목표 조회 실패 시 이 영역만 에러 안내로 대체된다. */}
       <AsyncBoundary
         fallback={<section className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-8" aria-hidden />}
         errorFallback={
           <div className="mx-auto w-full max-w-328 py-20 text-center text-slate-500">목표 정보를 불러오지 못했어요</div>
         }
       >
-        <GoalDetailTopSection goalId={goalId} />
+        <section className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-8">
+          <GoalDetailHeader goalId={goalId} className="min-w-0" />
+          <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+            <ProgressCard
+              goalId={goalId}
+              className="w-full min-w-0 shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)]"
+            />
+            <GoalNotesCard goalId={goalId} className="w-full min-w-0" />
+          </div>
+        </section>
       </AsyncBoundary>
 
       {/* 본문 2컬럼 — To do / Done. grid로 균등 분할(xl) */}
@@ -78,25 +83,5 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
       <TodoFormSheet mode="create" isOpen={creating} onClose={() => setCreating(false)} defaultGoalId={goalId} />
       <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </div>
-  );
-}
-
-/**
- * 상단 3카드 — 목표 객체(`useGoalSuspense`)에 의존한다. 상위 AsyncBoundary가 로딩/에러를 처리한다.
- * xl에서 목표 카드와 진행도·노트 그룹이 1:1(figma 640:640)로 함께 비례 축소되도록 grid로 균등 분할.
- */
-function GoalDetailTopSection({ goalId }: { goalId: number }) {
-  const { data: goal } = useGoalSuspense(goalId);
-  return (
-    <section className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-8">
-      <GoalDetailHeader goalId={goalId} title={goal.title} className="min-w-0" />
-      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-        <ProgressCard
-          goalId={goalId}
-          className="w-full min-w-0 shadow-[0_8px_12px_0_rgba(61,54,119,0.25)] transition-shadow hover:shadow-[0_12px_20px_0_rgba(61,54,119,0.35)]"
-        />
-        <GoalNotesCard goalId={goalId} className="w-full min-w-0" />
-      </div>
-    </section>
   );
 }
