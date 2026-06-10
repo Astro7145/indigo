@@ -4,11 +4,10 @@ import { useEffect, useRef } from 'react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
-import TodoRow from '@/src/components/common/todo-list/TodoRow';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcCalendar } from '@/src/components/common/icons/IcCalendar';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
-import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import { useInfiniteTodoList } from '@/src/hooks/todo';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
@@ -109,9 +108,6 @@ function GoalTodoColumnContent({
     goalId,
     done: done ? 'true' : 'false',
   });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
 
   const scrollRef = useRef<HTMLUListElement>(null);
   const sentinelRef = useRef<HTMLLIElement>(null);
@@ -134,10 +130,6 @@ function GoalTodoColumnContent({
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage, todos.length]);
 
-  const toggle = (id: number, isDone: boolean) => update.mutate({ todoId: id, body: { done: isDone } });
-  const toggleFavorite = (id: number, isFavorite: boolean) =>
-    isFavorite ? removeFavorite.mutate(id) : addFavorite.mutate(id);
-
   if (todos.length === 0) {
     return (
       <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
@@ -147,23 +139,16 @@ function GoalTodoColumnContent({
   }
 
   return (
-    <ul
+    <TodoList
       ref={scrollRef}
       className="scrollbar-slate flex max-h-[420px] flex-1 flex-col gap-1 overflow-y-auto xl:max-h-none"
+      todos={todos}
+      size="large"
+      onEdit={onEditTodo}
+      onSelect={onSelectTodo}
     >
-      {todos.map((t) => (
-        <TodoRow
-          key={t.id}
-          size="large"
-          todo={t}
-          onToggle={toggle}
-          onToggleFavorite={toggleFavorite}
-          onEdit={onEditTodo}
-          onSelect={onSelectTodo}
-        />
-      ))}
       {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
       {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">불러오는 중…</li>}
-    </ul>
+    </TodoList>
   );
 }

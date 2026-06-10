@@ -9,10 +9,9 @@ import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
-import TodoRow from '@/src/components/common/todo-list/TodoRow';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
-import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import { useTodoList } from '@/src/hooks/todo';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
@@ -34,15 +33,11 @@ function percentOf(done: number, total: number): number {
 function Column({
   label,
   todos,
-  onToggle,
-  onToggleFavorite,
   onEdit,
   onSelect,
 }: {
   label: 'To do' | 'Done';
   todos: Todo[];
-  onToggle: (id: number, done: boolean) => void;
-  onToggleFavorite: (id: number, isFavorite: boolean) => void;
   onEdit: (todo: Todo) => void;
   onSelect: (todo: Todo) => void;
 }) {
@@ -70,19 +65,13 @@ function Column({
       >
         {isTodo ? 'TO DO' : 'DONE'}
       </span>
-      <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
-        {todos.map((t) => (
-          <TodoRow
-            key={t.id}
-            size="responsive"
-            todo={t}
-            onToggle={onToggle}
-            onToggleFavorite={onToggleFavorite}
-            onEdit={onEdit}
-            onSelect={onSelect}
-          />
-        ))}
-      </ul>
+      <TodoList
+        className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
+        todos={todos}
+        size="responsive"
+        onEdit={onEdit}
+        onSelect={onSelect}
+      />
     </div>
   );
 }
@@ -215,17 +204,10 @@ function GoalTodoBoardContent({
   onSelectTodo: (todo: Todo) => void;
 }) {
   const { data } = useTodoList({ goalId, keyword: keyword || undefined });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
 
   const todos = data.todos;
   const todoItems = todos.filter((t) => !t.done);
   const doneItems = todos.filter((t) => t.done);
-
-  const toggle = (id: number, done: boolean) => update.mutate({ todoId: id, body: { done } });
-  const toggleFavorite = (id: number, isFavorite: boolean) =>
-    isFavorite ? removeFavorite.mutate(id) : addFavorite.mutate(id);
 
   if (todos.length === 0) {
     return keyword ? (
@@ -237,22 +219,8 @@ function GoalTodoBoardContent({
 
   return (
     <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
-      <Column
-        label="To do"
-        todos={todoItems}
-        onToggle={toggle}
-        onToggleFavorite={toggleFavorite}
-        onEdit={onEditTodo}
-        onSelect={onSelectTodo}
-      />
-      <Column
-        label="Done"
-        todos={doneItems}
-        onToggle={toggle}
-        onToggleFavorite={toggleFavorite}
-        onEdit={onEditTodo}
-        onSelect={onSelectTodo}
-      />
+      <Column label="To do" todos={todoItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
+      <Column label="Done" todos={doneItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
     </div>
   );
 }

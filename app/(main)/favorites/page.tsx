@@ -7,13 +7,12 @@ import Card from '@/src/components/common/cards/Card';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
-import TodoRow from '@/src/components/common/todo-list/TodoRow';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
-import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
-import { useUpdateTodo } from '@/src/hooks/todo';
 import type { FavoriteTodo } from '@/src/types/favorite';
 import type { Todo } from '@/src/types/todo';
 
@@ -138,32 +137,21 @@ function FavoritesList({
   onSelectTodo: (todo: Todo) => void;
 }) {
   const { data } = useFavoriteTodoList({ limit: 100 });
-  const update = useUpdateTodo();
-  const removeFavorite = useRemoveTodoFavorite();
 
   const visible = filterFavorites(data.favorites, tab, goalId);
-
-  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
-  const unfavorite = (todoId: number) => removeFavorite.mutate(todoId);
 
   if (visible.length === 0) {
     return <p className="py-20 text-center text-sm text-slate-500">아직 찜한 할 일이 없어요</p>;
   }
 
+  // 즐겨찾기 응답의 todo는 isFavorite=true인 완전한 Todo — 별 클릭은 TodoList의 일반 토글로 해제가 된다.
   return (
-    <ul className="flex flex-col gap-2">
-      {visible.map((f, idx) => (
-        <TodoRow
-          key={f.id}
-          size="large"
-          index={idx}
-          todo={f.todo}
-          onToggle={toggle}
-          onToggleFavorite={() => unfavorite(f.todoId)}
-          onEdit={onEditTodo}
-          onSelect={onSelectTodo}
-        />
-      ))}
-    </ul>
+    <TodoList
+      className="flex flex-col gap-2"
+      todos={visible.map((f) => f.todo)}
+      size="large"
+      onEdit={onEditTodo}
+      onSelect={onSelectTodo}
+    />
   );
 }

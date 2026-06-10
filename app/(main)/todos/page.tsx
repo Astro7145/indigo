@@ -6,12 +6,11 @@ import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
 import Card from '@/src/components/common/cards/Card';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import TodoRow from '@/src/components/common/todo-list/TodoRow';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
-import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
-import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import { useInfiniteTodoList } from '@/src/hooks/todo';
 import type { Todo, TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
@@ -117,9 +116,6 @@ function TodosList({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteTodoList(
     listParams(tab),
   );
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const todos = data.pages.flatMap((p) => p.todos);
@@ -138,33 +134,19 @@ function TodosList({
     return () => io.disconnect();
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
-  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
-  const toggleFavorite = (todoId: number, isFavorite: boolean) => {
-    if (isFavorite) removeFavorite.mutate(todoId);
-    else addFavorite.mutate(todoId);
-  };
-
   if (todos.length === 0) {
     return <p className="py-20 text-center text-sm text-slate-500">{EMPTY_MSG_BY_TAP[tab]}</p>;
   }
 
   return (
     <>
-      <ul className="flex flex-col gap-2">
-        {todos.map((t, idx) => (
-          <TodoRow
-            key={t.id}
-            size="large"
-            // 페이지가 누적되면 인덱스가 커진다 — 신규 페이지 행만 지연을 받도록 모듈로로 감싼다.
-            index={idx % 40}
-            todo={t}
-            onToggle={toggle}
-            onToggleFavorite={toggleFavorite}
-            onEdit={onEditTodo}
-            onSelect={onSelectTodo}
-          />
-        ))}
-      </ul>
+      <TodoList
+        className="flex flex-col gap-2"
+        todos={todos}
+        size="large"
+        onEdit={onEditTodo}
+        onSelect={onSelectTodo}
+      />
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
       {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
     </>

@@ -3,12 +3,11 @@
 import Link from 'next/link';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
-import TodoRow from '@/src/components/common/todo-list/TodoRow';
+import TodoList from '@/src/components/common/todo-list/TodoList';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
-import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
-import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
+import { useTodoList } from '@/src/hooks/todo';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
@@ -27,8 +26,8 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
- * `useTodoList`로 최신 할일을 직접 조회하고, 토글/즐겨찾기는 도메인 mutation으로 처리.
- * 각 행은 `TodoRow`로 합성 — 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
+ * `useTodoList`로 최신 할일을 직접 조회하고, 행 렌더·토글/즐겨찾기 배선은 `TodoList`가 소유.
+ * 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
 export default function RecentTodos({ className, onEditTodo, onSelectTodo }: RecentTodosProps) {
   return (
@@ -64,16 +63,7 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
 
 function RecentTodosContent({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps, 'onEditTodo' | 'onSelectTodo'>) {
   const { data } = useTodoList({ sort: 'latest', limit: 4 });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
   const todos = data.todos;
-
-  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
-  const toggleFavorite = (todoId: number, isFavorite: boolean) => {
-    if (isFavorite) removeFavorite.mutate(todoId);
-    else addFavorite.mutate(todoId);
-  };
 
   if (todos.length === 0) {
     // figma: 빈 상태는 카드 정중앙에 안내 문구
@@ -81,18 +71,12 @@ function RecentTodosContent({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps,
   }
 
   return (
-    <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto">
-      {todos.map((t) => (
-        <TodoRow
-          key={t.id}
-          size="large"
-          todo={t}
-          onToggle={toggle}
-          onToggleFavorite={toggleFavorite}
-          onEdit={onEditTodo}
-          onSelect={onSelectTodo}
-        />
-      ))}
-    </ul>
+    <TodoList
+      className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto"
+      todos={todos}
+      size="large"
+      onEdit={onEditTodo}
+      onSelect={onSelectTodo}
+    />
   );
 }
