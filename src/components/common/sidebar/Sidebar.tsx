@@ -8,7 +8,7 @@ import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
-import SidebarNotificationButton from './SidebarNotificationButton';
+import SidebarNotification from './SidebarNotification';
 import TodoAddButton from './TodoAddButton';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
@@ -98,10 +98,7 @@ export default function Sidebar() {
       {isTablet && <span className="w-15" />}
       <motion.aside
         style={{ width }}
-        className={cn(
-          'scrollbar-slate top-0 left-0 z-50 flex h-screen overflow-x-hidden overflow-y-auto bg-[#1A1B2E]',
-          isTablet ? 'fixed' : 'sticky',
-        )}
+        className={cn('scrollbar-slate top-0 left-0 z-50 flex h-screen bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
       >
         <div
           className={cn(
@@ -165,7 +162,7 @@ export default function Sidebar() {
               />
               <div className="flex gap-x-2">
                 <SidebarProfileButton />
-                <SidebarNotificationButton />
+                <SidebarNotification />
               </div>
             </div>
           )}
