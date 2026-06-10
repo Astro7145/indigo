@@ -23,10 +23,10 @@ export function useInfiniteGoalList(params: Omit<CursorParams, 'cursor'> = {}) {
   });
 }
 
-export function useGoal(id: number | undefined) {
+export function useGoal(id: number) {
   return useQuery<GoalDetail, ApiError>({
-    queryKey: id == null ? [...goalKeys.details(), 'pending'] : goalKeys.detail(id),
-    queryFn: id == null ? skipToken : () => getGoal(id),
+    queryKey: goalKeys.detail(id),
+    queryFn: () => getGoal(id),
   });
 }
 
