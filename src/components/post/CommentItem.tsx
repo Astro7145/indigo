@@ -175,7 +175,7 @@ export default function CommentItem({
                     type="button"
                     onClick={() => onReplyClick?.(comment.id, comment.writer.name)}
                     className={cn(
-                      'cursor-pointer transition-colors hover:text-indigo-500 focus-visible:text-indigo-500 focus-visible:outline-none active:text-indigo-500',
+                      'cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
                       activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
                     )}
                   >
@@ -185,7 +185,10 @@ export default function CommentItem({
                     <button
                       type="button"
                       onClick={() => onRepliesOpenChange?.(!repliesOpen)}
-                      className="cursor-pointer hover:text-slate-600"
+                      className={cn(
+                        'cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
+                        repliesOpen && 'font-semibold text-indigo-500',
+                      )}
                     >
                       {repliesOpen ? '답글 숨기기' : `답글 ${comment.replyCount}개 보기`}
                     </button>
