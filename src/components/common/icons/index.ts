@@ -38,6 +38,7 @@ export { IcProfileBlue } from './IcProfileBlue';
 export { IcProfilePink } from './IcProfilePink';
 export { IcProfileYellow } from './IcProfileYellow';
 export { IcProgress } from './IcProgress';
+export { IcRefresh } from './IcRefresh';
 export { IcReport } from './IcReport';
 export { IcSearch } from './IcSearch';
 export { IcSettings } from './IcSettings';
