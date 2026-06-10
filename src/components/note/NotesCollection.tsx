@@ -127,12 +127,7 @@ function NotesCollectionContent({ goalId, search, sort }: { goalId: number; sear
       <ul className="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-2 xl:gap-6">
         {notes.map((n) => (
           <li key={n.id}>
-            <NoteCard
-              noteId={n.id}
-              note={n}
-              onClick={() => router.push(`/goals/${goalId}/notes/${n.id}`)}
-              menu={moreMenu}
-            />
+            <NoteCard note={n} onClick={() => router.push(`/goals/${goalId}/notes/${n.id}`)} menu={moreMenu} />
           </li>
         ))}
       </ul>

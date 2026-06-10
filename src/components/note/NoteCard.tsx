@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 
-import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
@@ -10,15 +9,13 @@ import Chip from '@/src/components/common/chips/Chip';
 import { IcKebab } from '@/src/components/common/icons/IcKebab';
 import { IcLink } from '@/src/components/common/icons/IcLink';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
-import { useNote } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
 import type { Note } from '@/src/types/note';
 import { formatDate } from '@/src/utils/date';
 
 export interface NoteCardProps {
-  noteId: number;
-  /** 이미 조회한 노트를 넘기면 재조회 없이 그대로 렌더한다(리스트의 N+1 방지). */
-  note?: Note;
+  /** 이미 조회한 노트 객체. 카드는 표시 전용이며 자체 조회하지 않는다(리스트의 N+1 방지). */
+  note: Note;
   onClick?: () => void;
   /** 더보기(케밥) 메뉴 핸들러 — 제공 시 케밥이 IconButton이 됨 */
   onMore?: () => void;
@@ -39,48 +36,11 @@ const kebabClass = 'size-4 sm:size-6';
 const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 
 /**
- * 노트 카드 — `Note` 도메인 객체를 받아 공통 Card 표면 위에 합성.
- * `note` prop이 있으면(리스트가 이미 조회) 그대로 렌더하고, 없으면 `noteId`로 조회한다.
- * 조회 경로는 Suspense 경계(AsyncBoundary)가 로딩/에러를 처리한다.
- */
-export default function NoteCard({ noteId, note, onClick, onMore, menu, className }: NoteCardProps) {
-  if (note) {
-    return <NoteCardView note={note} onClick={onClick} onMore={onMore} menu={menu} className={className} />;
-  }
-  return (
-    <AsyncBoundary
-      fallback={
-        <Card className={cn(rootClass, className)}>
-          <p className="text-sm text-slate-400">불러오는 중…</p>
-        </Card>
-      }
-      errorFallback={
-        <Card className={cn(rootClass, className)}>
-          <p className="text-sm text-slate-400">불러오지 못했어요</p>
-        </Card>
-      }
-    >
-      <NoteCardFetcher noteId={noteId} onClick={onClick} onMore={onMore} menu={menu} className={className} />
-    </AsyncBoundary>
-  );
-}
-
-function NoteCardFetcher({ noteId, ...rest }: Omit<NoteCardProps, 'note'>) {
-  const { data } = useNote(noteId);
-  return <NoteCardView note={data} {...rest} />;
-}
-
-/**
- * 표시 전용 — 상단: 노트 아이콘 + 제목 (+ linkUrl 있을 때 link icon)
+ * 노트 카드 — 이미 조회한 `Note` 객체를 받아 공통 Card 위에 합성하는 표시 전용 컴포넌트.
+ * 상단: 노트 아이콘 + 제목 (+ linkUrl 있을 때 link icon)
  * 하단: TODO 칩 + 연결된 todo title + 작성일. 사이즈는 뷰포트 반응형(md)으로 자동 결정.
  */
-function NoteCardView({
-  note,
-  onClick,
-  onMore,
-  menu,
-  className,
-}: { note: Note } & Pick<NoteCardProps, 'onClick' | 'onMore' | 'menu' | 'className'>) {
+export default function NoteCard({ note, onClick, onMore, menu, className }: NoteCardProps) {
   return (
     <Card className={cn(rootClass, className)} onClick={onClick}>
       <div className="flex items-center justify-between">
