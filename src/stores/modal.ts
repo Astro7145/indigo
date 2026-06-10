@@ -17,6 +17,8 @@ export interface ModalControls {
 }
 
 export interface ModalEntry {
+  /** AnimatePresence가 exit 애니메이션 동안 엔트리를 안정적으로 추적하기 위한 키. */
+  id: string;
   variant: ModalVariant;
   render: (controls: ModalControls) => ReactNode;
   closeOnBackdropClick: boolean;
@@ -43,6 +45,7 @@ export const useModalStore = create<ModalState>((set) => ({
   modals: [],
   open: (render, options) => {
     const entry: ModalEntry = {
+      id: crypto.randomUUID(),
       render,
       variant: options?.variant ?? 'auto',
       closeOnBackdropClick: options?.closeOnBackdropClick ?? true,

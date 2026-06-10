@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+import { AnimatePresence } from 'motion/react';
 
 import BottomSheet from '@/src/components/common/BottomSheet';
 import Modal from '@/src/components/common/modal/Modal';
 import { useIsMobile } from '@/src/hooks/useIsMobile';
-import { useModalStore } from '@/src/stores/modal';
+import { useModalStore, type ModalEntry } from '@/src/stores/modal';
 import { lockScroll, unlockScroll } from '@/src/utils/scrollLock';
 
 // 콘텐츠 스택 모달의 단일 오케스트레이터. app/layout.tsx에 한 번만 마운트한다.
@@ -42,27 +43,35 @@ export default function ModalStack() {
   // 모든 닫기는 최상단을 향한다. controls는 위치와 무관하게 동일하다(close=맨 위, closeWithParent=위 2개).
   const controls = { close, closeWithParent };
 
-  return modals.map((entry, index) => {
-    const resolved = entry.variant === 'auto' ? (isMobile ? 'bottom-sheet' : 'modal') : entry.variant;
-    const isTopmost = index === modals.length - 1;
-    const zIndex = 50 + index;
+  const isBottomSheet = (entry: ModalEntry) =>
+    (entry.variant === 'auto' ? (isMobile ? 'bottom-sheet' : 'modal') : entry.variant) === 'bottom-sheet';
 
-    if (resolved === 'bottom-sheet') {
+  // 엔트리 하나를 알맞은 셸(BottomSheet/Modal)에 내용까지 끼워 렌더한다.
+  // zIndex·active(focus trap)는 전체 스택 위치(index) 기준.
+  const renderEntry = (entry: ModalEntry, index: number) => {
+    const zIndex = 50 + index;
+    if (isBottomSheet(entry)) {
       return (
-        <BottomSheet key={index} isOpen onClose={close} zIndex={zIndex} scrollLock={false}>
+        <BottomSheet
+          key={entry.id}
+          isOpen
+          onClose={close}
+          closeOnBackdropClick={entry.closeOnBackdropClick}
+          zIndex={zIndex}
+          scrollLock={false}
+        >
           {entry.render(controls)}
         </BottomSheet>
       );
     }
-
     return (
       <Modal
-        key={index}
+        key={entry.id}
         open
         onClose={close}
         closeOnBackdropClick={entry.closeOnBackdropClick}
         closeOnEsc={false}
-        active={isTopmost}
+        active={index === modals.length - 1}
         zIndex={zIndex}
         scrollLock={false}
         className={entry.className}
@@ -70,5 +79,16 @@ export default function ModalStack() {
         {entry.render(controls)}
       </Modal>
     );
-  });
+  };
+
+  // exit 애니메이션이 있는 BottomSheet만 AnimatePresence로 감싸 slide-down 후 언마운트한다.
+  // Modal은 exit 애니메이션이 없어 AnimatePresence 밖에서 즉시 언마운트한다 — 한 AnimatePresence
+  // (sync 모드)에 섞으면 closeWithParent로 폼+확인창을 함께 닫을 때 둘의 제거가 묶여, 확인 Modal이
+  // BottomSheet의 slide가 끝날 때까지 화면에 남는다. key는 entry.id로 exit 추적을 안정화한다.
+  return (
+    <>
+      <AnimatePresence>{modals.map((entry, i) => isBottomSheet(entry) && renderEntry(entry, i))}</AnimatePresence>
+      {modals.map((entry, i) => !isBottomSheet(entry) && renderEntry(entry, i))}
+    </>
+  );
 }

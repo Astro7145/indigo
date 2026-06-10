@@ -73,9 +73,17 @@ export default function Modal({
     return () => unlockScroll();
   }, [open, scrollLock]);
 
+  // 열림 시 트리거를 기억했다가 "닫힐 때만" 복귀시킨다. active 변화(위에 모달이 더 열려
+  // 비활성화되는 경우)에는 복귀하지 않아야, 배경 페이지로 포커스가 새는 것을 막는다.
+  useEffect(() => {
+    if (!open) return;
+    const trigger = document.activeElement as HTMLElement | null;
+    return () => trigger?.focus();
+  }, [open]);
+
+  // focus trap은 최상단(active)일 때만: 첫 포커서블로 진입시키고 Tab을 내부에 가둔다.
   useEffect(() => {
     if (!open || !active) return;
-    const trigger = document.activeElement as HTMLElement | null;
     const container = containerRef.current;
     const getFocusable = () =>
       container
@@ -106,10 +114,7 @@ export default function Modal({
       }
     };
     container?.addEventListener('keydown', onKeyDown);
-    return () => {
-      container?.removeEventListener('keydown', onKeyDown);
-      trigger?.focus();
-    };
+    return () => container?.removeEventListener('keydown', onKeyDown);
   }, [open, active]);
 
   if (typeof window === 'undefined' || !open) return null;
