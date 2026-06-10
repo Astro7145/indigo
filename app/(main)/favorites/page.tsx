@@ -1,16 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
-import TodoItem from '@/src/components/common/todo-list/TodoItem';
+import TodoRow from '@/src/components/common/todo-list/TodoRow';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
+import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
@@ -42,9 +41,9 @@ export default function FavoritesPage() {
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
 
-  // 케밥 수정/삭제 — 단일 시트/모달을 페이지가 소유(/todos 페이지와 동일 패턴).
+  // 행 클릭(상세)·케밥 수정 시트 — 단일 인스턴스를 페이지가 소유(/todos 동일 패턴). 삭제 확인은 각 행(TodoRow)이 소유.
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -105,7 +104,7 @@ export default function FavoritesPage() {
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
             resetKeys={[tab, goalId]}
           >
-            <FavoritesList tab={tab} goalId={goalId} onEditTodo={setEditingTodo} onDeleteTodo={setDeletingTodo} />
+            <FavoritesList tab={tab} goalId={goalId} onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
           </AsyncBoundary>
         </Card>
       </div>
@@ -116,7 +115,7 @@ export default function FavoritesPage() {
         onClose={() => setEditingTodo(null)}
         todo={editingTodo}
       />
-      {deletingTodo && <TodoDeleteConfirm open todo={deletingTodo} onClose={() => setDeletingTodo(null)} />}
+      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </section>
   );
 }
@@ -131,17 +130,16 @@ function FavoritesList({
   tab,
   goalId,
   onEditTodo,
-  onDeleteTodo,
+  onSelectTodo,
 }: {
   tab: Tab;
   goalId: number | null;
   onEditTodo: (todo: Todo) => void;
-  onDeleteTodo: (todo: Todo) => void;
+  onSelectTodo: (todo: Todo) => void;
 }) {
   const { data } = useFavoriteTodoList({ limit: 100 });
   const update = useUpdateTodo();
   const removeFavorite = useRemoveTodoFavorite();
-  const reduce = useReducedMotion();
 
   const visible = filterFavorites(data.favorites, tab, goalId);
 
@@ -154,34 +152,18 @@ function FavoritesList({
 
   return (
     <ul className="flex flex-col gap-2">
-      {visible.map((f, idx) => {
-        // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-        const hasNote = (f.todo.noteIds?.length ?? 0) > 0;
-        const hasLink = !!f.todo.linkUrl;
-        return (
-          <motion.li
-            key={f.id}
-            initial={reduce ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min(idx * 0.015, 0.3) }}
-            className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
-          >
-            <TodoItem title={f.todo.title} checked={f.todo.done} onCheckedChange={(done) => toggle(f.todoId, done)}>
-              <TodoItem.Actions>
-                {hasNote && <TodoItem.NoteAction />}
-                {hasLink && <TodoItem.LinkAction />}
-                {!hasNote && <TodoItem.EditAction hoverOnly aria-label="노트 작성" />}
-                <TodoItem.KebabAction
-                  hoverOnly
-                  onEdit={() => onEditTodo(f.todo)}
-                  onDelete={() => onDeleteTodo(f.todo)}
-                />
-                <TodoItem.StarAction active onClick={() => unfavorite(f.todoId)} />
-              </TodoItem.Actions>
-            </TodoItem>
-          </motion.li>
-        );
-      })}
+      {visible.map((f, idx) => (
+        <TodoRow
+          key={f.id}
+          size="large"
+          index={idx}
+          todo={f.todo}
+          onToggle={toggle}
+          onToggleFavorite={() => unfavorite(f.todoId)}
+          onEdit={onEditTodo}
+          onSelect={onSelectTodo}
+        />
+      ))}
     </ul>
   );
 }
