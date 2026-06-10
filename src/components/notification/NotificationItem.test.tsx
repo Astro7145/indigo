@@ -19,9 +19,9 @@ const BASE: Notification = {
   id: 1,
   teamId: 'team',
   userId: 1,
-  type: 'deadline',
+  type: 'todo',
   message: '[할 일 제목]의 마감일이 하루 남았어요!',
-  data: undefined,
+  data: { goalTitle: null, todoTitle: '할 일 제목', userImage: null },
   isRead: false,
   resourceId: 1,
   createdAt: new Date(FIXED_NOW.getTime() - 2 * 60_000).toISOString(), // 2분 전
@@ -98,17 +98,26 @@ it('subtext prop이 없으면 p 요소가 message와 timestamp 2개뿐이다', (
 });
 
 // 아바타는 aria-hidden 컨테이너 안에 있으므로 container.querySelector로 DOM에 직접 접근한다
-it('avatarUrl이 없으면 img를 렌더링하지 않는다', () => {
+it('data.userImage가 없으면 img를 렌더링하지 않는다', () => {
   const { container } = renderItem();
   expect(container.querySelector('img')).not.toBeInTheDocument();
 });
 
-it('avatarUrl이 있으면 alt가 빈 문자열인 img를 렌더링한다', () => {
-  const { container } = renderItem({ avatarUrl: 'https://example.com/avatar.png' });
+it('data.userImage가 있으면 프로필 img를 렌더링한다', () => {
+  const notification: Notification = {
+    ...BASE,
+    type: 'comment',
+    data: {
+      postTitle: '게시글 제목',
+      userImage: 'https://example.com/avatar.png',
+      commentAuthor: 'OOO',
+      commentContent: '댓글 내용',
+    },
+  };
+  const { container } = renderItem({ notification });
   const img = container.querySelector('img');
   expect(img).toBeInTheDocument();
-  expect(img).toHaveAttribute('src', 'https://example.com/avatar.png');
-  expect(img).toHaveAttribute('alt', '');
+  expect(img).toHaveAttribute('alt', '알림 프로필 이미지');
 });
 
 // ── 읽음 / 안읽음 상태 ──────────────────────────────────────────────────────
