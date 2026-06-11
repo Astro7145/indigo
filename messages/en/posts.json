@@ -1,1 +1,41 @@
-{}
+﻿{
+  "title": "Posts",
+  "viewCount": "Views {count}",
+  "commentCount": "{count} comments",
+  "empty": "No posts yet.",
+  "loadError": "Failed to load posts.",
+  "loadMoreError": "Failed to load more.",
+  "searchPlaceholder": "Search posts",
+  "searchLabel": "Search posts",
+  "sortLatest": "Latest",
+  "sortPopular": "Popular",
+  "detail": {
+    "deleteTitle": "Delete this post?",
+    "deleteError": "Failed to delete post."
+  },
+  "form": {
+    "createTitle": "Write Post",
+    "editTitle": "Edit Post",
+    "submitCreate": "Register",
+    "titlePlaceholder": "Enter post title",
+    "titleLabel": "Title",
+    "contentPlaceholder": "Write your content here",
+    "imageSelect": "Select image file",
+    "cancelTitle": "Cancel writing post?",
+    "createError": "Failed to create post.",
+    "updateError": "Failed to update post."
+  },
+  "comment": {
+    "title": "Comments",
+    "empty": "No comments yet. Be the first to comment!",
+    "placeholder": "Enter a comment.",
+    "inputLabel": "Comment input",
+    "submit": "Submit",
+    "mine": "My comment",
+    "editLabel": "Edit comment",
+    "deleteTitle": "Delete this comment?",
+    "createError": "Failed to create comment.",
+    "updateError": "Failed to update comment.",
+    "deleteError": "Failed to delete comment."
+  }
+}

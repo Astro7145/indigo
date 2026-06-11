@@ -1,1 +1,24 @@
-{}
+﻿{
+  "title": "My Profile",
+  "formLabel": "My profile form",
+  "meta": {
+    "title": "My Profile | INdigo",
+    "description": "Change your profile picture, name, and password."
+  },
+  "password": {
+    "section": "Change Password",
+    "currentPlaceholder": "Enter your current password",
+    "currentLabel": "Current Password",
+    "newPlaceholder": "Enter your new password",
+    "newLabel": "New Password",
+    "confirmPlaceholder": "Re-enter your new password",
+    "confirmLabel": "Confirm New Password",
+    "mismatch": "Current password does not match."
+  },
+  "image": {
+    "alt": "Profile picture",
+    "change": "Change profile picture",
+    "select": "Select profile picture file",
+    "unsupported": "Unsupported image format. (jpg, jpeg, png, gif, webp, svg)"
+  }
+}

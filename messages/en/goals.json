@@ -1,1 +1,52 @@
-{}
+﻿{
+  "title": "{name}\u0027s Goals",
+  "loadError": "Failed to load goal information",
+  "moreMenu": "Goal more menu",
+  "progress": "Goal progress",
+  "calendarView": "Calendar view",
+  "createError": "Failed to create goal",
+  "edit": {
+    "title": "Edit Goal",
+    "placeholder": "Enter goal"
+  },
+  "delete": {
+    "warning": "Deleted goals cannot be recovered."
+  },
+  "note": {
+    "collectTitle": "Notes",
+    "searchPlaceholder": "Search notes",
+    "searchLabel": "Search notes",
+    "sortLatest": "Latest",
+    "sortOldest": "Oldest",
+    "empty": "No notes yet",
+    "loadError": "Failed to load notes",
+    "notFound": "Note not found",
+    "linkBadge": "Attached link",
+    "goalLabel": "Goal",
+    "dateLabel": "Created",
+    "todoLabel": "TODO",
+    "tagLabel": "Tag",
+    "createTitle": "Write Note",
+    "editTitle": "Edit Note",
+    "submit": "Register",
+    "draft": "Save as draft",
+    "titlePlaceholder": "Enter note title",
+    "titleLabel": "Title",
+    "contentPlaceholder": "Start writing your note here",
+    "linkUploadTitle": "Upload link",
+    "linkPlaceholder": "Enter link",
+    "linkLabel": "Link URL",
+    "linkError": "Link must start with http:// or https://",
+    "cancelTitle": "Cancel writing note?",
+    "embedLabel": "Link embed panel",
+    "embedExpand": "Expand panel",
+    "embedCollapse": "Collapse panel",
+    "embedClose": "Close panel",
+    "embedEmpty": "Embed will be shown here",
+    "embedPreview": "Link preview",
+    "linkPreviewOpen": "Open link preview",
+    "openNewTab": "Open in new tab",
+    "embedPreviewTitle": "Attached link preview",
+    "drawerLabel": "Note details"
+  }
+}

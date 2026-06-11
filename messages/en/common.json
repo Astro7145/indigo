@@ -1,1 +1,107 @@
-{}
+﻿{
+  "state": {
+    "loading": "Loading…",
+    "loadError": "Failed to load",
+    "noSearchResults": "No search results found"
+  },
+  "tabs": {
+    "all": "ALL",
+    "todo": "TODO",
+    "done": "DONE"
+  },
+  "actions": {
+    "edit": "Edit",
+    "update": "Update",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "save": "Save",
+    "more": "More",
+    "writeNote": "Write Note",
+    "viewAll": "View All"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name"
+  },
+  "placeholders": {
+    "email": "Enter your email",
+    "password": "Enter your password",
+    "name": "Enter your name"
+  },
+  "social": {
+    "divider": "Sign in with SNS",
+    "google": "Sign in with Google",
+    "kakao": "Sign in with Kakao"
+  },
+  "toast": {
+    "saved": "Saved successfully.",
+    "saveError": "Save failed. Please try again."
+  },
+  "discard": {
+    "title": "Are you sure you want to leave?",
+    "warning": "Your work in progress will be lost.",
+    "confirm": "Yes",
+    "cancel": "No"
+  },
+  "deleteConfirm": {
+    "title": "Are you sure you want to delete?"
+  },
+  "charCount": "Total {total} characters | {nonSpace} without spaces",
+  "cancelWarning": "All your work will be lost.",
+  "moreMenu": "More menu",
+  "linkDelete": "Delete link",
+  "imageDelete": "Delete image",
+  "linkUploadPlaceholder": "Upload a link",
+  "relativeTime": {
+    "justNow": "Just now",
+    "minutes": "{count}m ago",
+    "hours": "{count}h ago",
+    "days": "{count}d ago",
+    "weeks": "{count}w ago",
+    "months": "{count}mo ago"
+  },
+  "search": {
+    "placeholder": "Search todos",
+    "label": "Search todos",
+    "button": "Search"
+  },
+  "passwordToggle": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
+  "file": {
+    "selected": "{fileName} selected",
+    "removed": "File deleted",
+    "placeholder": "Select a file",
+    "delete": "Delete file"
+  },
+  "image": {
+    "attachmentAlt": "Attached image",
+    "removed": "Image deleted",
+    "selectedAlt": "Selected image: {fileName}",
+    "existingAlt": "Existing image",
+    "attach": "Attach image"
+  },
+  "editor": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "alignLeft": "Align left",
+    "alignCenter": "Align center",
+    "alignRight": "Align right",
+    "bulletList": "Bullet list",
+    "insertImage": "Insert image",
+    "insertLink": "Insert link"
+  },
+  "todoList": {
+    "note": "Note",
+    "link": "Link"
+  },
+  "favorite": {
+    "add": "Add to favorites",
+    "remove": "Remove from favorites"
+  }
+}

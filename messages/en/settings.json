@@ -1,1 +1,7 @@
-{}
+﻿{
+  "title": "Settings",
+  "language": "Language",
+  "darkMode": "Dark Mode",
+  "themeLight": "Light Mode",
+  "themeDark": "Dark Mode"
+}

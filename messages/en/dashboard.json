@@ -1,1 +1,17 @@
-{}
+﻿{
+  "title": "{name}\u0027s Dashboard",
+  "recentTodos": {
+    "title": "Recent TODOs",
+    "empty": "No recent todos"
+  },
+  "goalTodos": {
+    "title": "TODOs by Goal",
+    "empty": "No goals registered",
+    "boardEmpty": "No todos yet",
+    "progressLabel": "{title} Progress"
+  },
+  "progress": {
+    "header": "My Progress",
+    "body": "{name}\u0027s progress is"
+  }
+}

@@ -1,1 +1,10 @@
-{}
+﻿{
+  "submit": "Sign Up",
+  "submitting": "Processing...",
+  "loginPrompt": "Already a member?",
+  "loginLink": "Sign In",
+  "passwordConfirmLabel": "Confirm Password",
+  "passwordConfirmPlaceholder": "Re-enter your password",
+  "nicknameTaken": "This nickname is already in use.",
+  "completeAlert": "Sign up completed successfully."
+}

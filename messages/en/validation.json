@@ -1,1 +1,15 @@
-{}
+﻿{
+  "titleRequired": "Please enter a title.",
+  "titleMax": "Title must be 30 characters or less.",
+  "dueDateRequired": "Please select a due date.",
+  "urlInvalid": "Please enter a valid URL.",
+  "emailInvalid": "Please enter a valid email.",
+  "passwordRequired": "Password is required.",
+  "nameRequired": "Please enter a name.",
+  "nameMax": "Name must be 20 characters or less.",
+  "passwordMin": "Password must be at least 8 characters.",
+  "passwordConfirmRequired": "Please confirm your password.",
+  "passwordMismatch": "Passwords do not match.",
+  "currentPasswordRequired": "Please enter your current password.",
+  "passwordSameAsOld": "Please enter a different password."
+}

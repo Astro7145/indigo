@@ -1,1 +1,6 @@
-{}
+﻿{
+  "submit": "Sign In",
+  "submitting": "Signing in...",
+  "signupPrompt": "New to INdigo?",
+  "signupLink": "Sign Up"
+}

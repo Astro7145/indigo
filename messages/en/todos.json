@@ -1,1 +1,50 @@
-{}
+﻿{
+  "title": "All TODOs",
+  "addButton": "Add TODO",
+  "empty": {
+    "all": "No todos yet",
+    "todo": "No pending todos",
+    "done": "No completed todos"
+  },
+  "fields": {
+    "title": "Title",
+    "goal": "Goal",
+    "dueDate": "Due Date",
+    "tag": "Tag",
+    "link": "Link",
+    "image": "Image",
+    "status": "Status"
+  },
+  "form": {
+    "titlePlaceholder": "Enter todo title",
+    "goalPlaceholder": "Select a goal",
+    "goalNone": "No goal",
+    "datePlaceholder": "Select a date",
+    "tagPlaceholder": "Enter and press Enter",
+    "tagAdd": "Add tag",
+    "tagDuplicate": "Tag already added",
+    "tagMax": "Maximum 10 tags allowed",
+    "imageHint": "Only one image can be attached.",
+    "statusError": "Please select a status."
+  },
+  "detail": {
+    "attachment": "Attachments",
+    "notes": "Notes"
+  },
+  "create": {
+    "title": "Create TODO",
+    "success": "TODO added successfully.",
+    "error": "Failed to create todo."
+  },
+  "update": {
+    "title": "Edit TODO",
+    "success": "TODO updated successfully.",
+    "error": "Failed to update todo."
+  },
+  "delete": {
+    "warning": "Deleted todos cannot be recovered.",
+    "success": "TODO deleted successfully.",
+    "error": "Failed to delete todo."
+  },
+  "imageUploadError": "Failed to upload image."
+}
