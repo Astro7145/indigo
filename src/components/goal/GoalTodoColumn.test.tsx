@@ -3,6 +3,9 @@ jest.mock('@/src/api/todo', () => ({
   getTodos: jest.fn(),
 }));
 
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
+
 import type { ComponentProps } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 
@@ -43,6 +46,13 @@ it('To do 컬럼은 goalId·done=false 필터로 조회한다', async () => {
   renderColumn();
   await screen.findByText('해야할 일이 아직 없어요');
   expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ goalId: 3, done: 'false' }));
+});
+
+it('캘린더 보기를 누르면 목표 필터가 프리셋된 캘린더로 이동한다', async () => {
+  mocked.getTodos.mockResolvedValue(listOf([]));
+  renderColumn();
+  fireEvent.click(await screen.findByRole('button', { name: '캘린더 보기' }));
+  expect(mockPush).toHaveBeenCalledWith('/calendar?goalId=3');
 });
 
 it('빈 Done 컬럼은 완료 안내 문구를 보여준다', async () => {
