@@ -43,6 +43,13 @@ it('현재 달 타이틀과 요일 헤더(월요일 시작)를 렌더한다', ()
   expect(headers).toEqual(['월', '화', '수', '목', '금', '토', '일']);
 });
 
+it('날짜가 월요일 시작 열에 맞게 배치된다 — 2025년 1월 첫 행은 12/30(월)~1/5(일)', () => {
+  const { container } = render(<Harness />);
+  const firstRow = container.querySelectorAll('tbody tr')[0];
+  const days = Array.from(firstRow.querySelectorAll('td')).map((td) => td.querySelector('span')?.textContent);
+  expect(days).toEqual(['30', '31', '1', '2', '3', '4', '5']);
+});
+
 it('해당 날짜 셀에 할일 칩을 렌더한다', () => {
   const map = new Map([['2025-01-10', [makeTodo(1, '챕터4 듣기')]]]);
   render(<Harness todosByDate={map} />);

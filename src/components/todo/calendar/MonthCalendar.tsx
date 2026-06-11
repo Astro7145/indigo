@@ -31,7 +31,9 @@ export interface MonthCalendarProps {
  */
 export default function MonthCalendar({ value, onChange, todosByDate, onSelectTodo, children }: MonthCalendarProps) {
   const { locale } = useLocale();
-  const state: CalendarState = useCalendarState({ value, onChange, locale, createCalendar });
+  // firstDayOfWeek는 state에 줘야 셀 배치(getDatesInWeek)가 월요일 시작이 된다 — grid 옵션만으로는
+  // 요일 라벨·주 수 계산만 바뀌고 날짜가 로케일 기준(ko/en=일요일)으로 깔려 한 칸 어긋난다.
+  const state: CalendarState = useCalendarState({ value, onChange, locale, createCalendar, firstDayOfWeek: 'mon' });
   const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar({ value, onChange }, state);
   const { gridProps, headerProps, weeksInMonth } = useCalendarGrid({ firstDayOfWeek: 'mon' }, state);
 
