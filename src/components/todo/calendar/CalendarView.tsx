@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -23,20 +22,19 @@ import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
 
 const statusMessageClass = 'py-16 text-center text-sm text-slate-400';
 
+export interface CalendarViewProps {
+  /** 목표 상세 "캘린더 보기" 진입(`/calendar?goalId=X`) 프리셋 — 파싱·검증과 변경 시 리마운트(key)는 page 담당 */
+  initialGoalId?: number;
+}
+
 /**
  * /calendar 본문 — 월 그리드에 dueDate 기준으로 할일 표시. 이슈 #150.
  * 선택 날짜·목표 필터·시트 상태를 소유하고, 데이터 본문(월 네비+그리드+선택 리스트)을 AsyncBoundary로 감싼다
  * (월 네비는 react-aria 상태와 결합돼 있어 chrome으로 분리하지 않음 — GoalTodoBoard의 전체 경계와 동일 판단).
  * 모바일 페이지 타이틀은 GNB(usePageTitle)가 담당 → 헤더는 sm+ 노출, 모바일은 하단 풀폭 추가 버튼.
  */
-export default function CalendarView() {
-  const searchParams = useSearchParams();
-  // 목표 상세 "캘린더 보기" 진입(`/calendar?goalId=X`) 프리셋 — 잘못된 값은 전체 목표로 무시
-  const [goalId, setGoalId] = useState<number | null>(() => {
-    const raw = searchParams.get('goalId');
-    const n = Number(raw);
-    return raw !== null && Number.isInteger(n) && n > 0 ? n : null;
-  });
+export default function CalendarView({ initialGoalId }: CalendarViewProps) {
+  const [goalId, setGoalId] = useState<number | null>(initialGoalId ?? null);
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   const [creating, setCreating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
