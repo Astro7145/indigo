@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Chip from '@/src/components/common/chips/Chip';
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
 import { IcCheckbox } from '@/src/components/common/icons/IcCheckbox';
@@ -22,11 +23,19 @@ export interface NoteDetailProps {
 
 /** 노트 상세 본문 — 드로어/standalone 페이지가 공유한다. 닫기 버튼은 감싸는 셸이 담당. */
 export default function NoteDetail({ noteId, className }: NoteDetailProps) {
-  const { data: note, isLoading, isError } = useNote(noteId);
-  const [embedOpen, setEmbedOpen] = useState(false);
+  return (
+    <AsyncBoundary
+      fallback={<p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>}
+      errorFallback={<p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>}
+    >
+      <NoteDetailContent noteId={noteId} className={className} />
+    </AsyncBoundary>
+  );
+}
 
-  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>;
-  if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>;
+function NoteDetailContent({ noteId, className }: NoteDetailProps) {
+  const { data: note } = useNote(noteId);
+  const [embedOpen, setEmbedOpen] = useState(false);
 
   const tags = note.todo.tags ?? [];
   const hasLink = !!note.linkUrl;

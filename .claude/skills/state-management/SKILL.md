@@ -1,6 +1,6 @@
 ---
 name: state-management
-description: INdigo 프로젝트의 상태 관리 전체 규칙 — TanStack Query(서버 상태)와 Zustand(클라이언트 상태)의 분리 원칙, 쿼리 키 팩토리, 커스텀 훅 작성법, 무한 스크롤. 데이터 페칭 훅을 만들거나, query/mutation을 작성하거나, 쿼리 키를 정의하거나, Zustand 스토어를 추가하거나, 무한 스크롤을 구현할 때 이 스킬을 로드하세요. "API 연동", "데이터 불러오기", "훅 만들어줘", "스토어 추가", "무한스크롤" 같은 요청에 항상 사용합니다. 이 스킬이 INdigo 상태 관리 규칙의 단일 출처입니다.
+description: INdigo 프로젝트의 상태 관리 전체 규칙 — TanStack Query(서버 상태)와 Zustand(클라이언트 상태)의 분리 원칙, 쿼리 키 팩토리, 커스텀 훅 작성법, 무한 스크롤, Suspense/ErrorBoundary 로딩·에러 처리. 데이터 페칭 훅을 만들거나, query/mutation을 작성하거나, 쿼리 키를 정의하거나, Zustand 스토어를 추가하거나, 무한 스크롤을 구현하거나, Suspense/ErrorBoundary로 로딩·에러를 처리할 때 이 스킬을 로드하세요. "API 연동", "데이터 불러오기", "훅 만들어줘", "스토어 추가", "무한스크롤", "로딩/에러 처리" 같은 요청에 항상 사용합니다. 이 스킬이 INdigo 상태 관리 규칙의 단일 출처입니다.
 ---
 
 # 상태 관리 (INdigo)
@@ -61,7 +61,38 @@ export function useCreateTodo() {
 ### 규칙
 
 - mutation 성공 후 관련 키를 `invalidateQueries`로 무효화
-- 무한 스크롤(전체 할일·게시판 등)은 `useInfiniteQuery` 사용
+- 무한 스크롤(전체 할일·게시판 등)은 `useInfiniteQuery`(또는 suspense면 `useSuspenseInfiniteQuery`) 사용
+
+### 로딩·에러: Suspense + AsyncBoundary
+
+`isLoading`/`isError` 삼항 분기 대신 **`useSuspenseQuery`/`useSuspenseInfiniteQuery` + `AsyncBoundary`**
+(`src/components/common/AsyncBoundary.tsx` — Suspense + `react-error-boundary` 묶음, props
+`fallback`/`errorFallback`/`children`)로 로딩·에러를 **선언적으로** 처리한다. goal·todo·favorite·note
+도메인에 적용됨(이슈 #137). **새 코드는 이 패턴을 우선**한다.
+
+핵심은 **데이터를 쓰는 컴포넌트를 `AsyncBoundary`로 감싸는 것**이다. chrome(헤더·탭·버튼)은 경계 **밖**에 둔다.
+
+작성 규칙:
+
+- `useSuspenseQuery` 호출부는 `<Suspense>`보다 **아래**여야 한다(React 규칙) — `AsyncBoundary`를 렌더하는
+  컴포넌트가 아니라 그 **자식**에서 호출한다. 그 자식은 데이터를 실제로 쓰는 기존 컴포넌트면 충분하다
+  (예: `GoalDetailHeader`가 `useGoalSuspense` 직접 호출). 전용 래퍼로 분리하는 게 목적이 아니다.
+- 무한쿼리는 **초기 로드만** 경계로. `fetchNextPage`·`isFetchingNextPage`·`isFetchNextPageError`는 인라인 유지.
+- fallback/errorFallback은 그 자리의 로딩/에러 JSX를 그대로 넣는다(UX 무변화).
+- 공유 훅에 비-suspense consumer가 남으면 `useXxxSuspense` 변형을 추가하고, consumer가 전부 전환되면 in-place로 바꾼다.
+
+```tsx
+// chrome은 경계 밖, 데이터 쓰는 자식만 AsyncBoundary로 감싼다.
+<Card>
+  <AsyncBoundary fallback={<p>불러오는 중…</p>} errorFallback={<p>불러오지 못했어요</p>}>
+    <GoalDetailHeader goalId={goalId} /> {/* 이 자식이 useGoalSuspense 호출 → data 항상 정의됨 */}
+  </AsyncBoundary>
+</Card>
+```
+
+**이 패턴을 쓰지 않는 경우(`isLoading`/`isError` 유지):** 내부 open 상태·조건부 분기·폼 하이드레이션처럼
+경계가 별도 인스턴스를 만들어 상태/핸들러가 소실되는 곳(예: 사이드바 목표 목록 `GoalSidebarList`). mutation의
+`isPending`(제출/삭제 버튼 상태)은 Suspense와 무관하므로 그대로 둔다.
 
 ## Zustand — 클라이언트 상태
 

@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import { useMe } from '@/src/hooks/user';
-import { useTodoList } from '@/src/hooks/todo';
-import { useFavoriteTodoList } from '@/src/hooks/favorite';
+import { useTodoCount } from '@/src/hooks/todo';
+import { useFavoriteCount } from '@/src/hooks/favorite';
 
 type RouteKey =
   | 'dashboard'
@@ -44,14 +44,14 @@ export function usePageTitle(): string {
   const { data: user } = useMe();
   const name = user?.name ?? '';
 
-  const { data: todoData } = useTodoList({}, route === 'todos');
-  const { data: favoriteData } = useFavoriteTodoList({}, route === 'favorites');
+  const { data: todoCount } = useTodoCount(route === 'todos');
+  const { data: favoriteCount } = useFavoriteCount(route === 'favorites');
 
   switch (route) {
     case 'dashboard':
       return `${name}님의 대시보드`;
     case 'todos':
-      return todoData ? `모든 할일 ${todoData.totalCount}` : '모든 할일';
+      return todoCount != null ? `모든 할일 ${todoCount}` : '모든 할일';
     case 'notes-write':
       return '노트 작성하기';
     case 'notes-edit':
@@ -67,7 +67,7 @@ export function usePageTitle(): string {
     case 'posts':
       return '소통 게시판';
     case 'favorites':
-      return favoriteData ? `찜한 할일 ${favoriteData.totalCount}` : '찜한 할일';
+      return favoriteCount != null ? `찜한 할일 ${favoriteCount}` : '찜한 할일';
     case 'calendar':
       return `${name}님의 캘린더`;
     case 'me':
