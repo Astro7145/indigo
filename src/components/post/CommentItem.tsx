@@ -88,9 +88,11 @@ export default function CommentItem({
     );
   };
 
-  // Enter → form submit, Shift+Enter → 개행. IME 조합 중에는 Enter가 한글 확정용이므로 무시
+  // 데스크탑(xl: 1280px+)에서만 Enter→submit / Shift+Enter→개행. 태블릿·모바일은 Enter도 개행이라 수정 버튼으로만 제출.
+  // IME 조합 중 Enter는 한글 확정용이므로 모든 환경에서 무시.
   const handleEditKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (!window.matchMedia('(min-width: 1280px)').matches) return;
     e.preventDefault();
     if (draft.trim().length > 0 && !isUpdating) e.currentTarget.form?.requestSubmit();
   };
