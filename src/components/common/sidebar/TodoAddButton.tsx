@@ -7,6 +7,8 @@ import { cn } from '@/src/utils/cn';
 interface TodoAddButtonProps {
   onClick?: () => void;
   className?: string;
+  /** N 단축키 활성화 — 전역 리스너라 한 곳(Sidebar)만 켠다. 중복 마운트 시 시트가 두 번 열린다. */
+  shortcut?: boolean;
 }
 
 // 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
@@ -15,9 +17,9 @@ const isTypingTarget = (target: EventTarget | null) => {
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 };
 
-export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
+export default function TodoAddButton({ onClick, className, shortcut = false }: TodoAddButtonProps) {
   useEffect(() => {
-    if (!onClick) return;
+    if (!onClick || !shortcut) return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
       if (event.key !== 'n' && event.key !== 'N') return;
@@ -27,7 +29,7 @@ export default function TodoAddButton({ onClick, className }: TodoAddButtonProps
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClick]);
+  }, [onClick, shortcut]);
 
   return (
     <motion.button
