@@ -21,16 +21,18 @@ export interface ModalEntry {
   id: string;
   variant: ModalVariant;
   render: (controls: ModalControls) => ReactNode;
-  closeOnBackdropClick: boolean;
-  closeOnEsc: boolean;
+  /**
+   * ESC·백드롭 클릭으로 닫기를 시도할 때 호출. 미지정 시 close()(맨 위 닫기)로 동작한다.
+   * 작성 중 폼처럼 곧장 닫지 않고 이탈 확인을 띄워야 할 때 override 한다. (항상 무언가에는 반응)
+   */
+  onClose?: () => void;
   /** modal variant의 셸(Modal)에 전달할 추가 클래스 — 기본 너비/패딩을 덮어쓸 때 쓴다. */
   className?: string;
 }
 
 export interface ModalOptions {
   variant?: ModalVariant;
-  closeOnBackdropClick?: boolean;
-  closeOnEsc?: boolean;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -48,8 +50,7 @@ export const useModalStore = create<ModalState>((set) => ({
       id: crypto.randomUUID(),
       render,
       variant: options?.variant ?? 'auto',
-      closeOnBackdropClick: options?.closeOnBackdropClick ?? true,
-      closeOnEsc: options?.closeOnEsc ?? true,
+      onClose: options?.onClose,
       className: options?.className,
     };
     set((state) => ({ modals: [...state.modals, entry] }));
