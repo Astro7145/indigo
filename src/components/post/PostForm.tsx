@@ -123,6 +123,16 @@ export default function PostForm(props: PostFormProps) {
     }
   };
 
+  // 핸들러는 입력마다 새 참조라 effect deps에 직접 넣으면 키 입력 한 번에 setRightSlot이 한 번씩 호출된다.
+  // ref로 최신 참조를 들고 있게 하고 effect에서는 ref 호출 wrapper만 등록 → setRightSlot은 isValid·isSubmitting 등 실제 UI 상태가 바뀔 때만 호출된다.
+  const handleSubmitRef = useRef(handleSubmit);
+  const handleCancelRef = useRef(handleCancel);
+  // ref 갱신은 render 중이 아니라 commit 이후로 미룬다 (react-hooks/refs)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+    handleCancelRef.current = handleCancel;
+  });
+
   // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 데이터 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
   useEffect(() => {
     if (props.mode === 'edit' && !initialPost) {
@@ -134,11 +144,11 @@ export default function PostForm(props: PostFormProps) {
         mode={props.mode}
         isValid={isValid}
         isSubmitting={isSubmitting}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
+        onSubmit={() => handleSubmitRef.current()}
+        onCancel={() => handleCancelRef.current()}
       />,
     );
-  }, [props.mode, initialPost, isValid, isSubmitting, handleSubmit, handleCancel, setRightSlot, clearRightSlot]);
+  }, [props.mode, initialPost, isValid, isSubmitting, setRightSlot, clearRightSlot]);
 
   // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
   useEffect(() => {

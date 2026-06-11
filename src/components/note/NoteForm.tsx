@@ -84,20 +84,35 @@ export default function NoteForm(props: NoteFormProps) {
 
   const handleSubmit = async () => {
     if (!isValid || isSubmitting) return;
-    if (props.mode === 'edit' && initialNote) {
-      // PATCH는 linkUrl을 항상 포함해야 null 전송이 "링크 제거" 의미를 가짐 (Swagger: linkUrl nullable, 생략 시 유지)
-      await updateNote({ noteId: initialNote.id, body: { title, content, linkUrl } });
+    try {
+      if (props.mode === 'edit' && initialNote) {
+        // PATCH는 linkUrl을 항상 포함해야 null 전송이 "링크 제거" 의미를 가짐 (Swagger: linkUrl nullable, 생략 시 유지)
+        await updateNote({ noteId: initialNote.id, body: { title, content, linkUrl } });
+        router.back();
+        return;
+      }
+      await createNote({
+        todoId: props.todoId,
+        title,
+        content,
+        ...(linkUrl ? { linkUrl } : {}),
+      });
       router.back();
-      return;
+    } catch (error) {
+      // TODO(@<wiring>): 노트 작업 마무리 시 PostForm처럼 showToast로 사용자 안내 추가
+      console.error('노트 저장 실패:', error);
     }
-    await createNote({
-      todoId: props.todoId,
-      title,
-      content,
-      ...(linkUrl ? { linkUrl } : {}),
-    });
-    router.back();
   };
+
+  // 핸들러는 입력마다 새 참조라 effect deps에 직접 넣으면 키 입력 한 번에 setRightSlot이 한 번씩 호출된다.
+  // ref로 최신 참조를 들고 있게 하고 effect에서는 ref 호출 wrapper만 등록 → setRightSlot은 isValid·isSubmitting 등 실제 UI 상태가 바뀔 때만 호출된다.
+  const handleSubmitRef = useRef(handleSubmit);
+  const handleDraftRef = useRef(handleDraft);
+  // ref 갱신은 render 중이 아니라 commit 이후로 미룬다 (react-hooks/refs)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+    handleDraftRef.current = handleDraft;
+  });
 
   // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
   useEffect(() => {
@@ -110,11 +125,11 @@ export default function NoteForm(props: NoteFormProps) {
         mode={props.mode}
         isValid={isValid}
         isSubmitting={isSubmitting}
-        onDraft={handleDraft}
-        onSubmit={handleSubmit}
+        onDraft={() => handleDraftRef.current()}
+        onSubmit={() => handleSubmitRef.current()}
       />,
     );
-  }, [props.mode, isNoteLoading, isValid, isSubmitting, handleDraft, handleSubmit, setRightSlot, clearRightSlot]);
+  }, [props.mode, isNoteLoading, isValid, isSubmitting, setRightSlot, clearRightSlot]);
 
   // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
   useEffect(() => {
