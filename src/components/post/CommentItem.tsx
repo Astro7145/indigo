@@ -32,6 +32,8 @@ interface CommentItemProps {
   activeReplyTargetId?: number | null;
   // 답글 입력창의 onSubmit — 상위에서 createComment + 성공 시 부모 답글 펼침까지 처리
   onReplySubmit?: (content: string, clearInput: () => void) => void;
+  // 답글 등록 진행 중이면 답글 입력창을 잠가 중복 제출 방지
+  isReplySubmitting?: boolean;
 }
 
 export default function CommentItem({
@@ -45,11 +47,12 @@ export default function CommentItem({
   onReplyClick,
   activeReplyTargetId = null,
   onReplySubmit,
+  isReplySubmitting = false,
 }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const { mutate: updateComment } = useUpdateComment(postId);
+  const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
   const { mutate: likeComment } = useLikeComment(postId);
   const { mutate: unlikeComment } = useUnlikeComment(postId);
@@ -89,7 +92,7 @@ export default function CommentItem({
   const handleEditKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
     e.preventDefault();
-    if (draft.trim().length > 0) e.currentTarget.form?.requestSubmit();
+    if (draft.trim().length > 0 && !isUpdating) e.currentTarget.form?.requestSubmit();
   };
 
   // 수정 진입 시 현재 댓글 내용으로 draft를 동기화 (mount 이후 외부에서 comment가 갱신된 경우 대비)
@@ -148,7 +151,8 @@ export default function CommentItem({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleEditKeyDown}
               aria-label="댓글 수정"
-              className="field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
+              disabled={isUpdating}
+              className="field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:px-4 sm:py-2.5"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
             <div className="flex items-center justify-between gap-2">
@@ -157,7 +161,7 @@ export default function CommentItem({
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
                   취소
                 </Button>
-                <Button type="submit" size="small" disabled={draft.trim().length === 0}>
+                <Button type="submit" size="small" disabled={draft.trim().length === 0 || isUpdating}>
                   수정
                 </Button>
               </div>
@@ -214,7 +218,13 @@ export default function CommentItem({
 
         {!isReply && activeReplyTargetId === comment.id && (
           <div className="mt-3">
-            <CommentInput autoFocus placeholder="답글을 입력해주세요." ariaLabel="답글 입력" onSubmit={onReplySubmit} />
+            <CommentInput
+              autoFocus
+              placeholder="답글을 입력해주세요."
+              ariaLabel="답글 입력"
+              onSubmit={onReplySubmit}
+              disabled={isReplySubmitting}
+            />
           </div>
         )}
 

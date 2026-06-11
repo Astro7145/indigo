@@ -34,7 +34,7 @@ export default function CommentSection({
   fetchNextPage,
   isFetchingNextPage,
 }: CommentSectionProps) {
-  const { mutate: createComment } = useCreateComment(postId);
+  const { mutate: createComment, isPending: isCreating } = useCreateComment(postId);
   const { showToast } = useToast();
   // 댓글 id → 답글 영역 펼침 여부. 각 CommentItem이 자기 상태를 들지 않고 상위에서 통합 관리
   const [openReplies, setOpenReplies] = useState<Record<number, boolean>>({});
@@ -79,14 +79,14 @@ export default function CommentSection({
       <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
         댓글 <span className="text-indigo-500">{totalCount}</span>
       </h2>
-      <CommentInput onSubmit={handleTopLevelSubmit} />
+      <CommentInput onSubmit={handleTopLevelSubmit} disabled={isCreating} />
       {/* 작성순(오래된 것이 위) 정렬이라 다음 페이지가 위에 누적된다. 시선·데이터 추가 위치를 맞추려고 버튼을 목록 위에 둠 */}
       {hasNextPage && (
         <button
           type="button"
           onClick={() => fetchNextPage?.()}
           disabled={isFetchingNextPage}
-          className="mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:p-4 sm:text-sm"
+          className="mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
         >
           <span>{isFetchingNextPage ? '불러오는 중…' : `${COMMENT_PAGE_SIZE}개 댓글 더 불러오기`}</span>
           <IcPlus className="size-4 text-slate-600 sm:size-6" />
@@ -110,6 +110,7 @@ export default function CommentSection({
                 onReplyClick={handleReplyClick}
                 activeReplyTargetId={replyTargetId}
                 onReplySubmit={handleReplySubmit}
+                isReplySubmitting={isCreating}
               />
             </li>
           ))}

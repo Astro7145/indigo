@@ -11,6 +11,8 @@ interface CommentInputProps {
   ariaLabel?: string;
   // 답글 입력창처럼 사용자가 명시적으로 연 입력에 즉시 포커스시킬 때 사용
   autoFocus?: boolean;
+  // 등록 진행 중 등 외부에서 입력을 잠가야 할 때 사용 (중복 제출 방지)
+  disabled?: boolean;
 }
 
 export default function CommentInput({
@@ -18,13 +20,14 @@ export default function CommentInput({
   placeholder = '댓글을 입력해주세요.',
   ariaLabel = '댓글 입력',
   autoFocus = false,
+  disabled = false,
 }: CommentInputProps) {
   const [text, setText] = useState('');
   const isEmpty = text.trim().length === 0;
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isEmpty) return;
+    if (isEmpty || disabled) return;
     onSubmit?.(text, () => setText(''));
   };
 
@@ -32,7 +35,7 @@ export default function CommentInput({
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
     e.preventDefault();
-    if (!isEmpty) e.currentTarget.form?.requestSubmit();
+    if (!isEmpty && !disabled) e.currentTarget.form?.requestSubmit();
   };
 
   return (
@@ -45,10 +48,16 @@ export default function CommentInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        disabled={disabled}
         // field-sizing-content: 입력 높이가 내용에 맞춰 자동 증가 (Chrome 123+, Safari 17.4+, Firefox 미지원은 1줄 고정 + 내부 스크롤)
-        className="field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none sm:min-h-12 sm:px-4 sm:py-3 sm:text-base"
+        className="field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:min-h-12 sm:px-4 sm:py-3 sm:text-base"
       />
-      <Button type="submit" size="small" disabled={isEmpty} className="h-10 w-[64px] shrink-0 px-0 sm:h-12 sm:w-[80px]">
+      <Button
+        type="submit"
+        size="small"
+        disabled={isEmpty || disabled}
+        className="h-10 w-[64px] shrink-0 px-0 sm:h-12 sm:w-[80px]"
+      >
         등록
       </Button>
     </form>
