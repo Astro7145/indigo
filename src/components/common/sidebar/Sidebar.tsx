@@ -3,8 +3,13 @@
 import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
+
+// 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
+const isTypingTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+};
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import { useNewTodoShortcut } from '@/src/hooks/useNewTodoShortcut';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
@@ -25,8 +30,20 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Sidebar() {
   const { openCreate } = useTodoSheet();
-  // 사이드바는 모든 뷰포트에서 항상 마운트(hidden sm:contents) — 전역 N 단축키의 단일 거처
-  useNewTodoShortcut(openCreate);
+
+  // 새 할일 N 단축키 — 사이드바는 모든 뷰포트에서 항상 마운트(hidden sm:contents)라 전역 리스너의
+  // 단일 거처다. 버튼(TodoAddButton)에 두면 접힘 시 언마운트로 단축키가 죽어서 컴포넌트 본문에 둔다.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+      if (event.key !== 'n' && event.key !== 'N') return;
+      if (isTypingTarget(event.target)) return;
+      event.preventDefault();
+      openCreate();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openCreate]);
   const path = usePathname();
   const openSettings = useSettingsModalStore((s) => s.open);
 

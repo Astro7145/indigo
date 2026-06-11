@@ -32,3 +32,28 @@ it('새 할일 버튼을 누르면 생성 시트를 연다', () => {
   fireEvent.click(screen.getByText('새 할일'));
   expect(mockOpenCreate).toHaveBeenCalledTimes(1);
 });
+
+it('N 단축키로 생성 시트를 연다', () => {
+  render(<Sidebar />);
+  fireEvent.keyDown(window, { key: 'n' });
+  expect(mockOpenCreate).toHaveBeenCalledTimes(1);
+});
+
+it('입력 중에는 N 단축키가 동작하지 않는다', () => {
+  render(
+    <>
+      <input aria-label="field" />
+      <Sidebar />
+    </>,
+  );
+  const input = screen.getByLabelText('field');
+  input.focus();
+  fireEvent.keyDown(input, { key: 'n' });
+  expect(mockOpenCreate).not.toHaveBeenCalled();
+});
+
+it('조합키(meta/ctrl/alt)와 함께 누르면 동작하지 않는다', () => {
+  render(<Sidebar />);
+  fireEvent.keyDown(window, { key: 'n', metaKey: true });
+  expect(mockOpenCreate).not.toHaveBeenCalled();
+});
