@@ -1,6 +1,6 @@
 jest.mock('@/src/api/client-fetcher');
 import instance from '@/src/api/client-fetcher';
-import { getTodos, createTodo, patchTodo, deleteTodo, getTodo, todoKeys } from '@/src/api/todo';
+import { getTodos, getAllTodos, createTodo, patchTodo, deleteTodo, getTodo, todoKeys } from '@/src/api/todo';
 
 const mocked = instance as jest.Mocked<typeof instance>;
 
@@ -16,6 +16,18 @@ it('getTodos는 params와 함께 GET /todos를 호출하고 데이터를 반환�
   const r = await getTodos({ cursor: 10, limit: 20, done: 'true' });
   expect(mocked.get).toHaveBeenCalledWith('/todos', { params: { cursor: 10, limit: 20, done: 'true' } });
   expect(r).toEqual({ todos: [], nextCursor: null, totalCount: 0 });
+});
+
+it('getAllTodos는 nextCursor 끝까지 따라가 전체 todo를 합친다', async () => {
+  mocked.get
+    .mockResolvedValueOnce({ data: { todos: [{ id: 1 }], nextCursor: 2, totalCount: 2 } } as never)
+    .mockResolvedValueOnce({ data: { todos: [{ id: 2 }], nextCursor: null, totalCount: 2 } } as never);
+  const r = await getAllTodos(50);
+  expect(mocked.get).toHaveBeenNthCalledWith(1, '/todos', { params: { cursor: undefined, limit: 50 } });
+  expect(mocked.get).toHaveBeenNthCalledWith(2, '/todos', { params: { cursor: 2, limit: 50 } });
+  expect(r.todos.map((t) => t.id)).toEqual([1, 2]);
+  expect(r.nextCursor).toBeNull();
+  expect(r.totalCount).toBe(2);
 });
 
 it('createTodo는 body와 함께 /todos로 POST한다', async () => {
