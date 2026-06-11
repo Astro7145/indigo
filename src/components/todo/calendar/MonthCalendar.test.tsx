@@ -79,6 +79,8 @@ it('다음 달 버튼을 누르면 타이틀이 익월로 바뀐다', () => {
 it('날짜 셀을 클릭하면 그 날짜가 선택된다', () => {
   render(<Harness />);
   const grid = screen.getByRole('grid');
-  fireEvent.click(within(grid).getByText('15'));
-  expect(within(grid).getByText('15').closest('[aria-selected]')).toHaveAttribute('aria-selected', 'true');
+  // 셀 선택은 오버레이 버튼이 담당 — react-aria가 버튼에 전체 날짜 aria-label을 부여한다
+  const cellButton = within(grid).getByRole('button', { name: /15,/ });
+  fireEvent.click(cellButton);
+  expect(cellButton.closest('[aria-selected]')).toHaveAttribute('aria-selected', 'true');
 });

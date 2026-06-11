@@ -24,7 +24,7 @@ interface MonthCalendarCellProps {
  * xl: 칩 목록 / 미만: 점 목록(CSS 분기). 이전·다음 달 날짜는 표시 전용(클릭 불가).
  */
 export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: MonthCalendarCellProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLButtonElement>(null);
   const { cellProps, buttonProps, isSelected, isOutsideVisibleRange } = useCalendarCell({ date }, state, ref);
 
   const visible = todos.slice(0, MAX_VISIBLE);
@@ -45,8 +45,8 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
       >
         {date.day}
       </span>
-      {/* xl: 칩 목록 */}
-      <span className="hidden w-full min-w-0 flex-col gap-1 xl:flex">
+      {/* xl: 칩 목록 — 콘텐츠 레이어는 pointer-events-none이므로 칩만 클릭을 되살린다 */}
+      <span className="pointer-events-auto hidden w-full min-w-0 flex-col gap-1 xl:flex">
         {visible.map((t) => (
           <CalendarTodoChip key={t.id} todo={t} onClick={onSelectTodo} />
         ))}
@@ -74,13 +74,17 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
     );
   }
 
+  // 셀 선택(날짜 클릭)은 절대 위치 오버레이 버튼이 담당하고, 콘텐츠는 pointer-events-none 레이어로 분리한다 —
+  // role="button" 안에 칩 <button>이 중첩되는 접근성 위반(대화형 요소 중첩)을 피하면서 셀 전체 클릭 UX를 유지.
   return (
-    <td {...cellProps} className="border-r border-b border-slate-200 p-0 align-top last:border-r-0">
-      <div
+    <td {...cellProps} className="relative border-r border-b border-slate-200 p-0 align-top last:border-r-0">
+      <button
         {...buttonProps}
         ref={ref}
-        className="flex h-[100px] flex-col items-start gap-1 p-2 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset xl:h-[158px]"
-      >
+        type="button"
+        className="absolute inset-0 size-full outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset"
+      />
+      <div className="pointer-events-none relative z-10 flex h-[100px] flex-col items-start gap-1 p-2 xl:h-[158px]">
         {content}
       </div>
     </td>
