@@ -23,8 +23,8 @@ interface AsyncBoundaryProps {
  * 로딩/에러를 선언적으로 처리한다. 정적 errorFallback을 fragment로 감싸 ReactElement 요구를 만족시킨다.
  *
  * SSR에선 라우트별 prefetch(#136)가 모든 suspense 쿼리를 커버해 첫 HTML에 데이터가 실린다.
- * 커버가 누락되면 client-fetcher의 SSR invariant가 이름 붙은 에러로 드러내고, React 스트리밍이
- * 해당 경계만 fallback으로 강등 후 클라에서 재시도한다(화면은 유지, 서버 로그가 신호).
+ * prefetch가 비거나 실패하면(커버 누락·토큰 만료 등) 서버에서 클라 fetcher가 상대 baseURL 때문에
+ * 실패하고, React 스트리밍이 해당 경계만 fallback으로 강등 후 클라에서 재시도한다(화면 유지, 서버 로그가 신호).
  */
 export default function AsyncBoundary({ fallback, errorFallback, children, resetKeys }: AsyncBoundaryProps) {
   return (

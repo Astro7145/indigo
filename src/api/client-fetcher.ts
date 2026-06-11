@@ -8,16 +8,6 @@ const instance: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// AsyncBoundary 클라 게이트(#137)를 대체하는 invariant (#136): 클라 전용 fetcher가 SSR에서 돌면
-// 해당 라우트의 prefetch 커버가 누락된 것이다. 조용한 "Invalid URL" 대신 이름 붙은 에러로 드러낸다.
-// React 스트리밍 SSR이 해당 Suspense 경계만 fallback으로 강등하고 클라가 재시도하므로 화면은 유지된다.
-instance.interceptors.request.use((config) => {
-  if (typeof window === 'undefined') {
-    throw new Error(`client fetcher ran during SSR — missing prefetch coverage (#136): ${config.url}`);
-  }
-  return config;
-});
-
 function toApiError(error: AxiosError): ApiError {
   const res = error.response;
   if (!res) {
