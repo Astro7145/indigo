@@ -4,6 +4,7 @@ import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from '
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import { useNewTodoShortcut } from '@/src/hooks/useNewTodoShortcut';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
@@ -24,6 +25,8 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Sidebar() {
   const { openCreate } = useTodoSheet();
+  // 사이드바는 모든 뷰포트에서 항상 마운트(hidden sm:contents) — 전역 N 단축키의 단일 거처
+  useNewTodoShortcut(openCreate);
   const path = usePathname();
   const openSettings = useSettingsModalStore((s) => s.open);
 
@@ -153,7 +156,6 @@ export default function Sidebar() {
           {!collapsed && (
             <div className="flex flex-col gap-y-8">
               <TodoAddButton
-                shortcut
                 onClick={() => {
                   openCreate();
                   // 태블릿 오버레이 사이드바는 폼을 가리지 않도록 함께 접는다 (목표 선택과 동일 동작)

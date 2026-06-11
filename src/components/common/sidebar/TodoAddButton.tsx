@@ -1,36 +1,15 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { useEffect } from 'react';
 import { cn } from '@/src/utils/cn';
 
 interface TodoAddButtonProps {
   onClick?: () => void;
   className?: string;
-  /** N 단축키 활성화 — 전역 리스너라 한 곳(Sidebar)만 켠다. 중복 마운트 시 시트가 두 번 열린다. */
-  shortcut?: boolean;
 }
 
-// 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
-const isTypingTarget = (target: EventTarget | null) => {
-  if (!(target instanceof HTMLElement)) return false;
-  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
-};
-
-export default function TodoAddButton({ onClick, className, shortcut = false }: TodoAddButtonProps) {
-  useEffect(() => {
-    if (!onClick || !shortcut) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
-      if (event.key !== 'n' && event.key !== 'N') return;
-      if (isTypingTarget(event.target)) return;
-      event.preventDefault();
-      onClick();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClick, shortcut]);
-
+// N 단축키는 useNewTodoShortcut(Sidebar)이 담당 — 버튼 마운트 여부(접힘)에 단축키가 종속되지 않게 분리.
+export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
   return (
     <motion.button
       type="button"
