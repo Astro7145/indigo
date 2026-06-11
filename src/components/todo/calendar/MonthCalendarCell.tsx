@@ -79,7 +79,7 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
       <div
         {...buttonProps}
         ref={ref}
-        className="flex h-[100px] cursor-pointer flex-col items-start gap-1 p-2 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset xl:h-[158px]"
+        className="flex h-[100px] flex-col items-start gap-1 p-2 outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset xl:h-[158px]"
       >
         {content}
       </div>

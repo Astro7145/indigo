@@ -22,7 +22,7 @@ export default function CalendarTodoChip({ todo, onClick, className }: CalendarT
         onClick(todo);
       }}
       className={cn(
-        'flex w-full items-center gap-0.5 rounded-[6px] border px-2 py-1 text-left',
+        'flex w-full cursor-pointer items-center gap-0.5 rounded-[6px] border px-2 py-1 text-left',
         todo.done ? 'border-slate-300 bg-slate-50' : 'border-indigo-300 bg-indigo-100',
         className,
       )}
