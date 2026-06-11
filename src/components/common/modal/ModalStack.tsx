@@ -29,12 +29,13 @@ export default function ModalStack() {
   }, [hasModals]);
 
   // ESC는 최상단 엔트리에만 작용한다. document 리스너 하나로 LIFO를 보장한다.
+  // 모든 모달/시트는 ESC에 반응한다. 닫는 방식만 엔트리가 정한다(onClose 미지정 시 close).
   useEffect(() => {
     if (!hasModals) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       const top = modals[modals.length - 1];
-      if (top.closeOnEsc) close();
+      (top.onClose ?? close)();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
@@ -49,17 +50,15 @@ export default function ModalStack() {
   // 엔트리 하나를 알맞은 셸(BottomSheet/Modal)에 내용까지 끼워 렌더한다.
   // zIndex·active(focus trap)는 전체 스택 위치(index) 기준.
   const renderEntry = (entry: ModalEntry, index: number) => {
-    const zIndex = 50 + index;
+    // 베이스 100 — 앱 크롬(Topbar/Sidebar z-50)·NoteEmbedPanel(z-60) 위에 항상 쌓이도록.
+    // (낮으면 z-index 동률로 DOM상 더 뒤인 크롬이 백드롭 위로 올라와 클릭이 새어나간다.)
+    const zIndex = 100 + index;
+    // ESC·백드롭은 항상 반응한다. 닫는 동작은 엔트리가 정한다(미지정 시 close).
+    // ESC는 ModalStack이 중앙 처리하므로 셸 자체 ESC(closeOnEsc)는 꺼서 중복을 막는다.
+    const handleClose = entry.onClose ?? close;
     if (isBottomSheet(entry)) {
       return (
-        <BottomSheet
-          key={entry.id}
-          isOpen
-          onClose={close}
-          closeOnBackdropClick={entry.closeOnBackdropClick}
-          zIndex={zIndex}
-          scrollLock={false}
-        >
+        <BottomSheet key={entry.id} isOpen onClose={handleClose} closeOnEsc={false} zIndex={zIndex} scrollLock={false}>
           {entry.render(controls)}
         </BottomSheet>
       );
@@ -68,8 +67,7 @@ export default function ModalStack() {
       <Modal
         key={entry.id}
         open
-        onClose={close}
-        closeOnBackdropClick={entry.closeOnBackdropClick}
+        onClose={handleClose}
         closeOnEsc={false}
         active={index === modals.length - 1}
         zIndex={zIndex}
