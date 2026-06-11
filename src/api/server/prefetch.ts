@@ -51,9 +51,23 @@ export const prefetchAllGoals = (qc: QueryClient) =>
     },
   });
 
-/** 대시보드 GoalTodoSection — useInfiniteGoalListSuspense({limit})와 동일 키. */
-export const prefetchInfiniteGoals = (qc: QueryClient, limit: number) =>
-  prefetchInfinite(qc, goalKeys.list({ limit }), 'goals', { limit });
+/**
+ * 대시보드 GoalTodoSection — useInfiniteGoalListSuspense({limit})와 동일 키.
+ * 첫 페이지 목표를 반환해 호출 측(page)이 키 지식 없이 보드 fan-out을 조합할 수 있게 한다.
+ * 실패는 빈 배열 — prefetch 실패는 무해해야 하므로(클라 재시도) 던지지 않는다.
+ */
+export async function prefetchInfiniteGoals(qc: QueryClient, limit: number): Promise<GoalListResponse['goals']> {
+  try {
+    const data = await qc.fetchInfiniteQuery({
+      queryKey: [...goalKeys.list({ limit }), 'infinite'],
+      queryFn: () => serverGet<GoalListResponse>('goals', { limit }),
+      initialPageParam: undefined as number | undefined,
+    });
+    return data.pages[0]?.goals ?? [];
+  } catch {
+    return [];
+  }
+}
 
 /** GoalTodoBoard — useTodoList({goalId, keyword: undefined})와 동일 키(undefined는 해시에서 탈락). */
 export const prefetchGoalBoard = (qc: QueryClient, goalId: number) =>

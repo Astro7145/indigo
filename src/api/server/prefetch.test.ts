@@ -9,9 +9,9 @@ import { noteKeys } from '@/src/api/note';
 import {
   prefetchAllGoals,
   prefetchCalendarMonth,
-  prefetchDashboard,
   prefetchFavorites,
   prefetchGoalDetail,
+  prefetchInfiniteGoals,
   prefetchInfiniteNotes,
   prefetchInfiniteTodos,
   prefetchMe,
@@ -96,14 +96,14 @@ it('prefetchCalendarMonth는 useTodosInRange와 동일한 range 키에 커서 �
   expect(data?.todos.map((t) => t.id)).toEqual([1, 2]);
 });
 
-it('prefetchDashboard는 첫 페이지 목표들의 보드까지 함께 캐시한다', async () => {
-  mocked.mockImplementation((path: string, params?: Record<string, unknown>) => {
-    if (path === 'goals' && params?.limit === 2)
-      return Promise.resolve({ goals: [{ id: 11 }, { id: 12 }], nextCursor: null, totalCount: 2 });
-    if (path === 'goals') return Promise.resolve({ goals: [], nextCursor: null, totalCount: 0 });
-    return Promise.resolve({ todos: [], nextCursor: null, totalCount: 0 });
-  });
-  await prefetchDashboard(qc);
-  expect(qc.getQueryData(todoKeys.list({ goalId: 11 }))).toBeDefined();
-  expect(qc.getQueryData(todoKeys.list({ goalId: 12 }))).toBeDefined();
+it('prefetchInfiniteGoals는 캐시에 넣고 첫 페이지 목표를 반환한다 — page가 보드 fan-out을 조합할 수 있게', async () => {
+  mocked.mockResolvedValue({ goals: [{ id: 11 }, { id: 12 }], nextCursor: null, totalCount: 2 });
+  const first = await prefetchInfiniteGoals(qc, 2);
+  expect(first.map((g) => g.id)).toEqual([11, 12]);
+  expect(qc.getQueryData([...goalKeys.list({ limit: 2 }), 'infinite'])).toBeDefined();
+});
+
+it('prefetchInfiniteGoals는 실패 시 던지지 않고 빈 배열을 반환한다', async () => {
+  mocked.mockRejectedValue(new Error('backend down'));
+  await expect(prefetchInfiniteGoals(qc, 2)).resolves.toEqual([]);
 });
