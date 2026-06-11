@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
@@ -10,10 +9,12 @@ import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
+import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
-import { useUpdateTodo } from '@/src/hooks/todo';
 import type { FavoriteTodo } from '@/src/types/favorite';
+import type { Todo } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 
@@ -38,6 +39,10 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
 export default function FavoritesPage() {
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
+
+  // 행 클릭(상세)·케밥 수정 시트 — 단일 인스턴스를 페이지가 소유(/todos 동일 패턴). 삭제 확인은 각 행(TodoRow)이 소유.
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -98,10 +103,18 @@ export default function FavoritesPage() {
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
             resetKeys={[tab, goalId]}
           >
-            <FavoritesList tab={tab} goalId={goalId} />
+            <FavoritesList tab={tab} goalId={goalId} onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
           </AsyncBoundary>
         </Card>
       </div>
+
+      <TodoFormSheet
+        mode="update"
+        isOpen={editingTodo !== null}
+        onClose={() => setEditingTodo(null)}
+        todo={editingTodo}
+      />
+      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </section>
   );
 }
@@ -112,47 +125,33 @@ function FavoritesCount({ tab, goalId }: { tab: Tab; goalId: number | null }) {
   return <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{visible.length}</span>;
 }
 
-function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
+function FavoritesList({
+  tab,
+  goalId,
+  onEditTodo,
+  onSelectTodo,
+}: {
+  tab: Tab;
+  goalId: number | null;
+  onEditTodo: (todo: Todo) => void;
+  onSelectTodo: (todo: Todo) => void;
+}) {
   const { data } = useFavoriteTodoList({ limit: 100 });
-  const update = useUpdateTodo();
-  const removeFavorite = useRemoveTodoFavorite();
-  const reduce = useReducedMotion();
 
   const visible = filterFavorites(data.favorites, tab, goalId);
-
-  const toggle = (todoId: number, done: boolean) => update.mutate({ todoId, body: { done } });
-  const unfavorite = (todoId: number) => removeFavorite.mutate(todoId);
 
   if (visible.length === 0) {
     return <p className="py-20 text-center text-sm text-slate-500">아직 찜한 할 일이 없어요</p>;
   }
 
+  // 즐겨찾기 응답의 todo는 isFavorite=true인 완전한 Todo — 별 클릭은 TodoList의 일반 토글로 해제가 된다.
   return (
-    <ul className="flex flex-col gap-2">
-      {visible.map((f, idx) => {
-        // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-        const hasNote = (f.todo.noteIds?.length ?? 0) > 0;
-        const hasLink = !!f.todo.linkUrl;
-        return (
-          <motion.li
-            key={f.id}
-            initial={reduce ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut', delay: Math.min(idx * 0.015, 0.3) }}
-            className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
-          >
-            <TodoList title={f.todo.title} checked={f.todo.done} onCheckedChange={(done) => toggle(f.todoId, done)}>
-              <TodoList.Actions>
-                {hasNote && <TodoList.NoteAction />}
-                {hasLink && <TodoList.LinkAction />}
-                {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
-                <TodoList.KebabAction hoverOnly />
-                <TodoList.StarAction active onClick={() => unfavorite(f.todoId)} />
-              </TodoList.Actions>
-            </TodoList>
-          </motion.li>
-        );
-      })}
-    </ul>
+    <TodoList
+      className="flex flex-col gap-2"
+      todos={visible.map((f) => f.todo)}
+      size="large"
+      onEdit={onEditTodo}
+      onSelect={onSelectTodo}
+    />
   );
 }
