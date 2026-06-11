@@ -10,7 +10,7 @@ import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import type { Todo, TodoListParams } from '@/src/types/todo';
+import type { TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 const EMPTY_MSG_BY_TAP = {

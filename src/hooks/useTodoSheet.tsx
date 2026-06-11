@@ -7,11 +7,11 @@ import TodoUpdateContainer from '@/src/components/todo/TodoUpdateContainer';
 import { useModalStore } from '@/src/stores/modal';
 import type { Todo } from '@/src/types/todo';
 
-/** 기존 TodoFormSheet의 confirm Modal 클래스 그대로 — 가운데 고정 폭. */
+/** 이탈 확인 모달 — 모바일에서도 가운데 고정 폭(시트가 아님). */
 const EXIT_CONFIRM_CLASS = 'w-[400px] pt-8 pb-6 sm:w-[400px] sm:pt-10 sm:pb-8';
-/** 기존 TodoFormSheet의 폼 Modal 패딩. */
+/** 생성/수정 폼 모달 패딩. */
 const FORM_CLASS = 'p-4 sm:p-8';
-/** 기존 TodoDetailSheet의 Modal 패딩(p-40 균일). */
+/** 상세 모달 패딩 — 디자인의 p-40 균일. */
 const DETAIL_CLASS = 'p-10 sm:p-10';
 
 /**

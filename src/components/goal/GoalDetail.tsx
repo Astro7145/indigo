@@ -6,7 +6,6 @@ import GoalDetailHeader from '@/src/components/goal/GoalDetailHeader';
 import GoalNotesCard from '@/src/components/goal/GoalNotesCard';
 import GoalTodoColumn from '@/src/components/goal/GoalTodoColumn';
 import { useMe } from '@/src/hooks/user';
-import type { Todo } from '@/src/types/todo';
 
 export interface GoalDetailProps {
   goalId: number;

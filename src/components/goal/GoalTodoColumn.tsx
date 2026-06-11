@@ -10,7 +10,6 @@ import { IcCalendar } from '@/src/components/common/icons/IcCalendar';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface GoalTodoColumnProps {

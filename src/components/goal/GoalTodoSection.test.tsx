@@ -5,7 +5,7 @@ jest.mock('@/src/components/goal/GoalTodoBoard', () => ({
 }));
 
 import type { ComponentProps } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { useInfiniteGoalListSuspense } from '@/src/hooks/goal';
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';

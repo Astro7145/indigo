@@ -13,7 +13,6 @@ import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { FavoriteTodo } from '@/src/types/favorite';
-import type { Todo } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 
