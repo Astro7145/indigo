@@ -1,4 +1,12 @@
-import { CalendarDate, parseAbsolute, toCalendarDate } from '@internationalized/date';
+import {
+  CalendarDate,
+  endOfMonth,
+  endOfWeek,
+  parseAbsolute,
+  startOfMonth,
+  startOfWeek,
+  toCalendarDate,
+} from '@internationalized/date';
 
 /** DB의 ISO 문자열(자정 UTC)을 달력상의 하루(CalendarDate)로 변환. 로컬 타임존 드리프트 없음. */
 export function isoToCalendarDate(iso: string | null): CalendarDate | null {
@@ -51,4 +59,17 @@ export function formatRelativeTime(iso: string | null | undefined, now: number =
   const m = String(past.getUTCMonth() + 1).padStart(2, '0');
   const d = String(past.getUTCDate()).padStart(2, '0');
   return `${y}.${m}.${d}`;
+}
+
+/**
+ * 해당 달의 캘린더 그리드 표시 범위(앞뒤 달 날짜 포함, 월요일 시작 주 단위)를 'YYYY-MM-DD'로 반환.
+ * 클라(캘린더 월 쿼리)와 서버(prefetch)가 같은 범위를 계산해 쿼리 키가 일치한다.
+ * firstDayOfWeek를 명시하므로 locale 인자는 결과에 영향이 없다.
+ */
+export function calendarGridRange(month: CalendarDate): { from: string; to: string } {
+  const start = startOfMonth(month);
+  return {
+    from: startOfWeek(start, 'ko-KR', 'mon').toString(),
+    to: endOfWeek(endOfMonth(start), 'ko-KR', 'mon').toString(),
+  };
 }

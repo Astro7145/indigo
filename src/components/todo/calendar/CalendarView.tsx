@@ -2,16 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useLocale } from 'react-aria';
-import {
-  endOfMonth,
-  endOfWeek,
-  getLocalTimeZone,
-  startOfMonth,
-  startOfWeek,
-  today,
-  type CalendarDate,
-} from '@internationalized/date';
+import { getLocalTimeZone, parseDate, startOfMonth, today, type CalendarDate } from '@internationalized/date';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -27,7 +18,7 @@ import { usePrefetchTodosInRange, useTodosInRange } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useMe } from '@/src/hooks/user';
 import type { Todo } from '@/src/types/todo';
-import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
+import { calendarDateToIso, calendarGridRange, isoToCalendarDate } from '@/src/utils/date';
 
 const statusMessageClass = 'py-16 text-center text-sm text-slate-400';
 
@@ -59,17 +50,18 @@ export default function CalendarView() {
     setGoalId(id);
     window.history.replaceState(null, '', id === null ? '/calendar' : `/calendar?goalId=${id}`);
   };
-  const { locale } = useLocale();
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   // 보이는 달의 기준(react-aria 포커스 날짜) — 월 범위 쿼리의 suspense 리마운트에도 보이는 달을 보존한다.
   const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   // 월 이동으로 선택 날짜가 새 그리드 범위를 벗어나면 범위 안으로 클램프 —
   // 범위 밖 날짜의 할일은 보이는 달 쿼리에 없어 선택 리스트가 거짓 빈 상태가 된다.
+  // (from/to는 YYYY-MM-DD라 문자열 비교가 날짜 순서와 일치)
   const handleFocusChange = (date: CalendarDate) => {
     setFocusedDate(date);
-    const { start, end } = gridBoundsOf(date, locale);
-    if (selectedDate.compare(start) < 0) setSelectedDate(start);
-    else if (selectedDate.compare(end) > 0) setSelectedDate(end);
+    const { from, to } = calendarGridRange(date);
+    const selected = selectedDate.toString();
+    if (selected < from) setSelectedDate(parseDate(from));
+    else if (selected > to) setSelectedDate(parseDate(to));
   };
   const { openCreate, openDetail } = useTodoSheet();
 
@@ -131,18 +123,6 @@ export default function CalendarView() {
   );
 }
 
-/** 해당 달의 그리드 표시 범위(앞뒤 달 날짜 포함, 월요일 시작 주 단위). */
-function gridBoundsOf(month: CalendarDate, locale: string): { start: CalendarDate; end: CalendarDate } {
-  const start = startOfMonth(month);
-  return { start: startOfWeek(start, locale, 'mon'), end: endOfWeek(endOfMonth(start), locale, 'mon') };
-}
-
-/** 그리드 표시 범위를 KST date 문자열(from/to)로 반환. */
-function gridRangeOf(month: CalendarDate, locale: string): { from: string; to: string } {
-  const { start, end } = gridBoundsOf(month, locale);
-  return { from: start.toString(), to: end.toString() };
-}
-
 function CalendarContent({
   goalId,
   onChangeGoalId,
@@ -160,14 +140,13 @@ function CalendarContent({
   onFocusChange: (date: CalendarDate) => void;
   onSelectTodo: (todo: Todo) => void;
 }) {
-  const { locale } = useLocale();
   // 보이는 달의 그리드 범위만 서버에서 조회 — 방문한 달은 캐시돼 재방문 즉시.
-  const { from, to } = gridRangeOf(focusedDate, locale);
+  const { from, to } = calendarGridRange(focusedDate);
   const { data } = useTodosInRange(from, to);
   // 인접 월은 백그라운드 프리페치해 월 이동 시 suspense 깜빡임을 줄인다.
   usePrefetchTodosInRange([
-    gridRangeOf(startOfMonth(focusedDate).subtract({ months: 1 }), locale),
-    gridRangeOf(startOfMonth(focusedDate).add({ months: 1 }), locale),
+    calendarGridRange(startOfMonth(focusedDate).subtract({ months: 1 })),
+    calendarGridRange(startOfMonth(focusedDate).add({ months: 1 })),
   ]);
   // 필터 드롭다운 — favorites 페이지와 동일 패턴 (공용 추출은 #150 범위 제외)
   const { data: goalData } = useGoalList({ limit: 100 });
