@@ -32,7 +32,17 @@ function Harness({
   onSelectTodo?: (todo: Todo) => void;
 }) {
   const [value, setValue] = useState(new CalendarDate(2025, 1, 10));
-  return <MonthCalendar value={value} onChange={setValue} todosByDate={todosByDate} onSelectTodo={onSelectTodo} />;
+  const [focused, setFocused] = useState(new CalendarDate(2025, 1, 10));
+  return (
+    <MonthCalendar
+      value={value}
+      onChange={setValue}
+      focusedValue={focused}
+      onFocusChange={setFocused}
+      todosByDate={todosByDate}
+      onSelectTodo={onSelectTodo}
+    />
+  );
 }
 
 it('현재 달 타이틀과 요일 헤더(월요일 시작)를 렌더한다', () => {

@@ -17,6 +17,12 @@ export interface MonthCalendarProps {
   /** 선택 날짜 (controlled) */
   value: CalendarDate;
   onChange: (date: CalendarDate) => void;
+  /**
+   * 포커스 날짜 (controlled) — 보이는 달을 결정한다. 부모가 들고 있어야 월 이동으로 suspense
+   * 리마운트가 일어나도 보이는 달이 선택 날짜의 달로 되돌아가지 않는다.
+   */
+  focusedValue: CalendarDate;
+  onFocusChange: (date: CalendarDate) => void;
   /** `CalendarDate.toString()`('YYYY-MM-DD') → 그 날짜의 할일 */
   todosByDate: Map<string, Todo[]>;
   onSelectTodo: (todo: Todo) => void;
@@ -29,11 +35,27 @@ export interface MonthCalendarProps {
  * 헤더(« 2025년 1월 » + 필터 슬롯)는 xl에서 한 줄(네비 좌·필터 우), 미만은 세로 스택(네비 중앙).
  * Figma 21209:62586(데스크탑)/21209:62734(태블릿).
  */
-export default function MonthCalendar({ value, onChange, todosByDate, onSelectTodo, children }: MonthCalendarProps) {
+export default function MonthCalendar({
+  value,
+  onChange,
+  focusedValue,
+  onFocusChange,
+  todosByDate,
+  onSelectTodo,
+  children,
+}: MonthCalendarProps) {
   const { locale } = useLocale();
   // firstDayOfWeek는 state에 줘야 셀 배치(getDatesInWeek)가 월요일 시작이 된다 — grid 옵션만으로는
   // 요일 라벨·주 수 계산만 바뀌고 날짜가 로케일 기준(ko/en=일요일)으로 깔려 한 칸 어긋난다.
-  const state: CalendarState = useCalendarState({ value, onChange, locale, createCalendar, firstDayOfWeek: 'mon' });
+  const state: CalendarState = useCalendarState({
+    value,
+    onChange,
+    focusedValue,
+    onFocusChange,
+    locale,
+    createCalendar,
+    firstDayOfWeek: 'mon',
+  });
   const { calendarProps, prevButtonProps, nextButtonProps } = useCalendar({ value, onChange }, state);
   const { gridProps, headerProps, weeksInMonth } = useCalendarGrid({ firstDayOfWeek: 'mon' }, state);
 

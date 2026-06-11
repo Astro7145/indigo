@@ -14,13 +14,19 @@ export async function getTodos(params: TodoListParams = {}): Promise<TodoListRes
   return data;
 }
 
-/** 캘린더 등 전체 할일이 필요한 화면용 — nextCursor 끝까지 따라가 전부 합친다. */
-export async function getAllTodos(limit = 100): Promise<TodoListResponse> {
+/**
+ * 주어진 필터로 nextCursor 끝까지 따라가 todo를 전부 합친다 — 페이지 한도(limit 최대 100) 때문에
+ * 단일 호출로는 누락될 수 있는 화면(캘린더의 월 범위 조회 등)에서 완전성을 보장한다.
+ */
+export async function getAllTodos(
+  params: Omit<TodoListParams, 'cursor' | 'limit'> = {},
+  limit = 100,
+): Promise<TodoListResponse> {
   const todos: Todo[] = [];
   let cursor: number | undefined;
   let totalCount = 0;
   do {
-    const page = await getTodos({ cursor, limit });
+    const page = await getTodos({ ...params, cursor, limit });
     todos.push(...page.todos);
     totalCount = page.totalCount;
     cursor = page.nextCursor ?? undefined;

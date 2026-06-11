@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import {
+  queryOptions,
   useQuery,
   useSuspenseQuery,
   useSuspenseInfiniteQuery,
@@ -21,12 +23,28 @@ export function useTodoList(params: TodoListParams = {}) {
   });
 }
 
-/** 캘린더 등 전체 할일이 필요한 화면용 — 커서 루프로 전부 받아 캐시한다(월 이동·필터 변경 시 재요청 없음). */
-export function useAllTodos() {
-  return useSuspenseQuery<TodoListResponse, ApiError>({
-    queryKey: [...todoKeys.lists(), 'all'],
-    queryFn: () => getAllTodos(),
+/** 마감일 범위(KST, YYYY-MM-DD) 쿼리 옵션 — suspense 훅과 프리페치가 키·fetcher를 공유한다. */
+function todosInRangeOptions(from: string, to: string) {
+  return queryOptions<TodoListResponse, ApiError>({
+    queryKey: [...todoKeys.lists(), 'range', { from, to }] as QueryKey,
+    queryFn: () => getAllTodos({ from, to }),
   });
+}
+
+/** 캘린더 등 기간 단위 화면용 — 범위 내에서도 커서를 끝까지 따라가 완전성을 보장한다. */
+export function useTodosInRange(from: string, to: string) {
+  return useSuspenseQuery(todosInRangeOptions(from, to));
+}
+
+/** 주어진 범위들을 백그라운드 프리페치 — 캘린더 월 이동 시 suspense 깜빡임을 줄인다. */
+export function usePrefetchTodosInRange(ranges: { from: string; to: string }[]) {
+  const qc = useQueryClient();
+  const rangesKey = ranges.map((r) => `${r.from}~${r.to}`).join(',');
+  useEffect(() => {
+    ranges.forEach((r) => qc.prefetchQuery(todosInRangeOptions(r.from, r.to)));
+    // ranges 배열은 렌더마다 새로 만들어지므로 내용 키로 비교한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qc, rangesKey]);
 }
 
 /** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch). */

@@ -1,7 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { getLocalTimeZone, today, type CalendarDate } from '@internationalized/date';
+import { useLocale } from 'react-aria';
+import {
+  endOfMonth,
+  endOfWeek,
+  getLocalTimeZone,
+  startOfMonth,
+  startOfWeek,
+  today,
+  type CalendarDate,
+} from '@internationalized/date';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -15,7 +24,7 @@ import SelectedDateTodos from '@/src/components/todo/calendar/SelectedDateTodos'
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useGoalList } from '@/src/hooks/goal';
-import { useAllTodos } from '@/src/hooks/todo';
+import { usePrefetchTodosInRange, useTodosInRange } from '@/src/hooks/todo';
 import { useMe } from '@/src/hooks/user';
 import type { Todo } from '@/src/types/todo';
 import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
@@ -41,10 +50,13 @@ export default function CalendarView({ initialGoalId }: CalendarViewProps) {
     window.history.replaceState(null, '', id === null ? '/calendar' : `/calendar?goalId=${id}`);
   };
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
+  // 보이는 달의 기준(react-aria 포커스 날짜) — 월 범위 쿼리의 suspense 리마운트에도 보이는 달을 보존한다.
+  const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   const [creating, setCreating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   const { data: me } = useMe();
+  const visibleMonthKey = startOfMonth(focusedDate).toString();
 
   return (
     <section className="mx-auto flex w-full max-w-320 flex-col gap-6">
@@ -69,13 +81,15 @@ export default function CalendarView({ initialGoalId }: CalendarViewProps) {
         <AsyncBoundary
           fallback={<p className={statusMessageClass}>불러오는 중…</p>}
           errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
-          resetKeys={[goalId]}
+          resetKeys={[goalId, visibleMonthKey]}
         >
           <CalendarContent
             goalId={goalId}
             onChangeGoalId={changeGoalId}
             selectedDate={selectedDate}
             onChangeSelectedDate={setSelectedDate}
+            focusedDate={focusedDate}
+            onFocusChange={setFocusedDate}
             onSelectTodo={setSelectedTodo}
           />
         </AsyncBoundary>
@@ -104,30 +118,50 @@ export default function CalendarView({ initialGoalId }: CalendarViewProps) {
   );
 }
 
+/** 해당 달의 그리드 표시 범위(앞뒤 달 날짜 포함, 월요일 시작 주 단위)를 KST date 문자열로 반환. */
+function gridRangeOf(month: CalendarDate, locale: string): { from: string; to: string } {
+  const start = startOfMonth(month);
+  return {
+    from: startOfWeek(start, locale, 'mon').toString(),
+    to: endOfWeek(endOfMonth(start), locale, 'mon').toString(),
+  };
+}
+
 function CalendarContent({
   goalId,
   onChangeGoalId,
   selectedDate,
   onChangeSelectedDate,
+  focusedDate,
+  onFocusChange,
   onSelectTodo,
 }: {
   goalId: number | null;
   onChangeGoalId: (goalId: number | null) => void;
   selectedDate: CalendarDate;
   onChangeSelectedDate: (date: CalendarDate) => void;
+  focusedDate: CalendarDate;
+  onFocusChange: (date: CalendarDate) => void;
   onSelectTodo: (todo: Todo) => void;
 }) {
-  const { data } = useAllTodos();
+  const { locale } = useLocale();
+  // 보이는 달의 그리드 범위만 서버에서 조회 — 방문한 달은 캐시돼 재방문 즉시.
+  const { from, to } = gridRangeOf(focusedDate, locale);
+  const { data } = useTodosInRange(from, to);
+  // 인접 월은 백그라운드 프리페치해 월 이동 시 suspense 깜빡임을 줄인다.
+  usePrefetchTodosInRange([
+    gridRangeOf(startOfMonth(focusedDate).subtract({ months: 1 }), locale),
+    gridRangeOf(startOfMonth(focusedDate).add({ months: 1 }), locale),
+  ]);
   // 필터 드롭다운 — favorites 페이지와 동일 패턴 (공용 추출은 #150 범위 제외)
   const { data: goalData } = useGoalList({ limit: 100 });
   const goals = goalData?.goals ?? [];
   const selectedGoal = goals.find((g) => g.id === goalId) ?? null;
 
-  // dueDate 없는 할일 제외 + 목표 필터. 월 필터는 불필요 — 셀이 자기 날짜만 조회한다.
+  // 목표 필터는 클라이언트(전환 즉시성). 범위는 서버가 거르지만 falsy dueDate 방어는 유지한다.
   const todosByDate = new Map<string, Todo[]>();
   for (const t of data.todos) {
     if (goalId !== null && t.goalId !== goalId) continue;
-    // null뿐 아니라 빈 문자열 등 falsy dueDate도 함께 거른다 (백엔드 응답 느슨함 방어)
     const date = isoToCalendarDate(t.dueDate);
     if (!date) continue;
     const key = date.toString();
@@ -141,6 +175,8 @@ function CalendarContent({
       <MonthCalendar
         value={selectedDate}
         onChange={onChangeSelectedDate}
+        focusedValue={focusedDate}
+        onFocusChange={onFocusChange}
         todosByDate={todosByDate}
         onSelectTodo={onSelectTodo}
       >

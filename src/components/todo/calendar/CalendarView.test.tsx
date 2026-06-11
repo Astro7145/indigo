@@ -90,9 +90,15 @@ beforeEach(() => {
 });
 
 // 칩(xl)·선택날짜 리스트(<xl)가 CSS로만 분기돼 jsdom에는 둘 다 존재 → *AllBy*로 조회한다.
-it('dueDate가 있는 할일만 캘린더에 표시한다', async () => {
+it('보이는 달의 그리드 범위(from/to)로 조회하고 dueDate 없는 할일은 방어적으로 거른다', async () => {
   renderWithClient(<CalendarView />);
   expect((await screen.findAllByText('오늘 할일')).length).toBeGreaterThan(0);
+  expect(mockedTodo.getAllTodos).toHaveBeenCalledWith(
+    expect.objectContaining({
+      from: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      to: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+    }),
+  );
   expect(screen.queryAllByText('날짜 없는 할일')).toHaveLength(0);
   expect(screen.queryAllByText('빈 날짜 할일')).toHaveLength(0);
 });
