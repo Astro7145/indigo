@@ -82,6 +82,7 @@ beforeEach(() => {
       makeTodo(1, '오늘 할일', { dueDate: isoToday() }),
       makeTodo(2, '목표 할일', { dueDate: isoToday(), goalId: 5 }),
       makeTodo(3, '날짜 없는 할일'),
+      makeTodo(4, '빈 날짜 할일', { dueDate: '' }),
     ],
     nextCursor: null,
     totalCount: 3,
@@ -93,6 +94,7 @@ it('dueDate가 있는 할일만 캘린더에 표시한다', async () => {
   renderWithClient(<CalendarView />);
   expect((await screen.findAllByText('오늘 할일')).length).toBeGreaterThan(0);
   expect(screen.queryAllByText('날짜 없는 할일')).toHaveLength(0);
+  expect(screen.queryAllByText('빈 날짜 할일')).toHaveLength(0);
 });
 
 it('목표 필터를 선택하면 해당 목표의 할일만 남는다', async () => {

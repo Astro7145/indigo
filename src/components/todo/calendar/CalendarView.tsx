@@ -121,9 +121,11 @@ function CalendarContent({
   // dueDate 없는 할일 제외 + 목표 필터. 월 필터는 불필요 — 셀이 자기 날짜만 조회한다.
   const todosByDate = new Map<string, Todo[]>();
   for (const t of data.todos) {
-    if (t.dueDate == null) continue;
     if (goalId !== null && t.goalId !== goalId) continue;
-    const key = isoToCalendarDate(t.dueDate)!.toString();
+    // null뿐 아니라 빈 문자열 등 falsy dueDate도 함께 거른다 (백엔드 응답 느슨함 방어)
+    const date = isoToCalendarDate(t.dueDate);
+    if (!date) continue;
+    const key = date.toString();
     const list = todosByDate.get(key);
     if (list) list.push(t);
     else todosByDate.set(key, [t]);
