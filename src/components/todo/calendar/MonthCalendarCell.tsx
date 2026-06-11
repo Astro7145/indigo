@@ -48,7 +48,7 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
       {/* xl: 칩 목록 — 콘텐츠 레이어는 pointer-events-none이므로 칩만 클릭을 되살린다 */}
       <span className="pointer-events-auto hidden w-full min-w-0 flex-col gap-1 xl:flex">
         {visible.map((t) => (
-          <CalendarTodoChip key={t.id} todo={t} onClick={onSelectTodo} />
+          <CalendarTodoChip key={t.id} todo={t} onClick={onSelectTodo} disabled={isOutsideVisibleRange} />
         ))}
       </span>
       {/* <xl: 점 목록 */}

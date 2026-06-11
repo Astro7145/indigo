@@ -63,6 +63,12 @@ it('할일이 3개를 넘으면 +N을 표시한다', () => {
   expect(screen.queryByText('d')).not.toBeInTheDocument();
 });
 
+it('이전/다음 달 셀의 칩은 비활성화된다', () => {
+  const map = new Map([['2024-12-30', [makeTodo(9, '저번달 할일')]]]);
+  render(<Harness todosByDate={map} />);
+  expect(screen.getByText('저번달 할일').closest('button')).toBeDisabled();
+});
+
 it('칩을 클릭하면 해당 todo로 onSelectTodo를 호출한다', () => {
   const onSelectTodo = jest.fn();
   const map = new Map([['2025-01-10', [makeTodo(7, '챕터4 듣기')]]]);

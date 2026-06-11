@@ -6,23 +6,26 @@ export interface CalendarTodoChipProps {
   todo: Todo;
   onClick: (todo: Todo) => void;
   className?: string;
+  /** 표시 전용 맥락(이전·다음 달 셀) — 클릭과 키보드 포커스를 차단한다 */
+  disabled?: boolean;
 }
 
 /**
  * 캘린더 할일 칩 — 미완료=인디고, 완료=슬레이트+체크(표시 전용, 토글은 상세 시트에서).
  * 월 그리드 셀(xl)과 선택 날짜 리스트(<xl)가 공유한다. Figma 21209:51959.
  */
-export default function CalendarTodoChip({ todo, onClick, className }: CalendarTodoChipProps) {
+export default function CalendarTodoChip({ todo, onClick, className, disabled }: CalendarTodoChipProps) {
   return (
     <button
       type="button"
+      disabled={disabled}
       onClick={(e) => {
         // 셀 클릭(날짜 선택)으로 전파 방지
         e.stopPropagation();
         onClick(todo);
       }}
       className={cn(
-        'flex w-full cursor-pointer items-center gap-0.5 rounded-[6px] border px-2 py-1 text-left',
+        'flex w-full cursor-pointer items-center gap-0.5 rounded-[6px] border px-2 py-1 text-left disabled:cursor-default',
         todo.done ? 'border-slate-300 bg-slate-50' : 'border-indigo-300 bg-indigo-100',
         className,
       )}
@@ -36,6 +39,8 @@ export default function CalendarTodoChip({ todo, onClick, className }: CalendarT
       >
         {todo.title}
       </span>
+      {/* 체크 아이콘은 aria-hidden — 완료 여부를 스크린리더에 텍스트로 전달 */}
+      {todo.done && <span className="sr-only">(완료)</span>}
     </button>
   );
 }
