@@ -3,6 +3,20 @@ import { NextRequest } from 'next/server';
 import { proxy } from '@/proxy';
 import { COOKIE } from '@/src/api/server/auth-cookies';
 
+// next-intl은 ESM이라 Jest(next/jest)가 파싱하지 못한다(node_modules 미변환).
+// 이 테스트의 관심사는 인증 가드이므로 라이브러리 모듈만 가볍게 스텁한다.
+// - middleware: 통과(NextResponse.next())만 반환해 인증 통과 케이스를 격리.
+// - routing(defineRouting): 입력 설정을 그대로 반환 → 실제 src/i18n/routing.ts의
+//   locales·defaultLocale·isValidLocale 로직은 그대로 동작한다.
+jest.mock('next-intl/middleware', () => ({
+  __esModule: true,
+  default: () => () => jest.requireActual('next/server').NextResponse.next(),
+}));
+jest.mock('next-intl/routing', () => ({
+  __esModule: true,
+  defineRouting: (config: unknown) => config,
+}));
+
 function req(pathname: string, cookie?: string) {
   return new NextRequest(`http://localhost${pathname}`, {
     headers: cookie ? { cookie } : {},

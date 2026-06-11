@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -13,4 +14,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin(
+  // request.ts 경로 지정
+  '@/src/i18n/request.ts',
+);
+
+export default withNextIntl(nextConfig);

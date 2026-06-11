@@ -54,6 +54,7 @@ npm run test:e2e    # E2E (Playwright)
     types/
       common.ts      # 공용 타입
       <domain>.ts    # 도메인별 타입
+    i18n/             # next-intl 설정 (routing·request) — 도메인 분리 대상 아님
     utils/            # 순수 유틸 함수
   ```
 

@@ -1,0 +1,52 @@
+{
+  "title": "{name}님의 목표",
+  "loadError": "목표 정보를 불러오지 못했어요",
+  "moreMenu": "목표 더보기 메뉴",
+  "progress": "목표 진행도",
+  "calendarView": "캘린더 보기",
+  "createError": "목표 생성에 실패했어요",
+  "edit": {
+    "title": "목표 수정",
+    "placeholder": "목표를 입력해주세요"
+  },
+  "delete": {
+    "warning": "삭제된 목표는 복구할 수 없습니다."
+  },
+  "note": {
+    "collectTitle": "노트 모아보기",
+    "searchPlaceholder": "노트를 검색해주세요",
+    "searchLabel": "노트 검색",
+    "sortLatest": "최신순",
+    "sortOldest": "오래된순",
+    "empty": "노트가 아직 없어요",
+    "loadError": "노트를 불러오지 못했어요",
+    "notFound": "수정할 노트를 찾을 수 없어요",
+    "linkBadge": "첨부 링크",
+    "goalLabel": "목표",
+    "dateLabel": "작성일",
+    "todoLabel": "할 일",
+    "tagLabel": "태그",
+    "createTitle": "노트 작성하기",
+    "editTitle": "노트 수정하기",
+    "submit": "등록하기",
+    "draft": "임시저장",
+    "titlePlaceholder": "노트의 제목을 입력해주세요",
+    "titleLabel": "제목",
+    "contentPlaceholder": "이 곳을 통해 노트 작성을 시작해주세요",
+    "linkUploadTitle": "링크 업로드",
+    "linkPlaceholder": "링크를 입력해주세요",
+    "linkLabel": "링크 URL",
+    "linkError": "http:// 또는 https://로 시작해야 해요",
+    "cancelTitle": "노트 작성을 취소하시겠어요?",
+    "embedLabel": "링크 임베드 패널",
+    "embedExpand": "패널 확장",
+    "embedCollapse": "패널 축소",
+    "embedClose": "패널 닫기",
+    "embedEmpty": "여기에 임베드가 표시됩니다",
+    "embedPreview": "링크 미리보기",
+    "linkPreviewOpen": "링크 미리보기 열기",
+    "openNewTab": "새 탭에서 열기",
+    "embedPreviewTitle": "첨부 링크 미리보기",
+    "drawerLabel": "노트 상세"
+  }
+}

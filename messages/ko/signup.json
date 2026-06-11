@@ -1,0 +1,10 @@
+{
+  "submit": "회원가입 하기",
+  "submitting": "처리중...",
+  "loginPrompt": "이미 회원이신가요?",
+  "loginLink": "로그인",
+  "passwordConfirmLabel": "비밀번호 확인",
+  "passwordConfirmPlaceholder": "비밀번호를 다시 입력해주세요",
+  "nicknameTaken": "이미 사용 중인 닉네임입니다.",
+  "completeAlert": "회원가입이 완료되었습니다."
+}

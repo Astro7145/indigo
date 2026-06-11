@@ -1,0 +1,41 @@
+{
+  "title": "소통 게시판",
+  "viewCount": "조회 {count}",
+  "commentCount": "댓글 {count}개",
+  "empty": "아직 등록된 게시물이 없어요.",
+  "loadError": "게시물을 불러오지 못했어요.",
+  "loadMoreError": "더 불러오지 못했어요.",
+  "searchPlaceholder": "궁금한 내용을 검색해주세요",
+  "searchLabel": "게시글 검색",
+  "sortLatest": "최신순",
+  "sortPopular": "인기순",
+  "detail": {
+    "deleteTitle": "게시물을 삭제하시겠어요?",
+    "deleteError": "게시물 삭제에 실패했어요."
+  },
+  "form": {
+    "createTitle": "게시물 작성하기",
+    "editTitle": "게시물 수정하기",
+    "submitCreate": "등록하기",
+    "titlePlaceholder": "게시물의 제목을 입력해주세요",
+    "titleLabel": "제목",
+    "contentPlaceholder": "이 곳을 통해 내용을 작성해주세요",
+    "imageSelect": "이미지 파일 선택",
+    "cancelTitle": "게시물 작성을 취소하시겠어요?",
+    "createError": "게시물 등록에 실패했어요.",
+    "updateError": "게시물 수정에 실패했어요."
+  },
+  "comment": {
+    "title": "댓글",
+    "empty": "아직 댓글이 없어요. 첫 댓글을 남겨보세요!",
+    "placeholder": "댓글을 입력해주세요.",
+    "inputLabel": "댓글 입력",
+    "submit": "등록",
+    "mine": "내 댓글",
+    "editLabel": "댓글 수정",
+    "deleteTitle": "댓글을 삭제하시겠어요?",
+    "createError": "댓글 등록에 실패했어요.",
+    "updateError": "댓글 수정에 실패했어요.",
+    "deleteError": "댓글 삭제에 실패했어요."
+  }
+}

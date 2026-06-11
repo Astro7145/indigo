@@ -1,0 +1,50 @@
+{
+  "title": "모든 할 일",
+  "addButton": "할 일 추가",
+  "empty": {
+    "all": "아직 등록한 할 일이 없어요",
+    "todo": "해야할 일이 아직 없어요",
+    "done": "완료한 일이 아직 없어요"
+  },
+  "fields": {
+    "title": "제목",
+    "goal": "목표",
+    "dueDate": "마감기한",
+    "tag": "태그",
+    "link": "링크",
+    "image": "이미지",
+    "status": "상태"
+  },
+  "form": {
+    "titlePlaceholder": "할 일의 제목을 적어주세요",
+    "goalPlaceholder": "목표를 선택해주세요",
+    "goalNone": "목표 없음",
+    "datePlaceholder": "날짜를 선택해주세요",
+    "tagPlaceholder": "입력 후 Enter",
+    "tagAdd": "태그 추가",
+    "tagDuplicate": "이미 추가된 태그예요",
+    "tagMax": "태그는 최대 10개까지 추가할 수 있어요",
+    "imageHint": "이미지는 최대 1개만 첨부할 수 있습니다.",
+    "statusError": "상태를 선택해주세요."
+  },
+  "detail": {
+    "attachment": "첨부자료",
+    "notes": "작성된 노트"
+  },
+  "create": {
+    "title": "할 일 생성",
+    "success": "할 일이 추가되었습니다.",
+    "error": "할 일 생성에 실패했습니다."
+  },
+  "update": {
+    "title": "할 일 수정",
+    "success": "할 일이 수정되었습니다.",
+    "error": "할 일 수정에 실패했습니다."
+  },
+  "delete": {
+    "warning": "삭제된 할 일은 복구할 수 없습니다.",
+    "success": "할 일이 삭제되었습니다.",
+    "error": "할 일 삭제에 실패했습니다."
+  },
+  "imageUploadError": "이미지 업로드에 실패했습니다."
+}
