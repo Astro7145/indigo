@@ -1,4 +1,11 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
+import {
+  useQuery,
+  useSuspenseQuery,
+  useInfiniteQuery,
+  useSuspenseInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { goalKeys, getGoals, getAllGoals, getGoal, createGoal, patchGoal, deleteGoal } from '@/src/api/goal';
 import type { Goal, GoalDetail, GoalListResponse, CreateGoalBody, UpdateGoalBody } from '@/src/types/goal';
 import type { CursorParams, ApiError } from '@/src/types/common';
@@ -23,8 +30,28 @@ export function useInfiniteGoalList(params: Omit<CursorParams, 'cursor'> = {}) {
   });
 }
 
+// Suspense 변형 — 경계가 초기 로딩/에러를 처리하는 컨텍스트(예: GoalTodoSection)에서 쓴다.
+// 사이드바(GoalSidebarList)는 내부 open 상태·open-게이트 무한스크롤 때문에 비-suspense 버전을 유지한다.
+export function useInfiniteGoalListSuspense(params: Omit<CursorParams, 'cursor'> = {}) {
+  return useSuspenseInfiniteQuery<GoalListResponse, ApiError>({
+    queryKey: [...goalKeys.list(params), 'infinite'],
+    queryFn: ({ pageParam }) => getGoals({ ...params, cursor: pageParam as number | undefined }),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
 export function useGoal(id: number) {
   return useQuery<GoalDetail, ApiError>({
+    queryKey: goalKeys.detail(id),
+    queryFn: () => getGoal(id),
+  });
+}
+
+// Suspense 변형 — 경계가 로딩/에러를 처리하는 GoalDetail 상단 섹션에서 쓴다.
+// ProgressCard·NotesCollection은 optional-chain으로 쓰므로 기존 useGoal을 유지한다.
+export function useGoalSuspense(id: number) {
+  return useSuspenseQuery<GoalDetail, ApiError>({
     queryKey: goalKeys.detail(id),
     queryFn: () => getGoal(id),
   });

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import { IcFilter } from '@/src/components/common/icons/IcFilter';
@@ -22,7 +23,6 @@ export interface NotesCollectionProps {
 
 /** 목표별 노트 모아보기 리스트 본문. 목표 헤더 + 검색/정렬 + 2열 노트 카드 그리드 + 무한 스크롤. */
 export default function NotesCollection({ goalId, className }: NotesCollectionProps) {
-  const router = useRouter();
   const { data: goal } = useGoal(goalId);
 
   const [input, setInput] = useState('');
@@ -34,35 +34,6 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
     const t = setTimeout(() => setSearch(input.trim()), 300);
     return () => clearTimeout(t);
   }, [input]);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
-    useInfiniteNoteList({ goalId, search: search || undefined, sort });
-
-  const notes = data?.pages.flatMap((p) => p.notes) ?? [];
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasNextPage || isFetchingNextPage || isFetchNextPageError) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) fetchNextPage();
-      },
-      { rootMargin: '200px' },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage, notes.length]);
-
-  // 노트 카드 케밥 메뉴 — 표시까지만(수정/삭제 동작·에디터 진입은 별도 작업)
-  const moreMenu = (
-    <Dropdown.Menu size="small" placement="bottom-end">
-      <Dropdown.Item onClick={() => {}}>수정하기</Dropdown.Item>
-      <Dropdown.Item onClick={() => {}} className="text-destructive">
-        삭제하기
-      </Dropdown.Item>
-    </Dropdown.Menu>
-  );
 
   return (
     <div className={cn('mx-auto flex w-full max-w-[1312px] flex-col gap-3 sm:gap-4 xl:gap-5', className)}>
@@ -102,30 +73,66 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
         </h2>
       </div>
 
-      {isLoading ? (
-        <p className="py-16 text-center text-sm text-slate-400">불러오는 중…</p>
-      ) : isError ? (
-        <p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>
-      ) : notes.length === 0 ? (
-        <p className="py-16 text-center text-sm text-slate-500">노트가 아직 없어요</p>
-      ) : (
-        <>
-          <ul className="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-2 xl:gap-6">
-            {notes.map((n) => (
-              <li key={n.id}>
-                <NoteCard
-                  noteId={n.id}
-                  note={n}
-                  onClick={() => router.push(`/goals/${goalId}/notes/${n.id}`)}
-                  menu={moreMenu}
-                />
-              </li>
-            ))}
-          </ul>
-          {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1" />}
-          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
-        </>
-      )}
+      <AsyncBoundary
+        fallback={<p className="py-16 text-center text-sm text-slate-400">불러오는 중…</p>}
+        errorFallback={<p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+        resetKeys={[search, sort]}
+      >
+        <NotesCollectionContent goalId={goalId} search={search} sort={sort} />
+      </AsyncBoundary>
     </div>
+  );
+}
+
+function NotesCollectionContent({ goalId, search, sort }: { goalId: number; search: string; sort: Sort }) {
+  const router = useRouter();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteNoteList({
+    goalId,
+    search: search || undefined,
+    sort,
+  });
+
+  const notes = data.pages.flatMap((p) => p.notes);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !hasNextPage || isFetchingNextPage || isFetchNextPageError) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) fetchNextPage();
+      },
+      { rootMargin: '200px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage, notes.length]);
+
+  // 노트 카드 케밥 메뉴 — 표시까지만(수정/삭제 동작·에디터 진입은 별도 작업)
+  const moreMenu = (
+    <Dropdown.Menu size="small" placement="bottom-end">
+      <Dropdown.Item onClick={() => {}}>수정하기</Dropdown.Item>
+      <Dropdown.Item onClick={() => {}} className="text-destructive">
+        삭제하기
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  );
+
+  if (notes.length === 0) {
+    return <p className="py-16 text-center text-sm text-slate-500">노트가 아직 없어요</p>;
+  }
+
+  return (
+    <>
+      <ul className="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-2 xl:gap-6">
+        {notes.map((n) => (
+          <li key={n.id}>
+            <NoteCard note={n} onClick={() => router.push(`/goals/${goalId}/notes/${n.id}`)} menu={moreMenu} />
+          </li>
+        ))}
+      </ul>
+      {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1" />}
+      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+    </>
   );
 }
