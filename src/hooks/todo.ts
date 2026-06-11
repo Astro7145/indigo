@@ -8,7 +8,7 @@ import {
   type QueryClient,
   type QueryKey,
 } from '@tanstack/react-query';
-import { todoKeys, getTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
+import { todoKeys, getTodos, getAllTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
@@ -18,6 +18,14 @@ export function useTodoList(params: TodoListParams = {}) {
   return useSuspenseQuery<TodoListResponse, ApiError>({
     queryKey: todoKeys.list(params),
     queryFn: () => getTodos(params),
+  });
+}
+
+/** 캘린더 등 전체 할일이 필요한 화면용 — 커서 루프로 전부 받아 캐시한다(월 이동·필터 변경 시 재요청 없음). */
+export function useAllTodos() {
+  return useSuspenseQuery<TodoListResponse, ApiError>({
+    queryKey: [...todoKeys.lists(), 'all'],
+    queryFn: () => getAllTodos(),
   });
 }
 
