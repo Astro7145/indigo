@@ -45,15 +45,6 @@ it('완료 todo는 스크린리더용 완료 표시를 포함한다', () => {
   expect(screen.getByText('(완료)')).toBeInTheDocument();
 });
 
-it('disabled면 비활성화되고 클릭해도 onClick이 호출되지 않는다', () => {
-  const onClick = jest.fn();
-  render(<CalendarTodoChip todo={makeTodo()} onClick={onClick} disabled />);
-  const button = screen.getByText('챕터1 듣기').closest('button');
-  expect(button).toBeDisabled();
-  fireEvent.click(screen.getByText('챕터1 듣기'));
-  expect(onClick).not.toHaveBeenCalled();
-});
-
 it('클릭이 부모(셀 날짜 선택)로 전파되지 않는다', () => {
   const onParent = jest.fn();
   render(
