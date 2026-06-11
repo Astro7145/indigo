@@ -1,3 +1,9 @@
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 jest.mock('@/src/api/todo', () => ({
   ...jest.requireActual('@/src/api/todo'),
   getTodos: jest.fn(),
@@ -20,7 +26,7 @@ import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo } from '@/src/types/todo';
 
 const renderRecent = (overrides?: Partial<ComponentProps<typeof RecentTodos>>) =>
-  renderWithClient(<RecentTodos onEditTodo={() => {}} onSelectTodo={() => {}} {...overrides} />);
+  renderWithClient(<RecentTodos {...overrides} />);
 
 const mocked = todoApi as jest.Mocked<typeof todoApi>;
 const mockedFav = favoriteApi as jest.Mocked<typeof favoriteApi>;
@@ -107,16 +113,15 @@ it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린
   expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
 });
 
-it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
+it('할일 행을 클릭하면 해당 할일로 상세 시트를 연다', async () => {
   mocked.getTodos.mockResolvedValue({
     todos: [makeTodo(1, '자바스크립트 듣기')],
     nextCursor: null,
     totalCount: 1,
   } as never);
-  const onSelectTodo = jest.fn();
-  renderRecent({ onSelectTodo });
+  renderRecent();
   const title = await screen.findByText('자바스크립트 듣기');
   fireEvent.click(title);
-  expect(onSelectTodo).toHaveBeenCalledTimes(1);
-  expect(onSelectTodo.mock.calls[0][0]).toMatchObject({ id: 1, title: '자바스크립트 듣기' });
+  expect(mockOpenDetail).toHaveBeenCalledTimes(1);
+  expect(mockOpenDetail.mock.calls[0][0]).toMatchObject({ id: 1, title: '자바스크립트 듣기' });
 });

@@ -3,6 +3,12 @@ jest.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
 }));
 
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 jest.mock('@/src/api/todo', () => ({
   ...jest.requireActual('@/src/api/todo'),
   getAllTodos: jest.fn(),
@@ -14,19 +20,6 @@ jest.mock('@/src/api/goal', () => ({
 jest.mock('@/src/api/user', () => ({
   ...jest.requireActual('@/src/api/user'),
   getMe: jest.fn(),
-}));
-
-jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
-  __esModule: true,
-  default: ({ isOpen, todo }: { isOpen: boolean; todo: { title: string } | null }) =>
-    isOpen && todo ? <div data-testid="detail-sheet">{todo.title}</div> : null,
-}));
-jest.mock('@/src/components/todo/TodoFormSheet', () => ({
-  __esModule: true,
-  default: (props: { isOpen: boolean; mode: string; defaultDueDate?: string; defaultGoalId?: number }) =>
-    props.isOpen ? (
-      <div data-testid="form-sheet" data-due={props.defaultDueDate} data-goal={props.defaultGoalId} />
-    ) : null,
 }));
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
@@ -141,7 +134,7 @@ it('뒤로가기 등으로 URL의 goalId가 바뀌면 필터가 따라간다', a
 it('칩을 클릭하면 상세 시트가 열린다', async () => {
   renderWithClient(<CalendarView />);
   fireEvent.click((await screen.findAllByText('오늘 할일'))[0]);
-  expect(screen.getByTestId('detail-sheet')).toHaveTextContent('오늘 할일');
+  expect(mockOpenDetail.mock.calls[0][0]).toMatchObject({ title: '오늘 할일' });
 });
 
 it('월 이동으로 선택 날짜가 그리드 범위를 벗어나면 범위 안으로 클램프된다', async () => {
@@ -161,6 +154,5 @@ it('할 일 추가를 누르면 선택 날짜(기본 오늘)가 프리필된 생
   renderWithClient(<CalendarView />);
   await screen.findAllByText('오늘 할일');
   fireEvent.click(screen.getAllByRole('button', { name: /할 일 추가/ })[0]);
-  const sheet = screen.getByTestId('form-sheet');
-  expect(sheet.getAttribute('data-due')).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00/);
+  expect(mockOpenCreate.mock.calls[0][0].dueDate).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00/);
 });

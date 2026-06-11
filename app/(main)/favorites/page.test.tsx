@@ -1,3 +1,9 @@
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 import type { ComponentProps, ReactNode } from 'react';
 
 jest.mock('@/src/api/favorite', () => ({
@@ -26,15 +32,6 @@ jest.mock('motion/react', () => {
 });
 
 // 수정/상세 시트는 스텁 — 케밥·행 클릭 배선만 검증한다. 삭제 확인 모달은 실제 컴포넌트를 사용한다.
-jest.mock('@/src/components/todo/TodoFormSheet', () => ({
-  __esModule: true,
-  default: ({ mode, isOpen }: { mode: 'create' | 'update'; isOpen: boolean }) =>
-    isOpen ? <div>{`form-sheet:${mode}`}</div> : null,
-}));
-jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
-  __esModule: true,
-  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div>detail-sheet</div> : null),
-}));
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
@@ -207,7 +204,7 @@ it('케밥 메뉴에서 수정하기를 누르면 수정 시트가 열린다', a
   await screen.findByText('찜 A');
   fireEvent.click(screen.getByLabelText('더보기 메뉴'));
   fireEvent.click(screen.getByText('수정하기'));
-  expect(await screen.findByText('form-sheet:update')).toBeInTheDocument();
+  expect(mockOpenEdit).toHaveBeenCalledTimes(1);
 });
 
 it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
@@ -223,5 +220,5 @@ it('행을 클릭하면 상세 시트가 열린다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')]));
   renderWithClient(<FavoritesPage />);
   fireEvent.click(await screen.findByText('찜 A'));
-  expect(await screen.findByText('detail-sheet')).toBeInTheDocument();
+  expect(mockOpenDetail).toHaveBeenCalledTimes(1);
 });

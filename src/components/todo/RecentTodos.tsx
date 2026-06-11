@@ -8,13 +8,11 @@ import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';
 import { useTodoList } from '@/src/hooks/todo';
-import type { Todo } from '@/src/types/todo';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { cn } from '@/src/utils/cn';
 
 export interface RecentTodosProps {
   className?: string;
-  onEditTodo: (todo: Todo) => void;
-  onSelectTodo: (todo: Todo) => void;
 }
 
 // 폭은 대시보드 상단 그리드 셀을 그대로 채운다(유동) — sm+ 2열, 모바일 1열.
@@ -29,7 +27,7 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
  * `useTodoList`로 최신 할일을 직접 조회하고, 행 렌더·토글/즐겨찾기 배선은 `TodoList`가 소유.
  * 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
-export default function RecentTodos({ className, onEditTodo, onSelectTodo }: RecentTodosProps) {
+export default function RecentTodos({ className }: RecentTodosProps) {
   return (
     <div className={cn(rootClass, className)}>
       {/* 좁은 폭(2열 셀이 ~260px대로 떨어지는 sm 구간)에서 제목·모두보기가 둘 다 wrap돼 카드가 밀리는 걸 방지:
@@ -54,14 +52,15 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
           fallback={<p className={statusMessageClass}>불러오는 중…</p>}
           errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
         >
-          <RecentTodosContent onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+          <RecentTodosContent />
         </AsyncBoundary>
       </Card>
     </div>
   );
 }
 
-function RecentTodosContent({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps, 'onEditTodo' | 'onSelectTodo'>) {
+function RecentTodosContent() {
+  const { openEdit, openDetail } = useTodoSheet();
   const { data } = useTodoList({ sort: 'latest', limit: 4 });
   const todos = data.todos;
 
@@ -75,8 +74,8 @@ function RecentTodosContent({ onEditTodo, onSelectTodo }: Pick<RecentTodosProps,
       className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto"
       todos={todos}
       size="large"
-      onEdit={onEditTodo}
-      onSelect={onSelectTodo}
+      onEdit={openEdit}
+      onSelect={openDetail}
     />
   );
 }

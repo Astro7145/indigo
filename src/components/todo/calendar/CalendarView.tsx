@@ -22,10 +22,9 @@ import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import MonthCalendar from '@/src/components/todo/calendar/MonthCalendar';
 import SelectedDateTodos from '@/src/components/todo/calendar/SelectedDateTodos';
-import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useGoalList } from '@/src/hooks/goal';
 import { usePrefetchTodosInRange, useTodosInRange } from '@/src/hooks/todo';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useMe } from '@/src/hooks/user';
 import type { Todo } from '@/src/types/todo';
 import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
@@ -72,8 +71,7 @@ export default function CalendarView() {
     if (selectedDate.compare(start) < 0) setSelectedDate(start);
     else if (selectedDate.compare(end) > 0) setSelectedDate(end);
   };
-  const [creating, setCreating] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const { openCreate, openDetail } = useTodoSheet();
 
   const { data: me } = useMe();
   const visibleMonthKey = startOfMonth(focusedDate).toString();
@@ -90,7 +88,9 @@ export default function CalendarView() {
           size="small"
           startIcon={<IcPlus className="size-5 text-white" />}
           className="whitespace-nowrap"
-          onClick={() => setCreating(true)}
+          onClick={() =>
+            openCreate({ goalId: goalId ?? undefined, dueDate: calendarDateToIso(selectedDate) ?? undefined })
+          }
         >
           할 일 추가
         </Button>
@@ -110,7 +110,7 @@ export default function CalendarView() {
             onChangeSelectedDate={setSelectedDate}
             focusedDate={focusedDate}
             onFocusChange={handleFocusChange}
-            onSelectTodo={setSelectedTodo}
+            onSelectTodo={openDetail}
           />
         </AsyncBoundary>
       </Card>
@@ -121,19 +121,12 @@ export default function CalendarView() {
         size="large"
         startIcon={<IcPlus className="size-5 text-white" />}
         className="w-full sm:hidden"
-        onClick={() => setCreating(true)}
+        onClick={() =>
+          openCreate({ goalId: goalId ?? undefined, dueDate: calendarDateToIso(selectedDate) ?? undefined })
+        }
       >
         할 일 추가
       </Button>
-
-      <TodoFormSheet
-        mode="create"
-        isOpen={creating}
-        onClose={() => setCreating(false)}
-        defaultGoalId={goalId ?? undefined}
-        defaultDueDate={calendarDateToIso(selectedDate) ?? undefined}
-      />
-      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </section>
   );
 }

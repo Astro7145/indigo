@@ -1,22 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import ProgressCard from '@/src/components/goal/ProgressCard';
 import RecentTodos from '@/src/components/todo/RecentTodos';
-import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useMe } from '@/src/hooks/user';
-import type { Todo } from '@/src/types/todo';
 
 export default function DashboardPage() {
   const { data: me } = useMe();
-  // 대시보드 내 모든 섹션(RecentTodos·GoalTodoBoard)이 공유하는 단일 폼 상태.
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [creatingForGoalId, setCreatingForGoalId] = useState<number | null>(null);
-  // 상세 시트로 열려 있는 할일. null이면 시트가 닫힌다.
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   return (
     <>
@@ -32,23 +22,10 @@ export default function DashboardPage() {
           </h1>
         </div>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-3 xl:gap-8">
-          <RecentTodos onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
+          <RecentTodos />
           <ProgressCard />
         </div>
-        <GoalTodoSection onEditTodo={setEditingTodo} onAddTodo={setCreatingForGoalId} onSelectTodo={setSelectedTodo} />
-        <TodoFormSheet
-          mode="update"
-          isOpen={editingTodo !== null}
-          onClose={() => setEditingTodo(null)}
-          todo={editingTodo}
-        />
-        <TodoFormSheet
-          mode="create"
-          isOpen={creatingForGoalId !== null}
-          onClose={() => setCreatingForGoalId(null)}
-          defaultGoalId={creatingForGoalId ?? undefined}
-        />
-        <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
+        <GoalTodoSection />
       </div>
     </>
   );
