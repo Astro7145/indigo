@@ -79,9 +79,6 @@ export const prefetchGoalDetail = (qc: QueryClient, goalId: number) =>
 export const prefetchInfiniteNotes = (qc: QueryClient, goalId: number) =>
   prefetchInfinite(qc, noteKeys.list({ goalId, sort: 'latest' }), 'notes', { goalId, sort: 'latest' });
 
-export const prefetchNote = (qc: QueryClient, noteId: number) =>
-  qc.prefetchQuery({ queryKey: noteKeys.detail(noteId), queryFn: () => serverGet(`notes/${noteId}`) });
-
 /** /calendar — useTodosInRange(calendarGridRange(month))와 동일 키·범위. 커서를 끝까지 합친다. */
 export const prefetchCalendarMonth = (qc: QueryClient, month: CalendarDate) => {
   const { from, to } = calendarGridRange(month);
