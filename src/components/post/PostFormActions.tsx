@@ -17,7 +17,8 @@ export default function PostFormActions({ mode, isValid, isSubmitting, onSubmit,
       <button
         type="button"
         onClick={onCancel}
-        className="cursor-pointer px-1.5 py-0.5 text-sm font-medium tracking-[-0.03em] text-slate-300"
+        disabled={isSubmitting}
+        className="cursor-pointer px-1.5 py-0.5 text-sm font-medium tracking-[-0.03em] text-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
       >
         취소
       </button>

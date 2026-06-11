@@ -123,8 +123,12 @@ export default function PostForm(props: PostFormProps) {
     }
   };
 
-  // 모바일 Topbar 우측 슬롯에 액션 등록. 폼 상태가 바뀔 때마다 새 노드로 갱신, unmount 시 해제
+  // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 데이터 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
   useEffect(() => {
+    if (props.mode === 'edit' && !initialPost) {
+      clearRightSlot();
+      return;
+    }
     setRightSlot(
       <PostFormActions
         mode={props.mode}
@@ -134,8 +138,12 @@ export default function PostForm(props: PostFormProps) {
         onCancel={handleCancel}
       />,
     );
+  }, [props.mode, initialPost, isValid, isSubmitting, handleSubmit, handleCancel, setRightSlot, clearRightSlot]);
+
+  // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
+  useEffect(() => {
     return () => clearRightSlot();
-  }, [props.mode, isValid, isSubmitting, handleSubmit, handleCancel, setRightSlot, clearRightSlot]);
+  }, [clearRightSlot]);
 
   // 수정 모드에서 데이터 도착까지 로딩 표시 (모든 hook 호출 이후에 위치)
   if (props.mode === 'edit' && !initialPost) {
