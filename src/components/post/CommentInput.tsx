@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type KeyboardEvent } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
 
@@ -28,16 +28,25 @@ export default function CommentInput({
     onSubmit?.(text, () => setText(''));
   };
 
+  // Enter → submit, Shift+Enter → 개행. IME 조합 중에는 Enter가 한글 확정용이므로 submit 무시
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    if (!isEmpty) e.currentTarget.form?.requestSubmit();
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-      <input
+    <form onSubmit={handleSubmit} className="flex w-full items-end gap-2">
+      <textarea
         autoFocus={autoFocus}
-        type="text"
+        rows={1}
         value={text}
         onChange={(e) => setText(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        className="h-10 w-full min-w-0 flex-1 rounded border border-slate-200 px-3 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none sm:h-12 sm:px-4 sm:text-base"
+        // field-sizing-content: 입력 높이가 내용에 맞춰 자동 증가 (Chrome 123+, Safari 17.4+, Firefox 미지원은 1줄 고정 + 내부 스크롤)
+        className="field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none sm:min-h-12 sm:px-4 sm:py-3 sm:text-base"
       />
       <Button type="submit" size="small" disabled={isEmpty} className="h-10 w-[64px] shrink-0 px-0 sm:h-12 sm:w-[80px]">
         등록

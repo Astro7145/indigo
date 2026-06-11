@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type KeyboardEvent } from 'react';
 import Image from 'next/image';
 
 import Button from '@/src/components/common/buttons/Button';
@@ -85,6 +85,13 @@ export default function CommentItem({
     );
   };
 
+  // Enter → form submit, Shift+Enter → 개행. IME 조합 중에는 Enter가 한글 확정용이므로 무시
+  const handleEditKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    if (draft.trim().length > 0) e.currentTarget.form?.requestSubmit();
+  };
+
   // 수정 진입 시 현재 댓글 내용으로 draft를 동기화 (mount 이후 외부에서 comment가 갱신된 경우 대비)
   const handleStartEdit = () => {
     setDraft(comment.content);
@@ -135,12 +142,13 @@ export default function CommentItem({
 
         {isEditing ? (
           <form onSubmit={handleSave} className="space-y-2">
-            <input
-              type="text"
+            <textarea
+              rows={1}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={handleEditKeyDown}
               aria-label="댓글 수정"
-              className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
+              className="field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
             <div className="flex items-center justify-between gap-2">
@@ -157,7 +165,7 @@ export default function CommentItem({
           </form>
         ) : (
           <>
-            <p className="text-sm text-slate-700 sm:text-base">{comment.content}</p>
+            <p className="text-sm whitespace-pre-wrap text-slate-700 sm:text-base">{comment.content}</p>
             <div className="flex items-center gap-3 text-xs text-slate-400">
               <span>{formattedDate}</span>
               <button
