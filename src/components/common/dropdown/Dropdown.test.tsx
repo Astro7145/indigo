@@ -170,6 +170,30 @@ describe('Dropdown.Menu', () => {
     );
     expect(screen.getByRole('menu')).toHaveClass('fixed');
   });
+
+  it('기본적으로 항목이 넘치면 스크롤되도록 최대 높이를 제한한다', () => {
+    render(
+      <Dropdown open>
+        <Dropdown.Menu>
+          <Dropdown.Item>아이템</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>,
+    );
+    expect(screen.getByRole('menu')).toHaveClass('max-h-60', 'overflow-y-auto');
+  });
+
+  it('className으로 최대 높이를 덮어쓸 수 있다', () => {
+    render(
+      <Dropdown open>
+        <Dropdown.Menu className="max-h-96">
+          <Dropdown.Item>아이템</Dropdown.Item>
+        </Dropdown.Menu>
+      </Dropdown>,
+    );
+    const menu = screen.getByRole('menu');
+    expect(menu).toHaveClass('max-h-96');
+    expect(menu).not.toHaveClass('max-h-60');
+  });
 });
 
 describe('computeMenuPosition', () => {

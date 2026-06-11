@@ -13,7 +13,7 @@
 ## 기술 스택
 
 - **TypeScript** (strict)
-- **React 19**
+- **React 19.2** — **React Compiler 사용**
 - **Next.js 16** (App Router)
 - **Tailwind CSS v4** — `shadcn` 등 컴포넌트 라이브러리 **사용 안 함**, 직접 구현
 - **TanStack Query** — 서버 상태
@@ -69,6 +69,7 @@ npm run test:e2e    # E2E (Playwright)
 
 - TypeScript `strict` 준수. `any` 지양, 타입 우선
 - Next.js App Router 패턴 준수 (Server/Client Component 구분, `"use client"` 최소화)
+- **React Compiler가 메모이제이션을 담당하므로 `useMemo`·`useCallback`을 수동으로 쓰지 않는다** (외부 라이브러리 요구 등 불가피한 경우만 예외, 이유 명시)
 - 포맷은 Prettier가 담당하며 규칙의 SSOT는 `.prettierrc` (수동 나열 금지, `npm run lint`로 검증).
   Tailwind 클래스는 `prettier-plugin-tailwindcss`가 자동 정렬
 - **반응형 브레이크포인트**: 모바일 `~639px` / 태블릿 `640px~1279px`(`sm`) / 데스크탑 `1280px~`(`xl`)
