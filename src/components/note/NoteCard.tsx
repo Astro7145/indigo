@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import Card from '@/src/components/common/cards/Card';
@@ -44,6 +45,8 @@ const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
  * 사이즈는 외부 prop이 아니라 뷰포트 반응형(md)으로 자동 결정.
  */
 export default function NoteCard({ noteId, note, onClick, onMore, menu, className }: NoteCardProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   const query = useNote(note ? undefined : noteId);
   const resolved = note ?? query.data;
   const isLoading = !note && query.isLoading;
@@ -52,7 +55,7 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
   if (isLoading || !resolved) {
     return (
       <Card className={cn(rootClass, className)}>
-        <p className="text-sm text-slate-400">{isError ? '불러오지 못했어요' : '불러오는 중…'}</p>
+        <p className="text-sm text-slate-400">{isError ? tc('state.loadError') : tc('state.loading')}</p>
       </Card>
     );
   }
@@ -65,11 +68,11 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
           <h3 className={cn('text-slate-800', titleClass)}>{resolved.title}</h3>
         </div>
         <div className="flex items-center gap-2">
-          {resolved.linkUrl && <IcLink aria-label="첨부 링크" />}
+          {resolved.linkUrl && <IcLink aria-label={t('note.linkBadge')} />}
           {menu ? (
             <Dropdown>
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기 메뉴" className="rounded-full" onClick={(e) => e.stopPropagation()}>
+                <IconButton aria-label={tc('moreMenu')} className="rounded-full" onClick={(e) => e.stopPropagation()}>
                   <IcKebab className={kebabClass} />
                 </IconButton>
               </Dropdown.Trigger>
@@ -77,7 +80,7 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
             </Dropdown>
           ) : onMore ? (
             <IconButton
-              aria-label="더보기 메뉴"
+              aria-label={tc('moreMenu')}
               className="rounded-full"
               onClick={(e) => {
                 e.stopPropagation();

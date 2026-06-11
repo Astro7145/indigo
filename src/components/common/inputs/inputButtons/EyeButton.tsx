@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import { IcEye, IcEyeOff } from '../../icons';
 
 interface EyeButtonProps {
@@ -8,9 +10,10 @@ interface EyeButtonProps {
 }
 
 export default function EyeButton({ hide, onClick }: EyeButtonProps) {
+  const t = useTranslations('common');
   return (
     <button
-      aria-label={hide ? '비밀번호 표시' : '비밀번호 숨기기'}
+      aria-label={hide ? t('passwordToggle.show') : t('passwordToggle.hide')}
       aria-pressed={!hide}
       onClick={onClick}
       className="cursor-pointer"

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
 
 import { IcMoon, IcSun } from '@/src/components/common/icons';
@@ -34,17 +35,18 @@ function ToggleTab({ label, active, onClick, children }: ToggleTabProps) {
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>('light');
+  const t = useTranslations('settings');
 
   return (
     <div
       role="radiogroup"
-      aria-label="다크모드"
+      aria-label={t('darkMode')}
       className="flex w-fit items-center gap-1.5 rounded-full bg-slate-50 p-1.5 sm:gap-2 sm:p-2"
     >
-      <ToggleTab label="라이트 모드" active={theme === 'light'} onClick={() => setTheme('light')}>
+      <ToggleTab label={t('themeLight')} active={theme === 'light'} onClick={() => setTheme('light')}>
         <IcSun className={cn('size-5 sm:size-6', theme === 'light' ? 'text-slate-600' : 'text-slate-400')} />
       </ToggleTab>
-      <ToggleTab label="다크 모드" active={theme === 'dark'} onClick={() => setTheme('dark')}>
+      <ToggleTab label={t('themeDark')} active={theme === 'dark'} onClick={() => setTheme('dark')}>
         <IcMoon className={cn('size-5 sm:size-6', theme === 'dark' ? 'text-slate-600' : 'text-slate-400')} />
       </ToggleTab>
     </div>

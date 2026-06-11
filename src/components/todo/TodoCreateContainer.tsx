@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useCreateTodo } from '@/src/hooks/todo';
 import { useCreateImageUploadUrl } from '@/src/hooks/upload';
@@ -17,6 +19,8 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
   const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
+  const t = useTranslations('todos');
+  const tc = useTranslations('common');
 
   const handleSubmit = async (values: TodoFormValues) => {
     let fileUrl: string | undefined;
@@ -28,7 +32,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
         if (!res.ok) throw new Error(`upload failed: ${res.status}`);
         fileUrl = url;
       } catch {
-        showToast('이미지 업로드에 실패했습니다.');
+        showToast(t('imageUploadError'));
         return;
       }
     }
@@ -40,15 +44,15 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
         dueDate: values.dueDate,
         linkUrl: values.linkUrl || undefined,
         fileUrl,
-        tags: values.tags.length > 0 ? values.tags.map((t) => t.text) : undefined,
+        tags: values.tags.length > 0 ? values.tags.map((tag) => tag.text) : undefined,
       },
       {
         onSuccess: () => {
-          showToast('할 일이 추가되었습니다.');
+          showToast(t('create.success'));
           onClose();
         },
         onError: () => {
-          showToast('할 일 생성에 실패했습니다.');
+          showToast(t('create.error'));
         },
       },
     );
@@ -58,8 +62,8 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
     <TodoFormUI
       onSubmit={handleSubmit}
       onClose={onCancel}
-      title="할 일 생성"
-      submitLabel="확인"
+      title={t('create.title')}
+      submitLabel={tc('actions.confirm')}
       initialValues={{ goalId: defaultGoalId }}
       disableSubmitUntilValid
       isPending={isPending}

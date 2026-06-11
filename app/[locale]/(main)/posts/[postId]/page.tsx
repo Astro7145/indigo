@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -17,6 +18,8 @@ import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
 
 export default function PostDetailPage() {
+  const t = useTranslations('posts');
+  const tc = useTranslations('common');
   const { postId } = useParams<{ postId: string }>();
   const router = useRouter();
   const id = Number(postId);
@@ -33,14 +36,14 @@ export default function PostDetailPage() {
   const handleDelete = () => {
     deletePost(id, {
       onSuccess: () => router.push('/posts'),
-      onError: () => showToast('게시물 삭제에 실패했어요.', 'error'),
+      onError: () => showToast(t('detail.deleteError'), 'error'),
     });
   };
 
   if (postPending || !post) {
     return (
       <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
+        <p className="text-sm text-slate-400">{tc('state.loading')}</p>
       </div>
     );
   }
@@ -53,15 +56,15 @@ export default function PostDetailPage() {
           {me?.id === post.writer.id && (
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기">
+                <IconButton aria-label={tc('actions.more')}>
                   <IcMeetballs className="size-5 text-slate-400" />
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
                 {/* 수정 페이지(/posts/[id]/edit)는 별도 작업 — 라우트 생성 후 연결 */}
-                <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>{tc('actions.edit')}</Dropdown.Item>
                 <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                  삭제하기
+                  {tc('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -101,7 +104,7 @@ export default function PostDetailPage() {
 
         {/* 메타 */}
         <div className="mb-8 text-xs text-slate-500">
-          {post.createdAt.slice(0, 10).replace(/-/g, '.')} · 조회 {post.viewCount}
+          {post.createdAt.slice(0, 10).replace(/-/g, '.')} · {t('viewCount', { count: post.viewCount })}
         </div>
 
         <CommentSection postId={id} comments={comments} currentUserId={me?.id} />
@@ -109,11 +112,11 @@ export default function PostDetailPage() {
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>게시물을 삭제하시겠어요?</Modal.Title>
+          <Modal.Title>{t('detail.deleteTitle')}</Modal.Title>
         </div>
         <Modal.Actions>
-          <Modal.Cancel>취소</Modal.Cancel>
-          <Modal.Confirm onClick={handleDelete}>삭제하기</Modal.Confirm>
+          <Modal.Cancel>{tc('actions.cancel')}</Modal.Cancel>
+          <Modal.Confirm onClick={handleDelete}>{tc('actions.delete')}</Modal.Confirm>
         </Modal.Actions>
       </Modal>
     </>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 
@@ -30,6 +31,8 @@ function isHtmlEmpty(html: string) {
 
 export default function PostForm(props: PostFormProps) {
   const router = useRouter();
+  const t = useTranslations('posts');
+  const tc = useTranslations('common');
   const editId = props.mode === 'edit' ? props.postId : undefined;
   const { data: initialPost } = usePost(editId);
   const { mutateAsync: createPost } = useCreatePost();
@@ -76,7 +79,7 @@ export default function PostForm(props: PostFormProps) {
   if (props.mode === 'edit' && !initialPost) {
     return (
       <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
+        <p className="text-sm text-slate-400">{tc('state.loading')}</p>
       </div>
     );
   }
@@ -121,15 +124,15 @@ export default function PostForm(props: PostFormProps) {
       router.push(`/posts/${post.id}`);
     } catch {
       // 이미지 업로드·게시글 등록/수정 어느 단계에서 실패해도 사용자에게 일관된 안내를 띄운다
-      showToast(props.mode === 'edit' ? '게시물 수정에 실패했어요.' : '게시물 등록에 실패했어요.', 'error');
+      showToast(props.mode === 'edit' ? t('form.updateError') : t('form.createError'), 'error');
     } finally {
       // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
       setIsSubmitting(false);
     }
   };
 
-  const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
-  const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
+  const headingText = props.mode === 'edit' ? t('form.editTitle') : t('form.createTitle');
+  const submitText = props.mode === 'edit' ? tc('actions.edit') : t('form.submitCreate');
 
   const contentText = htmlToPlainText(content);
   const contentCharCount = contentText.length;
@@ -149,7 +152,7 @@ export default function PostForm(props: PostFormProps) {
             onClick={handleCancel}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
-            취소
+            {tc('actions.cancel')}
           </Button>
           <Button
             variant="primary"
@@ -176,7 +179,7 @@ export default function PostForm(props: PostFormProps) {
           value={content}
           onChange={setContent}
           onImageClick={handleImageClick}
-          placeholder="이 곳을 통해 내용을 작성해주세요"
+          placeholder={t('form.contentPlaceholder')}
           // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
           contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 sm:min-h-[600px] sm:pt-5 sm:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
@@ -187,8 +190,8 @@ export default function PostForm(props: PostFormProps) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={30}
-                  placeholder="게시물의 제목을 입력해주세요"
-                  aria-label="제목"
+                  placeholder={t('form.titlePlaceholder')}
+                  aria-label={t('form.titleLabel')}
                   className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
                 />
                 <span className="shrink-0 text-xs text-slate-400 sm:text-sm">{title.length}/30</span>
@@ -211,7 +214,7 @@ export default function PostForm(props: PostFormProps) {
         )}
 
         <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-          공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+          {tc('charCount', { total: contentCharCount, nonSpace: contentNoSpaceCount })}
         </div>
       </div>
 
@@ -220,12 +223,12 @@ export default function PostForm(props: PostFormProps) {
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label="이미지 파일 선택"
+        aria-label={t('form.imageSelect')}
         onChange={handleFileChange}
       />
 
       <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">게시물 작성을 취소하시겠어요?</Modal.Title>
+        <Modal.Title className="text-center text-base sm:text-xl">{t('form.cancelTitle')}</Modal.Title>
         <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
           <span
             aria-hidden
@@ -233,12 +236,12 @@ export default function PostForm(props: PostFormProps) {
           >
             !
           </span>
-          작성하신 모든 내용이 사라집니다.
+          {tc('cancelWarning')}
         </p>
         <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">{tc('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
-            확인
+            {tc('actions.confirm')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

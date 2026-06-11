@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type FormEvent } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
@@ -11,6 +12,7 @@ interface CommentInputProps {
 export default function CommentInput({ onSubmit }: CommentInputProps) {
   const [text, setText] = useState('');
   const isEmpty = text.trim().length === 0;
+  const t = useTranslations('posts');
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,12 +27,12 @@ export default function CommentInput({ onSubmit }: CommentInputProps) {
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="댓글을 입력해주세요."
-        aria-label="댓글 입력"
+        placeholder={t('comment.placeholder')}
+        aria-label={t('comment.inputLabel')}
         className="h-10 w-[235px] rounded border border-slate-200 px-3 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none sm:h-12 sm:w-[480px] sm:px-4 sm:text-base xl:w-[560px]"
       />
       <Button type="submit" size="small" disabled={isEmpty} className="h-10 w-[64px] px-0 sm:h-12 sm:w-[80px]">
-        등록
+        {t('comment.submit')}
       </Button>
     </form>
   );

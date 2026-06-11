@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
@@ -18,6 +19,7 @@ interface TagInputProps {
 const BADGE_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 export default function TagInput({ value, onChange }: TagInputProps) {
+  const t = useTranslations('todos');
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
   const colorIndexRef = useRef(value.length);
@@ -26,12 +28,12 @@ export default function TagInput({ value, onChange }: TagInputProps) {
 
   const addTag = () => {
     if (!trimmed) return;
-    if (value.some((t) => t.text === trimmed)) {
-      setError('이미 추가된 태그예요');
+    if (value.some((tag) => tag.text === trimmed)) {
+      setError(t('form.tagDuplicate'));
       return;
     }
     if (value.length >= 10) {
-      setError('태그는 최대 10개까지 추가할 수 있어요');
+      setError(t('form.tagMax'));
       return;
     }
     const color = BADGE_COLORS[colorIndexRef.current % BADGE_COLORS.length];
@@ -51,7 +53,11 @@ export default function TagInput({ value, onChange }: TagInputProps) {
     <>
       <div className="flex flex-wrap items-center gap-1.5 rounded-sm border border-slate-300 p-3 focus-within:border-indigo-500 sm:p-4">
         {value.map((tag) => (
-          <Badge key={tag.text} color={tag.color} onDelete={() => onChange(value.filter((t) => t.text !== tag.text))}>
+          <Badge
+            key={tag.text}
+            color={tag.color}
+            onDelete={() => onChange(value.filter((other) => other.text !== tag.text))}
+          >
             {tag.text}
           </Badge>
         ))}
@@ -64,12 +70,12 @@ export default function TagInput({ value, onChange }: TagInputProps) {
           }}
           onKeyDown={handleKeyDown}
           maxLength={50}
-          placeholder="입력 후 Enter"
+          placeholder={t('form.tagPlaceholder')}
           className="min-w-0 flex-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base"
         />
         <button
           type="button"
-          aria-label="태그 추가"
+          aria-label={t('form.tagAdd')}
           disabled={!trimmed}
           onMouseDown={(e) => e.preventDefault()}
           onClick={addTag}

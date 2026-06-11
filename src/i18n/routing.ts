@@ -8,4 +8,7 @@ export const routing = defineRouting({
   defaultLocale: 'ko',
 });
 
-export const isValidLocale = (locale: string) => routing.locales.includes(locale as 'en' | 'jp' | 'ko');
+export type Locale = (typeof routing.locales)[number];
+
+export const isValidLocale = (locale: string): locale is Locale =>
+  (routing.locales as readonly string[]).includes(locale);

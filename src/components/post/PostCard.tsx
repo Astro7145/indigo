@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 import Card from '@/src/components/common/cards/Card';
@@ -20,6 +21,7 @@ export const postCardRootClass =
   'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden sm:h-[280px] sm:w-[384px] sm:p-8 sm:gap-4 xl:w-full';
 
 export default function PostCard({ post, onClick, className }: PostCardProps) {
+  const t = useTranslations('posts');
   return (
     <Card className={cn(postCardRootClass, className)} onClick={onClick}>
       <h3 className="line-clamp-2 text-xl font-semibold text-slate-900">{post.title}</h3>
@@ -52,12 +54,12 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
           <span className="flex items-center gap-1 whitespace-nowrap">
             <span className="max-w-[80px] truncate">{post.writer.name}</span>
             <span aria-hidden>·</span>
-            <span>조회 {post.viewCount}</span>
+            <span>{t('viewCount', { count: post.viewCount })}</span>
           </span>
         </div>
         <div
           className="flex shrink-0 items-center gap-0.5 text-base text-slate-600"
-          aria-label={`댓글 ${post.commentCount}개`}
+          aria-label={t('commentCount', { count: post.commentCount })}
         >
           <IcMessageCircle className="size-4 text-slate-600" />
           <span>{post.commentCount}</span>

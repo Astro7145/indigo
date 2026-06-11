@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
 import Card from '@/src/components/common/cards/Card';
@@ -24,6 +25,7 @@ const GRADIENT = 'bg-[linear-gradient(120deg,#6E66C8_0%,#3D3677_73.21%)]';
  * 감싸 처리한다 — 앵커 시맨틱이라 cmd/중간 클릭 새 탭·키보드 포커스를 기본으로 확보한다.
  */
 export default function GoalNotesCard({ goalId, className }: GoalNotesCardProps) {
+  const t = useTranslations('goals');
   return (
     <Link href={`/goals/${goalId}/notes`} className={cn('block', className)}>
       <Card
@@ -41,7 +43,7 @@ export default function GoalNotesCard({ goalId, className }: GoalNotesCardProps)
         <NotesIllustration className="pointer-events-none absolute top-[15px] right-1 size-[119px] rotate-[15deg] opacity-70 mix-blend-luminosity" />
         {/* 안내 텍스트 + 우측 chevron */}
         <div className="absolute bottom-8 left-10 flex items-center gap-0.5">
-          <span className="text-xl font-bold tracking-[-0.03em]">노트 모아보기</span>
+          <span className="text-xl font-bold tracking-[-0.03em]">{t('note.collectTitle')}</span>
           <IcChevron aria-hidden direction="right" className="size-6 text-white" />
         </div>
       </Card>

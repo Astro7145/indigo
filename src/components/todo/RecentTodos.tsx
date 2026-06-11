@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -34,6 +35,8 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
 export default function RecentTodos({ className, onEditTodo, onSelectTodo }: RecentTodosProps) {
   const { data, isLoading, isError } = useTodoList({ sort: 'latest', limit: 4 });
   const update = useUpdateTodo();
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
   const addFavorite = useAddTodoFavorite();
   const removeFavorite = useRemoveTodoFavorite();
   // 삭제 확인 모달 대상 — null이면 닫힘.
@@ -54,25 +57,25 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
         <div className="flex min-w-0 items-center gap-3">
           <IcTask aria-hidden className="size-8 shrink-0 xl:size-10" />
           <h3 className="truncate text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
-            최근 등록한 할일
+            {t('recentTodos.title')}
           </h3>
         </div>
         <Link
           href="/todos"
           className="flex shrink-0 items-center text-base font-semibold whitespace-nowrap text-indigo-600"
         >
-          모두 보기
+          {tc('actions.viewAll')}
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </Link>
       </div>
       <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)]">
         {isLoading ? (
-          <p className={statusMessageClass}>불러오는 중…</p>
+          <p className={statusMessageClass}>{tc('state.loading')}</p>
         ) : isError ? (
-          <p className={statusMessageClass}>불러오지 못했어요</p>
+          <p className={statusMessageClass}>{tc('state.loadError')}</p>
         ) : todos.length === 0 ? (
           // figma: 빈 상태는 카드 정중앙에 안내 문구
-          <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>
+          <p className={statusMessageClass}>{t('recentTodos.empty')}</p>
         ) : (
           <ul className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto">
             {todos.map((t) => {
@@ -91,7 +94,9 @@ export default function RecentTodos({ className, onEditTodo, onSelectTodo }: Rec
                       {hasNote && <TodoList.NoteAction onClick={() => {}} />}
                       {t.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
                       {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-                      {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
+                      {!hasNote && (
+                        <TodoList.EditAction onClick={() => {}} hoverOnly aria-label={tc('actions.writeNote')} />
+                      )}
                       <TodoList.KebabAction
                         hoverOnly
                         onEdit={() => onEditTodo(t)}

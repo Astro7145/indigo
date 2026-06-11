@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { cn } from '@/src/utils/cn';
 import { IcTextAlignCenter } from '@/src/components/common/icons/IcTextAlignCenter';
@@ -52,41 +54,72 @@ export default function EditorToolbar({
   showLink = true,
   className,
 }: EditorToolbarProps) {
+  const t = useTranslations('common');
   return (
     <div className={cn('flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5', className)}>
-      <IconButton aria-label="굵게" title="굵게" hover={!state.isBold} onClick={onBold}>
+      <IconButton aria-label={t('editor.bold')} title={t('editor.bold')} hover={!state.isBold} onClick={onBold}>
         <IcTextBold state={state.isBold ? 'active' : 'default'} />
       </IconButton>
-      <IconButton aria-label="기울임" title="기울임" hover={!state.isItalic} onClick={onItalic}>
+      <IconButton aria-label={t('editor.italic')} title={t('editor.italic')} hover={!state.isItalic} onClick={onItalic}>
         <IcTextItalic state={state.isItalic ? 'active' : 'default'} />
       </IconButton>
-      <IconButton aria-label="밑줄" title="밑줄" hover={!state.isUnderline} onClick={onUnderline}>
+      <IconButton
+        aria-label={t('editor.underline')}
+        title={t('editor.underline')}
+        hover={!state.isUnderline}
+        onClick={onUnderline}
+      >
         <IcTextUnderline state={state.isUnderline ? 'active' : 'default'} />
       </IconButton>
 
       <div className="mx-1 h-5 w-px bg-slate-200" />
 
-      <IconButton aria-label="왼쪽 정렬" title="왼쪽 정렬" hover={!state.isAlignLeft} onClick={onAlignLeft}>
+      <IconButton
+        aria-label={t('editor.alignLeft')}
+        title={t('editor.alignLeft')}
+        hover={!state.isAlignLeft}
+        onClick={onAlignLeft}
+      >
         <IcTextAlignLeft state={state.isAlignLeft ? 'active' : 'default'} />
       </IconButton>
-      <IconButton aria-label="가운데 정렬" title="가운데 정렬" hover={!state.isAlignCenter} onClick={onAlignCenter}>
+      <IconButton
+        aria-label={t('editor.alignCenter')}
+        title={t('editor.alignCenter')}
+        hover={!state.isAlignCenter}
+        onClick={onAlignCenter}
+      >
         <IcTextAlignCenter state={state.isAlignCenter ? 'active' : 'default'} />
       </IconButton>
-      <IconButton aria-label="오른쪽 정렬" title="오른쪽 정렬" hover={!state.isAlignRight} onClick={onAlignRight}>
+      <IconButton
+        aria-label={t('editor.alignRight')}
+        title={t('editor.alignRight')}
+        hover={!state.isAlignRight}
+        onClick={onAlignRight}
+      >
         <IcTextAlignRight state={state.isAlignRight ? 'active' : 'default'} />
       </IconButton>
-      <IconButton aria-label="목록" title="목록" hover={!state.isBulletList} onClick={onBulletList}>
+      <IconButton
+        aria-label={t('editor.bulletList')}
+        title={t('editor.bulletList')}
+        hover={!state.isBulletList}
+        onClick={onBulletList}
+      >
         <IcTextDotPoints state={state.isBulletList ? 'active' : 'default'} />
       </IconButton>
 
       {showImageUpload && (
-        <IconButton aria-label="이미지 삽입" title="이미지 삽입" onClick={onImageUpload}>
+        <IconButton aria-label={t('editor.insertImage')} title={t('editor.insertImage')} onClick={onImageUpload}>
           <IcTextInsertImage />
         </IconButton>
       )}
 
       {showLink && (
-        <IconButton aria-label="링크 삽입" title="링크 삽입" hover={!state.isLink} onClick={onLink}>
+        <IconButton
+          aria-label={t('editor.insertLink')}
+          title={t('editor.insertLink')}
+          hover={!state.isLink}
+          onClick={onLink}
+        >
           <IcTextLink state={state.isLink ? 'active' : 'default'} />
         </IconButton>
       )}

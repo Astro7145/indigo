@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 import NotificationPanel from '@/src/components/notification/NotificationPanel';
@@ -25,6 +26,7 @@ export default function TopbarNotification({ active }: TopbarNotificationProps) 
   const [prevActive, setPrevActive] = useState(active);
   const bellRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const t = useTranslations('sidebar');
 
   const close = () => setIsOpen(false);
 
@@ -69,7 +71,7 @@ export default function TopbarNotification({ active }: TopbarNotificationProps) 
       <button
         ref={bellRef}
         type="button"
-        aria-label="알림"
+        aria-label={t('notification.title')}
         aria-haspopup="true"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}

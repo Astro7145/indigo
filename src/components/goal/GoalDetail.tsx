@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import ProgressCard from '@/src/components/goal/ProgressCard';
@@ -25,6 +26,7 @@ export interface GoalDetailProps {
  * - 반응형: 모바일 세로 스택 → 태블릿(sm) 진행도·노트 2열 → 데스크톱(xl) 전체 가로 배치
  */
 export default function GoalDetail({ goalId }: GoalDetailProps) {
+  const t = useTranslations('goals');
   const { data: goal, isError } = useGoal(goalId);
   const { data: me } = useMe();
 
@@ -35,16 +37,16 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
 
   // 목표 조회 실패(삭제된 목표·네트워크 오류 등) 시 빈 화면 대신 안내를 보여준다.
   if (isError) {
-    return (
-      <div className="mx-auto w-full max-w-328 py-20 text-center text-slate-500">목표 정보를 불러오지 못했어요</div>
-    );
+    return <div className="mx-auto w-full max-w-328 py-20 text-center text-slate-500">{t('loadError')}</div>;
   }
 
   return (
     <div className="mx-auto flex w-full max-w-328 flex-col gap-8">
       {/* 모바일(<sm)은 GNB가 타이틀을 담당 → sm+에서 노출. 로드 전후 레이아웃 시프트 방지로 h-8 예약 */}
       <div className="hidden h-8 sm:block">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{`${me?.name ?? ''}님의 목표`}</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">
+          {t('title', { name: me?.name ?? '' })}
+        </h1>
       </div>
 
       {/* 상단 3카드 — xl에서 목표 카드와 진행도·노트 그룹이 1:1(figma 640:640)로 함께 비례 축소.

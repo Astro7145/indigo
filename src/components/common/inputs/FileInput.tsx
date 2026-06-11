@@ -2,6 +2,7 @@
 
 import { cn } from '@/src/utils/cn';
 import { cva } from 'class-variance-authority';
+import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { IcDelete, IcUpload } from '../icons';
 
@@ -35,6 +36,7 @@ interface FileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function FileInput({ variant, onFileChange, ...props }: FileInputProps) {
+  const t = useTranslations('common');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -46,14 +48,14 @@ export default function FileInput({ variant, onFileChange, ...props }: FileInput
     // 이 경우 기존 선택 파일을 유지하기 위해 early return
     if (!selectedFile) return;
     setFile(selectedFile);
-    setStatusMessage(`${selectedFile.name} 선택됨`);
+    setStatusMessage(t('file.selected', { fileName: selectedFile.name }));
     onFileChange?.(selectedFile);
   };
 
   const handleRemoveFile = (e: React.MouseEvent) => {
     e.preventDefault();
     setFile(null);
-    setStatusMessage('파일이 삭제되었습니다');
+    setStatusMessage(t('file.removed'));
     onFileChange?.(null);
 
     if (inputRef.current) {
@@ -67,10 +69,10 @@ export default function FileInput({ variant, onFileChange, ...props }: FileInput
         {statusMessage}
       </span>
       <IcUpload />
-      <span className={cn(textVariants({ selected: !!file }))}>{file ? file.name : '파일을 선택해주세요'}</span>
+      <span className={cn(textVariants({ selected: !!file }))}>{file ? file.name : t('file.placeholder')}</span>
       <input ref={inputRef} type="file" className="sr-only" onChange={handleFileChange} {...props} />
       {file && (
-        <button type="button" aria-label="파일 삭제" onClick={handleRemoveFile} className="cursor-pointer">
+        <button type="button" aria-label={t('file.delete')} onClick={handleRemoveFile} className="cursor-pointer">
           <IcDelete />
         </button>
       )}

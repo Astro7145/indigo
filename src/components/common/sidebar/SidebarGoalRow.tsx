@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
@@ -40,6 +41,8 @@ export default function SidebarGoalRow({
   const [open, setOpen] = useState(false);
   const [inputOpen, setInputOpen] = useState(false);
   const [value, setValue] = useState('');
+  const t = useTranslations('sidebar');
+  const tc = useTranslations('common');
 
   const listRef = useRef<HTMLUListElement>(null);
   const sentinelRef = useRef<HTMLLIElement>(null);
@@ -64,7 +67,7 @@ export default function SidebarGoalRow({
       <li className="list-none">
         <button
           type="button"
-          title="목표"
+          title={t('goal.title')}
           onClick={() => {
             setOpen(true);
             onExpand?.();
@@ -110,14 +113,14 @@ export default function SidebarGoalRow({
           className="flex flex-1 cursor-pointer items-center gap-x-2"
         >
           <IcFlagFill state={current ? 'active' : 'default'} />
-          <span className="text-lg font-bold text-white">목표</span>
+          <span className="text-lg font-bold text-white">{t('goal.title')}</span>
           <IcChevron direction={open ? 'up' : 'down'} className="text-slate-300" />
         </button>
 
         <button
           type="button"
           onClick={handleToggleInput}
-          aria-label="목표 추가"
+          aria-label={t('goal.add')}
           aria-expanded={inputOpen}
           className="cursor-pointer rounded-md p-1 transition-colors hover:bg-white/10"
         >
@@ -143,8 +146,8 @@ export default function SidebarGoalRow({
                   // 한글 등 IME 조합 중 Enter는 "조합 확정"이므로 제출로 보지 않는다(마지막 글자 중복 생성 방지)
                   if (e.key === 'Enter' && !e.nativeEvent.isComposing) handleCreate();
                 }}
-                placeholder="새 목표를 입력하세요"
-                aria-label="새 목표 입력"
+                placeholder={t('goal.inputPlaceholder')}
+                aria-label={t('goal.inputLabel')}
                 className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-white placeholder:text-slate-400 focus:outline-none"
               />
               <button
@@ -171,11 +174,11 @@ export default function SidebarGoalRow({
           >
             <ul ref={listRef} className="scrollbar-slate flex max-h-45 flex-col overflow-y-auto">
               {isLoading ? (
-                <li className="list-none px-6 py-2 text-sm text-slate-400">불러오는 중…</li>
+                <li className="list-none px-6 py-2 text-sm text-slate-400">{tc('state.loading')}</li>
               ) : isError ? (
-                <li className="list-none px-6 py-2 text-sm text-slate-400">불러오지 못했어요</li>
+                <li className="list-none px-6 py-2 text-sm text-slate-400">{tc('state.loadError')}</li>
               ) : goals.length === 0 ? (
-                <li className="list-none px-6 py-2 text-sm text-slate-400">목표가 없어요</li>
+                <li className="list-none px-6 py-2 text-sm text-slate-400">{t('goal.empty')}</li>
               ) : (
                 <>
                   {goals.map((goal) => (

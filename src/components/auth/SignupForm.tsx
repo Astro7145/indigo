@@ -5,6 +5,7 @@ import { useDebounce } from '@/src/hooks/useDebounce';
 import { useCheckNickname } from '@/src/hooks/user';
 import { signupSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { type ReactNode } from 'react';
 import { useForm, useWatch, type FieldError } from 'react-hook-form';
@@ -22,6 +23,9 @@ type SignupFields = {
 
 export default function SignupForm() {
   const router = useRouter();
+  const t = useTranslations('signup');
+  const tc = useTranslations('common');
+  const tv = useTranslations('validation');
 
   const {
     register,
@@ -29,7 +33,7 @@ export default function SignupForm() {
     control,
     formState: { isSubmitting, isSubmitted, errors, isValid },
   } = useForm<SignupFields>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(signupSchema(tv)),
     defaultValues: {
       name: '',
       email: '',
@@ -48,7 +52,7 @@ export default function SignupForm() {
   // React-Hook-Form errors와 무관하게 표시(nameError)·submit 차단(nicknameTaken)한다.
   const nicknameTaken = nicknameCheck?.available === false;
   const nameError: FieldError | undefined =
-    errors.name ?? (nicknameTaken ? { type: 'manual', message: '이미 사용 중인 닉네임입니다.' } : undefined);
+    errors.name ?? (nicknameTaken ? { type: 'manual', message: t('nicknameTaken') } : undefined);
 
   const handleSignupBehavior = (data: SignupFields) => {
     const { email, name, password } = data;
@@ -57,7 +61,7 @@ export default function SignupForm() {
       { email, name, password },
       {
         onSuccess: () => {
-          alert('회원가입이 완료되었습니다.');
+          alert(t('completeAlert'));
           router.push('/');
         },
       },
@@ -69,11 +73,11 @@ export default function SignupForm() {
       {/* 입력 필드 */}
       <div className="flex flex-col gap-4">
         {/* 이름 */}
-        <InputSection label="이름" htmlFor="name" error={nameError}>
+        <InputSection label={tc('fields.name')} htmlFor="name" error={nameError}>
           <Input
             id="name"
             type="text"
-            placeholder="이름을 입력해주세요"
+            placeholder={tc('placeholders.name')}
             className="w-full"
             variant={nameError ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (nameError ? 'true' : 'false') : undefined}
@@ -82,11 +86,11 @@ export default function SignupForm() {
         </InputSection>
 
         {/* 이메일 */}
-        <InputSection label="이메일" htmlFor="email" error={errors.email}>
+        <InputSection label={tc('fields.email')} htmlFor="email" error={errors.email}>
           <Input
             id="email"
             type="text"
-            placeholder="이메일을 입력해주세요"
+            placeholder={tc('placeholders.email')}
             className="w-full"
             variant={errors.email ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (errors.email ? 'true' : 'false') : undefined}
@@ -95,10 +99,10 @@ export default function SignupForm() {
         </InputSection>
 
         {/* 패스워드 */}
-        <InputSection label="비밀번호" htmlFor="password" error={errors.password}>
+        <InputSection label={tc('fields.password')} htmlFor="password" error={errors.password}>
           <PasswordInput
             id="password"
-            placeholder="비밀번호를 입력해주세요"
+            placeholder={tc('placeholders.password')}
             className="w-full"
             variant={errors.password ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (errors.password ? 'true' : 'false') : undefined}
@@ -107,10 +111,10 @@ export default function SignupForm() {
         </InputSection>
 
         {/* 패스워드 확인 */}
-        <InputSection label="비밀번호 확인" htmlFor="passwordConfirm" error={errors.passwordConfirm}>
+        <InputSection label={t('passwordConfirmLabel')} htmlFor="passwordConfirm" error={errors.passwordConfirm}>
           <PasswordInput
             id="passwordConfirm"
-            placeholder="비밀번호를 다시 입력해주세요"
+            placeholder={t('passwordConfirmPlaceholder')}
             className="w-full"
             variant={errors.passwordConfirm ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (errors.passwordConfirm ? 'true' : 'false') : undefined}
@@ -122,12 +126,12 @@ export default function SignupForm() {
       {/* 로그인 버튼 & 회원가입 링크 */}
       <div className="flex flex-col gap-6">
         <Button type="submit" className="w-full" disabled={isSubmitting || !isValid || nicknameTaken}>
-          {isSubmitting ? '처리중...' : '회원가입 하기'}
+          {isSubmitting ? t('submitting') : t('submit')}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
-          <span className="font-medium text-slate-700">이미 회원이신가요?</span>
+          <span className="font-medium text-slate-700">{t('loginPrompt')}</span>
           <Link href="/login" className="font-semibold text-indigo-600">
-            로그인
+            {t('loginLink')}
           </Link>
         </div>
       </div>

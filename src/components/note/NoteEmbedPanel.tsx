@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcDelete } from '@/src/components/common/icons/IcDelete';
@@ -18,13 +20,14 @@ export interface NoteEmbedPanelProps {
 }
 
 export default function NoteEmbedPanel({ open, onClose, expanded = false, onToggleExpand, data }: NoteEmbedPanelProps) {
+  const t = useTranslations('goals');
   // 모바일/태블릿 (xl 미만): fixed bottom drawer로 에디터 위에 오버레이.
   // 데스크탑 (xl+): 부모 flex 컨테이너의 자식으로 inline, 에디터와 side-by-side로 reflow.
   // 모바일 transform 슬라이드 애니메이션을 위해 항상 렌더하되, 데스크탑 닫힘 상태는 xl:hidden으로 flex flow에서 제외.
   return (
     <aside
       aria-hidden={!open}
-      aria-label="링크 임베드 패널"
+      aria-label={t('note.embedLabel')}
       className={cn(
         'fixed inset-x-0 bottom-0 bg-white shadow-xl transition-transform duration-300',
         // sm 이상에서 사이드바 collapsed 폭(60px)만큼 left 비워 chevron이 사이드바에 안 가리게 함. expanded는 풀스크린이라 미적용
@@ -38,10 +41,10 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
       )}
     >
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-        <IconButton aria-label={expanded ? '패널 축소' : '패널 확장'} onClick={onToggleExpand}>
+        <IconButton aria-label={expanded ? t('note.embedCollapse') : t('note.embedExpand')} onClick={onToggleExpand}>
           <IcChevron className={expanded ? '-rotate-90 xl:rotate-180' : 'rotate-90 xl:rotate-0'} />
         </IconButton>
-        <IconButton aria-label="패널 닫기" onClick={onClose}>
+        <IconButton aria-label={t('note.embedClose')} onClick={onClose}>
           <IcDelete />
         </IconButton>
       </header>
@@ -49,7 +52,7 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
       <div className="h-[calc(100%-49px)] overflow-auto">
         {!data && (
           <div className="flex h-full items-center justify-center text-sm text-slate-400">
-            <p>여기에 임베드가 표시됩니다</p>
+            <p>{t('note.embedEmpty')}</p>
           </div>
         )}
 
@@ -57,7 +60,7 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
         {data?.type === 'iframe' && /^https?:\/\//i.test(data.url) && (
           <iframe
             src={data.url}
-            title="링크 미리보기"
+            title={t('note.embedPreview')}
             className="size-full border-0"
             sandbox="allow-scripts allow-same-origin allow-popups"
           />

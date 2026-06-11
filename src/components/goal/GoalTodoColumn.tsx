@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
@@ -84,7 +85,10 @@ export default function GoalTodoColumn({
   onSelectTodo,
   className,
 }: GoalTodoColumnProps) {
-  const label = done ? 'DONE' : 'TO DO';
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
+  const tt = useTranslations('todos');
+  const label = done ? tc('tabs.done') : tc('tabs.todo');
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
     useInfiniteTodoList({ goalId, done: done ? 'true' : 'false' });
   const update = useUpdateTodo();
@@ -130,7 +134,7 @@ export default function GoalTodoColumn({
               startIcon={<IcCalendar className="size-5" />}
               className="h-10 whitespace-nowrap"
             >
-              캘린더 보기
+              {t('calendarView')}
             </Button>
             <Button
               variant="primary"
@@ -139,7 +143,7 @@ export default function GoalTodoColumn({
               className="h-10 whitespace-nowrap"
               onClick={() => onAddTodo(goalId)}
             >
-              할 일 추가
+              {tt('addButton')}
             </Button>
           </div>
         )}
@@ -154,25 +158,25 @@ export default function GoalTodoColumn({
       >
         {isLoading ? (
           <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-            불러오는 중…
+            {tc('state.loading')}
           </p>
         ) : isError ? (
           <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-            불러오지 못했어요
+            {tc('state.loadError')}
           </p>
         ) : todos.length === 0 ? (
           <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
-            {done ? '완료한 일이 아직 없어요' : '해야할 일이 아직 없어요'}
+            {done ? tt('empty.done') : tt('empty.todo')}
           </p>
         ) : (
           <ul
             ref={scrollRef}
             className="scrollbar-slate flex max-h-[420px] flex-1 flex-col gap-1 overflow-y-auto xl:max-h-none"
           >
-            {todos.map((t) => (
+            {todos.map((todo) => (
               <Row
-                key={t.id}
-                todo={t}
+                key={todo.id}
+                todo={todo}
                 onToggle={toggle}
                 onToggleFavorite={toggleFavorite}
                 onEdit={onEditTodo}
@@ -180,7 +184,7 @@ export default function GoalTodoColumn({
               />
             ))}
             {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
-            {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">불러오는 중…</li>}
+            {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">{tc('state.loading')}</li>}
           </ul>
         )}
       </div>

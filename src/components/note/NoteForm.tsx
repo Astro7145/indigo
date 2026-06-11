@@ -1,6 +1,7 @@
 'use client';
 
 import type { JSONContent } from '@tiptap/core';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -46,6 +47,8 @@ export default function NoteForm(props: NoteFormProps) {
   const { mutateAsync: createNote, isPending: isCreating } = useCreateNote();
   const { mutateAsync: updateNote, isPending: isUpdating } = useUpdateNote();
   const isSubmitting = isCreating || isUpdating;
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
 
   const initialNote = props.mode === 'edit' ? noteListData?.notes[0] : undefined;
 
@@ -79,14 +82,14 @@ export default function NoteForm(props: NoteFormProps) {
   if (props.mode === 'edit' && isNoteLoading) {
     return (
       <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
+        <p className="text-sm text-slate-400">{tc('state.loading')}</p>
       </div>
     );
   }
   if (props.mode === 'edit' && !initialNote) {
     return (
       <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">수정할 노트를 찾을 수 없어요</p>
+        <p className="text-sm text-slate-400">{t('note.notFound')}</p>
       </div>
     );
   }
@@ -137,8 +140,8 @@ export default function NoteForm(props: NoteFormProps) {
     router.back();
   };
 
-  const headingText = props.mode === 'edit' ? '노트 수정하기' : '노트 작성하기';
-  const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
+  const headingText = props.mode === 'edit' ? t('note.editTitle') : t('note.createTitle');
+  const submitText = props.mode === 'edit' ? tc('actions.edit') : t('note.submit');
 
   const { total: contentCharCount, nonSpace: contentNoSpaceCount } = countText(content);
 
@@ -171,7 +174,7 @@ export default function NoteForm(props: NoteFormProps) {
               disabled={!isValid || isSubmitting}
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
-              임시저장
+              {t('note.draft')}
             </Button>
             <Button
               variant="primary"
@@ -198,7 +201,7 @@ export default function NoteForm(props: NoteFormProps) {
             value={content}
             onChange={setContent}
             onLinkInsertClick={handleLinkInsertClick}
-            placeholder="이 곳을 통해 노트 작성을 시작해주세요"
+            placeholder={t('note.contentPlaceholder')}
             // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
             contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
             titleSlot={
@@ -210,8 +213,8 @@ export default function NoteForm(props: NoteFormProps) {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     maxLength={30}
-                    placeholder="노트의 제목을 입력해주세요"
-                    aria-label="제목"
+                    placeholder={t('note.titlePlaceholder')}
+                    aria-label={t('note.titleLabel')}
                     className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
                   />
                   <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>
@@ -241,7 +244,7 @@ export default function NoteForm(props: NoteFormProps) {
           />
 
           <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-            공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+            {tc('charCount', { total: contentCharCount, nonSpace: contentNoSpaceCount })}
           </div>
         </div>
       </div>
@@ -262,13 +265,13 @@ export default function NoteForm(props: NoteFormProps) {
         showCloseButton
         className="h-[180px] sm:h-[260px]"
       >
-        <Modal.Title className="text-left text-base sm:text-xl">링크 업로드</Modal.Title>
+        <Modal.Title className="text-left text-base sm:text-xl">{t('note.linkUploadTitle')}</Modal.Title>
         <input
           type="url"
           value={linkInput}
           onChange={(e) => setLinkInput(e.target.value)}
-          placeholder="링크를 입력해주세요"
-          aria-label="링크 URL"
+          placeholder={t('note.linkPlaceholder')}
+          aria-label={t('note.linkLabel')}
           aria-invalid={showLinkError || undefined}
           aria-describedby={showLinkError ? 'link-input-error' : undefined}
           className={`mt-4 h-10 w-full rounded-md border px-3 text-sm outline-none sm:mt-6 sm:h-14 sm:text-base ${
@@ -277,19 +280,19 @@ export default function NoteForm(props: NoteFormProps) {
         />
         {showLinkError && (
           <p id="link-input-error" className="mt-1 text-xs text-red-500 sm:text-sm">
-            http:// 또는 https://로 시작해야 해요
+            {t('note.linkError')}
           </p>
         )}
         <Modal.Actions className="mt-auto">
           <Modal.Confirm className="h-10 sm:h-14" onClick={handleLinkConfirm} disabled={!isLinkValid}>
-            확인
+            {tc('actions.confirm')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>
 
       {/* 작성 취소 모달 */}
       <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">노트 작성을 취소하시겠어요?</Modal.Title>
+        <Modal.Title className="text-center text-base sm:text-xl">{t('note.cancelTitle')}</Modal.Title>
         <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
           <span
             aria-hidden
@@ -297,12 +300,12 @@ export default function NoteForm(props: NoteFormProps) {
           >
             !
           </span>
-          작성하신 모든 내용이 사라집니다.
+          {tc('cancelWarning')}
         </p>
         <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">{tc('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
-            확인
+            {tc('actions.confirm')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

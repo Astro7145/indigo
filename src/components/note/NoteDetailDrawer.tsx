@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -15,6 +16,8 @@ export interface NoteDetailDrawerProps {
 
 /** 리스트 위에 우측에서 슬라이드되는 노트 상세 드로어. 닫기/백드롭/Escape는 router.back으로 리스트 복귀. */
 export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   const router = useRouter();
   const close = () => router.back();
 
@@ -41,10 +44,10 @@ export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="노트 상세"
+        aria-label={t('note.drawerLabel')}
         className={cn('absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-2xl xl:w-[60%]')}
       >
-        <IconButton aria-label="닫기" onClick={close} className="absolute top-4 right-4 z-10">
+        <IconButton aria-label={tc('actions.close')} onClick={close} className="absolute top-4 right-4 z-10">
           <IcDelete aria-hidden="true" className="size-6" />
         </IconButton>
         <NoteDetail noteId={noteId} className="h-full" />

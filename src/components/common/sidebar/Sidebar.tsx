@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
@@ -25,6 +26,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 export default function Sidebar() {
   const path = usePathname();
   const openSettings = useSettingsModalStore((s) => s.open);
+  const t = useTranslations('sidebar');
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -110,13 +112,19 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={() => applyCollapsed(!collapsed)}
-              aria-label={collapsed ? '사이드바 확장' : '사이드바 축소'}
+              aria-label={collapsed ? t('expand') : t('collapse')}
               className={cn('flex cursor-pointer', collapsed && 'justify-center')}
             >
               {collapsed ? <Logo size={isTablet ? 'sm' : 'md'} /> : <LogoFull type="white" />}
             </button>
             <ul className="flex flex-col gap-y-3">
-              <SidebarRow type="dashboard" text="대시보드" href="/" current={path === '/'} collapsed={collapsed} />
+              <SidebarRow
+                type="dashboard"
+                text={t('nav.dashboard')}
+                href="/"
+                current={path === '/'}
+                collapsed={collapsed}
+              />
               <GoalSidebarList
                 collapsed={collapsed}
                 onExpand={() => applyCollapsed(false)}
@@ -126,28 +134,28 @@ export default function Sidebar() {
               />
               <SidebarRow
                 type="calendar"
-                text="캘린더"
+                text={t('nav.calendar')}
                 href="/calendar"
                 current={path === '/calendar'}
                 collapsed={collapsed}
               />
               <SidebarRow
                 type="posts"
-                text="소통 게시판"
+                text={t('nav.posts')}
                 href="/posts"
                 current={path.startsWith('/posts')}
                 collapsed={collapsed}
               />
               <SidebarRow
                 type="favorites"
-                text="찜한 할일"
+                text={t('nav.favorites')}
                 href="/favorites"
                 current={path === '/favorites'}
                 collapsed={collapsed}
               />
             </ul>
             <ul className="flex flex-col">
-              <SidebarRow type="settings" text="설정" onClick={openSettings} collapsed={collapsed} />
+              <SidebarRow type="settings" text={t('nav.settings')} onClick={openSettings} collapsed={collapsed} />
               <LogoutButton collapsed={collapsed} />
             </ul>
           </div>

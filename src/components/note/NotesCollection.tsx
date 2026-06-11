@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -13,7 +14,6 @@ import { useInfiniteNoteList } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
 
 type Sort = 'latest' | 'oldest';
-const SORT_LABELS: Record<Sort, string> = { latest: '최신순', oldest: '오래된순' };
 
 export interface NotesCollectionProps {
   goalId: number;
@@ -22,8 +22,11 @@ export interface NotesCollectionProps {
 
 /** 목표별 노트 모아보기 리스트 본문. 목표 헤더 + 검색/정렬 + 2열 노트 카드 그리드 + 무한 스크롤. */
 export default function NotesCollection({ goalId, className }: NotesCollectionProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   const router = useRouter();
   const { data: goal } = useGoal(goalId);
+  const sortLabels: Record<Sort, string> = { latest: t('note.sortLatest'), oldest: t('note.sortOldest') };
 
   const [input, setInput] = useState('');
   const [search, setSearch] = useState('');
@@ -57,9 +60,9 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
   // 노트 카드 케밥 메뉴 — 표시까지만(수정/삭제 동작·에디터 진입은 별도 작업)
   const moreMenu = (
     <Dropdown.Menu size="small" placement="bottom-end">
-      <Dropdown.Item onClick={() => {}}>수정하기</Dropdown.Item>
+      <Dropdown.Item onClick={() => {}}>{tc('actions.edit')}</Dropdown.Item>
       <Dropdown.Item onClick={() => {}} className="text-destructive">
-        삭제하기
+        {tc('actions.delete')}
       </Dropdown.Item>
     </Dropdown.Menu>
   );
@@ -67,12 +70,12 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
   return (
     <div className={cn('mx-auto flex w-full max-w-[1312px] flex-col gap-3 sm:gap-4 xl:gap-5', className)}>
       <div className="flex h-12 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="hidden text-2xl font-semibold text-slate-800 sm:block">노트 모아보기</h1>
+        <h1 className="hidden text-2xl font-semibold text-slate-800 sm:block">{t('note.collectTitle')}</h1>
         <div className="flex items-center gap-8 sm:gap-4">
           <div className="w-full sm:w-[320px]">
             <SearchInput
-              placeholder="노트를 검색해주세요"
-              aria-label="노트 검색"
+              placeholder={t('note.searchPlaceholder')}
+              aria-label={t('note.searchLabel')}
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
@@ -83,13 +86,13 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
                 type="button"
                 className="flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-slate-600"
               >
-                {SORT_LABELS[sort]}
+                {sortLabels[sort]}
                 <IcFilter aria-hidden className="size-5" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="small" placement="bottom-end">
-              <Dropdown.Item onClick={() => setSort('latest')}>최신순</Dropdown.Item>
-              <Dropdown.Item onClick={() => setSort('oldest')}>오래된순</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSort('latest')}>{t('note.sortLatest')}</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSort('oldest')}>{t('note.sortOldest')}</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -103,11 +106,11 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
       </div>
 
       {isLoading ? (
-        <p className="py-16 text-center text-sm text-slate-400">불러오는 중…</p>
+        <p className="py-16 text-center text-sm text-slate-400">{tc('state.loading')}</p>
       ) : isError ? (
-        <p className="py-16 text-center text-sm text-slate-400">불러오지 못했어요</p>
+        <p className="py-16 text-center text-sm text-slate-400">{tc('state.loadError')}</p>
       ) : notes.length === 0 ? (
-        <p className="py-16 text-center text-sm text-slate-500">노트가 아직 없어요</p>
+        <p className="py-16 text-center text-sm text-slate-500">{t('note.empty')}</p>
       ) : (
         <>
           <ul className="grid grid-cols-1 gap-3 sm:gap-4 xl:grid-cols-2 xl:gap-6">
@@ -123,7 +126,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
             ))}
           </ul>
           {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1" />}
-          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tc('state.loading')}</p>}
         </>
       )}
     </div>

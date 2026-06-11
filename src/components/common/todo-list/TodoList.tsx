@@ -12,6 +12,8 @@ import {
   type Ref,
 } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Checkbox from '@/src/components/common/checkbox/Checkbox';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
@@ -215,9 +217,10 @@ interface ActionProps {
 
 function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   useTodoListContext();
+  const t = useTranslations('common');
   return (
     <ActionButton
-      label={rest['aria-label'] ?? '노트'}
+      label={rest['aria-label'] ?? t('todoList.note')}
       onClick={onClick}
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
@@ -229,9 +232,10 @@ function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
 
 function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   useTodoListContext();
+  const t = useTranslations('common');
   return (
     <ActionButton
-      label={rest['aria-label'] ?? '링크'}
+      label={rest['aria-label'] ?? t('todoList.link')}
       onClick={onClick}
       hoverOnly={hoverOnly}
       className={cn('bg-indigo-alpha-20', className)}
@@ -243,9 +247,10 @@ function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
 
 function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
   useTodoListContext();
+  const t = useTranslations('common');
   return (
     <ActionButton
-      label={rest['aria-label'] ?? '수정'}
+      label={rest['aria-label'] ?? t('actions.update')}
       onClick={onClick}
       hoverOnly={hoverOnly}
       className={cn('bg-white', className)}
@@ -272,6 +277,7 @@ interface KebabActionProps {
 // 유지(!open)해야 absolute 메뉴 위치가 어긋나지 않는다.
 function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ariaLabel }: KebabActionProps) {
   useTodoListContext();
+  const t = useTranslations('common');
   const [open, setOpen] = useState(false);
   return (
     <Dropdown
@@ -280,14 +286,14 @@ function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ari
       className={cn('inline-flex', hoverOnly && !open && 'hidden group-hover:inline-flex')}
     >
       <Dropdown.Trigger asChild>
-        <ActionButton label={ariaLabel ?? '더보기 메뉴'} className={cn('bg-white', className)}>
+        <ActionButton label={ariaLabel ?? t('moreMenu')} className={cn('bg-white', className)}>
           <IcKebab className="size-[14px] text-indigo-600" />
         </ActionButton>
       </Dropdown.Trigger>
       <Dropdown.Menu size="small" placement="bottom-end">
-        <Dropdown.Item onClick={onEdit}>수정하기</Dropdown.Item>
+        <Dropdown.Item onClick={onEdit}>{t('actions.edit')}</Dropdown.Item>
         <Dropdown.Item onClick={onDelete} className="text-destructive">
-          삭제하기
+          {t('actions.delete')}
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
@@ -305,7 +311,8 @@ interface StarActionProps {
 // active(채운 별)는 외부 상태(즐겨찾기)로 제어 — 낙관적 업데이트 시 호출 측이 동기화. checked(done)와 독립.
 function StarAction({ onClick, active = false, className, ...rest }: StarActionProps) {
   useTodoListContext(); // <TodoList> 밖 사용 방지
-  const label = rest['aria-label'] ?? (active ? '즐겨찾기 해제' : '즐겨찾기');
+  const t = useTranslations('common');
+  const label = rest['aria-label'] ?? (active ? t('favorite.remove') : t('favorite.add'));
   return (
     <ActionButton label={label} onClick={onClick} className={className}>
       <IcStar state={active ? 'active' : 'default'} />

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import Chip from '@/src/components/common/chips/Chip';
@@ -22,11 +23,13 @@ export interface NoteDetailProps {
 
 /** 노트 상세 본문 — 드로어/standalone 페이지가 공유한다. 닫기 버튼은 감싸는 셸이 담당. */
 export default function NoteDetail({ noteId, className }: NoteDetailProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   const { data: note, isLoading, isError } = useNote(noteId);
   const [embedOpen, setEmbedOpen] = useState(false);
 
-  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>;
-  if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>;
+  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>{tc('state.loading')}</p>;
+  if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>{t('note.loadError')}</p>;
 
   const tags = note.todo.tags ?? [];
   const hasLink = !!note.linkUrl;
@@ -43,7 +46,7 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
           <div className="flex items-center gap-2">
             <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
               <IcFlagOutline aria-hidden className="size-4" size="small" />
-              목표
+              {t('note.goalLabel')}
             </dt>
             <dd className="min-w-0 flex-1 truncate text-slate-700">{note.todo.goal?.title ?? '-'}</dd>
           </div>
@@ -51,13 +54,14 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
             {/* 값=updatedAt(기획 "마지막 저장일"). 라벨은 Figma 시안의 "작성일" 표기를 따른다. */}
             <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
               <IcCalendarOutline aria-hidden className="size-4" />
-              작성일
+              {t('note.dateLabel')}
             </dt>
             <dd className="text-slate-700">{formatDate(note.updatedAt)}</dd>
           </div>
           <div className="flex items-center gap-2">
             <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
-              <IcCheckbox aria-hidden className="size-4" />할 일
+              <IcCheckbox aria-hidden className="size-4" />
+              {t('note.todoLabel')}
             </dt>
             <dd className="flex min-w-0 items-center gap-2">
               <span className="min-w-0 truncate text-slate-700">{note.todo.title}</span>
@@ -68,16 +72,16 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
           <div className="flex items-center gap-2">
             <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
               <IcHash aria-hidden className="size-4" />
-              태그
+              {t('note.tagLabel')}
             </dt>
             {tags.length > 0 && (
               <dd className="flex flex-wrap gap-1">
-                {tags.map((t) => (
+                {tags.map((tag) => (
                   <span
-                    key={t.id}
+                    key={tag.id}
                     className="rounded-full border border-indigo-300 bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
                   >
-                    {t.name}
+                    {tag.name}
                   </span>
                 ))}
               </dd>

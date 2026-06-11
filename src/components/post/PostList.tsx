@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -15,6 +16,8 @@ import { useInfinitePostList, usePostList } from '@/src/hooks/post';
 export default function PostList() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('posts');
+  const tc = useTranslations('common');
   const search = searchParams.get('search') || undefined;
   const sortBy = searchParams.get('sortBy');
   const type = sortBy === 'popular' ? 'best' : 'all';
@@ -83,11 +86,11 @@ export default function PostList() {
       <section className="mx-auto max-w-[1200px]">
         {isPending ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <p className="text-sm text-slate-400">불러오는 중…</p>
+            <p className="text-sm text-slate-400">{tc('state.loading')}</p>
           </div>
         ) : isListError ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <p className="text-sm text-slate-500">게시물을 불러오지 못했어요.</p>
+            <p className="text-sm text-slate-500">{t('loadError')}</p>
           </div>
         ) : posts.length === 0 ? (
           <PostListEmpty />
@@ -101,7 +104,7 @@ export default function PostList() {
               ))}
             </ul>
             <div ref={sentinelRef} aria-hidden className="h-4 w-full" />
-            {isFetchNextPageError && <p className="py-4 text-center text-sm text-slate-500">더 불러오지 못했어요.</p>}
+            {isFetchNextPageError && <p className="py-4 text-center text-sm text-slate-500">{t('loadMoreError')}</p>}
           </>
         )}
       </section>
@@ -114,7 +117,7 @@ export default function PostList() {
         onClick={() => router.push('/posts/write')}
         className="fixed right-4 bottom-4 p-[13px] sm:right-8 sm:bottom-16 sm:min-w-[190px] sm:px-[18px] sm:py-[13px]"
       >
-        <span className="hidden sm:inline">게시물 작성하기</span>
+        <span className="hidden sm:inline">{t('form.createTitle')}</span>
       </Button>
     </>
   );

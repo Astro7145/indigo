@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcBadgeClose } from '@/src/components/common/icons/IcBadgeClose';
 
@@ -10,13 +12,15 @@ export interface NoteLinkCardProps {
 }
 
 export default function NoteLinkCard({ url, title, faviconUrl, onClick, onDelete }: NoteLinkCardProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   return (
     <div className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2 sm:px-4 sm:py-3">
       <button
         type="button"
         onClick={onClick}
         className="flex min-w-0 flex-1 items-start gap-2 text-left sm:gap-3"
-        aria-label="링크 미리보기 열기"
+        aria-label={t('note.linkPreviewOpen')}
       >
         {faviconUrl ? (
           <img src={faviconUrl} alt="" className="size-5 shrink-0 rounded-sm sm:size-6" />
@@ -29,7 +33,7 @@ export default function NoteLinkCard({ url, title, faviconUrl, onClick, onDelete
           <p className="text-[11px] break-all text-slate-400 sm:text-xs">{url}</p>
         </div>
       </button>
-      <IconButton aria-label="링크 삭제" onClick={onDelete} className="shrink-0">
+      <IconButton aria-label={tc('linkDelete')} onClick={onDelete} className="shrink-0">
         <IcBadgeClose />
       </IconButton>
     </div>

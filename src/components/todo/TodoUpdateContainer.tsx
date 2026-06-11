@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import type { BadgeColor } from '@/src/components/common/badges/Badge';
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useUpdateTodo } from '@/src/hooks/todo';
@@ -19,13 +21,15 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
   const { mutate: updateTodo, isPending } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
+  const t = useTranslations('todos');
+  const tc = useTranslations('common');
 
   const initialValues: Partial<TodoFormValues> = {
     title: todo.title,
     goalId: todo.goalId ?? undefined,
     dueDate: todo.dueDate ?? '',
     linkUrl: todo.linkUrl ?? '',
-    tags: todo.tags?.map((t, i) => ({ text: t.name, color: BADGE_COLORS[i % BADGE_COLORS.length] })) ?? [],
+    tags: todo.tags?.map((tag, i) => ({ text: tag.name, color: BADGE_COLORS[i % BADGE_COLORS.length] })) ?? [],
     imageFile: null,
     fileUrl: todo.fileUrl,
     done: todo.done,
@@ -42,7 +46,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
         if (!res.ok) throw new Error(`upload failed: ${res.status}`);
         fileUrl = url;
       } catch {
-        showToast('이미지 업로드에 실패했습니다.');
+        showToast(t('imageUploadError'));
         return;
       }
     }
@@ -57,16 +61,16 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
           linkUrl: values.linkUrl || null,
           fileUrl,
           done: values.done,
-          tags: values.tags.map((t) => t.text),
+          tags: values.tags.map((tag) => tag.text),
         },
       },
       {
         onSuccess: () => {
-          showToast('할 일이 수정되었습니다.');
+          showToast(t('update.success'));
           onClose();
         },
         onError: () => {
-          showToast('할 일 수정에 실패했습니다.');
+          showToast(t('update.error'));
         },
       },
     );
@@ -77,8 +81,8 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
       initialValues={initialValues}
       onSubmit={handleSubmit}
       onClose={onCancel ?? onClose}
-      title="할 일 수정"
-      submitLabel="수정"
+      title={t('update.title')}
+      submitLabel={tc('actions.update')}
       isPending={isPending}
     />
   );

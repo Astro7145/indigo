@@ -3,7 +3,8 @@ import { cn } from '@/src/utils/cn';
 export type CategoryTabLabel = 'ALL' | 'TO DO' | 'DONE';
 
 interface CategoryTabProps {
-  label: CategoryTabLabel;
+  /** 탭에 표시할 텍스트. i18n 메시지를 주입받으므로 string. */
+  label: string;
   isActive?: boolean;
   onClick?: () => void;
   className?: string;

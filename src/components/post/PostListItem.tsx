@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
@@ -12,6 +13,7 @@ interface PostListItemProps {
 }
 
 export default function PostListItem({ post, onClick }: PostListItemProps) {
+  const t = useTranslations('posts');
   return (
     <article
       className="flex w-full cursor-pointer items-center gap-6 border-b border-slate-300 px-2 py-6 sm:gap-8 sm:px-4 sm:py-10"
@@ -43,7 +45,7 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
             <span aria-hidden>·</span>
             <span>{formatRelativeTime(post.createdAt)}</span>
             <span aria-hidden>·</span>
-            <span>조회 {post.viewCount}</span>
+            <span>{t('viewCount', { count: post.viewCount })}</span>
             <span aria-hidden>·</span>
             <span className="inline-flex items-center gap-0.5 text-slate-600">
               <IcMessageCircle className="size-3 sm:size-4" />

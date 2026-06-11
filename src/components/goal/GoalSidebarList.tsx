@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 
 import SidebarGoalRow from '@/src/components/common/sidebar/SidebarGoalRow';
@@ -18,6 +19,7 @@ export interface GoalSidebarListProps {
  * 공용 프레젠테이션 컴포넌트 `SidebarGoalRow`에 주입한다. 데스크톱(Sidebar)·모바일(Topbar) 공유.
  */
 export default function GoalSidebarList({ collapsed, onExpand, onSelected }: GoalSidebarListProps) {
+  const t = useTranslations('goals');
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
@@ -32,7 +34,7 @@ export default function GoalSidebarList({ collapsed, onExpand, onSelected }: Goa
   const currentGoalId = match ? Number(match[1]) : undefined;
 
   const handleCreate = (title: string) => {
-    create.mutate({ title }, { onError: () => showToast('목표 생성에 실패했어요') });
+    create.mutate({ title }, { onError: () => showToast(t('createError')) });
   };
 
   const handleSelect = (id: number) => {

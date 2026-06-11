@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import Modal from '@/src/components/common/modal/Modal';
 import { IcReport } from '@/src/components/common/icons';
 import { useDeleteTodo } from '@/src/hooks/todo';
@@ -19,31 +21,33 @@ interface TodoDeleteConfirmProps {
 export default function TodoDeleteConfirm({ open, todo, onClose }: TodoDeleteConfirmProps) {
   const del = useDeleteTodo();
   const { showToast } = useToast();
+  const t = useTranslations('todos');
+  const tc = useTranslations('common');
 
   const handleConfirm = () => {
     if (!todo) return;
     del.mutate(todo.id, {
       onSuccess: () => {
-        showToast('할 일이 삭제되었습니다.');
+        showToast(t('delete.success'));
         onClose();
       },
-      onError: () => showToast('할 일 삭제에 실패했습니다.'),
+      onError: () => showToast(t('delete.error')),
     });
   };
 
   return (
     <Modal open={open && todo !== null} onClose={onClose}>
       <div className="flex flex-col gap-1">
-        <Modal.Title className="text-center">정말 삭제하시겠어요?</Modal.Title>
+        <Modal.Title className="text-center">{tc('deleteConfirm.title')}</Modal.Title>
         <p className="text-destructive flex items-center justify-center gap-1 text-base font-medium">
           <IcReport aria-hidden className="text-destructive size-5" />
-          <span>삭제된 할 일은 복구할 수 없습니다.</span>
+          <span>{t('delete.warning')}</span>
         </p>
       </div>
       <Modal.Actions className="mt-10">
-        <Modal.Cancel>취소</Modal.Cancel>
+        <Modal.Cancel>{tc('actions.cancel')}</Modal.Cancel>
         <Modal.Confirm onClick={handleConfirm} disabled={del.isPending}>
-          확인
+          {tc('actions.confirm')}
         </Modal.Confirm>
       </Modal.Actions>
     </Modal>

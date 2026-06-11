@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
@@ -9,15 +10,16 @@ import SearchInput from '@/src/components/common/inputs/SearchInput';
 
 type SortBy = 'latest' | 'popular';
 
-const SORT_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-];
-
 export default function PostSearchBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const t = useTranslations('posts');
+
+  const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+    { value: 'latest', label: t('sortLatest') },
+    { value: 'popular', label: t('sortPopular') },
+  ];
 
   const sortBy = (searchParams.get('sortBy') as SortBy) ?? 'latest';
 
@@ -46,8 +48,8 @@ export default function PostSearchBar() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onSearch={() => updateParam('search', input)}
-          placeholder="궁금한 내용을 검색해주세요"
-          aria-label="게시글 검색"
+          placeholder={t('searchPlaceholder')}
+          aria-label={t('searchLabel')}
         />
       </div>
 

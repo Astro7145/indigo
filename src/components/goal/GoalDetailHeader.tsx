@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -29,6 +30,8 @@ export interface GoalDetailHeaderProps {
  * Figma 21209:54538 (목표 카드, 640×160). 반응형: 높이·패딩·타이포를 viewport 기준으로 조절.
  */
 export default function GoalDetailHeader({ goalId, title, className }: GoalDetailHeaderProps) {
+  const t = useTranslations('goals');
+  const tc = useTranslations('common');
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -49,14 +52,14 @@ export default function GoalDetailHeader({ goalId, title, className }: GoalDetai
 
       <Dropdown className="shrink-0">
         <Dropdown.Trigger asChild>
-          <IconButton aria-label="목표 더보기 메뉴" className="rounded-full p-1">
+          <IconButton aria-label={t('moreMenu')} className="rounded-full p-1">
             <IcKebab className="size-6" />
           </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Menu size="small" placement="bottom-end">
-          <Dropdown.Item onClick={() => setEditOpen(true)}>수정하기</Dropdown.Item>
+          <Dropdown.Item onClick={() => setEditOpen(true)}>{tc('actions.edit')}</Dropdown.Item>
           <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-            삭제하기
+            {tc('actions.delete')}
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

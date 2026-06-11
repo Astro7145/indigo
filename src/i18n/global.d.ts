@@ -14,6 +14,7 @@ import type settings from '@/messages/ko/settings.json';
 import type sidebar from '@/messages/ko/sidebar.json';
 import type signup from '@/messages/ko/signup.json';
 import type todos from '@/messages/ko/todos.json';
+import type validation from '@/messages/ko/validation.json';
 
 declare module 'next-intl' {
   interface AppConfig {
@@ -31,6 +32,7 @@ declare module 'next-intl' {
       sidebar: typeof sidebar;
       signup: typeof signup;
       todos: typeof todos;
+      validation: typeof validation;
     };
   }
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
@@ -12,6 +13,7 @@ import type { Todo } from '@/src/types/todo';
 
 export default function DashboardPage() {
   const { data: me } = useMe();
+  const t = useTranslations('dashboard');
   // 대시보드 내 모든 섹션(RecentTodos·GoalTodoBoard)이 공유하는 단일 폼 상태.
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [creatingForGoalId, setCreatingForGoalId] = useState<number | null>(null);
@@ -28,7 +30,7 @@ export default function DashboardPage() {
             <span data-testid="user-name" className="text-indigo-600">
               {me?.name}
             </span>
-            님의 대시보드
+            {t('title')}
           </h1>
         </div>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-3 xl:gap-8">

@@ -258,7 +258,7 @@ it('"더 보기" 클릭 시 fetchNextPage가 호출된다', () => {
 it('isFetchingNextPage가 true이면 "불러오는 중..."을 표시한다', () => {
   setHookMocks({ hasNextPage: true, isFetchingNextPage: true });
   render(<NotificationPanel />);
-  expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
+  expect(screen.getByText('불러오는 중…')).toBeInTheDocument();
 });
 
 it('"더 보기" 클릭 후 새 데이터로 재렌더링 시 추가 알림이 표시되고 버튼이 사라진다', () => {

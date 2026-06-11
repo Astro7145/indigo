@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
@@ -24,6 +25,8 @@ type Tab = 'all' | 'todo' | 'done';
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesPage() {
+  const t = useTranslations('favorites');
+  const tc = useTranslations('common');
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
 
@@ -54,16 +57,16 @@ export default function FavoritesPage() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:61509) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">찜한 할 일</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{t('title')}</h1>
         {/* 카운트는 현재 보이는(필터된) 찜 개수 — 탭·목표 필터에 따라 갱신. aria-label 미부착으로 h1+숫자를 이어 읽힘 */}
         <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{visible.length}</span>
       </div>
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 px-2">
-          <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => setTab('all')} />
-          <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
-          <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
+          <CategoryTab label={tc('tabs.all')} isActive={tab === 'all'} onClick={() => setTab('all')} />
+          <CategoryTab label={tc('tabs.todo')} isActive={tab === 'todo'} onClick={() => setTab('todo')} />
+          <CategoryTab label={tc('tabs.done')} isActive={tab === 'done'} onClick={() => setTab('done')} />
         </div>
 
         <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
@@ -77,14 +80,14 @@ export default function FavoritesPage() {
                 <span className="flex items-center gap-3">
                   <IcGoal className="size-8" />
                   <span className="text-base font-semibold tracking-[-0.03em] text-slate-800">
-                    {selectedGoal ? selectedGoal.title : '전체 목표'}
+                    {selectedGoal ? selectedGoal.title : t('goalFilter.all')}
                   </span>
                 </span>
                 <IcChevron direction="down" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
-              <Dropdown.Item onClick={() => setGoalId(null)}>전체 목표</Dropdown.Item>
+              <Dropdown.Item onClick={() => setGoalId(null)}>{t('goalFilter.all')}</Dropdown.Item>
               {goals.map((g) => (
                 <Dropdown.Item key={g.id} onClick={() => setGoalId(g.id)}>
                   {g.title}
@@ -94,11 +97,11 @@ export default function FavoritesPage() {
           </Dropdown>
 
           {isLoading ? (
-            <p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>
+            <p className="py-12 text-center text-sm text-slate-400">{tc('state.loading')}</p>
           ) : isError ? (
-            <p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>
+            <p className="py-12 text-center text-sm text-slate-400">{tc('state.loadError')}</p>
           ) : visible.length === 0 ? (
-            <p className="py-20 text-center text-sm text-slate-500">아직 찜한 할 일이 없어요</p>
+            <p className="py-20 text-center text-sm text-slate-500">{t('empty')}</p>
           ) : (
             <ul className="flex flex-col gap-2">
               {visible.map((f, idx) => {
@@ -121,7 +124,7 @@ export default function FavoritesPage() {
                       <TodoList.Actions>
                         {hasNote && <TodoList.NoteAction />}
                         {hasLink && <TodoList.LinkAction />}
-                        {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
+                        {!hasNote && <TodoList.EditAction hoverOnly aria-label={tc('actions.writeNote')} />}
                         <TodoList.KebabAction hoverOnly />
                         <TodoList.StarAction active onClick={() => unfavorite(f.todoId)} />
                       </TodoList.Actions>

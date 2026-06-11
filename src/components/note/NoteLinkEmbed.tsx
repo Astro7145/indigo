@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { cn } from '@/src/utils/cn';
 
 export interface NoteLinkEmbedProps {
@@ -10,6 +12,7 @@ export interface NoteLinkEmbedProps {
  * 프레이밍을 차단하므로(감지는 불가) 헤더에 "새 탭에서 열기"를 항상 제공해 폴백을 보장한다.
  */
 export default function NoteLinkEmbed({ url, className }: NoteLinkEmbedProps) {
+  const t = useTranslations('goals');
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
       <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2">
@@ -20,12 +23,12 @@ export default function NoteLinkEmbed({ url, className }: NoteLinkEmbedProps) {
           rel="noopener noreferrer"
           className="shrink-0 text-xs font-medium text-indigo-600 underline"
         >
-          새 탭에서 열기
+          {t('note.openNewTab')}
         </a>
       </div>
       <iframe
         src={url}
-        title="첨부 링크 미리보기"
+        title={t('note.embedPreviewTitle')}
         className="min-h-0 flex-1 border-0"
         sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
       />

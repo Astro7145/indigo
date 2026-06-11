@@ -15,8 +15,8 @@ const nextConfig: NextConfig = {
 };
 
 const withNextIntl = createNextIntlPlugin(
-  // request.ts 경로 지정
-  '@/src/i18n/request.ts',
+  // request.ts 경로 지정 (next.config는 번들링 대상이 아니라 @/ 별칭 사용 불가)
+  './src/i18n/request.ts',
 );
 
 export default withNextIntl(nextConfig);

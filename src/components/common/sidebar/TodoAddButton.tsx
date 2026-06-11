@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { motion } from 'motion/react';
 import { useEffect } from 'react';
 import { cn } from '@/src/utils/cn';
@@ -16,6 +17,7 @@ const isTypingTarget = (target: EventTarget | null) => {
 };
 
 export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
+  const t = useTranslations('sidebar');
   useEffect(() => {
     if (!onClick) return;
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -46,7 +48,7 @@ export default function TodoAddButton({ onClick, className }: TodoAddButtonProps
         transition={{ ease: 'linear', duration: 0.1 }}
         className="absolute -top-1 right-0 left-0 flex items-center justify-center rounded-lg bg-indigo-700 px-2 py-2"
       >
-        <span className="text-lg font-bold tracking-[-0.03em] text-white">새 할일</span>
+        <span className="text-lg font-bold tracking-[-0.03em] text-white">{t('newTodo')}</span>
         <span className="absolute right-2 rounded px-1 py-0.5 text-sm font-semibold text-white opacity-40">
           Press N
         </span>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
@@ -16,11 +17,6 @@ import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import type { Todo, TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
-const EMPTY_MSG_BY_TAP = {
-  all: '아직 등록한 할 일이 없어요',
-  todo: '해야할 일이 아직 없어요',
-  done: '완료한 일이 아직 없어요',
-};
 
 const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
   all: undefined,
@@ -34,6 +30,8 @@ const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function TodosPage() {
+  const t = useTranslations('todos');
+  const tc = useTranslations('common');
   const [tab, setTab] = useState<Tab>('all');
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError, isLoading, isError } =
     useInfiniteTodoList({ sort: 'latest', limit: 40, done: DONE_PARAM[tab] });
@@ -42,6 +40,12 @@ export default function TodosPage() {
   const removeFavorite = useRemoveTodoFavorite();
   const reduce = useReducedMotion();
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const emptyByTab: Record<Tab, string> = {
+    all: t('empty.all'),
+    todo: t('empty.todo'),
+    done: t('empty.done'),
+  };
 
   // 단일 리스트라 시트 상태를 페이지가 직접 소유한다(목표 상세의 GoalDetail과 동일 패턴).
   // 삭제 확인은 deletingTodo가 있을 때만 마운트해 useDeleteTodo/useToast 인스턴스를 단일 유지.
@@ -77,7 +81,7 @@ export default function TodosPage() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:54371) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">모든 할 일</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{t('title')}</h1>
         {/* aria-label 미부착 — 스크린리더가 h1 "모든 할 일" + 숫자 텍스트를 그대로 이어 읽도록 둔다 */}
         <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{totalCount}</span>
       </div>
@@ -86,9 +90,9 @@ export default function TodosPage() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 px-2">
-            <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => setTab('all')} />
-            <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
-            <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
+            <CategoryTab label={tc('tabs.all')} isActive={tab === 'all'} onClick={() => setTab('all')} />
+            <CategoryTab label={tc('tabs.todo')} isActive={tab === 'todo'} onClick={() => setTab('todo')} />
+            <CategoryTab label={tc('tabs.done')} isActive={tab === 'done'} onClick={() => setTab('done')} />
           </div>
           <Button
             variant="tertiary"
@@ -96,25 +100,25 @@ export default function TodosPage() {
             startIcon={<IcPlus className="size-5 text-slate-500" />}
             onClick={() => setCreating(true)}
           >
-            할 일 추가
+            {t('addButton')}
           </Button>
         </div>
 
         <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
           {isLoading ? (
-            <p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>
+            <p className="py-12 text-center text-sm text-slate-400">{tc('state.loading')}</p>
           ) : isError ? (
-            <p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>
+            <p className="py-12 text-center text-sm text-slate-400">{tc('state.loadError')}</p>
           ) : todos.length === 0 ? (
-            <p className="py-20 text-center text-sm text-slate-500">{EMPTY_MSG_BY_TAP[tab]}</p>
+            <p className="py-20 text-center text-sm text-slate-500">{emptyByTab[tab]}</p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {todos.map((t, idx) => {
+              {todos.map((todo, idx) => {
                 // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-                const hasNote = (t.noteIds?.length ?? 0) > 0;
+                const hasNote = (todo.noteIds?.length ?? 0) > 0;
                 return (
                   <motion.li
-                    key={t.id}
+                    key={todo.id}
                     initial={reduce ? false : { opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     // 페이지가 누적되면 인덱스가 커진다 — 신규 페이지 행만 지연을 받도록 모듈로로 감싼다.
@@ -122,21 +126,24 @@ export default function TodosPage() {
                     className="rounded transition-shadow hover:shadow-[0_2px_8px_0_rgba(0,0,0,0.08)]"
                   >
                     <TodoList
-                      title={t.title}
-                      checked={t.done}
-                      onCheckedChange={(done) => toggle(t.id, done)}
-                      onClick={() => setSelectedTodo(t)}
+                      title={todo.title}
+                      checked={todo.done}
+                      onCheckedChange={(done) => toggle(todo.id, done)}
+                      onClick={() => setSelectedTodo(todo)}
                     >
                       <TodoList.Actions>
                         {hasNote && <TodoList.NoteAction />}
-                        {t.linkUrl && <TodoList.LinkAction />}
-                        {!hasNote && <TodoList.EditAction hoverOnly aria-label="노트 작성" />}
+                        {todo.linkUrl && <TodoList.LinkAction />}
+                        {!hasNote && <TodoList.EditAction hoverOnly aria-label={tc('actions.writeNote')} />}
                         <TodoList.KebabAction
                           hoverOnly
-                          onEdit={() => setEditingTodo(t)}
-                          onDelete={() => setDeletingTodo(t)}
+                          onEdit={() => setEditingTodo(todo)}
+                          onDelete={() => setDeletingTodo(todo)}
                         />
-                        <TodoList.StarAction active={t.isFavorite} onClick={() => toggleFavorite(t.id, t.isFavorite)} />
+                        <TodoList.StarAction
+                          active={todo.isFavorite}
+                          onClick={() => toggleFavorite(todo.id, todo.isFavorite)}
+                        />
                       </TodoList.Actions>
                     </TodoList>
                   </motion.li>
@@ -145,7 +152,7 @@ export default function TodosPage() {
             </ul>
           )}
           {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+          {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tc('state.loading')}</p>}
         </Card>
       </div>
 

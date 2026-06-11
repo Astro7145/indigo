@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type FormEvent } from 'react';
 import Image from 'next/image';
 
@@ -26,6 +27,8 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
   const { mutate: updateComment } = useUpdateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
   const { showToast } = useToast();
+  const t = useTranslations('posts');
+  const tc = useTranslations('common');
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -38,7 +41,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
       { commentId: comment.id, body: { content: draft } },
       {
         onSuccess: () => setIsEditing(false),
-        onError: () => showToast('댓글 수정에 실패했어요.', 'error'),
+        onError: () => showToast(t('comment.updateError'), 'error'),
       },
     );
   };
@@ -70,7 +73,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
             <span className="text-sm text-slate-700 sm:text-base">{comment.writer.name}</span>
             {isMine && (
               <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
-                내 댓글
+                {t('comment.mine')}
               </span>
             )}
           </div>
@@ -82,9 +85,9 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
-                <Dropdown.Item onClick={handleStartEdit}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={handleStartEdit}>{tc('actions.edit')}</Dropdown.Item>
                 <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                  삭제하기
+                  {tc('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -97,7 +100,7 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
               type="text"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              aria-label="댓글 수정"
+              aria-label={t('comment.editLabel')}
               className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
@@ -105,10 +108,10 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
               <span className="text-xs text-slate-400">{formattedDate}</span>
               <div className="flex gap-2">
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
-                  취소
+                  {tc('actions.cancel')}
                 </Button>
                 <Button type="submit" size="small" disabled={draft.trim().length === 0}>
-                  수정
+                  {tc('actions.update')}
                 </Button>
               </div>
             </div>
@@ -123,17 +126,17 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>댓글을 삭제하시겠어요?</Modal.Title>
+          <Modal.Title>{t('comment.deleteTitle')}</Modal.Title>
         </div>
         <Modal.Actions>
-          <Modal.Cancel>취소</Modal.Cancel>
+          <Modal.Cancel>{tc('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm
             onClick={() => {
-              deleteComment(comment.id, { onError: () => showToast('댓글 삭제에 실패했어요.', 'error') });
+              deleteComment(comment.id, { onError: () => showToast(t('comment.deleteError'), 'error') });
               setDeleteOpen(false);
             }}
           >
-            삭제하기
+            {tc('actions.delete')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

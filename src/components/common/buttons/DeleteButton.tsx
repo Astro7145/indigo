@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { IcDelete } from '@/src/components/common/icons/IcDelete';
 import { cn } from '@/src/utils/cn';
 
@@ -33,11 +35,12 @@ const iconSizeClasses: Record<DeleteButtonSize, string> = {
  * </div>
  */
 export default function DeleteButton({ onClick, size = 'small', className }: DeleteButtonProps) {
+  const t = useTranslations('common');
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label="이미지 삭제"
+      aria-label={t('imageDelete')}
       className={cn(
         'z-10 flex cursor-pointer items-center justify-center rounded-full border border-slate-300 bg-white transition-colors hover:border-slate-400',
         sizeClasses[size],

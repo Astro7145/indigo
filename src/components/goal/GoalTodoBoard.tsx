@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
@@ -89,6 +90,7 @@ function Column({
   onEdit: (todo: Todo) => void;
   onSelect: (todo: Todo) => void;
 }) {
+  const tc = useTranslations('common');
   const isTodo = label === 'To do';
   return (
     <div
@@ -111,7 +113,7 @@ function Column({
           isTodo ? 'text-indigo-700' : 'text-slate-400',
         )}
       >
-        {isTodo ? 'TO DO' : 'DONE'}
+        {isTodo ? tc('tabs.todo') : tc('tabs.done')}
       </span>
       <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
         {todos.map((t) => (
@@ -130,6 +132,9 @@ function Column({
 }
 
 export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, onSelectTodo }: GoalTodoBoardProps) {
+  const t = useTranslations('dashboard');
+  const tc = useTranslations('common');
+  const tt = useTranslations('todos');
   const router = useRouter();
   const [input, setInput] = useState('');
   const [keyword, setKeyword] = useState('');
@@ -142,8 +147,8 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
   const reduce = useReducedMotion();
 
   const todos = data?.todos ?? [];
-  const todoItems = todos.filter((t) => !t.done);
-  const doneItems = todos.filter((t) => t.done);
+  const todoItems = todos.filter((todo) => !todo.done);
+  const doneItems = todos.filter((todo) => todo.done);
   const percent = percentOf(goal.completedCount, goal.todoCount);
 
   const toggle = (id: number, done: boolean) => update.mutate({ todoId: id, body: { done } });
@@ -178,7 +183,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
             <div className="flex items-center gap-2 pr-4 xl:min-w-0 xl:flex-[350]">
               <div
                 role="progressbar"
-                aria-label={`${goal.title} 진행률`}
+                aria-label={t('goalTodos.progressLabel', { title: goal.title })}
                 aria-valuenow={percent}
                 aria-valuemin={0}
                 aria-valuemax={100}
@@ -198,7 +203,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
           </div>
           {/* 할 일 추가 — 모바일 전용 아이콘 버튼 */}
           <IconButton
-            aria-label="할 일 추가"
+            aria-label={tt('addButton')}
             className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
             onClick={(e) => {
               e.stopPropagation();
@@ -228,7 +233,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
             className="hidden h-10 shrink-0 whitespace-nowrap sm:inline-flex"
             onClick={() => onAddTodo(goal.id)}
           >
-            할 일 추가
+            {tt('addButton')}
           </Button>
         </div>
       </div>
@@ -241,14 +246,14 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
         {isLoading ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
+          <p className="py-10 text-center text-sm text-slate-400">{tc('state.loading')}</p>
         ) : isError ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>
+          <p className="py-10 text-center text-sm text-slate-400">{tc('state.loadError')}</p>
         ) : todos.length === 0 ? (
           keyword ? (
-            <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
+            <p className="py-10 text-center text-sm text-slate-500">{tc('state.noSearchResults')}</p>
           ) : (
-            <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
+            <p className="py-10 text-center text-sm text-slate-500">{t('goalTodos.boardEmpty')}</p>
           )
         ) : (
           <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
