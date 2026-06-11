@@ -48,7 +48,7 @@ export default function PostDetailPage() {
 
   if (postPending || !post) {
     return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
+      <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -56,7 +56,7 @@ export default function PostDetailPage() {
 
   return (
     <>
-      <article className="mx-auto min-h-full w-full max-w-[343px] rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
+      <article className="mx-2 min-h-full rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
           <h1 className="text-lg font-bold text-slate-900 sm:text-2xl">{post.title}</h1>
           {me?.id === post.writer.id && (

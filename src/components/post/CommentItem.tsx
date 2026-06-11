@@ -15,6 +15,8 @@ import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
 import { cn } from '@/src/utils/cn';
 
+import CommentInput from './CommentInput';
+
 interface CommentItemProps {
   comment: Comment;
   postId: number;
@@ -25,9 +27,11 @@ interface CommentItemProps {
   isReply?: boolean;
   repliesOpen?: boolean;
   onRepliesOpenChange?: (open: boolean) => void;
-  onReplyClick?: (commentId: number, writerName: string) => void;
-  // 하단 입력창이 현재 답글 작성 중인 대상 댓글 id. 자기 id와 같으면 "답글 달기" 버튼 강조
+  onReplyClick?: (commentId: number) => void;
+  // 상위가 보유한 "현재 답글 작성 중 대상 댓글 id". 자기 id와 같으면 답글 입력창을 인라인 렌더하고 "답글 달기" 버튼 강조
   activeReplyTargetId?: number | null;
+  // 답글 입력창의 onSubmit — 상위에서 createComment + 성공 시 부모 답글 펼침까지 처리
+  onReplySubmit?: (content: string, clearInput: () => void) => void;
 }
 
 export default function CommentItem({
@@ -40,6 +44,7 @@ export default function CommentItem({
   onRepliesOpenChange,
   onReplyClick,
   activeReplyTargetId = null,
+  onReplySubmit,
 }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
@@ -173,7 +178,7 @@ export default function CommentItem({
                 <>
                   <button
                     type="button"
-                    onClick={() => onReplyClick?.(comment.id, comment.writer.name)}
+                    onClick={() => onReplyClick?.(comment.id)}
                     className={cn(
                       'cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
                       activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
@@ -197,6 +202,12 @@ export default function CommentItem({
               )}
             </div>
           </>
+        )}
+
+        {!isReply && activeReplyTargetId === comment.id && (
+          <div className="mt-3">
+            <CommentInput autoFocus placeholder="답글을 입력해주세요." ariaLabel="답글 입력" onSubmit={onReplySubmit} />
+          </div>
         )}
 
         {!isReply && repliesOpen && (

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
+import { IcPlus } from '@/src/components/common/icons';
 import { useCreateComment } from '@/src/hooks/comment';
 import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
@@ -21,6 +22,9 @@ interface CommentSectionProps {
   isFetchingNextPage?: boolean;
 }
 
+// "이전 댓글 보기" 버튼 문구의 N. API 기본 limit과 일치 (현재 10)
+const COMMENT_PAGE_SIZE = 10;
+
 export default function CommentSection({
   postId,
   comments,
@@ -34,45 +38,40 @@ export default function CommentSection({
   const { showToast } = useToast();
   // 댓글 id → 답글 영역 펼침 여부. 각 CommentItem이 자기 상태를 들지 않고 상위에서 통합 관리
   const [openReplies, setOpenReplies] = useState<Record<number, boolean>>({});
-  // 답글 작성 대상. null이면 일반 댓글 작성 모드, 값이 있으면 그 댓글에 답글 작성 모드
-  const [replyTarget, setReplyTarget] = useState<{ commentId: number; writerName: string } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // 답글 작성 모드 진입 시 자동 포커스 (사용자가 바로 입력 가능하게)
-  useEffect(() => {
-    if (replyTarget) inputRef.current?.focus();
-  }, [replyTarget]);
+  // 현재 답글 작성 중인 대상 댓글 id. null이면 답글 작성 모드 아님
+  const [replyTargetId, setReplyTargetId] = useState<number | null>(null);
 
   // clearInput은 CommentInput이 전달하는 콜백 — 등록 성공 시점에만 호출해 입력값을 보존(실패 시 재시도 가능)
-  const handleCommentSubmit = (content: string, clearInput: () => void) => {
-    if (replyTarget) {
-      const parentId = replyTarget.commentId;
-      createComment(
-        { content, parentId },
-        {
-          onSuccess: () => {
-            // 답글 등록 직후 그 부모의 자식 영역 자동 펼침 — 등록 결과를 즉시 확인
-            setOpenReplies((prev) => ({ ...prev, [parentId]: true }));
-            setReplyTarget(null);
-            clearInput();
-          },
-          onError: () => showToast('답글 등록에 실패했어요.', 'error'),
+  const handleTopLevelSubmit = (content: string, clearInput: () => void) => {
+    createComment(
+      { content },
+      {
+        onSuccess: () => clearInput(),
+        onError: () => showToast('댓글 등록에 실패했어요.', 'error'),
+      },
+    );
+  };
+
+  const handleReplySubmit = (content: string, clearInput: () => void) => {
+    if (replyTargetId == null) return;
+    const parentId = replyTargetId;
+    createComment(
+      { content, parentId },
+      {
+        onSuccess: () => {
+          // 답글 등록 직후 그 부모의 자식 영역 자동 펼침 — 등록 결과를 즉시 확인
+          setOpenReplies((prev) => ({ ...prev, [parentId]: true }));
+          setReplyTargetId(null);
+          clearInput();
         },
-      );
-    } else {
-      createComment(
-        { content },
-        {
-          onSuccess: () => clearInput(),
-          onError: () => showToast('댓글 등록에 실패했어요.', 'error'),
-        },
-      );
-    }
+        onError: () => showToast('답글 등록에 실패했어요.', 'error'),
+      },
+    );
   };
 
   // "답글 달기" 토글 — 같은 댓글이면 취소, 다르면 그 댓글로 전환
-  const handleReplyClick = (commentId: number, writerName: string) => {
-    setReplyTarget((prev) => (prev?.commentId === commentId ? null : { commentId, writerName }));
+  const handleReplyClick = (commentId: number) => {
+    setReplyTargetId((prev) => (prev === commentId ? null : commentId));
   };
 
   return (
@@ -80,24 +79,18 @@ export default function CommentSection({
       <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
         댓글 <span className="text-indigo-500">{totalCount}</span>
       </h2>
-      <CommentInput
-        inputRef={inputRef}
-        replyToName={replyTarget?.writerName}
-        onCancelReply={() => setReplyTarget(null)}
-        onSubmit={handleCommentSubmit}
-      />
+      <CommentInput onSubmit={handleTopLevelSubmit} />
       {/* 작성순(오래된 것이 위) 정렬이라 다음 페이지가 위에 누적된다. 시선·데이터 추가 위치를 맞추려고 버튼을 목록 위에 둠 */}
       {hasNextPage && (
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => fetchNextPage?.()}
-            disabled={isFetchingNextPage}
-            className="cursor-pointer rounded border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isFetchingNextPage ? '불러오는 중…' : '이전 댓글 보기'}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => fetchNextPage?.()}
+          disabled={isFetchingNextPage}
+          className="mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:p-4 sm:text-sm"
+        >
+          <span>{isFetchingNextPage ? '불러오는 중…' : `${COMMENT_PAGE_SIZE}개 댓글 더 불러오기`}</span>
+          <IcPlus className="size-4 text-slate-600 sm:size-6" />
+        </button>
       )}
       {comments.length === 0 ? (
         <div className="mt-6 flex h-20 items-center justify-center">
@@ -115,7 +108,8 @@ export default function CommentSection({
                 repliesOpen={!!openReplies[c.id]}
                 onRepliesOpenChange={(open) => setOpenReplies((prev) => ({ ...prev, [c.id]: open }))}
                 onReplyClick={handleReplyClick}
-                activeReplyTargetId={replyTarget?.commentId ?? null}
+                activeReplyTargetId={replyTargetId}
+                onReplySubmit={handleReplySubmit}
               />
             </li>
           ))}
