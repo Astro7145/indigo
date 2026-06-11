@@ -1,5 +1,8 @@
 import { notFound } from 'next/navigation';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
+import { prefetchGoalDetail, prefetchInfiniteTodos } from '@/src/api/server/prefetch';
+import { getQueryClient } from '@/src/api/server/query-client';
 import GoalDetail from '@/src/components/goal/GoalDetail';
 
 /**
@@ -10,5 +13,18 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
   const { goalId } = await params;
   const id = Number(goalId);
   if (!Number.isInteger(id) || id <= 0) notFound();
-  return <GoalDetail goalId={id} />;
+
+  const qc = getQueryClient();
+  // 목표 헤더·진행도와 To do/Done 두 컬럼의 첫 페이지를 prefetch (#136)
+  await Promise.all([
+    prefetchGoalDetail(qc, id),
+    prefetchInfiniteTodos(qc, { goalId: id, done: 'false' }),
+    prefetchInfiniteTodos(qc, { goalId: id, done: 'true' }),
+  ]);
+
+  return (
+    <HydrationBoundary state={dehydrate(qc)}>
+      <GoalDetail goalId={id} />
+    </HydrationBoundary>
+  );
 }
