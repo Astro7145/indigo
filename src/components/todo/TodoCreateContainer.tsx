@@ -11,9 +11,16 @@ interface TodoCreateContainerProps {
   /** 취소 버튼 클릭 시 호출 — 확인 절차가 필요하면 호출자가 처리 */
   onCancel: () => void;
   defaultGoalId?: number;
+  /** 캘린더 등에서 마감일 프리필 (ISO) */
+  defaultDueDate?: string;
 }
 
-export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }: TodoCreateContainerProps) {
+export default function TodoCreateContainer({
+  onClose,
+  onCancel,
+  defaultGoalId,
+  defaultDueDate,
+}: TodoCreateContainerProps) {
   const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
@@ -60,7 +67,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
       onClose={onCancel}
       title="할 일 생성"
       submitLabel="확인"
-      initialValues={{ goalId: defaultGoalId }}
+      initialValues={{ goalId: defaultGoalId, dueDate: defaultDueDate }}
       disableSubmitUntilValid
       isPending={isPending}
     />
