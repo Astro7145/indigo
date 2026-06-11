@@ -1,0 +1,239 @@
+jest.mock('@/src/api/note', () => ({
+  ...jest.requireActual('@/src/api/note'),
+  createNote: jest.fn(),
+  patchNote: jest.fn(),
+}));
+
+// NoteContentEditor는 별도 테스트됨. 여기선 wiring만 보므로, 편집 모드는 textarea로,
+// 읽기 모드는 본문 텍스트만 노출하는 가벼운 stub으로 대체한다.
+jest.mock('./NoteContentEditor', () => ({
+  __esModule: true,
+  default: ({
+    value,
+    onChange,
+    editable,
+    titleSlot,
+    attachmentSlot,
+  }: {
+    value?: { content?: { content?: { text?: string }[] }[] };
+    onChange?: (json: unknown) => void;
+    editable?: boolean;
+    titleSlot?: React.ReactNode;
+    attachmentSlot?: React.ReactNode;
+  }) => (
+    <>
+      {titleSlot}
+      {attachmentSlot}
+      {editable ? (
+        <textarea
+          aria-label="본문"
+          onChange={(e) =>
+            onChange?.({
+              type: 'doc',
+              content: [{ type: 'paragraph', content: [{ type: 'text', text: e.target.value }] }],
+            })
+          }
+        />
+      ) : (
+        <div data-testid="note-body">{value?.content?.[0]?.content?.[0]?.text ?? ''}</div>
+      )}
+    </>
+  ),
+}));
+
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+
+import { createNote, patchNote } from '@/src/api/note';
+import NoteWorkspace from './NoteWorkspace';
+import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
+import type { Note } from '@/src/types/note';
+
+const sampleTodo = {
+  id: 12,
+  teamId: 't',
+  userId: 1,
+  goalId: 5,
+  title: '자바스크립트 기초 챕터1 듣기',
+  done: false,
+  fileUrl: null,
+  linkUrl: null,
+  dueDate: null,
+  createdAt: '2024-03-25T00:00:00.000Z',
+  updatedAt: '2024-03-25T00:00:00.000Z',
+  goal: { id: 5, title: '자바스크립트로 웹 서비스 만들기' },
+  noteIds: [],
+  tags: [{ id: 1, name: '코딩' }],
+  isFavorite: false,
+};
+
+const existingNote: Note = {
+  id: 7,
+  teamId: 't',
+  userId: 1,
+  todoId: 12,
+  title: '원래 제목',
+  content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: '원래 본문' }] }] },
+  linkUrl: null,
+  createdAt: '2024-03-25T00:00:00.000Z',
+  updatedAt: '2024-03-25T00:00:00.000Z',
+  // 목록 응답의 embedded todo ref는 tags를 포함하지 않는다 (tags는 full todo 조회로만 옴).
+  todo: {
+    id: 12,
+    title: '자바스크립트 기초 챕터1 듣기',
+    done: false,
+    goal: { id: 5, title: '자바스크립트로 웹 서비스 만들기' },
+  },
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+// --- 상세(읽기) 모드 ---
+
+it('상세: 노트 제목과 메타 정보, 본문을 보여준다', () => {
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      todo={sampleTodo}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.getByRole('heading', { name: '원래 제목' })).toBeInTheDocument();
+  expect(screen.getByText('자바스크립트로 웹 서비스 만들기')).toBeInTheDocument();
+  expect(screen.getByText('자바스크립트 기초 챕터1 듣기')).toBeInTheDocument();
+  expect(screen.getByTestId('note-body')).toHaveTextContent('원래 본문');
+  // tags는 note.todo에 없고 full todo(prop)로 채워진다.
+  expect(screen.getByText('코딩')).toBeInTheDocument();
+});
+
+it('상세: 수정 버튼을 누르면 수정 전환 콜백을 부른다', () => {
+  const onEdit = jest.fn();
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      mode="read"
+      onEdit={onEdit}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: '수정' }));
+
+  expect(onEdit).toHaveBeenCalledTimes(1);
+});
+
+it('상세: 제목 입력창은 노출되지 않는다', () => {
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.queryByLabelText('제목')).not.toBeInTheDocument();
+});
+
+// --- 작성(create) 모드 ---
+
+it('작성: 제목과 본문이 비어 있으면 등록할 수 없다', () => {
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  expect(screen.getByRole('button', { name: '등록하기' })).toBeDisabled();
+});
+
+it('작성: 제목과 본문을 채우면 등록할 수 있다', () => {
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '제목입니다' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '본문 내용' } });
+
+  expect(screen.getByRole('button', { name: '등록하기' })).toBeEnabled();
+});
+
+it('작성: 등록하면 노트를 생성하고 완료 콜백을 부른다', async () => {
+  const onComplete = jest.fn();
+  (createNote as jest.Mock).mockResolvedValue({ id: 99 });
+
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={onComplete} onCancel={() => {}} />,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '제목' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '본문' } });
+  fireEvent.click(screen.getByRole('button', { name: '등록하기' }));
+
+  await waitFor(() => expect(createNote).toHaveBeenCalledWith(expect.objectContaining({ todoId: 12, title: '제목' })));
+  await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
+});
+
+// --- 수정(edit) 모드 ---
+
+it('수정: 기존 노트 내용이 채워지고, 수정하면 노트를 갱신하고 완료 콜백을 부른다', async () => {
+  const onComplete = jest.fn();
+  (patchNote as jest.Mock).mockResolvedValue({ id: 7 });
+
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      mode="edit"
+      onEdit={() => {}}
+      onComplete={onComplete}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.getByLabelText('제목')).toHaveValue('원래 제목');
+
+  fireEvent.click(screen.getByRole('button', { name: '수정하기' }));
+
+  await waitFor(() => expect(patchNote).toHaveBeenCalledWith(7, expect.objectContaining({ title: '원래 제목' })));
+  await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
+});
+
+it('수정: 변경한 채로 취소하면 확인 후 취소 콜백을 부른다', () => {
+  const onCancel = jest.fn();
+
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      mode="edit"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={onCancel}
+    />,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '바뀐 제목' } });
+  fireEvent.click(screen.getByRole('button', { name: '취소' }));
+
+  // 변경사항이 있으므로 확인 모달이 뜬다
+  fireEvent.click(screen.getByRole('button', { name: '확인' }));
+
+  expect(onCancel).toHaveBeenCalledTimes(1);
+});
+
+it('임시저장 버튼은 제공하지 않는다', () => {
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  expect(screen.queryByRole('button', { name: '임시저장' })).not.toBeInTheDocument();
+});

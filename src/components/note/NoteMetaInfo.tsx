@@ -1,6 +1,7 @@
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
-import { IcCheckboxWhite } from '@/src/components/common/icons/IcCheckboxWhite';
+import { IcCheckbox } from '@/src/components/common/icons/IcCheckbox';
 import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
+import { IcHash } from '@/src/components/common/icons/IcHash';
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
 import Chip from '@/src/components/common/chips/Chip';
 import { formatDate } from '@/src/utils/date';
@@ -22,7 +23,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
       {/* 모바일 순서는 JSX 순서로 흐르고, 데스크탑/태블릿(2col)은 명시적 grid 위치로 [목표|작성일][할일|태그] 배치 */}
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-1">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
-          <IcFlagOutline />
+          <IcFlagOutline size="small" className="size-4" />
           <span>목표</span>
         </dt>
         <dd className="truncate text-slate-800">{goalTitle}</dd>
@@ -30,7 +31,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
 
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-2">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
-          <IcCheckboxWhite />
+          <IcCheckbox className="size-4" />
           <span>할 일</span>
         </dt>
         <dd className="flex min-w-0 items-center gap-2">
@@ -41,7 +42,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
 
       <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-1">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
-          <IcCalendarOutline />
+          <IcCalendarOutline className="size-4" />
           <span>작성일</span>
         </dt>
         <dd className="text-slate-800">{formatDate(createdAt)}</dd>
@@ -50,7 +51,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
       {tags && tags.length > 0 && (
         <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-2">
           <dt className="flex shrink-0 items-center gap-1 text-slate-500">
-            <span className="text-base">#</span>
+            <IcHash className="size-4" />
             <span>태그</span>
           </dt>
           <dd className="flex flex-wrap gap-1">
