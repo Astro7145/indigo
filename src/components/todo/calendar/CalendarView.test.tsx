@@ -105,6 +105,8 @@ it('목표 필터를 선택하면 해당 목표의 할일만 남는다', async (
   await user.click(await screen.findByText('자바스크립트'));
   await waitFor(() => expect(screen.queryAllByText('오늘 할일')).toHaveLength(0));
   expect(screen.getAllByText('목표 할일').length).toBeGreaterThan(0);
+  // 필터 변경이 URL에 셸로우 반영된다 (새로고침/공유 시 보존)
+  expect(window.location.search).toBe('?goalId=5');
 });
 
 it('initialGoalId 프리셋으로 진입하면 해당 목표만 표시한다', async () => {

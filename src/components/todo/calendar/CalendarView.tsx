@@ -35,6 +35,11 @@ export interface CalendarViewProps {
  */
 export default function CalendarView({ initialGoalId }: CalendarViewProps) {
   const [goalId, setGoalId] = useState<number | null>(initialGoalId ?? null);
+  // 필터 변경을 URL에도 반영(셸로우) — 서버 왕복·리마운트 없이 새로고침/공유 시 현재 필터가 보존된다.
+  const changeGoalId = (id: number | null) => {
+    setGoalId(id);
+    window.history.replaceState(null, '', id === null ? '/calendar' : `/calendar?goalId=${id}`);
+  };
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   const [creating, setCreating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
@@ -68,7 +73,7 @@ export default function CalendarView({ initialGoalId }: CalendarViewProps) {
         >
           <CalendarContent
             goalId={goalId}
-            onChangeGoalId={setGoalId}
+            onChangeGoalId={changeGoalId}
             selectedDate={selectedDate}
             onChangeSelectedDate={setSelectedDate}
             onSelectTodo={setSelectedTodo}
