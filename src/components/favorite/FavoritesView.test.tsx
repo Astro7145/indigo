@@ -222,3 +222,22 @@ it('행을 클릭하면 상세 시트가 열린다', async () => {
   fireEvent.click(await screen.findByText('찜 A'));
   expect(mockOpenDetail).toHaveBeenCalledTimes(1);
 });
+
+it('initialTab=todo면 TO DO 탭으로 시작해 미완료만 보인다 (#104)', async () => {
+  goal.getAllGoals.mockResolvedValue(goalPage([]));
+  fav.getFavoriteTodos.mockResolvedValue(
+    favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '완료 B', true)]),
+  );
+  renderWithClient(<FavoritesView initialTab="todo" />);
+  expect(await screen.findByText('미완료 A')).toBeInTheDocument();
+  expect(screen.queryByText('완료 B')).not.toBeInTheDocument();
+});
+
+it('탭을 바꾸면 URL이 셸로우로 동기화된다 (#104)', async () => {
+  goal.getAllGoals.mockResolvedValue(goalPage([]));
+  fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '미완료 A', false)]));
+  renderWithClient(<FavoritesView />);
+  await screen.findByText('미완료 A');
+  fireEvent.click(screen.getByText('DONE'));
+  expect(window.location.pathname + window.location.search).toBe('/favorites?tab=done');
+});

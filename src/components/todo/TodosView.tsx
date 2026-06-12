@@ -12,7 +12,13 @@ import { useInfiniteTodoList } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { TodoListParams } from '@/src/types/todo';
 
-type Tab = 'all' | 'todo' | 'done';
+export type TodosTab = 'all' | 'todo' | 'done';
+type Tab = TodosTab;
+
+/** ?tab= 파싱 — 잘못된 값은 all (이슈 #104) */
+export function parseTodosTab(raw: string | undefined): TodosTab {
+  return raw === 'todo' || raw === 'done' ? raw : 'all';
+}
 const EMPTY_MSG_BY_TAP = {
   all: '아직 등록한 할 일이 없어요',
   todo: '해야할 일이 아직 없어요',
@@ -25,15 +31,24 @@ const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
   done: 'true',
 };
 
-const listParams = (tab: Tab): Omit<TodoListParams, 'cursor'> => ({ sort: 'latest', limit: 40, done: DONE_PARAM[tab] });
+export const listParams = (tab: Tab): Omit<TodoListParams, 'cursor'> => ({
+  sort: 'latest',
+  limit: 40,
+  done: DONE_PARAM[tab],
+});
 
 /**
  * /todos 클라 본문 — 탭 상태가 카운트·리스트를 묶으므로 한 덩어리의 클라 섬이다(서버 셸은 page).
  * ALL/TO DO/DONE 탭으로 `done` 파라미터 매핑, 40개씩 무한 스크롤, 행 등장 애니메이션.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
-export default function TodosView() {
-  const [tab, setTab] = useState<Tab>('all');
+export default function TodosView({ initialTab = 'all' }: { initialTab?: TodosTab }) {
+  const [tab, setTab] = useState<Tab>(initialTab);
+  // 탭을 URL에도 반영(셸로우, 이슈 #104) — 서버 왕복 없이 새로고침/공유 시 현재 탭이 보존된다.
+  const changeTab = (next: Tab) => {
+    setTab(next);
+    window.history.replaceState(null, '', next === 'all' ? '/todos' : `/todos?tab=${next}`);
+  };
 
   const { openCreate } = useTodoSheet();
 
@@ -56,9 +71,9 @@ export default function TodosView() {
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 px-2">
-            <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => setTab('all')} />
-            <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
-            <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
+            <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => changeTab('all')} />
+            <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => changeTab('todo')} />
+            <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => changeTab('done')} />
           </div>
           <Button
             variant="tertiary"

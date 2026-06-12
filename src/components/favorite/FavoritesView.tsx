@@ -14,7 +14,13 @@ import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { FavoriteTodo } from '@/src/types/favorite';
 
-type Tab = 'all' | 'todo' | 'done';
+export type FavoritesTab = 'all' | 'todo' | 'done';
+type Tab = FavoritesTab;
+
+/** ?tab= 파싱 — 잘못된 값은 all (이슈 #104) */
+export function parseFavoritesTab(raw: string | undefined): FavoritesTab {
+  return raw === 'todo' || raw === 'done' ? raw : 'all';
+}
 
 // 클라이언트 필터 (favorites API가 done/goalId 미지원). 카운트·목록이 공유한다.
 function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | null): FavoriteTodo[] {
@@ -34,8 +40,13 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  * 불러와(`limit: 100`) 탭·목표 필터를 **클라이언트**에서 처리한다 — 전체가 로드돼 있어 필터·카운트가 정확하다.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
-export default function FavoritesView() {
-  const [tab, setTab] = useState<Tab>('all');
+export default function FavoritesView({ initialTab = 'all' }: { initialTab?: FavoritesTab }) {
+  const [tab, setTab] = useState<Tab>(initialTab);
+  // 탭을 URL에도 반영(셸로우, 이슈 #104) — 찜 필터링은 클라이언트라 재페칭 없음.
+  const changeTab = (next: Tab) => {
+    setTab(next);
+    window.history.replaceState(null, '', next === 'all' ? '/favorites' : `/favorites?tab=${next}`);
+  };
   const [goalId, setGoalId] = useState<number | null>(null);
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
@@ -60,9 +71,9 @@ export default function FavoritesView() {
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2 px-2">
-          <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => setTab('all')} />
-          <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => setTab('todo')} />
-          <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => setTab('done')} />
+          <CategoryTab label="ALL" isActive={tab === 'all'} onClick={() => changeTab('all')} />
+          <CategoryTab label="TO DO" isActive={tab === 'todo'} onClick={() => changeTab('todo')} />
+          <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => changeTab('done')} />
         </div>
 
         <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
