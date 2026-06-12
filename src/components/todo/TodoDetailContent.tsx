@@ -112,7 +112,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 type="button"
                 onClick={() => openImageLightbox(todo.fileUrl!, todo.title)}
                 aria-label="첨부 이미지 확대 보기"
-                className="relative block aspect-[408/223] w-full cursor-zoom-in overflow-hidden rounded-[4px] border border-slate-200"
+                className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200"
               >
                 <Image src={todo.fileUrl} alt="첨부 이미지" fill className="object-cover" />
               </button>

@@ -109,7 +109,7 @@ export default function PostDetailPage() {
             type="button"
             onClick={() => openImageLightbox(post.image!, post.title)}
             aria-label="첨부 이미지 확대 보기"
-            className="relative mb-6 block size-[150px] cursor-zoom-in overflow-hidden rounded border border-slate-200 sm:size-[232px]"
+            className="relative mb-6 block size-[150px] cursor-pointer overflow-hidden rounded border border-slate-200 sm:size-[232px]"
           >
             <Image src={post.image} alt="" fill className="object-cover" />
           </button>

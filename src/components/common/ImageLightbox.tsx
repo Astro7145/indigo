@@ -35,7 +35,7 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
         src={src}
         alt={alt}
         onLoad={() => setLoaded(true)}
-        onDoubleClick={() => setZoomed((z) => !z)}
+        onClick={() => setZoomed((z) => !z)}
         className={`max-h-[90vh] max-w-[90vw] object-contain ${zoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
         style={{
           touchAction: 'pinch-zoom',

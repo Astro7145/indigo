@@ -29,12 +29,12 @@ it('이미지 자체 클릭으로는 onClose가 호출되지 않는다', () => {
   expect(onClose).not.toHaveBeenCalled();
 });
 
-it('이미지 더블 클릭 시 scale이 1x ↔ 2x로 토글된다', () => {
+it('이미지 클릭 시 scale이 1x ↔ 2x로 토글된다', () => {
   render(<ImageLightbox src="https://example.com/a.png" alt="이미지" onClose={() => {}} />);
   const img = screen.getByAltText('이미지');
   expect(img.style.transform).toBe('scale(1)');
-  fireEvent.doubleClick(img);
+  fireEvent.click(img);
   expect(img.style.transform).toBe('scale(2)');
-  fireEvent.doubleClick(img);
+  fireEvent.click(img);
   expect(img.style.transform).toBe('scale(1)');
 });
