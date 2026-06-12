@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import Card from '@/src/components/common/cards/Card';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
@@ -28,6 +29,8 @@ export interface GoalDetailHeaderProps {
  * Figma 21209:54538 (목표 카드, 640×160). 반응형: 높이·패딩·타이포를 viewport 기준으로 조절.
  */
 export default function GoalDetailHeader({ goalId, className }: GoalDetailHeaderProps) {
+  const tCommon = useTranslations('common');
+  const tGoals = useTranslations('goals');
   const router = useRouter();
   const { data: goal } = useGoalSuspense(goalId);
   const [editOpen, setEditOpen] = useState(false);
@@ -49,14 +52,14 @@ export default function GoalDetailHeader({ goalId, className }: GoalDetailHeader
 
       <Dropdown className="shrink-0">
         <Dropdown.Trigger asChild>
-          <IconButton aria-label="목표 더보기 메뉴" className="rounded-full p-1">
+          <IconButton aria-label={tGoals('moreMenu')} className="rounded-full p-1">
             <IcKebab className="size-6" />
           </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Menu size="small" placement="bottom-end">
-          <Dropdown.Item onClick={() => setEditOpen(true)}>수정하기</Dropdown.Item>
+          <Dropdown.Item onClick={() => setEditOpen(true)}>{tCommon('actions.edit')}</Dropdown.Item>
           <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-            삭제하기
+            {tCommon('actions.delete')}
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

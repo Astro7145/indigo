@@ -20,6 +20,7 @@
     "goalPlaceholder": "목표를 선택해주세요",
     "goalNone": "목표 없음",
     "datePlaceholder": "날짜를 선택해주세요",
+    "dateDialogLabel": "날짜 선택",
     "tagPlaceholder": "입력 후 Enter",
     "tagAdd": "태그 추가",
     "tagDuplicate": "이미 추가된 태그예요",

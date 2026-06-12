@@ -1,21 +1,28 @@
 import z from 'zod';
 
-export const todoCreateSchema = z.object({
-  title: z.string().min(1, { error: '제목을 입력해주세요.' }).max(30, { error: '제목은 30자 이하로 입력해주세요.' }),
-  goalId: z.number().optional(),
-  dueDate: z.string().min(1, { error: '마감일을 선택해주세요.' }),
-  linkUrl: z
-    .string()
-    .transform((val) => {
-      if (!val) return val;
-      if (/^https?:\/\//i.test(val)) return val;
-      return `https://${val}`;
-    })
-    .pipe(z.union([z.url({ error: '올바른 URL을 입력해주세요.' }), z.literal('')]))
-    .optional(),
-});
+// 다국어 메시지를 위해 t(validation 네임스페이스 번역 함수)를 받아 스키마를 생성한다.
+type TodoValidationKey = 'titleRequired' | 'titleMax' | 'dueDateRequired' | 'urlInvalid';
 
-export type TodoCreateValues = z.infer<typeof todoCreateSchema>;
+export const createTodoCreateSchema = (t: (key: TodoValidationKey) => string) =>
+  z.object({
+    title: z
+      .string()
+      .min(1, { error: t('titleRequired') })
+      .max(30, { error: t('titleMax') }),
+    goalId: z.number().optional(),
+    dueDate: z.string().min(1, { error: t('dueDateRequired') }),
+    linkUrl: z
+      .string()
+      .transform((val) => {
+        if (!val) return val;
+        if (/^https?:\/\//i.test(val)) return val;
+        return `https://${val}`;
+      })
+      .pipe(z.union([z.url({ error: t('urlInvalid') }), z.literal('')]))
+      .optional(),
+  });
+
+export type TodoCreateValues = z.infer<ReturnType<typeof createTodoCreateSchema>>;
 
 export const loginSchema = z.object({
   email: z.email({ error: '올바른 이메일을 입력해주세요.' }),

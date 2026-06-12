@@ -1,4 +1,5 @@
 import type { CalendarDate } from '@internationalized/date';
+import { useTranslations } from 'next-intl';
 
 import CalendarTodoChip from '@/src/components/todo/calendar/CalendarTodoChip';
 import type { Todo } from '@/src/types/todo';
@@ -16,13 +17,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
  * Figma 21209:62876(Selected date 섹션).
  */
 export default function SelectedDateTodos({ date, todos, onSelectTodo }: SelectedDateTodosProps) {
+  const tCalendar = useTranslations('calendar');
+
   return (
     <section className="flex flex-col gap-4 px-4 py-5">
       <h3 className="text-sm leading-5 font-semibold text-slate-800">
         {date.year}. {pad(date.month)}. {pad(date.day)}
       </h3>
       {todos.length === 0 ? (
-        <p className="py-2 text-center text-sm text-slate-500">등록된 할 일이 없어요</p>
+        <p className="py-2 text-center text-sm text-slate-500">{tCalendar('empty')}</p>
       ) : (
         <ul className="flex flex-col gap-1.5">
           {todos.map((t) => (

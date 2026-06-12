@@ -1,6 +1,7 @@
 'use client';
 
 import { animate, useReducedMotion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import Card from '@/src/components/common/cards/Card';
@@ -192,6 +193,7 @@ function toPercent(done: number, total: number): number {
 
 /** 전체 "내 진행 상황" — 모든 goal의 완료/전체 todo를 집계 */
 function OverallProgress({ headerText, bodyText, onClick, className }: Omit<ProgressCardProps, 'goalId'>) {
+  const tDashboard = useTranslations('dashboard');
   const { data: list } = useGoalList();
   const { data: me } = useMe();
   const goals = list?.goals ?? [];
@@ -199,8 +201,8 @@ function OverallProgress({ headerText, bodyText, onClick, className }: Omit<Prog
   const total = goals.reduce((acc, g) => acc + g.todoCount, 0);
   return (
     <ProgressCardView
-      headerText={headerText ?? '내 진행 상황'}
-      bodyText={bodyText ?? `${me?.name ?? ''}님의 진행도는`}
+      headerText={headerText ?? tDashboard('progress.header')}
+      bodyText={bodyText ?? tDashboard('progress.body', { name: me?.name ?? '' })}
       percent={toPercent(done, total)}
       cardHeight={187}
       onClick={onClick}
@@ -211,12 +213,13 @@ function OverallProgress({ headerText, bodyText, onClick, className }: Omit<Prog
 
 /** 단일 "목표 진행도" — 해당 goal의 todos 완료 비율 */
 function GoalProgress({ goalId, bodyText, onClick, className }: ProgressCardProps & { goalId: number }) {
+  const tGoals = useTranslations('goals');
   const { data: goal } = useGoal(goalId);
   const todos = goal?.todos ?? [];
   const done = todos.filter((t) => t.done).length;
   return (
     <ProgressCardView
-      bodyText={bodyText ?? '목표 진행도'}
+      bodyText={bodyText ?? tGoals('progress')}
       percent={toPercent(done, todos.length)}
       cardHeight={160}
       onClick={onClick}

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import type { BadgeColor } from '@/src/components/common/badges/Badge';
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useUpdateTodo } from '@/src/hooks/todo';
@@ -18,6 +20,8 @@ interface TodoUpdateContainerProps {
 }
 
 export default function TodoUpdateContainer({ todo, onClose, onCancel, onPendingChange }: TodoUpdateContainerProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const { mutate: updateTodo, isPending } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
@@ -45,7 +49,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel, onPending
         if (!res.ok) throw new Error(`upload failed: ${res.status}`);
         fileUrl = url;
       } catch {
-        showToast('이미지 업로드에 실패했습니다.');
+        showToast(tTodos('imageUploadError'));
         onPendingChange?.(false);
         return;
       }
@@ -66,11 +70,11 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel, onPending
       },
       {
         onSuccess: () => {
-          showToast('할 일이 수정되었습니다.');
+          showToast(tTodos('update.success'));
           onClose();
         },
         onError: () => {
-          showToast('할 일 수정에 실패했습니다.');
+          showToast(tTodos('update.error'));
           onPendingChange?.(false);
         },
       },
@@ -82,8 +86,8 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel, onPending
       initialValues={initialValues}
       onSubmit={handleSubmit}
       onClose={onCancel ?? onClose}
-      title="할 일 수정"
-      submitLabel="수정"
+      title={tTodos('update.title')}
+      submitLabel={tCommon('actions.update')}
       isPending={isPending}
     />
   );

@@ -76,8 +76,8 @@ it('목표명과 진행률(1/4 → 25%)을 렌더한다', async () => {
 it('할일을 done 기준으로 To Do/Done 열에 나눠 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일'), makeTodo(2, '완료 할일', true)]));
   renderBoard();
-  const todoCol = await screen.findByRole('group', { name: 'To do' });
-  const doneCol = screen.getByRole('group', { name: 'Done' });
+  const todoCol = await screen.findByRole('group', { name: 'TO DO' });
+  const doneCol = screen.getByRole('group', { name: 'DONE' });
   expect(within(todoCol).getByText('미완료 할일')).toBeInTheDocument();
   expect(within(doneCol).getByText('완료 할일')).toBeInTheDocument();
 });

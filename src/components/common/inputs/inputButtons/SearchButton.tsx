@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { IcSearch } from '../../icons';
 
 interface SearchButtonProps {
@@ -5,8 +7,10 @@ interface SearchButtonProps {
 }
 
 export default function SearchButton({ onClick }: SearchButtonProps) {
+  const tCommon = useTranslations('common');
+
   return (
-    <button aria-label="검색" onClick={onClick} className="cursor-pointer">
+    <button aria-label={tCommon('search.button')} onClick={onClick} className="cursor-pointer">
       <IcSearch />
     </button>
   );

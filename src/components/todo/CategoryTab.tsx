@@ -1,6 +1,11 @@
+import { useTranslations } from 'next-intl';
+
 import { cn } from '@/src/utils/cn';
 
 export type CategoryTabLabel = 'ALL' | 'TO DO' | 'DONE';
+
+// label(semantic 값) → common.tabs 번역 키
+const TAB_KEYS = { ALL: 'all', 'TO DO': 'todo', DONE: 'done' } as const;
 
 interface CategoryTabProps {
   label: CategoryTabLabel;
@@ -23,6 +28,8 @@ interface CategoryTabProps {
  * <CategoryTab label="DONE" onClick={() => setFilter('done')} />
  */
 export default function CategoryTab({ label, isActive = false, onClick, className }: CategoryTabProps) {
+  const tCommon = useTranslations('common');
+
   return (
     <button
       type="button"
@@ -34,7 +41,7 @@ export default function CategoryTab({ label, isActive = false, onClick, classNam
         className,
       )}
     >
-      {label}
+      {tCommon(`tabs.${TAB_KEYS[label]}`)}
     </button>
   );
 }

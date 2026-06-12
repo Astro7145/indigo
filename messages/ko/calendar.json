@@ -1,1 +1,21 @@
-{}
+{
+  "title": "{name}님의 캘린더",
+  "titleFallback": "캘린더",
+  "monthYear": "{year}년 {month}월",
+  "weekdays": {
+    "mon": "월",
+    "tue": "화",
+    "wed": "수",
+    "thu": "목",
+    "fri": "금",
+    "sat": "토",
+    "sun": "일"
+  },
+  "nav": {
+    "prevMonth": "이전 달",
+    "nextMonth": "다음 달"
+  },
+  "allGoals": "전체 목표",
+  "empty": "등록된 할 일이 없어요",
+  "doneBadge": "(완료)"
+}

@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { IcCheck } from '@/src/components/common/icons/IcCheck';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
@@ -13,6 +15,8 @@ export interface CalendarTodoChipProps {
  * 월 그리드 셀(xl)과 선택 날짜 리스트(<xl)가 공유한다. Figma 21209:51959.
  */
 export default function CalendarTodoChip({ todo, onClick, className }: CalendarTodoChipProps) {
+  const tCalendar = useTranslations('calendar');
+
   return (
     <button
       type="button"
@@ -37,7 +41,7 @@ export default function CalendarTodoChip({ todo, onClick, className }: CalendarT
         {todo.title}
       </span>
       {/* 체크 아이콘은 aria-hidden — 완료 여부를 스크린리더에 텍스트로 전달 */}
-      {todo.done && <span className="sr-only">(완료)</span>}
+      {todo.done && <span className="sr-only">{tCalendar('doneBadge')}</span>}
     </button>
   );
 }

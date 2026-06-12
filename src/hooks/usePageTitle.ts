@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useMe } from '@/src/hooks/user';
 import { useTodoCount } from '@/src/hooks/todo';
 import { useFavoriteCount } from '@/src/hooks/favorite';
@@ -40,6 +41,11 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
+  const tCalendar = useTranslations('calendar');
+  const tDashboard = useTranslations('dashboard');
+  const tFavorites = useTranslations('favorites');
+  const tGoals = useTranslations('goals');
+  const tTodos = useTranslations('todos');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
@@ -49,15 +55,16 @@ export function usePageTitle(): string {
 
   switch (route) {
     case 'dashboard':
-      return `${name}님의 대시보드`;
+      // DashboardTitle과 동일하게 이름 + 접미사(title) 조합
+      return `${name}${tDashboard('title')}`;
     case 'todos':
-      return todoCount != null ? `모든 할일 ${todoCount}` : '모든 할일';
+      return todoCount != null ? `${tTodos('title')} ${todoCount}` : tTodos('title');
     case 'notes-write':
       return '노트 작성하기';
     case 'notes-edit':
       return '노트 수정하기';
     case 'goal':
-      return `${name}님의 목표`;
+      return tGoals('title', { name });
     case 'goal-notes':
       return '노트 모아보기';
     case 'posts-write':
@@ -67,9 +74,9 @@ export function usePageTitle(): string {
     case 'posts':
       return '소통 게시판';
     case 'favorites':
-      return favoriteCount != null ? `찜한 할일 ${favoriteCount}` : '찜한 할일';
+      return favoriteCount != null ? `${tFavorites('title')} ${favoriteCount}` : tFavorites('title');
     case 'calendar':
-      return `${name}님의 캘린더`;
+      return tCalendar('title', { name });
     case 'me':
       return '내 정보 관리';
     default:

@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useCreateTodo } from '@/src/hooks/todo';
 import { useCreateImageUploadUrl } from '@/src/hooks/upload';
@@ -24,6 +26,8 @@ export default function TodoCreateContainer({
   defaultGoalId,
   defaultDueDate,
 }: TodoCreateContainerProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
@@ -39,7 +43,7 @@ export default function TodoCreateContainer({
         if (!res.ok) throw new Error(`upload failed: ${res.status}`);
         fileUrl = url;
       } catch {
-        showToast('이미지 업로드에 실패했습니다.');
+        showToast(tTodos('imageUploadError'));
         onPendingChange?.(false);
         return;
       }
@@ -56,11 +60,11 @@ export default function TodoCreateContainer({
       },
       {
         onSuccess: () => {
-          showToast('할 일이 추가되었습니다.');
+          showToast(tTodos('create.success'));
           onClose();
         },
         onError: () => {
-          showToast('할 일 생성에 실패했습니다.');
+          showToast(tTodos('create.error'));
           onPendingChange?.(false);
         },
       },
@@ -71,8 +75,8 @@ export default function TodoCreateContainer({
     <TodoFormUI
       onSubmit={handleSubmit}
       onClose={onCancel}
-      title="할 일 생성"
-      submitLabel="확인"
+      title={tTodos('create.title')}
+      submitLabel={tCommon('actions.confirm')}
       initialValues={{ goalId: defaultGoalId, dueDate: defaultDueDate }}
       disableSubmitUntilValid
       isPending={isPending}
