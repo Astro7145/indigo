@@ -13,20 +13,9 @@ import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import { parseFavoritesTab, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
-import type { FavoriteTodo } from '@/src/types/favorite';
+import { filterFavorites, parseFavoritesTab, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
 
 type Tab = FavoritesTab;
-
-// 클라이언트 필터 (favorites API가 done/goalId 미지원). 카운트·목록이 공유한다.
-function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | null): FavoriteTodo[] {
-  return favorites.filter((f) => {
-    if (tab === 'todo' && f.todo.done) return false;
-    if (tab === 'done' && !f.todo.done) return false;
-    if (goalId !== null && f.todo.goal?.id !== goalId) return false;
-    return true;
-  });
-}
 
 /**
  * /favorites — 찜한 할 일 페이지

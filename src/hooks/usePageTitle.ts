@@ -1,6 +1,8 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { parseFavoritesTab } from '@/src/components/favorite/favoritesTab';
+import { parseTodosTab, todosListParams } from '@/src/components/todo/todosTab';
 import { useMe } from '@/src/hooks/user';
 import { useTodoCount } from '@/src/hooks/todo';
 import { useFavoriteCount } from '@/src/hooks/favorite';
@@ -44,8 +46,11 @@ export function usePageTitle(): string {
   const { data: user } = useMe();
   const name = user?.name ?? '';
 
-  const { data: todoCount } = useTodoCount(route === 'todos');
-  const { data: favoriteCount } = useFavoriteCount(route === 'favorites');
+  // 카운트는 데스크탑/태블릿 헤더와 동일하게 현재 탭(?tab=) 기준 —
+  // 페이지의 탭 셸로우 동기화(replaceState)를 Next가 useSearchParams에 반영해 탭 전환 시 함께 갱신된다.
+  const tabParam = useSearchParams().get('tab') ?? undefined;
+  const { data: todoCount } = useTodoCount(route === 'todos', { done: todosListParams(parseTodosTab(tabParam)).done });
+  const { data: favoriteCount } = useFavoriteCount(route === 'favorites', parseFavoritesTab(tabParam));
 
   switch (route) {
     case 'dashboard':
