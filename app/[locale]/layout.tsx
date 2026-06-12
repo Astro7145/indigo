@@ -33,7 +33,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="ko" className={`${pretendard.className} h-full antialiased`}>
+    <html lang={locale} className={`${pretendard.className} h-full antialiased`}>
       <body className="flex min-h-full bg-slate-100">
         <NextIntlClientProvider>
           <Providers>
