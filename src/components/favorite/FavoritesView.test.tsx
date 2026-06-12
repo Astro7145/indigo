@@ -108,6 +108,7 @@ const goalPage = (goals: GoalListItem[]): GoalListResponse => ({ goals, nextCurs
 
 beforeEach(() => {
   mockSearchParams.delete('tab');
+  mockSearchParams.delete('goalId');
   jest.resetAllMocks();
   // 기본값: 목표 목록은 비어 있음.
   goal.getAllGoals.mockResolvedValue(goalPage([]));
@@ -247,4 +248,45 @@ it('탭을 바꾸면 URL이 셸로우로 동기화된다', async () => {
   await screen.findByText('미완료 A');
   fireEvent.click(screen.getByText('DONE'));
   expect(window.location.pathname + window.location.search).toBe('/favorites?tab=done');
+});
+
+it('?goalId=로 진입하면 해당 목표의 항목만 보인다', async () => {
+  mockSearchParams.set('goalId', '1');
+  goal.getAllGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1'), makeGoal(2, '목표2')]));
+  fav.getFavoriteTodos.mockResolvedValue(
+    favList([
+      makeFav(1, 101, '목표1 할일', false, { id: 1, title: '목표1' }),
+      makeFav(2, 102, '목표2 할일', false, { id: 2, title: '목표2' }),
+    ]),
+  );
+  renderWithClient(<FavoritesView />);
+  expect(await screen.findByText('목표1 할일')).toBeInTheDocument();
+  expect(screen.queryByText('목표2 할일')).not.toBeInTheDocument();
+});
+
+it('목표를 선택하면 URL에 goalId가 반영되고 기존 탭 파라미터도 보존된다', async () => {
+  mockSearchParams.set('tab', 'todo');
+  goal.getAllGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1')]));
+  fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '목표1 할일', false, { id: 1, title: '목표1' })]));
+  renderWithClient(<FavoritesView />);
+  await screen.findByText('목표1 할일');
+  fireEvent.click(screen.getByRole('button', { name: /전체 목표/ }));
+  fireEvent.click(await screen.findByRole('menuitem', { name: '목표1' }));
+  expect(window.location.pathname + window.location.search).toBe('/favorites?tab=todo&goalId=1');
+});
+
+it('뒤로가기 등으로 URL의 goalId가 바뀌면 필터가 따라간다', async () => {
+  goal.getAllGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1'), makeGoal(2, '목표2')]));
+  fav.getFavoriteTodos.mockResolvedValue(
+    favList([
+      makeFav(1, 101, '목표1 할일', false, { id: 1, title: '목표1' }),
+      makeFav(2, 102, '목표2 할일', false, { id: 2, title: '목표2' }),
+    ]),
+  );
+  const { rerender } = renderWithClient(<FavoritesView />);
+  await screen.findByText('목표1 할일');
+  mockSearchParams.set('goalId', '2');
+  rerender(<FavoritesView />);
+  await waitFor(() => expect(screen.queryByText('목표1 할일')).not.toBeInTheDocument());
+  expect(screen.getByText('목표2 할일')).toBeInTheDocument();
 });
