@@ -9,7 +9,7 @@ import Card from '@/src/components/common/cards/Card';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';

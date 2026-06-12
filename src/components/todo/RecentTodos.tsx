@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import TodoList from '@/src/components/common/todo-list/TodoList';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import Card from '@/src/components/common/cards/Card';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcTask } from '@/src/components/common/icons/IcTask';

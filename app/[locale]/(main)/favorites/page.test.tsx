@@ -25,12 +25,23 @@ jest.mock('motion/react', () => {
   };
 });
 
+// 수정/상세 시트는 스텁 — 케밥·행 클릭 배선만 검증한다. 삭제 확인 모달은 실제 컴포넌트를 사용한다.
+jest.mock('@/src/components/todo/TodoFormSheet', () => ({
+  __esModule: true,
+  default: ({ mode, isOpen }: { mode: 'create' | 'update'; isOpen: boolean }) =>
+    isOpen ? <div>{`form-sheet:${mode}`}</div> : null,
+}));
+jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
+  __esModule: true,
+  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div>detail-sheet</div> : null),
+}));
+
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import * as favoriteApi from '@/src/api/favorite';
 import * as goalApi from '@/src/api/goal';
 import FavoritesPage from '@/app/[locale]/(main)/favorites/page';
-import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
+import { renderWithIntl } from '@/src/hooks/__tests__/test-utils';
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { Todo, TodoGoalRef } from '@/src/types/todo';
 import type { GoalListItem, GoalListResponse } from '@/src/types/goal';
@@ -102,7 +113,7 @@ beforeEach(() => {
 it('헤더 숫자는 현재 보이는 찜 개수를 렌더한다(전체 totalCount가 아님)', async () => {
   // 1개만 보이지만 totalCount는 42 — 클라이언트 필터 기준이라 헤더는 보이는 개수(1)를 따른다.
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')], 42));
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   expect(await screen.findByText('찜 A')).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: '찜한 할 일' })).toBeInTheDocument();
   expect(screen.getByText('1')).toBeInTheDocument();
@@ -111,7 +122,7 @@ it('헤더 숫자는 현재 보이는 찜 개수를 렌더한다(전체 totalCou
 
 it('찜한 할 일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(favList([], 0));
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   expect(await screen.findByText('아직 찜한 할 일이 없어요')).toBeInTheDocument();
 });
 
@@ -119,7 +130,7 @@ it('TO DO 탭 클릭 시 완료되지 않은 항목만 보인다(클라이언트
   fav.getFavoriteTodos.mockResolvedValue(
     favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '완료 B', true)]),
   );
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('미완료 A');
   fireEvent.click(screen.getByRole('button', { name: 'TO DO' }));
   await waitFor(() => expect(screen.queryByText('완료 B')).not.toBeInTheDocument());
@@ -130,7 +141,7 @@ it('DONE 탭 클릭 시 완료된 항목만 보인다(클라이언트 필터)', 
   fav.getFavoriteTodos.mockResolvedValue(
     favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '완료 B', true)]),
   );
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('미완료 A');
   fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
   await waitFor(() => expect(screen.queryByText('미완료 A')).not.toBeInTheDocument());
@@ -141,7 +152,7 @@ it('탭으로 거르면 헤더 숫자도 그 개수로 바뀐다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(
     favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '미완료 B', false), makeFav(3, 103, '완료 C', true)]),
   );
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('미완료 A');
   expect(screen.getByText('3')).toBeInTheDocument(); // ALL
   fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
@@ -156,7 +167,7 @@ it('목표를 선택하면 해당 목표의 항목만 보인다(클라이언트 
     ]),
   );
   goal.getAllGoals.mockResolvedValue(goalPage([makeGoal(1, '목표1'), makeGoal(2, '목표2')]));
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('목표1 할일');
   // 목표 드롭다운 열기 → "목표1" 선택
   fireEvent.click(screen.getByRole('button', { name: /전체 목표/ }));
@@ -168,7 +179,7 @@ it('목표를 선택하면 해당 목표의 항목만 보인다(클라이언트 
 it('별 클릭 시 찜을 해제한다(removeTodoFavorite 호출)', async () => {
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')]));
   fav.removeTodoFavorite.mockResolvedValue(undefined);
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('찜 A');
   fireEvent.click(screen.getByRole('button', { name: '즐겨찾기 해제' }));
   await waitFor(() => expect(fav.removeTodoFavorite).toHaveBeenCalledWith(101));
@@ -178,14 +189,39 @@ it('todo.linkUrl이 있으면 링크 아이콘을 표시한다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(
     favList([makeFav(1, 101, '링크 있는 찜', false, null, { linkUrl: 'https://example.com' })]),
   );
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('링크 있는 찜');
   expect(screen.getByRole('button', { name: '링크' })).toBeInTheDocument();
 });
 
 it('todo.linkUrl이 없으면 링크 아이콘을 표시하지 않는다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '링크 없는 찜')]));
-  renderWithClient(<FavoritesPage />);
+  await renderWithIntl(<FavoritesPage />);
   await screen.findByText('링크 없는 찜');
   expect(screen.queryByRole('button', { name: '링크' })).not.toBeInTheDocument();
+});
+
+it('케밥 메뉴에서 수정하기를 누르면 수정 시트가 열린다', async () => {
+  fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')]));
+  await renderWithIntl(<FavoritesPage />);
+  await screen.findByText('찜 A');
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('수정하기'));
+  expect(await screen.findByText('form-sheet:update')).toBeInTheDocument();
+});
+
+it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
+  fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')]));
+  await renderWithIntl(<FavoritesPage />);
+  await screen.findByText('찜 A');
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('삭제하기'));
+  expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
+});
+
+it('행을 클릭하면 상세 시트가 열린다', async () => {
+  fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')]));
+  await renderWithIntl(<FavoritesPage />);
+  fireEvent.click(await screen.findByText('찜 A'));
+  expect(await screen.findByText('detail-sheet')).toBeInTheDocument();
 });

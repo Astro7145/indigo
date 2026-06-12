@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
 import TodoList from '@/src/components/common/todo-list/TodoList';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import { IcCalendar } from '@/src/components/common/icons/IcCalendar';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useInfiniteTodoList, useUpdateTodo } from '@/src/hooks/todo';

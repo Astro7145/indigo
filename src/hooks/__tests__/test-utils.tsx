@@ -1,6 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, renderHook } from '@testing-library/react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { NextIntlClientProvider } from 'next-intl';
+import { Suspense } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
 export function createTestQueryClient(): QueryClient {
@@ -21,16 +23,35 @@ export function renderHookWithClient<TResult>(callback: () => TResult) {
   return { client, ...utils };
 }
 
+const MESSAGE_NAMESPACES = [
+  'calendar',
+  'common',
+  'dashboard',
+  'favorites',
+  'goals',
+  'login',
+  'me',
+  'posts',
+  'settings',
+  'sidebar',
+  'signup',
+  'todos',
+  'validation',
+] as const;
+
 export async function renderWithIntl(ui: ReactElement, locale: string = 'ko') {
-  const [common, settings] = await Promise.all([
-    import(`@/messages/${locale}/common.json`),
-    import(`@/messages/${locale}/settings.json`),
-  ]);
-  const messages = { common: common.default, settings: settings.default };
+  const loaded = await Promise.all(
+    MESSAGE_NAMESPACES.map((ns) => import(`@/messages/${locale}/${ns}.json`).then((m) => [ns, m.default] as const)),
+  );
+  const messages = Object.fromEntries(loaded);
   const client = createTestQueryClient();
   const wrapper = ({ children }: { children: ReactNode }) => (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      <QueryClientProvider client={client}>
+        <ErrorBoundary fallbackRender={({ error }) => <div data-testid="error">{(error as Error).message}</div>}>
+          <Suspense fallback={<div data-testid="loading" />}>{children}</Suspense>
+        </ErrorBoundary>
+      </QueryClientProvider>
     </NextIntlClientProvider>
   );
   return { client, ...render(ui, { wrapper }) };

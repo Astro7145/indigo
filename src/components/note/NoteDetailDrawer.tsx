@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -50,7 +50,9 @@ export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
         <IconButton aria-label={tc('actions.close')} onClick={close} className="absolute top-4 right-4 z-10">
           <IcDelete aria-hidden="true" className="size-6" />
         </IconButton>
-        <NoteDetail noteId={noteId} className="h-full" />
+        <Suspense fallback={null}>
+          <NoteDetail noteId={noteId} className="h-full" />
+        </Suspense>
       </div>
     </div>
   );

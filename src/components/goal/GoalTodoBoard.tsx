@@ -10,7 +10,7 @@ import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import TodoList from '@/src/components/common/todo-list/TodoList';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
 import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';

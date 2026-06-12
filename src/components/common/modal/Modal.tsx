@@ -36,6 +36,11 @@ interface ModalProps {
   className?: string;
   children: ReactNode;
   ref?: Ref<HTMLDivElement>;
+  // 아래 3개는 ModalStack이 스택 구동 시 전역 책임을 위임받기 위한 선택적 prop.
+  // 기본값은 단독 사용 시의 현행 동작과 동일하므로 기존 직접 호출부는 영향받지 않는다.
+  active?: boolean; // 최상단(topmost)일 때만 focus trap을 건다
+  zIndex?: number; // 적층 시 z-index를 덮어쓴다 (미지정 시 z-50 클래스 유지)
+  scrollLock?: boolean; // 스택이 scroll lock을 중앙 관리할 땐 false로 끈다
 }
 
 export default function Modal({
@@ -47,6 +52,9 @@ export default function Modal({
   className,
   children,
   ref,
+  active = true,
+  zIndex,
+  scrollLock = true,
 }: ModalProps) {
   const [titleId, setTitleId] = useState<string | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,14 +70,22 @@ export default function Modal({
   }, [open, closeOnEsc, onClose]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !scrollLock) return;
     lockScroll();
     return () => unlockScroll();
-  }, [open]);
+  }, [open, scrollLock]);
 
+  // 열림 시 트리거를 기억했다가 "닫힐 때만" 복귀시킨다. active 변화(위에 모달이 더 열려
+  // 비활성화되는 경우)에는 복귀하지 않아야, 배경 페이지로 포커스가 새는 것을 막는다.
   useEffect(() => {
     if (!open) return;
     const trigger = document.activeElement as HTMLElement | null;
+    return () => trigger?.focus();
+  }, [open]);
+
+  // focus trap은 최상단(active)일 때만: 첫 포커서블로 진입시키고 Tab을 내부에 가둔다.
+  useEffect(() => {
+    if (!open || !active) return;
     const container = containerRef.current;
     const getFocusable = () =>
       container
@@ -100,11 +116,8 @@ export default function Modal({
       }
     };
     container?.addEventListener('keydown', onKeyDown);
-    return () => {
-      container?.removeEventListener('keydown', onKeyDown);
-      trigger?.focus();
-    };
-  }, [open]);
+    return () => container?.removeEventListener('keydown', onKeyDown);
+  }, [open, active]);
 
   if (typeof window === 'undefined' || !open) return null;
 
@@ -118,6 +131,7 @@ export default function Modal({
     <ModalContext value={{ close: onClose, setTitleId }}>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        style={zIndex !== undefined ? { zIndex } : undefined}
         onClick={(e) => {
           if (closeOnBackdropClick && e.target === e.currentTarget) onClose();
         }}

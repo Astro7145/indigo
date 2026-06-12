@@ -5,14 +5,18 @@ import { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
 import Card from '@/src/components/common/cards/Card';
+import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
+import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
+import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useFavoriteTodoList, useRemoveTodoFavorite } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useUpdateTodo } from '@/src/hooks/todo';
+import type { Todo } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 
@@ -29,6 +33,9 @@ export default function FavoritesPage() {
   const tc = useTranslations('common');
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [deletingTodo, setDeletingTodo] = useState<Todo | null>(null);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   const { data, isLoading, isError } = useFavoriteTodoList({ limit: 100 });
   const update = useUpdateTodo();
@@ -120,12 +127,17 @@ export default function FavoritesPage() {
                       title={f.todo.title}
                       checked={f.todo.done}
                       onCheckedChange={(done) => toggle(f.todoId, done)}
+                      onClick={() => setSelectedTodo(f.todo)}
                     >
                       <TodoList.Actions>
                         {hasNote && <TodoList.NoteAction />}
                         {hasLink && <TodoList.LinkAction />}
                         {!hasNote && <TodoList.EditAction hoverOnly aria-label={tc('actions.writeNote')} />}
-                        <TodoList.KebabAction hoverOnly />
+                        <TodoList.KebabAction
+                          hoverOnly
+                          onEdit={() => setEditingTodo(f.todo)}
+                          onDelete={() => setDeletingTodo(f.todo)}
+                        />
                         <TodoList.StarAction active onClick={() => unfavorite(f.todoId)} />
                       </TodoList.Actions>
                     </TodoList>
@@ -136,6 +148,15 @@ export default function FavoritesPage() {
           )}
         </Card>
       </div>
+
+      <TodoFormSheet
+        mode="update"
+        isOpen={editingTodo !== null}
+        onClose={() => setEditingTodo(null)}
+        todo={editingTodo}
+      />
+      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
+      {deletingTodo && <TodoDeleteConfirm open todo={deletingTodo} onClose={() => setDeletingTodo(null)} />}
     </section>
   );
 }
