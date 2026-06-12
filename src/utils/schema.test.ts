@@ -1,4 +1,4 @@
-import { loginSchema, signupSchema } from './schema';
+import { createMeSchema, loginSchema, signupSchema } from './schema';
 
 describe('loginSchema', () => {
   describe('email 필드', () => {
@@ -135,5 +135,77 @@ describe('signupSchema', () => {
         expect(fieldErrors.passwordConfirm?.[0]).toBe('비밀번호가 일치하지 않습니다.');
       }
     });
+  });
+});
+
+// 번역 키를 그대로 돌려주는 가짜 t — 메시지가 validation 카탈로그 키로 연결되는지 검증한다.
+const fakeT = (key: string) => `t:${key}`;
+
+describe('createMeSchema', () => {
+  const meSchema = createMeSchema(fakeT);
+  const validMe = { name: '홍길동', currentPassword: '', password: '', passwordConfirm: '' };
+
+  function fieldErrorsOf(input: Record<string, string>) {
+    const result = meSchema.safeParse(input);
+    expect(result.success).toBe(false);
+    return result.success ? {} : result.error.flatten().fieldErrors;
+  }
+
+  it('이름이 있고 비밀번호 필드가 모두 비어 있으면 통과한다', () => {
+    expect(meSchema.safeParse(validMe).success).toBe(true);
+  });
+
+  it('이름이 비어 있으면 nameRequired 키 메시지를 반환한다', () => {
+    expect(fieldErrorsOf({ ...validMe, name: '' }).name?.[0]).toBe('t:nameRequired');
+  });
+
+  it('비밀번호 변경 시 현재 비밀번호가 비어 있으면 currentPasswordRequired 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({ ...validMe, password: 'newpass123', passwordConfirm: 'newpass123' });
+    expect(errors.currentPassword?.[0]).toBe('t:currentPasswordRequired');
+  });
+
+  it('새 비밀번호가 8자 미만이면 passwordMin 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'short',
+      passwordConfirm: 'short',
+    });
+    expect(errors.password?.[0]).toBe('t:passwordMin');
+  });
+
+  it('비밀번호 확인이 비어 있으면 passwordConfirmRequired 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({ ...validMe, currentPassword: 'oldpass123', password: 'newpass123' });
+    expect(errors.passwordConfirm?.[0]).toBe('t:passwordConfirmRequired');
+  });
+
+  it('비밀번호 확인이 다르면 passwordMismatch 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'newpass123',
+      passwordConfirm: 'different123',
+    });
+    expect(errors.passwordConfirm?.[0]).toBe('t:passwordMismatch');
+  });
+
+  it('새 비밀번호가 기존과 같으면 passwordSameAsOld 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'samepass123',
+      password: 'samepass123',
+      passwordConfirm: 'samepass123',
+    });
+    expect(errors.password?.[0]).toBe('t:passwordSameAsOld');
+  });
+
+  it('유효한 비밀번호 변경 입력이면 통과한다', () => {
+    const result = meSchema.safeParse({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'newpass123',
+      passwordConfirm: 'newpass123',
+    });
+    expect(result.success).toBe(true);
   });
 });

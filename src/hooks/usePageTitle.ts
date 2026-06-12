@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useMe } from '@/src/hooks/user';
 import { useTodoCount } from '@/src/hooks/todo';
 import { useFavoriteCount } from '@/src/hooks/favorite';
@@ -40,6 +41,7 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
+  const tMe = useTranslations('me');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
@@ -71,7 +73,7 @@ export function usePageTitle(): string {
     case 'calendar':
       return `${name}님의 캘린더`;
     case 'me':
-      return '내 정보 관리';
+      return tMe('title');
     default:
       return '';
   }
