@@ -1,4 +1,4 @@
-// SERVER-ONLY: 라우트별 RSC prefetch 함수. 이슈 #136.
+// SERVER-ONLY: 라우트별 RSC prefetch 함수.
 // 쿼리 키는 반드시 기존 키 팩토리로 만든다 — 클라 훅과 키가 어긋나면 prefetch가 통째로 무효가 된다.
 // prefetch 실패는 TanStack이 삼켜 dehydrate에서 빠지고, 해당 경계만 클라에서 재시도한다(SSR 무해).
 import type { QueryClient } from '@tanstack/react-query';

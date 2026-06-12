@@ -8,7 +8,7 @@ interface TodoAddButtonProps {
   className?: string;
 }
 
-// N 단축키는 useNewTodoShortcut(Sidebar)이 담당 — 버튼 마운트 여부(접힘)에 단축키가 종속되지 않게 분리.
+// N 단축키는 Sidebar 본문이 담당 — 버튼은 접히면 언마운트되므로 전역 리스너를 두기에 부적합하다.
 export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
   return (
     <motion.button

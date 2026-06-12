@@ -12,7 +12,7 @@ import CalendarView from '@/src/components/todo/calendar/CalendarView';
 export default async function CalendarPage() {
   const qc = getQueryClient();
   // 초기 보이는 달의 그리드 범위 prefetch — 서버 타임존이 아니라 서비스 기준(KST)으로 고정해
-  // 클라(useTodosInRange) 쿼리 키와 어긋나지 않게 한다 (#136)
+  // 클라(useTodosInRange) 쿼리 키와 어긋나지 않게 한다
   await prefetchCalendarMonth(qc, startOfMonth(today('Asia/Seoul')));
 
   return (

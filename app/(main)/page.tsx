@@ -13,7 +13,7 @@ import RecentTodos from '@/src/components/todo/RecentTodos';
 import DashboardTitle from '@/src/components/user/DashboardTitle';
 
 /**
- * 대시보드 라우트(`/`). 서버 셸 — 핵심 쿼리를 prefetch해 하이드레이션하고(#136),
+ * 대시보드 라우트(`/`). 서버 셸 — 핵심 쿼리를 prefetch해 하이드레이션하고,
  * 본문은 클라 섹션 컴포넌트들을 직접 합성한다(시트는 전역 모달 스택이 담당).
  */
 export default async function DashboardPage() {

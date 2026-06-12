@@ -8,7 +8,7 @@ import Topbar from '@/src/components/common/sidebar/Topbar';
 import Settings from '@/src/components/common/settings/Settings';
 
 /**
- * (main) 그룹 레이아웃. 전 페이지가 쓰는 useMe(타이틀·사이드바 프로필)를 서버에서 prefetch한다(#136).
+ * (main) 그룹 레이아웃. 전 페이지가 쓰는 useMe(타이틀·사이드바 프로필)를 서버에서 prefetch한다.
  * cookies()를 읽으므로 (main) 전 라우트는 동적(ƒ) — 전 쿼리 prefetch 커버의 의도된 비용.
  */
 export default async function MainLayout({ children }: { children: React.ReactNode }) {

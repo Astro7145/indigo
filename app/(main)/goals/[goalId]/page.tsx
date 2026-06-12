@@ -15,7 +15,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ goa
   if (!Number.isInteger(id) || id <= 0) notFound();
 
   const qc = getQueryClient();
-  // 목표 헤더·진행도와 To do/Done 두 컬럼의 첫 페이지를 prefetch (#136)
+  // 목표 헤더·진행도와 To do/Done 두 컬럼의 첫 페이지를 prefetch
   await Promise.all([
     prefetchGoalDetail(qc, id),
     prefetchInfiniteTodos(qc, { goalId: id, done: 'false' }),

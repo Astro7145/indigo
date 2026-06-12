@@ -15,7 +15,7 @@ import type { TodoListParams } from '@/src/types/todo';
 export type TodosTab = 'all' | 'todo' | 'done';
 type Tab = TodosTab;
 
-/** ?tab= 파싱 — 잘못된 값은 all (이슈 #104) */
+/** ?tab= 파싱 — 잘못된 값은 all */
 export function parseTodosTab(raw: string | undefined): TodosTab {
   return raw === 'todo' || raw === 'done' ? raw : 'all';
 }
@@ -44,7 +44,7 @@ export const listParams = (tab: Tab): Omit<TodoListParams, 'cursor'> => ({
  */
 export default function TodosView({ initialTab = 'all' }: { initialTab?: TodosTab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
-  // 탭을 URL에도 반영(셸로우, 이슈 #104) — 서버 왕복 없이 새로고침/공유 시 현재 탭이 보존된다.
+  // 탭을 URL에도 반영(셸로우) — 서버 왕복 없이 새로고침/공유 시 현재 탭이 보존된다.
   const changeTab = (next: Tab) => {
     setTab(next);
     window.history.replaceState(null, '', next === 'all' ? '/todos' : `/todos?tab=${next}`);

@@ -17,7 +17,7 @@ import type { FavoriteTodo } from '@/src/types/favorite';
 export type FavoritesTab = 'all' | 'todo' | 'done';
 type Tab = FavoritesTab;
 
-/** ?tab= 파싱 — 잘못된 값은 all (이슈 #104) */
+/** ?tab= 파싱 — 잘못된 값은 all */
 export function parseFavoritesTab(raw: string | undefined): FavoritesTab {
   return raw === 'todo' || raw === 'done' ? raw : 'all';
 }
@@ -42,7 +42,7 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  */
 export default function FavoritesView({ initialTab = 'all' }: { initialTab?: FavoritesTab }) {
   const [tab, setTab] = useState<Tab>(initialTab);
-  // 탭을 URL에도 반영(셸로우, 이슈 #104) — 찜 필터링은 클라이언트라 재페칭 없음.
+  // 탭을 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없음.
   const changeTab = (next: Tab) => {
     setTab(next);
     window.history.replaceState(null, '', next === 'all' ? '/favorites' : `/favorites?tab=${next}`);
