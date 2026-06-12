@@ -12,6 +12,7 @@ import IconButton from '@/src/components/common/buttons/IconButton';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useTodoList } from '@/src/hooks/todo';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
@@ -19,9 +20,6 @@ import { cn } from '@/src/utils/cn';
 export interface GoalTodoBoardProps {
   goal: GoalListItem;
   className?: string;
-  onEditTodo: (todo: Todo) => void;
-  onAddTodo: (goalId: number) => void;
-  onSelectTodo: (todo: Todo) => void;
 }
 
 function percentOf(done: number, total: number): number {
@@ -30,18 +28,9 @@ function percentOf(done: number, total: number): number {
   return Math.max(0, Math.min(100, Math.round((done / total) * 100)));
 }
 
-function Column({
-  label,
-  todos,
-  onEdit,
-  onSelect,
-}: {
-  label: 'To do' | 'Done';
-  todos: Todo[];
-  onEdit: (todo: Todo) => void;
-  onSelect: (todo: Todo) => void;
-}) {
+function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
   const isTodo = label === 'To do';
+  const { openEdit, openDetail } = useTodoSheet();
   return (
     <div
       role="group"
@@ -69,14 +58,15 @@ function Column({
         className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
         todos={todos}
         size="responsive"
-        onEdit={onEdit}
-        onSelect={onSelect}
+        onEdit={openEdit}
+        onSelect={openDetail}
       />
     </div>
   );
 }
 
-export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, onSelectTodo }: GoalTodoBoardProps) {
+export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
+  const { openCreate } = useTodoSheet();
   const router = useRouter();
   const [input, setInput] = useState('');
   const [keyword, setKeyword] = useState('');
@@ -137,7 +127,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
             className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
             onClick={(e) => {
               e.stopPropagation();
-              onAddTodo(goal.id);
+              openCreate({ goalId: goal.id });
             }}
           >
             <IcPlus className="size-4 text-indigo-600" />
@@ -161,7 +151,7 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
             size="small"
             startIcon={<IcPlus className="size-5 text-indigo-600" />}
             className="hidden h-10 shrink-0 whitespace-nowrap sm:inline-flex"
-            onClick={() => onAddTodo(goal.id)}
+            onClick={() => openCreate({ goalId: goal.id })}
           >
             할 일 추가
           </Button>
@@ -180,29 +170,14 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
           errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
           resetKeys={[keyword]}
         >
-          <GoalTodoBoardContent
-            goalId={goal.id}
-            keyword={keyword}
-            onEditTodo={onEditTodo}
-            onSelectTodo={onSelectTodo}
-          />
+          <GoalTodoBoardContent goalId={goal.id} keyword={keyword} />
         </AsyncBoundary>
       </div>
     </Card>
   );
 }
 
-function GoalTodoBoardContent({
-  goalId,
-  keyword,
-  onEditTodo,
-  onSelectTodo,
-}: {
-  goalId: number;
-  keyword: string;
-  onEditTodo: (todo: Todo) => void;
-  onSelectTodo: (todo: Todo) => void;
-}) {
+function GoalTodoBoardContent({ goalId, keyword }: { goalId: number; keyword: string }) {
   const { data } = useTodoList({ goalId, keyword: keyword || undefined });
 
   const todos = data.todos;
@@ -219,8 +194,8 @@ function GoalTodoBoardContent({
 
   return (
     <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
-      <Column label="To do" todos={todoItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
-      <Column label="Done" todos={doneItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
+      <Column label="To do" todos={todoItems} />
+      <Column label="Done" todos={doneItems} />
     </div>
   );
 }

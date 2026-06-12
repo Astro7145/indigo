@@ -3,6 +3,14 @@
 import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/src/utils/cn';
+
+// 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
+const isTypingTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+};
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import { useModalStore } from '@/src/stores/modal';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
@@ -10,7 +18,6 @@ import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarNotification from './SidebarNotification';
 import TodoAddButton from './TodoAddButton';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import { usePathname } from 'next/navigation';
 
@@ -23,13 +30,29 @@ const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Sidebar() {
+  const { openCreate } = useTodoSheet();
+
+  // 새 할일 N 단축키 — 사이드바는 모든 뷰포트에서 항상 마운트(hidden sm:contents)라 전역 리스너의
+  // 단일 거처다. 버튼(TodoAddButton)에 두면 접힘 시 언마운트로 단축키가 죽어서 컴포넌트 본문에 둔다.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+      if (event.key !== 'n' && event.key !== 'N') return;
+      if (isTypingTarget(event.target)) return;
+      // 모달이 떠 있는 동안은 무시 — 모달 안 포커스(닫기 버튼 등)는 typing 가드에 안 걸려
+      // N이 열린 폼 위에 생성 폼을 계속 적층한다
+      if (useModalStore.getState().modals.length > 0) return;
+      event.preventDefault();
+      openCreate();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openCreate]);
   const path = usePathname();
   const openSettings = useSettingsModalStore((s) => s.open);
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  // 새 할일 생성 폼(시트) 열림 상태 — 사이드바가 소유.
-  const [createOpen, setCreateOpen] = useState(false);
   const width = useMotionValue(EXPANDED_WIDTH);
   const dragStartWidth = useRef(EXPANDED_WIDTH);
 
@@ -155,7 +178,7 @@ export default function Sidebar() {
             <div className="flex flex-col gap-y-8">
               <TodoAddButton
                 onClick={() => {
-                  setCreateOpen(true);
+                  openCreate();
                   // 태블릿 오버레이 사이드바는 폼을 가리지 않도록 함께 접는다 (목표 선택과 동일 동작)
                   if (isTablet) applyCollapsed(true);
                 }}
@@ -180,7 +203,6 @@ export default function Sidebar() {
           className="flex w-4 shrink-0 cursor-ew-resize items-center justify-center transition-colors after:h-15 after:w-1 after:rounded-full after:bg-indigo-800 hover:bg-indigo-600/10"
         />
       </motion.aside>
-      <TodoFormSheet mode="create" isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </div>
   );
 }

@@ -10,15 +10,26 @@ interface TodoCreateContainerProps {
   onClose: () => void;
   /** 취소 버튼 클릭 시 호출 — 확인 절차가 필요하면 호출자가 처리 */
   onCancel: () => void;
+  /** 제출 진행(업로드~뮤테이션) 여부 보고 — 진행 중에는 호출자가 이탈 확인을 막는다 */
+  onPendingChange?: (pending: boolean) => void;
   defaultGoalId?: number;
+  /** 캘린더 등에서 마감일 프리필 (ISO) */
+  defaultDueDate?: string;
 }
 
-export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }: TodoCreateContainerProps) {
+export default function TodoCreateContainer({
+  onClose,
+  onCancel,
+  onPendingChange,
+  defaultGoalId,
+  defaultDueDate,
+}: TodoCreateContainerProps) {
   const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
   const handleSubmit = async (values: TodoFormValues) => {
+    onPendingChange?.(true);
     let fileUrl: string | undefined;
 
     if (values.imageFile) {
@@ -29,6 +40,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
         fileUrl = url;
       } catch {
         showToast('이미지 업로드에 실패했습니다.');
+        onPendingChange?.(false);
         return;
       }
     }
@@ -49,6 +61,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
         },
         onError: () => {
           showToast('할 일 생성에 실패했습니다.');
+          onPendingChange?.(false);
         },
       },
     );
@@ -60,7 +73,7 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
       onClose={onCancel}
       title="할 일 생성"
       submitLabel="확인"
-      initialValues={{ goalId: defaultGoalId }}
+      initialValues={{ goalId: defaultGoalId, dueDate: defaultDueDate }}
       disableSubmitUntilValid
       isPending={isPending}
     />
