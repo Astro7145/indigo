@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 
-import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Chip from '@/src/components/common/chips/Chip';
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
 import { IcCheckbox } from '@/src/components/common/icons/IcCheckbox';
@@ -21,21 +20,17 @@ export interface NoteDetailProps {
   className?: string;
 }
 
-/** 노트 상세 본문 — 드로어/standalone 페이지가 공유한다. 닫기 버튼은 감싸는 셸이 담당. */
+/**
+ * 노트 상세 본문 — 드로어/standalone 페이지가 공유한다. 닫기 버튼은 감싸는 셸이 담당.
+ * 프로토타입(구조 개편 예정)이라 suspense/AsyncBoundary 대신 인라인 로딩·에러로 둔다 —
+ * standalone 직접 진입이 prefetch 범위 밖이어도 SSR이 로딩 상태만 그리고 끝난다.
+ */
 export default function NoteDetail({ noteId, className }: NoteDetailProps) {
-  return (
-    <AsyncBoundary
-      fallback={<p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>}
-      errorFallback={<p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>}
-    >
-      <NoteDetailContent noteId={noteId} className={className} />
-    </AsyncBoundary>
-  );
-}
-
-function NoteDetailContent({ noteId, className }: NoteDetailProps) {
-  const { data: note } = useNote(noteId);
+  const { data: note, isLoading, isError } = useNote(noteId);
   const [embedOpen, setEmbedOpen] = useState(false);
+
+  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>;
+  if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>;
 
   const tags = note.todo.tags ?? [];
   const hasLink = !!note.linkUrl;
