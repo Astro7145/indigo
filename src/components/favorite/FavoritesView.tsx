@@ -13,20 +13,15 @@ import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import { parseFavoritesTab, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
-import type { FavoriteTodo } from '@/src/types/favorite';
+import {
+  favoritesUrl,
+  filterFavorites,
+  parseFavoritesTab,
+  parseGoalId,
+  type FavoritesTab,
+} from '@/src/components/favorite/favoritesTab';
 
 type Tab = FavoritesTab;
-
-// 클라이언트 필터 (favorites API가 done/goalId 미지원). 카운트·목록이 공유한다.
-function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | null): FavoriteTodo[] {
-  return favorites.filter((f) => {
-    if (tab === 'todo' && f.todo.done) return false;
-    if (tab === 'done' && !f.todo.done) return false;
-    if (goalId !== null && f.todo.goal?.id !== goalId) return false;
-    return true;
-  });
-}
 
 /**
  * /favorites — 찜한 할 일 페이지
@@ -37,8 +32,9 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesView() {
-  // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
-  const urlTab = parseFavoritesTab(useSearchParams().get('tab') ?? undefined);
+  // 탭·목표 필터의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
+  const searchParams = useSearchParams();
+  const urlTab = parseFavoritesTab(searchParams.get('tab') ?? undefined);
   const [tab, setTab] = useState<Tab>(urlTab);
   const [syncedTab, setSyncedTab] = useState<Tab>(urlTab);
   // 뒤로가기/앞으로가기로 URL이 바뀌면 탭을 URL에 맞춘다 (렌더 중 보정)
@@ -46,12 +42,22 @@ export default function FavoritesView() {
     setSyncedTab(urlTab);
     setTab(urlTab);
   }
-  // 탭을 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없음.
+  const urlGoalId = parseGoalId(searchParams.get('goalId'));
+  const [goalId, setGoalId] = useState<number | null>(urlGoalId);
+  const [syncedGoalId, setSyncedGoalId] = useState<number | null>(urlGoalId);
+  if (urlGoalId !== syncedGoalId) {
+    setSyncedGoalId(urlGoalId);
+    setGoalId(urlGoalId);
+  }
+  // 필터를 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없고, GNB 카운트·새로고침·공유가 따라온다.
   const changeTab = (next: Tab) => {
     setTab(next);
-    window.history.replaceState(null, '', next === 'all' ? '/favorites' : `/favorites?tab=${next}`);
+    window.history.replaceState(null, '', favoritesUrl(next, goalId));
   };
-  const [goalId, setGoalId] = useState<number | null>(null);
+  const changeGoalId = (id: number | null) => {
+    setGoalId(id);
+    window.history.replaceState(null, '', favoritesUrl(tab, id));
+  };
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -98,9 +104,9 @@ export default function FavoritesView() {
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
-              <Dropdown.Item onClick={() => setGoalId(null)}>전체 목표</Dropdown.Item>
+              <Dropdown.Item onClick={() => changeGoalId(null)}>전체 목표</Dropdown.Item>
               {goals.map((g) => (
-                <Dropdown.Item key={g.id} onClick={() => setGoalId(g.id)}>
+                <Dropdown.Item key={g.id} onClick={() => changeGoalId(g.id)}>
                   {g.title}
                 </Dropdown.Item>
               ))}

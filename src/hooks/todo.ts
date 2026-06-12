@@ -47,11 +47,12 @@ export function usePrefetchTodosInRange(ranges: { from: string; to: string }[]) 
   }, [qc, rangesKey]);
 }
 
-/** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch). */
-export function useTodoCount(enabled: boolean) {
+/** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch).
+ * done 등 필터를 받아 데스크탑 헤더의 탭별 서버 카운트와 같은 숫자를 보게 한다. */
+export function useTodoCount(enabled: boolean, params: Pick<TodoListParams, 'done'> = {}) {
   return useQuery<TodoListResponse, ApiError, number>({
-    queryKey: todoKeys.list({}),
-    queryFn: () => getTodos({}),
+    queryKey: todoKeys.list(params),
+    queryFn: () => getTodos(params),
     enabled,
     select: (data) => data.totalCount,
   });
