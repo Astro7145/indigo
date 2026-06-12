@@ -9,6 +9,7 @@ import Modal from '@/src/components/common/modal/Modal';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
 import { useNoteDraft } from '@/src/components/note/todo-note/useNoteDraft';
+import { useNoteDraftPersistence } from '@/src/components/note/todo-note/useNoteDraftPersistence';
 import { useNoteSubmit } from '@/src/components/note/todo-note/useNoteSubmit';
 import type { Note } from '@/src/types/note';
 import type { Todo } from '@/src/types/todo';
@@ -51,8 +52,25 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
 
   // 폼 초안(제목·본문)·dirty·valid 판별은 useNoteDraft가 전담한다.
   const { title, content, setTitle, setContent, isDirty, isValid } = useNoteDraft(note, editing);
-  // 등록/수정 분기·실패 토스트는 useNoteSubmit가 전담한다.
-  const { submit, isSubmitting } = useNoteSubmit({ todoId, note, mode, onComplete });
+  // 임시저장·불러오기(localStorage)는 useNoteDraftPersistence가 전담한다.
+  const draft = useNoteDraftPersistence({
+    todoId,
+    editing,
+    applyDraft: (stored) => {
+      setTitle(stored.title);
+      setContent(stored.content);
+    },
+  });
+  // 등록/수정 분기·실패 토스트는 useNoteSubmit가 전담한다. 성공 시 보관된 초안을 비운다.
+  const { submit, isSubmitting } = useNoteSubmit({
+    todoId,
+    note,
+    mode,
+    onComplete: () => {
+      draft.clear();
+      onComplete();
+    },
+  });
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const editorRef = useRef<NoteContentEditorHandle>(null);
 
@@ -101,6 +119,15 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
               취소
+            </Button>
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={() => draft.save({ title, content })}
+              disabled={isSubmitting}
+              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
+            >
+              임시저장
             </Button>
             <Button
               variant="primary"
@@ -201,6 +228,19 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
           <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
           <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={onCancel}>
             확인
+          </Modal.Confirm>
+        </Modal.Actions>
+      </Modal>
+
+      <Modal open={draft.promptOpen} onClose={draft.dismissPrompt} className="h-[178px] sm:h-[250px]">
+        <Modal.Title className="text-center text-base sm:text-xl">임시 저장된 노트가 있어요</Modal.Title>
+        <p className="mt-1 mb-6 text-center text-xs font-medium text-slate-500 sm:mb-10 sm:text-base">
+          이어서 작성하시겠어요?
+        </p>
+        <Modal.Actions>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">새로 쓰기</Modal.Cancel>
+          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={draft.confirmLoad}>
+            불러오기
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

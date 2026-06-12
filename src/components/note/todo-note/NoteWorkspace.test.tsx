@@ -45,7 +45,9 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { createNote, patchNote } from '@/src/api/note';
 import NoteWorkspace from './NoteWorkspace';
+import { loadDraft, saveDraft } from './noteDraftStorage';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
+import { useToastStore } from '@/src/stores/toast';
 import type { Note } from '@/src/types/note';
 
 const sampleTodo = {
@@ -87,6 +89,8 @@ const existingNote: Note = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  localStorage.clear();
+  useToastStore.setState({ isOpen: false, message: '', variant: 'success' });
 });
 
 // --- 상세(읽기) 모드 ---
@@ -230,10 +234,74 @@ it('수정: 변경한 채로 취소하면 확인 후 취소 콜백을 부른다'
   expect(onCancel).toHaveBeenCalledTimes(1);
 });
 
-it('임시저장 버튼은 제공하지 않는다', () => {
+// --- 임시저장·불러오기 ---
+
+it('작성 모드에 임시저장 버튼이 있다', () => {
   renderWithClient(
     <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
   );
 
+  expect(screen.getByRole('button', { name: '임시저장' })).toBeInTheDocument();
+});
+
+it('상세(읽기) 모드에는 임시저장 버튼이 없다', () => {
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={existingNote}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
   expect(screen.queryByRole('button', { name: '임시저장' })).not.toBeInTheDocument();
+});
+
+it('임시저장을 누르면 작성 중인 내용이 보관되고 안내 토스트가 뜬다', () => {
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '임시 제목' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '임시 본문' } });
+  fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+
+  expect(loadDraft(12)?.title).toBe('임시 제목');
+  expect(useToastStore.getState().message).toBe('임시 저장되었어요.');
+  expect(useToastStore.getState().variant).toBe('success');
+});
+
+it('저장된 초안이 있으면 작성 진입 시 불러오기를 묻고, 불러오면 제목이 채워진다', () => {
+  saveDraft(12, {
+    title: '저장된 제목',
+    content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: '저장된 본문' }] }] },
+  });
+
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: '불러오기' }));
+
+  expect(screen.getByLabelText('제목')).toHaveValue('저장된 제목');
+});
+
+it('등록에 성공하면 임시저장해 둔 초안이 비워진다', async () => {
+  (createNote as jest.Mock).mockResolvedValue({ id: 99 });
+
+  renderWithClient(
+    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '제목' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '본문' } });
+  fireEvent.click(screen.getByRole('button', { name: '임시저장' }));
+  expect(loadDraft(12)).not.toBeNull();
+
+  fireEvent.click(screen.getByRole('button', { name: '등록하기' }));
+
+  await waitFor(() => expect(createNote).toHaveBeenCalled());
+  await waitFor(() => expect(loadDraft(12)).toBeNull());
 });
