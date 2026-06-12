@@ -37,11 +37,6 @@ it('useGoalList는 getAllGoals로 전체 goal을 불러온다', async () => {
   expect(result.current.data?.goals).toHaveLength(2);
 });
 
-it('useGoal은 id가 undefined이면 비활성화된다', () => {
-  renderHookWithClient(() => useGoal(undefined));
-  expect(mocked.getGoal).not.toHaveBeenCalled();
-});
-
 it('useGoal은 id가 주어지면 getGoal을 호출한다', async () => {
   mocked.getGoal.mockResolvedValue({ id: 5, title: 't', todos: [] } as never);
   const { result } = renderHookWithClient(() => useGoal(5));

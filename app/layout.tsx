@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import ModalStack from '@/src/components/common/modal/ModalStack';
 import Toast from '@/src/components/common/toast/Toast';
 import Providers from './providers';
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="flex min-h-full bg-slate-100">
         <Providers>
           <Toast />
+          <ModalStack />
           {children}
         </Providers>
       </body>

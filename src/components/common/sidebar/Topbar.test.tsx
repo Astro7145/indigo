@@ -2,6 +2,7 @@ jest.mock('@/src/hooks/usePageTitle', () => ({ usePageTitle: () => '대시보드
 jest.mock('@/src/components/goal/GoalSidebarList', () => ({ __esModule: true, default: () => null }));
 jest.mock('./SidebarProfileButton', () => ({ __esModule: true, default: () => null }));
 jest.mock('./SidebarNotificationButton', () => ({ __esModule: true, default: () => null }));
+jest.mock('./TopbarNotification', () => ({ __esModule: true, default: () => null }));
 jest.mock('./LogoutButton', () => ({ __esModule: true, default: () => null }));
 jest.mock('@/src/components/todo/TodoFormSheet', () => ({
   __esModule: true,

@@ -1,171 +1,106 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+jest.mock('@/src/api/todo', () => ({
+  ...jest.requireActual('@/src/api/todo'),
+  patchTodo: jest.fn(),
+}));
 
+jest.mock('@/src/api/favorite', () => ({
+  ...jest.requireActual('@/src/api/favorite'),
+  addTodoFavorite: jest.fn(),
+  removeTodoFavorite: jest.fn(),
+}));
+
+import { createRef, type ComponentProps } from 'react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+
+import * as favoriteApi from '@/src/api/favorite';
+import * as todoApi from '@/src/api/todo';
 import TodoList from '@/src/components/common/todo-list/TodoList';
+import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
+import type { Todo } from '@/src/types/todo';
 
-it('title을 렌더한다', () => {
-  render(<TodoList title="자바스크립트 듣기" />);
-  expect(screen.getByText('자바스크립트 듣기')).toBeInTheDocument();
+const mocked = todoApi as jest.Mocked<typeof todoApi>;
+const mockedFav = favoriteApi as jest.Mocked<typeof favoriteApi>;
+
+const makeTodo = (id: number, title: string, overrides?: Partial<Todo>): Todo => ({
+  id,
+  teamId: 't',
+  userId: 1,
+  goalId: null,
+  title,
+  done: false,
+  fileUrl: null,
+  linkUrl: null,
+  dueDate: null,
+  createdAt: '2026-05-20T00:00:00Z',
+  updatedAt: '2026-05-20T00:00:00Z',
+  goal: null,
+  noteIds: [],
+  tags: [],
+  isFavorite: false,
+  ...overrides,
 });
 
-it('checked를 체크박스에 반영하고 aria-label은 title이다', () => {
-  render(<TodoList title="할일 A" checked />);
-  expect(screen.getByRole('checkbox', { name: '할일 A' })).toBeChecked();
+const renderList = (overrides?: Partial<ComponentProps<typeof TodoList>>) =>
+  renderWithClient(
+    <TodoList todos={[makeTodo(1, '할일 A')]} size="large" onEdit={() => {}} onSelect={() => {}} {...overrides} />,
+  );
+
+beforeEach(() => jest.resetAllMocks());
+
+it('todos를 행으로 매핑해 렌더한다', () => {
+  renderList({ todos: [makeTodo(1, '할일 A'), makeTodo(2, '할일 B', { done: true })] });
+  expect(screen.getByText('할일 A')).toBeInTheDocument();
+  expect(screen.getByText('할일 B')).toBeInTheDocument();
+  expect(screen.getAllByRole('listitem')).toHaveLength(2);
 });
 
-it('체크박스 클릭 시 onCheckedChange를 토글 값으로 호출한다', () => {
-  const onCheckedChange = jest.fn();
-  render(<TodoList title="할일" checked={false} onCheckedChange={onCheckedChange} />);
+it('체크박스를 클릭하면 patchTodo로 done을 토글한다', async () => {
+  mocked.patchTodo.mockResolvedValue(makeTodo(1, '할일 A', { done: true }));
+  renderList();
   fireEvent.click(screen.getByRole('checkbox'));
-  expect(onCheckedChange).toHaveBeenCalledWith(true);
+  await waitFor(() => expect(mocked.patchTodo).toHaveBeenCalledWith(1, { done: true }));
 });
 
-it('StarAction은 아이콘 버튼이며 클릭 시 onClick을 호출한다', () => {
-  const onClick = jest.fn();
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.StarAction onClick={onClick} />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  fireEvent.click(screen.getByRole('button', { name: '즐겨찾기' }));
-  expect(onClick).toHaveBeenCalledTimes(1);
+it('즐겨찾기가 아닌 할일의 별을 클릭하면 addTodoFavorite를 호출한다', async () => {
+  mockedFav.addTodoFavorite.mockResolvedValue({ todo: makeTodo(1, '할일 A') } as never);
+  renderList();
+  fireEvent.click(screen.getByLabelText('즐겨찾기'));
+  await waitFor(() => expect(mockedFav.addTodoFavorite).toHaveBeenCalledWith(1));
 });
 
-it('StarAction은 active prop으로 채운 별이 된다', () => {
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.StarAction onClick={() => {}} active />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  expect(screen.getByRole('button', { name: '즐겨찾기 해제' })).toBeInTheDocument();
+it('즐겨찾기인 할일의 별을 클릭하면 removeTodoFavorite를 호출한다', async () => {
+  mockedFav.removeTodoFavorite.mockResolvedValue(undefined as never);
+  renderList({ todos: [makeTodo(1, '할일 A', { isFavorite: true })] });
+  fireEvent.click(screen.getByLabelText('즐겨찾기 해제'));
+  await waitFor(() => expect(mockedFav.removeTodoFavorite).toHaveBeenCalledWith(1));
 });
 
-it('StarAction의 active는 checked(done)와 독립이다', () => {
-  // checked여도 active 미지정이면 빈 별 — 별(즐겨찾기)과 체크박스(done)는 다른 상태
-  render(
-    <TodoList title="할일" checked>
-      <TodoList.Actions>
-        <TodoList.StarAction onClick={() => {}} />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  expect(screen.getByRole('button', { name: '즐겨찾기' })).toBeInTheDocument();
+it('케밥 메뉴에서 수정하기를 누르면 해당 할일로 onEdit을 호출한다', () => {
+  const onEdit = jest.fn();
+  renderList({ onEdit });
+  fireEvent.click(screen.getByLabelText('더보기 메뉴'));
+  fireEvent.click(screen.getByText('수정하기'));
+  expect(onEdit).toHaveBeenCalledTimes(1);
+  expect(onEdit.mock.calls[0][0]).toMatchObject({ id: 1, title: '할일 A' });
 });
 
-it('StarAction은 상시 표시다 (hoverOnly 클래스 없음)', () => {
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.StarAction onClick={() => {}} />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  expect(screen.getByRole('button', { name: '즐겨찾기' }).className).not.toMatch(/group-hover/);
+it('행을 클릭하면 해당 할일로 onSelect를 호출한다', () => {
+  const onSelect = jest.fn();
+  renderList({ onSelect });
+  fireEvent.click(screen.getByText('할일 A'));
+  expect(onSelect).toHaveBeenCalledTimes(1);
+  expect(onSelect.mock.calls[0][0]).toMatchObject({ id: 1, title: '할일 A' });
 });
 
-it('NoteAction·LinkAction은 상시 표시 아이콘 버튼이다 (hoverOnly 아님)', () => {
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.NoteAction onClick={() => {}} />
-        <TodoList.LinkAction onClick={() => {}} />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  expect(screen.getByRole('button', { name: '노트' }).className).not.toMatch(/group-hover/);
-  expect(screen.getByRole('button', { name: '링크' }).className).not.toMatch(/group-hover/);
+it('children을 행 뒤에 렌더한다 — 무한 스크롤 sentinel 슬롯', () => {
+  renderList({ children: <li data-testid="sentinel" /> });
+  const list = screen.getByRole('list');
+  expect(list.lastElementChild).toHaveAttribute('data-testid', 'sentinel');
 });
 
-it('EditAction·KebabAction은 hoverOnly 아이콘 버튼이다', () => {
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.EditAction onClick={() => {}} hoverOnly />
-        <TodoList.KebabAction hoverOnly />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  expect(screen.getByRole('button', { name: '수정' }).className).toMatch(/group-hover/);
-  // 케밥은 Dropdown으로 감싸져 hover 토글이 트리거 래퍼(부모)에 적용된다
-  expect(screen.getByRole('button', { name: '더보기 메뉴' }).parentElement?.className).toMatch(/group-hover/);
-});
-
-it('KebabAction 클릭 시 수정하기·삭제하기 메뉴가 열린다', () => {
-  render(
-    <TodoList title="할일">
-      <TodoList.Actions>
-        <TodoList.KebabAction hoverOnly />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  fireEvent.click(screen.getByRole('button', { name: '더보기 메뉴' }));
-  expect(screen.getByRole('menuitem', { name: '수정하기' })).toBeInTheDocument();
-  expect(screen.getByRole('menuitem', { name: '삭제하기' })).toBeInTheDocument();
-});
-
-it('액션 클릭은 행으로 버블링되지 않는다 (stopPropagation)', () => {
-  const onRowClick = jest.fn();
-  const onStar = jest.fn();
-  render(
-    <div onClick={onRowClick}>
-      <TodoList title="할일">
-        <TodoList.Actions>
-          <TodoList.StarAction onClick={onStar} />
-        </TodoList.Actions>
-      </TodoList>
-    </div>,
-  );
-  fireEvent.click(screen.getByRole('button', { name: '즐겨찾기' }));
-  expect(onStar).toHaveBeenCalledTimes(1);
-  expect(onRowClick).not.toHaveBeenCalled();
-});
-
-it('size="small"이면 본문에 text-sm를 적용한다', () => {
-  render(<TodoList title="작은 할일" size="small" />);
-  expect(screen.getByText('작은 할일').className).toMatch(/text-sm/);
-});
-
-it('variant="onDark"이면 white 체크박스를 렌더한다', () => {
-  const { container } = render(<TodoList title="할일" variant="onDark" />);
-  expect(container.querySelector('path[stroke="var(--color-indigo-600)"]')).toBeInTheDocument();
-});
-
-it('컨텍스트 밖에서 서브컴포넌트를 쓰면 에러를 던진다', () => {
-  const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  expect(() => render(<TodoList.StarAction onClick={() => {}} />)).toThrow();
-  spy.mockRestore();
-});
-
-it('행을 클릭하면 onClick을 호출한다', () => {
-  const onClick = jest.fn();
-  render(<TodoList title="자바스크립트 듣기" onClick={onClick} />);
-  fireEvent.click(screen.getByText('자바스크립트 듣기'));
-  expect(onClick).toHaveBeenCalledTimes(1);
-});
-
-it('체크박스를 클릭하면 토글만 되고 행 onClick은 호출되지 않는다', () => {
-  const onClick = jest.fn();
-  const onCheckedChange = jest.fn();
-  render(<TodoList title="할일" onClick={onClick} onCheckedChange={onCheckedChange} />);
-  fireEvent.click(screen.getByRole('checkbox'));
-  expect(onCheckedChange).toHaveBeenCalled();
-  expect(onClick).not.toHaveBeenCalled();
-});
-
-it('우측 액션 버튼을 클릭하면 행 onClick은 호출되지 않는다', () => {
-  const onClick = jest.fn();
-  const onStar = jest.fn();
-  render(
-    <TodoList title="할일" onClick={onClick}>
-      <TodoList.Actions>
-        <TodoList.StarAction onClick={onStar} />
-      </TodoList.Actions>
-    </TodoList>,
-  );
-  fireEvent.click(screen.getByRole('button', { name: '즐겨찾기' }));
-  expect(onStar).toHaveBeenCalledTimes(1);
-  expect(onClick).not.toHaveBeenCalled();
+it('className과 ref를 ul에 전달한다', () => {
+  const ref = createRef<HTMLUListElement>();
+  renderList({ ref, className: 'custom-class' });
+  expect(ref.current).toBeInstanceOf(HTMLUListElement);
+  expect(ref.current).toHaveClass('custom-class');
 });

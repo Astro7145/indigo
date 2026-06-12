@@ -35,7 +35,6 @@ const ALLOWLIST: ReadonlyArray<readonly [HttpMethod, string]> = [
   ['DELETE', 'notifications'],
   ['PATCH', 'notifications/{notificationId}'],
   ['DELETE', 'notifications/{notificationId}'],
-  ['GET', 'users/check-nickname'],
   ['GET', 'users/me'],
   ['PATCH', 'users/me'],
   ['DELETE', 'users/me'],

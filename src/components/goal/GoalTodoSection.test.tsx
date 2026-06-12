@@ -1,4 +1,4 @@
-jest.mock('@/src/hooks/goal', () => ({ useInfiniteGoalList: jest.fn() }));
+jest.mock('@/src/hooks/goal', () => ({ useInfiniteGoalListSuspense: jest.fn() }));
 jest.mock('@/src/components/goal/GoalTodoBoard', () => ({
   __esModule: true,
   default: ({
@@ -18,7 +18,7 @@ jest.mock('@/src/components/goal/GoalTodoBoard', () => ({
 import type { ComponentProps } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { useInfiniteGoalList } from '@/src/hooks/goal';
+import { useInfiniteGoalListSuspense } from '@/src/hooks/goal';
 import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import type { GoalListItem } from '@/src/types/goal';
 
@@ -43,7 +43,7 @@ function setHook({
   hasNextPage = false,
   isFetchingNextPage = false,
 }: { goals?: GoalListItem[]; hasNextPage?: boolean; isFetchingNextPage?: boolean } = {}) {
-  jest.mocked(useInfiniteGoalList).mockReturnValue({
+  jest.mocked(useInfiniteGoalListSuspense).mockReturnValue({
     data: {
       pages: [{ goals, nextCursor: hasNextPage ? 99 : null, totalCount: goals.length }],
       pageParams: [undefined],
@@ -51,7 +51,7 @@ function setHook({
     fetchNextPage: mockFetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } as unknown as ReturnType<typeof useInfiniteGoalList>);
+  } as unknown as ReturnType<typeof useInfiniteGoalListSuspense>);
 }
 
 beforeEach(() => {

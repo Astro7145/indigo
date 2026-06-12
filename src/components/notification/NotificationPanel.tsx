@@ -2,15 +2,20 @@
 
 import type { Notification, NotificationListResponse } from '@/src/types/notification';
 import type { CursorParams } from '@/src/types/common';
-import { useInfiniteNotificationList, useReadAllNotifications, useUpdateNotification } from '@/src/hooks/notification';
+import {
+  useInfiniteNotificationList,
+  useRefreshNotifications,
+  useReadAllNotifications,
+  useDeleteAllNotifications,
+  useUpdateNotification,
+} from '@/src/hooks/notification';
+import { IcRefresh } from '@/src/components/common/icons';
 import NotificationItem from './NotificationItem';
 
-/** data 필드에서 댓글 서브텍스트를 안전하게 추출합니다. */
+/** 댓글 알림이면 댓글 내용을 서브텍스트로 추출합니다. */
 function extractSubtext(notification: Notification): string | undefined {
-  if (!notification.data || typeof notification.data !== 'object') return undefined;
-  const data = notification.data as Record<string, unknown>;
-  const candidate = data.comment ?? data.content ?? data.body;
-  return typeof candidate === 'string' ? candidate : undefined;
+  if (notification.type === 'comment') return notification.data.commentContent;
+  return undefined;
 }
 
 type NotificationPanelProps = {
@@ -34,7 +39,9 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteNotificationList({ limit: 5 }, queryFn);
 
   const { mutate: readAll, isPending: isReadingAll } = useReadAllNotifications();
+  const { mutate: deleteAll, isPending: isDeletingAll } = useDeleteAllNotifications();
   const { mutate: updateNotification } = useUpdateNotification();
+  const refreshNotifications = useRefreshNotifications();
 
   const notifications = data?.pages.flatMap((page) => page.notifications) ?? [];
   const hasNotifications = notifications.length > 0;
@@ -53,23 +60,48 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
     if (hasUnread && !isReadingAll) readAll();
   }
 
+  function handleDeleteAll() {
+    if (hasNotifications && !isDeletingAll) deleteAll();
+  }
+
   return (
     <section
       aria-label="알림"
-      className="w-72 overflow-hidden rounded border border-slate-200 bg-white px-3 py-5 shadow-[0px_0px_30px_0px_rgba(0,0,0,0.05)]"
+      className="w-72 overflow-hidden rounded border border-slate-200 bg-white px-3 py-5 shadow-md"
     >
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between px-2">
-        <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700">알림</h2>
-        <button
-          type="button"
-          onClick={handleReadAll}
-          disabled={!hasUnread || isReadingAll}
-          aria-label="모든 알림을 읽음으로 표시"
-          className="text-xs leading-4 font-semibold text-indigo-500 transition-colors disabled:cursor-not-allowed disabled:text-slate-300"
-        >
-          모두 읽기
-        </button>
+        <div className="flex items-center gap-2">
+          <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700">알림</h2>
+          <button
+            type="button"
+            onClick={refreshNotifications}
+            aria-label="알림 목록 새로고침"
+            className="cursor-pointer text-slate-300 transition-colors hover:text-slate-500"
+          >
+            <IcRefresh className="size-4 text-inherit" />
+          </button>
+        </div>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={handleDeleteAll}
+            disabled={!hasNotifications || isDeletingAll}
+            aria-label="모두 삭제"
+            className="text-destructive/80 hover:text-destructive hover:bg-destructive/20 cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold transition-colors disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
+          >
+            모두 삭제
+          </button>
+          <button
+            type="button"
+            onClick={handleReadAll}
+            disabled={!hasUnread || isReadingAll}
+            aria-label="모든 알림을 읽음으로 표시"
+            className="cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold text-indigo-500 transition-colors hover:bg-indigo-500/20 hover:text-indigo-600 disabled:cursor-not-allowed disabled:text-slate-300"
+          >
+            모두 읽기
+          </button>
+        </div>
       </div>
 
       {/* 알림 목록 또는 빈 상태 */}

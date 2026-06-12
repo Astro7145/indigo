@@ -10,12 +10,11 @@ import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import { IcKebab } from '@/src/components/common/icons/IcKebab';
 import GoalDeleteModal from '@/src/components/goal/GoalDeleteModal';
 import GoalEditModal from '@/src/components/goal/GoalEditModal';
+import { useGoalSuspense } from '@/src/hooks/goal';
 import { cn } from '@/src/utils/cn';
 
 export interface GoalDetailHeaderProps {
   goalId: number;
-  /** 목표명. 로딩 중에는 undefined */
-  title?: string;
   className?: string;
 }
 
@@ -28,8 +27,9 @@ export interface GoalDetailHeaderProps {
  *
  * Figma 21209:54538 (목표 카드, 640×160). 반응형: 높이·패딩·타이포를 viewport 기준으로 조절.
  */
-export default function GoalDetailHeader({ goalId, title, className }: GoalDetailHeaderProps) {
+export default function GoalDetailHeader({ goalId, className }: GoalDetailHeaderProps) {
   const router = useRouter();
+  const { data: goal } = useGoalSuspense(goalId);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export default function GoalDetailHeader({ goalId, title, className }: GoalDetai
       <div className="flex min-w-0 flex-1 items-center gap-3 xl:gap-4">
         <IcGoal aria-hidden className="size-8 shrink-0 xl:size-10" />
         <h2 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-700 xl:text-2xl">
-          {title}
+          {goal.title}
         </h2>
       </div>
 
@@ -61,7 +61,7 @@ export default function GoalDetailHeader({ goalId, title, className }: GoalDetai
         </Dropdown.Menu>
       </Dropdown>
 
-      {editOpen && <GoalEditModal onClose={() => setEditOpen(false)} goalId={goalId} currentTitle={title ?? ''} />}
+      {editOpen && <GoalEditModal onClose={() => setEditOpen(false)} goalId={goalId} currentTitle={goal.title} />}
       {deleteOpen && (
         <GoalDeleteModal onClose={() => setDeleteOpen(false)} goalId={goalId} onDeleted={() => router.push('/')} />
       )}

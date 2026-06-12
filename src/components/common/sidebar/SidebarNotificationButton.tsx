@@ -1,19 +1,23 @@
+'use client';
+
+import type { ComponentPropsWithRef } from 'react';
 import { IcBell } from '../icons';
+import { useInfiniteNotificationList } from '@/src/hooks/notification';
 
-interface SidebarNotificationButtonProps {
-  unread?: boolean;
-  onClick?: () => void;
-}
+export default function SidebarNotificationButton({ ...props }: ComponentPropsWithRef<'button'>) {
+  const { data } = useInfiniteNotificationList({ limit: 100 });
 
-export default function SidebarNotificationButton({ unread = false, onClick }: SidebarNotificationButtonProps) {
+  const notifications = data?.pages.flatMap((page) => page.notifications) ?? [];
+  const hasUnread = notifications.some((n) => !n.isRead);
+
   return (
     <button
       type="button"
-      onClick={onClick}
       aria-label="알림"
+      {...props}
       className="flex aspect-square size-16 cursor-pointer items-center justify-center rounded-sm border border-indigo-600 bg-indigo-800/20 transition-shadow hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.4)]"
     >
-      <IcBell className="text-white" state={unread ? 'unread' : 'read'} />
+      <IcBell className="text-white" state={hasUnread ? 'unread' : 'read'} />
     </button>
   );
 }

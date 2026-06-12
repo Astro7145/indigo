@@ -4,15 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'motion/react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import TodoList from '@/src/components/common/todo-list/TodoList';
-import TodoDeleteConfirm from '@/src/components/todo/TodoDeleteConfirm';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import { useTodoList, useUpdateTodo } from '@/src/hooks/todo';
-import { useAddTodoFavorite, useRemoveTodoFavorite } from '@/src/hooks/favorite';
+import { useTodoList } from '@/src/hooks/todo';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
@@ -31,61 +30,14 @@ function percentOf(done: number, total: number): number {
   return Math.max(0, Math.min(100, Math.round((done / total) * 100)));
 }
 
-function Row({
-  todo,
-  onToggle,
-  onToggleFavorite,
-  onEdit,
-  onSelect,
-}: {
-  todo: Todo;
-  onToggle: (id: number, done: boolean) => void;
-  onToggleFavorite: (id: number, isFavorite: boolean) => void;
-  onEdit: (todo: Todo) => void;
-  onSelect: (todo: Todo) => void;
-}) {
-  // 타입상 noteIds는 number[] required지만, 백엔드 응답이 누락/null인 케이스를 방어한다.
-  const hasNote = (todo.noteIds?.length ?? 0) > 0;
-  // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  return (
-    <li>
-      <TodoList
-        size="responsive"
-        title={todo.title}
-        checked={todo.done}
-        onCheckedChange={(done) => onToggle(todo.id, done)}
-        onClick={() => onSelect(todo)}
-      >
-        <TodoList.Actions>
-          {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필, 케밥 왼쪽) · 케밥 · 별 */}
-          {hasNote && <TodoList.NoteAction onClick={() => {}} />}
-          {todo.linkUrl && <TodoList.LinkAction onClick={() => {}} />}
-          {/* 노트 없으면 hover 시 노트 작성(연필) 노출 */}
-          {!hasNote && <TodoList.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
-          <TodoList.KebabAction hoverOnly onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
-          <TodoList.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
-        </TodoList.Actions>
-      </TodoList>
-      {/* 닫혀 있을 땐 마운트하지 않아 행마다 useDeleteTodo/useToast 인스턴스가 쌓이지 않게 한다. */}
-      {confirmOpen && <TodoDeleteConfirm open todo={todo} onClose={() => setConfirmOpen(false)} />}
-    </li>
-  );
-}
-
 function Column({
   label,
   todos,
-  onToggle,
-  onToggleFavorite,
   onEdit,
   onSelect,
 }: {
   label: 'To do' | 'Done';
   todos: Todo[];
-  onToggle: (id: number, done: boolean) => void;
-  onToggleFavorite: (id: number, isFavorite: boolean) => void;
   onEdit: (todo: Todo) => void;
   onSelect: (todo: Todo) => void;
 }) {
@@ -113,18 +65,13 @@ function Column({
       >
         {isTodo ? 'TO DO' : 'DONE'}
       </span>
-      <ul className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto">
-        {todos.map((t) => (
-          <Row
-            key={t.id}
-            todo={t}
-            onToggle={onToggle}
-            onToggleFavorite={onToggleFavorite}
-            onEdit={onEdit}
-            onSelect={onSelect}
-          />
-        ))}
-      </ul>
+      <TodoList
+        className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
+        todos={todos}
+        size="responsive"
+        onEdit={onEdit}
+        onSelect={onSelect}
+      />
     </div>
   );
 }
@@ -134,21 +81,9 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
   const [input, setInput] = useState('');
   const [keyword, setKeyword] = useState('');
 
-  const { data, isLoading, isError } = useTodoList({ goalId: goal.id, keyword: keyword || undefined });
-  const update = useUpdateTodo();
-  const addFavorite = useAddTodoFavorite();
-  const removeFavorite = useRemoveTodoFavorite();
-
   const reduce = useReducedMotion();
 
-  const todos = data?.todos ?? [];
-  const todoItems = todos.filter((t) => !t.done);
-  const doneItems = todos.filter((t) => t.done);
   const percent = percentOf(goal.completedCount, goal.todoCount);
-
-  const toggle = (id: number, done: boolean) => update.mutate({ todoId: id, body: { done } });
-  const toggleFavorite = (id: number, isFavorite: boolean) =>
-    isFavorite ? removeFavorite.mutate(id) : addFavorite.mutate(id);
 
   return (
     <Card
@@ -240,37 +175,52 @@ export default function GoalTodoBoard({ goal, className, onEditTodo, onAddTodo, 
         것을 막고 레이아웃 시프트도 방지한다.
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
-        {isLoading ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>
-        ) : isError ? (
-          <p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>
-        ) : todos.length === 0 ? (
-          keyword ? (
-            <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
-          ) : (
-            <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
-          )
-        ) : (
-          <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
-            <Column
-              label="To do"
-              todos={todoItems}
-              onToggle={toggle}
-              onToggleFavorite={toggleFavorite}
-              onEdit={onEditTodo}
-              onSelect={onSelectTodo}
-            />
-            <Column
-              label="Done"
-              todos={doneItems}
-              onToggle={toggle}
-              onToggleFavorite={toggleFavorite}
-              onEdit={onEditTodo}
-              onSelect={onSelectTodo}
-            />
-          </div>
-        )}
+        <AsyncBoundary
+          fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
+          errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+          resetKeys={[keyword]}
+        >
+          <GoalTodoBoardContent
+            goalId={goal.id}
+            keyword={keyword}
+            onEditTodo={onEditTodo}
+            onSelectTodo={onSelectTodo}
+          />
+        </AsyncBoundary>
       </div>
     </Card>
+  );
+}
+
+function GoalTodoBoardContent({
+  goalId,
+  keyword,
+  onEditTodo,
+  onSelectTodo,
+}: {
+  goalId: number;
+  keyword: string;
+  onEditTodo: (todo: Todo) => void;
+  onSelectTodo: (todo: Todo) => void;
+}) {
+  const { data } = useTodoList({ goalId, keyword: keyword || undefined });
+
+  const todos = data.todos;
+  const todoItems = todos.filter((t) => !t.done);
+  const doneItems = todos.filter((t) => t.done);
+
+  if (todos.length === 0) {
+    return keyword ? (
+      <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
+    ) : (
+      <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5 sm:flex-row sm:gap-2 xl:gap-8">
+      <Column label="To do" todos={todoItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
+      <Column label="Done" todos={doneItems} onEdit={onEditTodo} onSelect={onSelectTodo} />
+    </div>
   );
 }

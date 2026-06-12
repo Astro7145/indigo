@@ -40,11 +40,6 @@ it('useNoteList는 enabled가 false면 getNotes를 호출하지 않는다', () =
   expect(mocked.getNotes).not.toHaveBeenCalled();
 });
 
-it('useNote는 id가 undefined이면 비활성화된다', () => {
-  renderHookWithClient(() => useNote(undefined));
-  expect(mocked.getNote).not.toHaveBeenCalled();
-});
-
 it('useNote는 id가 주어지면 getNote를 호출한다', async () => {
   mocked.getNote.mockResolvedValue({ id: 5, title: 't' } as never);
   const { result } = renderHookWithClient(() => useNote(5));

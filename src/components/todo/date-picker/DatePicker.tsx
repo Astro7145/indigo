@@ -60,7 +60,7 @@ export default function DatePicker(props: DatePickerProps) {
       </button>
 
       {isMobile ? (
-        <BottomSheet isOpen={isOpen} onClose={handleCancel}>
+        <BottomSheet isOpen={isOpen} onClose={handleCancel} closeOnEsc={false}>
           <FocusScope restoreFocus autoFocus contain>
             <div className="flex justify-center px-[23.5px] pt-4 pb-3">
               <div ref={popupRef} {...dialogProps} className={cn('w-full overflow-hidden outline-none')}>

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import instance from '@/src/api/client-fetcher';
 import type { UserProfile, CheckNicknameResponse, UpdateMeBody, ChangePasswordBody } from '@/src/types/user';
 import type { MessageResponse } from '@/src/types/common';
@@ -8,8 +9,11 @@ export const userKeys = {
   nickname: (name: string) => [...userKeys.all, 'nickname', name] as const,
 };
 
+// check-nickname은 인가가 필요 없는 엔드포인트라 BFF(/api)를 거치지 않고 외부 백엔드를 직접 호출한다.
 export async function checkNickname(name: string): Promise<CheckNicknameResponse> {
-  const { data } = await instance.get<CheckNicknameResponse>('/users/check-nickname', {
+  const base = process.env.NEXT_PUBLIC_BACKEND_API_BASE_URL;
+  const teamId = process.env.NEXT_PUBLIC_BACKEND_TEAM_ID;
+  const { data } = await axios.get<CheckNicknameResponse>(`${base}/${teamId}/users/check-nickname`, {
     params: { name },
   });
   return data;

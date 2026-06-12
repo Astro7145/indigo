@@ -1,6 +1,7 @@
 import {
   useQuery,
-  useInfiniteQuery,
+  useSuspenseQuery,
+  useSuspenseInfiniteQuery,
   useMutation,
   useQueryClient,
   skipToken,
@@ -13,16 +14,25 @@ import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 import type { ApiError } from '@/src/types/common';
 
-export function useTodoList(params: TodoListParams = {}, enabled = true) {
-  return useQuery<TodoListResponse, ApiError>({
+export function useTodoList(params: TodoListParams = {}) {
+  return useSuspenseQuery<TodoListResponse, ApiError>({
     queryKey: todoKeys.list(params),
     queryFn: () => getTodos(params),
+  });
+}
+
+/** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch). */
+export function useTodoCount(enabled: boolean) {
+  return useQuery<TodoListResponse, ApiError, number>({
+    queryKey: todoKeys.list({}),
+    queryFn: () => getTodos({}),
     enabled,
+    select: (data) => data.totalCount,
   });
 }
 
 export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {}) {
-  return useInfiniteQuery<TodoListResponse, ApiError>({
+  return useSuspenseInfiniteQuery<TodoListResponse, ApiError>({
     queryKey: [...todoKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => getTodos({ ...params, cursor: pageParam as number | undefined }),
     initialPageParam: undefined as number | undefined,

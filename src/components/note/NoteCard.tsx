@@ -9,15 +9,13 @@ import Chip from '@/src/components/common/chips/Chip';
 import { IcKebab } from '@/src/components/common/icons/IcKebab';
 import { IcLink } from '@/src/components/common/icons/IcLink';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
-import { useNote } from '@/src/hooks/note';
 import { cn } from '@/src/utils/cn';
 import type { Note } from '@/src/types/note';
 import { formatDate } from '@/src/utils/date';
 
 export interface NoteCardProps {
-  noteId: number;
-  /** 이미 조회한 노트를 넘기면 재조회 없이 그대로 렌더한다(리스트의 N+1 방지). */
-  note?: Note;
+  /** 이미 조회한 노트 객체. 카드는 표시 전용이며 자체 조회하지 않는다(리스트의 N+1 방지). */
+  note: Note;
   onClick?: () => void;
   /** 더보기(케밥) 메뉴 핸들러 — 제공 시 케밥이 IconButton이 됨 */
   onMore?: () => void;
@@ -38,34 +36,20 @@ const kebabClass = 'size-4 sm:size-6';
 const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 
 /**
- * 노트 카드 — `Note` 도메인 객체를 받아 공통 Card 표면 위에 합성.
+ * 노트 카드 — 이미 조회한 `Note` 객체를 받아 공통 Card 위에 합성하는 표시 전용 컴포넌트.
  * 상단: 노트 아이콘 + 제목 (+ linkUrl 있을 때 link icon)
- * 하단: TODO 칩 + 연결된 todo title + 작성일
- * 사이즈는 외부 prop이 아니라 뷰포트 반응형(md)으로 자동 결정.
+ * 하단: TODO 칩 + 연결된 todo title + 작성일. 사이즈는 뷰포트 반응형(md)으로 자동 결정.
  */
-export default function NoteCard({ noteId, note, onClick, onMore, menu, className }: NoteCardProps) {
-  const query = useNote(note ? undefined : noteId);
-  const resolved = note ?? query.data;
-  const isLoading = !note && query.isLoading;
-  const isError = !note && query.isError;
-
-  if (isLoading || !resolved) {
-    return (
-      <Card className={cn(rootClass, className)}>
-        <p className="text-sm text-slate-400">{isError ? '불러오지 못했어요' : '불러오는 중…'}</p>
-      </Card>
-    );
-  }
-
+export default function NoteCard({ note, onClick, onMore, menu, className }: NoteCardProps) {
   return (
     <Card className={cn(rootClass, className)} onClick={onClick}>
       <div className="flex items-center justify-between">
         <div className={cn('flex items-center', headerGapClass)}>
           <IcSpringNote aria-hidden className={iconBoxClass} />
-          <h3 className={cn('text-slate-800', titleClass)}>{resolved.title}</h3>
+          <h3 className={cn('text-slate-800', titleClass)}>{note.title}</h3>
         </div>
         <div className="flex items-center gap-2">
-          {resolved.linkUrl && <IcLink aria-label="첨부 링크" />}
+          {note.linkUrl && <IcLink aria-label="첨부 링크" />}
           {menu ? (
             <Dropdown>
               <Dropdown.Trigger asChild>
@@ -94,10 +78,10 @@ export default function NoteCard({ noteId, note, onClick, onMore, menu, classNam
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Chip type={resolved.todo.done ? 'done' : 'todo'} />
-          <span className={cn('text-slate-700', todoTextClass)}>{resolved.todo.title}</span>
+          <Chip type={note.todo.done ? 'done' : 'todo'} />
+          <span className={cn('text-slate-700', todoTextClass)}>{note.todo.title}</span>
         </div>
-        <span className="text-xs leading-4 text-slate-400">{formatDate(resolved.createdAt)}</span>
+        <span className="text-xs leading-4 text-slate-400">{formatDate(note.createdAt)}</span>
       </div>
     </Card>
   );

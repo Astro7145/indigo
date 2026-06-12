@@ -8,9 +8,10 @@ import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
-import SidebarNotificationButton from './SidebarNotificationButton';
+import SidebarNotification from './SidebarNotification';
 import TodoAddButton from './TodoAddButton';
 import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
+import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import { usePathname } from 'next/navigation';
 
 const EXPANDED_WIDTH = 360;
@@ -23,6 +24,7 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Sidebar() {
   const path = usePathname();
+  const openSettings = useSettingsModalStore((s) => s.open);
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
@@ -96,10 +98,7 @@ export default function Sidebar() {
       {isTablet && <span className="w-15" />}
       <motion.aside
         style={{ width }}
-        className={cn(
-          'scrollbar-slate top-0 left-0 z-50 flex h-screen overflow-x-hidden overflow-y-auto bg-[#1A1B2E]',
-          isTablet ? 'fixed' : 'sticky',
-        )}
+        className={cn('scrollbar-slate top-0 left-0 z-50 flex h-screen bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
       >
         <div
           className={cn(
@@ -148,13 +147,7 @@ export default function Sidebar() {
               />
             </ul>
             <ul className="flex flex-col">
-              <SidebarRow
-                type="settings"
-                text="설정"
-                href="/settings"
-                current={path === '/settings'}
-                collapsed={collapsed}
-              />
+              <SidebarRow type="settings" text="설정" onClick={openSettings} collapsed={collapsed} />
               <LogoutButton collapsed={collapsed} />
             </ul>
           </div>
@@ -169,7 +162,7 @@ export default function Sidebar() {
               />
               <div className="flex gap-x-2">
                 <SidebarProfileButton />
-                <SidebarNotificationButton />
+                <SidebarNotification />
               </div>
             </div>
           )}
