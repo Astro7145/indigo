@@ -1,3 +1,9 @@
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 jest.mock('@/src/hooks/useIsMobile', () => ({ useIsMobile: () => false }));
 
 jest.mock('@/src/api/todo', () => ({
@@ -56,9 +62,7 @@ const makeTodo = (id: number, title: string, done = false): Todo => ({
 const listOf = (todos: Todo[]) => ({ todos, nextCursor: null, totalCount: todos.length });
 
 const renderBoard = (overrides?: Partial<ComponentProps<typeof GoalTodoBoard>>) =>
-  renderWithClient(
-    <GoalTodoBoard goal={goal} onEditTodo={() => {}} onAddTodo={() => {}} onSelectTodo={() => {}} {...overrides} />,
-  );
+  renderWithClient(<GoalTodoBoard goal={goal} {...overrides} />);
 
 beforeEach(() => jest.resetAllMocks());
 
@@ -163,13 +167,12 @@ it('진행바는 최종 percent를 aria-valuenow로 노출하고 fill 요소를 
   expect(bar.firstElementChild).toBeTruthy();
 });
 
-it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
+it('할일 행을 클릭하면 해당 할일로 상세 시트를 연다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일')]));
-  const onSelectTodo = jest.fn();
-  renderBoard({ onSelectTodo });
+  renderBoard();
   fireEvent.click(await screen.findByText('미완료 할일'));
-  expect(onSelectTodo).toHaveBeenCalledTimes(1);
-  expect(onSelectTodo.mock.calls[0][0]).toMatchObject({ id: 1, title: '미완료 할일' });
+  expect(mockOpenDetail).toHaveBeenCalledTimes(1);
+  expect(mockOpenDetail.mock.calls[0][0]).toMatchObject({ id: 1, title: '미완료 할일' });
   expect(mockPush).not.toHaveBeenCalled();
 });
 

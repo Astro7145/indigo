@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { useEffect } from 'react';
 import { cn } from '@/src/utils/cn';
 
 interface TodoAddButtonProps {
@@ -9,26 +8,8 @@ interface TodoAddButtonProps {
   className?: string;
 }
 
-// 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
-const isTypingTarget = (target: EventTarget | null) => {
-  if (!(target instanceof HTMLElement)) return false;
-  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
-};
-
+// N 단축키는 Sidebar 본문이 담당 — 버튼은 접히면 언마운트되므로 전역 리스너를 두기에 부적합하다.
 export default function TodoAddButton({ onClick, className }: TodoAddButtonProps) {
-  useEffect(() => {
-    if (!onClick) return;
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
-      if (event.key !== 'n' && event.key !== 'N') return;
-      if (isTypingTarget(event.target)) return;
-      event.preventDefault();
-      onClick();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClick]);
-
   return (
     <motion.button
       type="button"

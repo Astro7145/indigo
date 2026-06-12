@@ -155,7 +155,8 @@ export default function TodoFormUI({
                 <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
               </button>
             </Dropdown.Trigger>
-            <Dropdown.Menu size="full">
+            {/* 폼은 모달 스택(z-100+) 안에서 열리므로 메뉴를 그 위로 — 기본 z-50은 페이지 맥락용으로 유지 */}
+            <Dropdown.Menu size="full" className="z-[120]">
               <Dropdown.Item onClick={() => setValue('goalId', undefined)}>목표 없음</Dropdown.Item>
               {goalData?.goals.map((goal) => (
                 <Dropdown.Item key={goal.id} onClick={() => setValue('goalId', goal.id)}>

@@ -1,19 +1,8 @@
 'use client';
 
-import { Suspense, useSyncExternalStore, type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
-
-// 서버(SSR/프리렌더)에선 false, 클라이언트 하이드레이션 후 true.
-// useSyncExternalStore라 set-state-in-effect 없이도 하이드레이션 불일치 경고가 없다.
-const subscribe = () => () => {};
-function useIsClient(): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
-}
 
 interface AsyncBoundaryProps {
   /** Suspense fallback — 로딩 중 표시. */
@@ -33,15 +22,11 @@ interface AsyncBoundaryProps {
  * Suspense + ErrorBoundary(react-error-boundary) 묶음. 데이터 컴포넌트가 본문을 감싸
  * 로딩/에러를 선언적으로 처리한다. 정적 errorFallback을 fragment로 감싸 ReactElement 요구를 만족시킨다.
  *
- * 데이터 페칭은 **클라이언트 전용**이다 — 클라 fetcher의 상대 baseURL(`/api`)은 서버에서 무효라
- * SSR/프리렌더 중 useSuspenseQuery가 실행되면 "Invalid URL"로 터진다(SSR 프리페치는 #136으로 보류).
- * 그래서 서버에선 children을 렌더하지 않고 로딩 fallback만 내보내고, 하이드레이션 후 클라에서 실제 조회한다.
- * 이렇게 하면 페이지는 정적 셸로 프리렌더되고(force-dynamic 불필요) 서버 페칭 크래시도 없다.
+ * SSR에선 라우트별 prefetch가 모든 suspense 쿼리를 커버해 첫 HTML에 데이터가 실린다.
+ * prefetch가 비거나 실패하면(커버 누락·토큰 만료 등) 서버에서 클라 fetcher가 상대 baseURL 때문에
+ * 실패하고, React 스트리밍이 해당 경계만 fallback으로 강등 후 클라에서 재시도한다(화면 유지, 서버 로그가 신호).
  */
 export default function AsyncBoundary({ fallback, errorFallback, children, resetKeys }: AsyncBoundaryProps) {
-  const isClient = useIsClient();
-  if (!isClient) return <>{fallback}</>;
-
   return (
     <QueryErrorResetBoundary>
       {({ reset }) => (

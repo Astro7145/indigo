@@ -13,9 +13,11 @@ interface TodoUpdateContainerProps {
   todo: Todo;
   onClose: () => void;
   onCancel?: () => void;
+  /** 제출 진행(업로드~뮤테이션) 여부 보고 — 진행 중에는 호출자가 이탈 확인을 막는다 */
+  onPendingChange?: (pending: boolean) => void;
 }
 
-export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpdateContainerProps) {
+export default function TodoUpdateContainer({ todo, onClose, onCancel, onPendingChange }: TodoUpdateContainerProps) {
   const { mutate: updateTodo, isPending } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
@@ -32,6 +34,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
   };
 
   const handleSubmit = async (values: TodoFormValues) => {
+    onPendingChange?.(true);
     // values.fileUrl: null이면 사용자가 명시적으로 삭제, 아니면 기존 URL 유지
     let fileUrl: string | null = values.fileUrl ?? null;
 
@@ -43,6 +46,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
         fileUrl = url;
       } catch {
         showToast('이미지 업로드에 실패했습니다.');
+        onPendingChange?.(false);
         return;
       }
     }
@@ -67,6 +71,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel }: TodoUpd
         },
         onError: () => {
           showToast('할 일 수정에 실패했습니다.');
+          onPendingChange?.(false);
         },
       },
     );
