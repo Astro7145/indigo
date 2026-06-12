@@ -9,7 +9,7 @@ import { Logo } from '@/src/components/common/icons/Logo';
  */
 export default function NotFound() {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
         <main className="flex min-h-screen w-full flex-col items-center justify-center gap-6 px-4 text-center">
           <Logo size="lg" aria-hidden />
