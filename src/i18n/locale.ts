@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { defaultLocale, isValidLocale, type Locale } from './routing';
 
 const COOKIE_NAME = 'NEXT_LOCALE';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1y — 언어 설정은 장기 영속(세션 쿠키면 브라우저 종료 시 사라짐)
 
 export async function getUserLocale(): Promise<Locale> {
   const value = (await cookies()).get(COOKIE_NAME)?.value;
@@ -14,5 +15,10 @@ export async function getUserLocale(): Promise<Locale> {
 }
 
 export async function setUserLocale(locale: Locale) {
-  (await cookies()).set(COOKIE_NAME, locale);
+  (await cookies()).set(COOKIE_NAME, locale, {
+    maxAge: COOKIE_MAX_AGE,
+    sameSite: 'lax',
+    path: '/',
+    secure: process.env.NODE_ENV === 'production',
+  });
 }
