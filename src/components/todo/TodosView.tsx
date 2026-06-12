@@ -10,32 +10,14 @@ import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import type { TodoListParams } from '@/src/types/todo';
+import { todosListParams as listParams, type TodosTab } from '@/src/components/todo/todosTab';
 
-export type TodosTab = 'all' | 'todo' | 'done';
 type Tab = TodosTab;
-
-/** ?tab= 파싱 — 잘못된 값은 all */
-export function parseTodosTab(raw: string | undefined): TodosTab {
-  return raw === 'todo' || raw === 'done' ? raw : 'all';
-}
 const EMPTY_MSG_BY_TAP = {
   all: '아직 등록한 할 일이 없어요',
   todo: '해야할 일이 아직 없어요',
   done: '완료한 일이 아직 없어요',
 };
-
-const DONE_PARAM: Record<Tab, TodoListParams['done']> = {
-  all: undefined,
-  todo: 'false',
-  done: 'true',
-};
-
-export const listParams = (tab: Tab): Omit<TodoListParams, 'cursor'> => ({
-  sort: 'latest',
-  limit: 40,
-  done: DONE_PARAM[tab],
-});
 
 /**
  * /todos 클라 본문 — 탭 상태가 카운트·리스트를 묶으므로 한 덩어리의 클라 섬이다(서버 셸은 page).
