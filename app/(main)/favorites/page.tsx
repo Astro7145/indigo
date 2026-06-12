@@ -9,12 +9,10 @@ import { IcChevron } from '@/src/components/common/icons/IcChevron';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { FavoriteTodo } from '@/src/types/favorite';
-import type { Todo } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 
@@ -39,10 +37,6 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
 export default function FavoritesPage() {
   const [tab, setTab] = useState<Tab>('all');
   const [goalId, setGoalId] = useState<number | null>(null);
-
-  // 행 클릭(상세)·케밥 수정 시트 — 단일 인스턴스를 페이지가 소유(/todos 동일 패턴). 삭제 확인은 각 행(TodoRow)이 소유.
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -103,18 +97,10 @@ export default function FavoritesPage() {
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
             resetKeys={[tab, goalId]}
           >
-            <FavoritesList tab={tab} goalId={goalId} onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
+            <FavoritesList tab={tab} goalId={goalId} />
           </AsyncBoundary>
         </Card>
       </div>
-
-      <TodoFormSheet
-        mode="update"
-        isOpen={editingTodo !== null}
-        onClose={() => setEditingTodo(null)}
-        todo={editingTodo}
-      />
-      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </section>
   );
 }
@@ -125,17 +111,8 @@ function FavoritesCount({ tab, goalId }: { tab: Tab; goalId: number | null }) {
   return <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{visible.length}</span>;
 }
 
-function FavoritesList({
-  tab,
-  goalId,
-  onEditTodo,
-  onSelectTodo,
-}: {
-  tab: Tab;
-  goalId: number | null;
-  onEditTodo: (todo: Todo) => void;
-  onSelectTodo: (todo: Todo) => void;
-}) {
+function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
+  const { openEdit, openDetail } = useTodoSheet();
   const { data } = useFavoriteTodoList({ limit: 100 });
 
   const visible = filterFavorites(data.favorites, tab, goalId);
@@ -150,8 +127,8 @@ function FavoritesList({
       className="flex flex-col gap-2"
       todos={visible.map((f) => f.todo)}
       size="large"
-      onEdit={onEditTodo}
-      onSelect={onSelectTodo}
+      onEdit={openEdit}
+      onSelect={openDetail}
     />
   );
 }

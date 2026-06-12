@@ -4,6 +4,7 @@ import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'mot
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
@@ -11,7 +12,6 @@ import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import TopbarNotification from './TopbarNotification';
 
@@ -22,11 +22,10 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 export default function Topbar() {
   const title = usePageTitle();
+  const { openCreate } = useTodoSheet();
   const openSettings = useSettingsModalStore((s) => s.open);
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
-  // 새 할일 생성 폼(시트) 열림 상태 — 탑바가 소유.
-  const [createOpen, setCreateOpen] = useState(false);
   const height = useMotionValue(COLLAPSED_HEIGHT);
   const dragStartHeight = useRef(COLLAPSED_HEIGHT);
 
@@ -154,7 +153,7 @@ export default function Topbar() {
               onClick={() => {
                 // 전체화면 메뉴를 접어 폼(바텀시트)이 그 위로 올라오게 한다
                 collapse();
-                setCreateOpen(true);
+                openCreate();
               }}
             />
             <div className="flex gap-x-2">
@@ -180,8 +179,6 @@ export default function Topbar() {
           {collapsed && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
         </motion.div> */}
       </motion.div>
-
-      <TodoFormSheet mode="create" isOpen={createOpen} onClose={() => setCreateOpen(false)} />
     </>
   );
 }

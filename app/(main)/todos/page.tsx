@@ -8,10 +8,9 @@ import Card from '@/src/components/common/cards/Card';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
-import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
-import type { Todo, TodoListParams } from '@/src/types/todo';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import type { TodoListParams } from '@/src/types/todo';
 
 type Tab = 'all' | 'todo' | 'done';
 const EMPTY_MSG_BY_TAP = {
@@ -36,10 +35,7 @@ const listParams = (tab: Tab): Omit<TodoListParams, 'cursor'> => ({ sort: 'lates
 export default function TodosPage() {
   const [tab, setTab] = useState<Tab>('all');
 
-  // 단일 리스트라 시트 상태를 페이지가 직접 소유한다(목표 상세의 GoalDetail과 동일 패턴). 삭제 확인은 각 행(TodoRow)이 소유.
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const { openCreate } = useTodoSheet();
 
   return (
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
@@ -68,7 +64,7 @@ export default function TodosPage() {
             variant="tertiary"
             size="small"
             startIcon={<IcPlus className="size-5 text-slate-500" />}
-            onClick={() => setCreating(true)}
+            onClick={() => openCreate()}
           >
             할 일 추가
           </Button>
@@ -80,20 +76,10 @@ export default function TodosPage() {
             errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
             resetKeys={[tab]}
           >
-            <TodosList tab={tab} onEditTodo={setEditingTodo} onSelectTodo={setSelectedTodo} />
+            <TodosList tab={tab} />
           </AsyncBoundary>
         </Card>
       </div>
-
-      {/* 모든 할 일은 폼에서 목표를 선택하므로 생성 시트에 defaultGoalId를 넘기지 않는다. */}
-      <TodoFormSheet
-        mode="update"
-        isOpen={editingTodo !== null}
-        onClose={() => setEditingTodo(null)}
-        todo={editingTodo}
-      />
-      <TodoFormSheet mode="create" isOpen={creating} onClose={() => setCreating(false)} />
-      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </section>
   );
 }
@@ -104,15 +90,8 @@ function TodosCount({ tab }: { tab: Tab }) {
   return <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{totalCount}</span>;
 }
 
-function TodosList({
-  tab,
-  onEditTodo,
-  onSelectTodo,
-}: {
-  tab: Tab;
-  onEditTodo: (todo: Todo) => void;
-  onSelectTodo: (todo: Todo) => void;
-}) {
+function TodosList({ tab }: { tab: Tab }) {
+  const { openEdit, openDetail } = useTodoSheet();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteTodoList(
     listParams(tab),
   );
@@ -140,13 +119,7 @@ function TodosList({
 
   return (
     <>
-      <TodoList
-        className="flex flex-col gap-2"
-        todos={todos}
-        size="large"
-        onEdit={onEditTodo}
-        onSelect={onSelectTodo}
-      />
+      <TodoList className="flex flex-col gap-2" todos={todos} size="large" onEdit={openEdit} onSelect={openDetail} />
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
       {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
     </>
