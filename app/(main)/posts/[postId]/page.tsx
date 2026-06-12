@@ -12,6 +12,7 @@ import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import Modal from '@/src/components/common/modal/Modal';
 import CommentSection from '@/src/components/post/CommentSection';
 import { useInfiniteComments } from '@/src/hooks/comment';
+import { useImageLightbox } from '@/src/hooks/useImageLightbox';
 import { useDeletePost, usePost } from '@/src/hooks/post';
 import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
@@ -32,6 +33,7 @@ export default function PostDetailPage() {
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
   const { showToast } = useToast();
+  const openImageLightbox = useImageLightbox();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
@@ -101,11 +103,16 @@ export default function PostDetailPage() {
           }}
         />
 
-        {/* 이미지 */}
+        {/* 이미지 — 클릭 시 라이트박스로 확대 */}
         {post.image && (
-          <div className="relative mb-6 size-[150px] overflow-hidden rounded border border-slate-200 sm:size-[232px]">
+          <button
+            type="button"
+            onClick={() => openImageLightbox(post.image!, post.title)}
+            aria-label="첨부 이미지 확대 보기"
+            className="relative mb-6 block size-[150px] cursor-zoom-in overflow-hidden rounded border border-slate-200 sm:size-[232px]"
+          >
             <Image src={post.image} alt="" fill className="object-cover" />
-          </div>
+          </button>
         )}
 
         {/* 메타 */}
