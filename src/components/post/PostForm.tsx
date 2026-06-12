@@ -6,10 +6,12 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import Button from '@/src/components/common/buttons/Button';
 import Modal from '@/src/components/common/modal/Modal';
 import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
+import PostFormActions from '@/src/components/post/PostFormActions';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
 import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -48,6 +50,8 @@ export default function PostForm(props: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<PostEditorHandle>(null);
+  const setRightSlot = useTopbarSlotStore((s) => s.setRightSlot);
+  const clearRightSlot = useTopbarSlotStore((s) => s.clearRightSlot);
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
   const hydrated = useRef(false);
 
@@ -71,15 +75,6 @@ export default function PostForm(props: PostFormProps) {
   const initialImage = initialPost?.image ?? null;
   const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage; //변경이 있는지
   const isValid = title.trim().length > 0 && !isHtmlEmpty(content);
-
-  // 수정 모드에서 데이터 도착까지 로딩 표시
-  if (props.mode === 'edit' && !initialPost) {
-    return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
-      </div>
-    );
-  }
 
   const handleCancel = () => {
     if (isDirty) {
@@ -128,6 +123,47 @@ export default function PostForm(props: PostFormProps) {
     }
   };
 
+  // 핸들러는 입력마다 새 참조라 effect deps에 직접 넣으면 키 입력 한 번에 setRightSlot이 한 번씩 호출된다.
+  // ref로 최신 참조를 들고 있게 하고 effect에서는 ref 호출 wrapper만 등록 → setRightSlot은 isValid·isSubmitting 등 실제 UI 상태가 바뀔 때만 호출된다.
+  const handleSubmitRef = useRef(handleSubmit);
+  const handleCancelRef = useRef(handleCancel);
+  // ref 갱신은 render 중이 아니라 commit 이후로 미룬다 (react-hooks/refs)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+    handleCancelRef.current = handleCancel;
+  });
+
+  // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 데이터 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
+  useEffect(() => {
+    if (props.mode === 'edit' && !initialPost) {
+      clearRightSlot();
+      return;
+    }
+    setRightSlot(
+      <PostFormActions
+        mode={props.mode}
+        isValid={isValid}
+        isSubmitting={isSubmitting}
+        onSubmit={() => handleSubmitRef.current()}
+        onCancel={() => handleCancelRef.current()}
+      />,
+    );
+  }, [props.mode, initialPost, isValid, isSubmitting, setRightSlot, clearRightSlot]);
+
+  // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
+  useEffect(() => {
+    return () => clearRightSlot();
+  }, [clearRightSlot]);
+
+  // 수정 모드에서 데이터 도착까지 로딩 표시 (모든 hook 호출 이후에 위치)
+  if (props.mode === 'edit' && !initialPost) {
+    return (
+      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400">불러오는 중…</p>
+      </div>
+    );
+  }
+
   const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
   const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
 
@@ -137,9 +173,9 @@ export default function PostForm(props: PostFormProps) {
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[343px] flex-col sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-        {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
-        <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
+      {/* 모바일은 Topbar 우측 슬롯이 액션을 담당하므로 헤더 전체를 sm 이상에서만 노출 */}
+      <header className="hidden h-10 items-center justify-between gap-3 sm:mb-3 sm:flex">
+        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
           {headingText}
         </h1>
         <div className="flex shrink-0 gap-2">

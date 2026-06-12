@@ -29,6 +29,8 @@ function matchRoute(pathname: string): RouteKey | null {
   if (pathname === '/posts/write') return 'posts-write';
   if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'posts-edit';
   if (pathname === '/posts') return 'posts';
+  // 게시물 상세(/posts/:id)도 메뉴 컨텍스트 유지를 위해 "소통 게시판"으로 표시
+  if (/^\/posts\/[^/]+$/.test(pathname)) return 'posts';
   if (pathname === '/favorites') return 'favorites';
   if (pathname === '/calendar') return 'calendar';
   if (pathname === '/me') return 'me';

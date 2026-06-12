@@ -2,10 +2,12 @@
 
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 import { LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
@@ -18,12 +20,23 @@ import TopbarNotification from './TopbarNotification';
 const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 
+// 폼 페이지 경로 — 진입 시 곧 슬롯이 등록되므로 첫 페인트에 fallback(종)을 띄우지 않고 빈 자리를 둔다.
+// 이 가드 없이 fallback을 두면 페이지 mount 전에 종 → 슬롯 액션으로 갈아끼는 한 프레임 깜빡임이 생긴다.
+const FORM_ROUTE_PATTERNS: RegExp[] = [
+  /^\/posts\/write$/,
+  /^\/posts\/[^/]+\/edit$/,
+  /^\/todos\/[^/]+\/notes\/(write|edit)$/,
+];
+
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Topbar() {
   const title = usePageTitle();
+  const pathname = usePathname();
+  const rightSlot = useTopbarSlotStore((s) => s.rightSlot);
   const { openCreate } = useTodoSheet();
   const openSettings = useSettingsModalStore((s) => s.open);
+  const isFormRoute = FORM_ROUTE_PATTERNS.some((p) => p.test(pathname));
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
   const height = useMotionValue(COLLAPSED_HEIGHT);
@@ -99,14 +112,24 @@ export default function Topbar() {
         style={{ height }}
         className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
       >
-        {/* 접힘 상태: 인사말 + 알림 */}
+        {/* 접힘 상태: 인사말 + 우측 슬롯(기본 알림, 페이지가 등록 시 액션) */}
         <motion.div
           style={{ opacity: barOpacity }}
           aria-hidden={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
           <span className="text-base font-semibold text-slate-50">{title}</span>
-          <TopbarNotification active={collapsed} />
+          {rightSlot ? (
+            // 슬롯 내부 버튼은 드래그 핸들과 별개로 클릭 가능해야 함
+            // - pointer-events-auto: 부모의 pointer-events-none 해제
+            // - relative z-10: 같은 부모 내 bottom 드래그 핸들이 JSX 뒤라 stacking 상 위에 깔리는 걸 해제
+            <div className="pointer-events-auto relative z-10">{rightSlot}</div>
+          ) : isFormRoute ? (
+            // 폼 페이지는 곧 슬롯이 등록될 거라 빈 자리를 둬서 fallback(종) 깜빡임 방지
+            <span aria-hidden />
+          ) : (
+            <TopbarNotification active={collapsed} />
+          )}
         </motion.div>
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div

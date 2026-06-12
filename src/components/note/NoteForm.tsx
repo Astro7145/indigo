@@ -8,11 +8,13 @@ import Button from '@/src/components/common/buttons/Button';
 import Modal from '@/src/components/common/modal/Modal';
 import NoteEditor, { type NoteEditorHandle } from '@/src/components/note/NoteEditor';
 import NoteEmbedPanel from '@/src/components/note/NoteEmbedPanel';
+import NoteFormActions from '@/src/components/note/NoteFormActions';
 import NoteLinkCard from '@/src/components/note/NoteLinkCard';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import { useCreateNote, useNoteList, useUpdateNote } from '@/src/hooks/note';
 import { useTodo } from '@/src/hooks/todo';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 
 export type NoteFormProps = { mode: 'create'; todoId: number } | { mode: 'edit'; todoId: number };
 
@@ -58,6 +60,8 @@ export default function NoteForm(props: NoteFormProps) {
   const [isEmbedOpen, setIsEmbedOpen] = useState(false);
   const [isEmbedExpanded, setIsEmbedExpanded] = useState(false);
   const editorRef = useRef<NoteEditorHandle>(null);
+  const setRightSlot = useTopbarSlotStore((s) => s.setRightSlot);
+  const clearRightSlot = useTopbarSlotStore((s) => s.clearRightSlot);
 
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
   const hydrated = useRef(false);
@@ -74,6 +78,63 @@ export default function NoteForm(props: NoteFormProps) {
   const initialLinkUrl = initialNote?.linkUrl ?? null;
   const isDirty = title !== initialTitle || linkUrl !== initialLinkUrl || !isSameJSON(content, initialContent);
   const isValid = title.trim().length > 0 && hasText(content);
+
+  // TODO(@<wiring>): 임시저장 — 로컬스토리지 추천 (ProseMirror JSON 그대로 직렬화 가능). 키 예시: `draft:note:todo-${todoId}`
+  const handleDraft = () => {};
+
+  const handleSubmit = async () => {
+    if (!isValid || isSubmitting) return;
+    try {
+      if (props.mode === 'edit' && initialNote) {
+        // PATCH는 linkUrl을 항상 포함해야 null 전송이 "링크 제거" 의미를 가짐 (Swagger: linkUrl nullable, 생략 시 유지)
+        await updateNote({ noteId: initialNote.id, body: { title, content, linkUrl } });
+        router.back();
+        return;
+      }
+      await createNote({
+        todoId: props.todoId,
+        title,
+        content,
+        ...(linkUrl ? { linkUrl } : {}),
+      });
+      router.back();
+    } catch (error) {
+      // TODO(@<wiring>): 노트 작업 마무리 시 PostForm처럼 showToast로 사용자 안내 추가
+      console.error('노트 저장 실패:', error);
+    }
+  };
+
+  // 핸들러는 입력마다 새 참조라 effect deps에 직접 넣으면 키 입력 한 번에 setRightSlot이 한 번씩 호출된다.
+  // ref로 최신 참조를 들고 있게 하고 effect에서는 ref 호출 wrapper만 등록 → setRightSlot은 isValid·isSubmitting 등 실제 UI 상태가 바뀔 때만 호출된다.
+  const handleSubmitRef = useRef(handleSubmit);
+  const handleDraftRef = useRef(handleDraft);
+  // ref 갱신은 render 중이 아니라 commit 이후로 미룬다 (react-hooks/refs)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+    handleDraftRef.current = handleDraft;
+  });
+
+  // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
+  useEffect(() => {
+    if (props.mode === 'edit' && isNoteLoading) {
+      clearRightSlot();
+      return;
+    }
+    setRightSlot(
+      <NoteFormActions
+        mode={props.mode}
+        isValid={isValid}
+        isSubmitting={isSubmitting}
+        onDraft={() => handleDraftRef.current()}
+        onSubmit={() => handleSubmitRef.current()}
+      />,
+    );
+  }, [props.mode, isNoteLoading, isValid, isSubmitting, setRightSlot, clearRightSlot]);
+
+  // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
+  useEffect(() => {
+    return () => clearRightSlot();
+  }, [clearRightSlot]);
 
   // 수정 모드: 로딩 중과 "노트 없음"을 구분 — 후자는 가드 없으면 무한 로딩 메시지가 됨
   if (props.mode === 'edit' && isNoteLoading) {
@@ -117,26 +178,6 @@ export default function NoteForm(props: NoteFormProps) {
     setIsEmbedOpen(false);
   };
 
-  // TODO(@<wiring>): 임시저장 — 로컬스토리지 추천 (ProseMirror JSON 그대로 직렬화 가능). 키 예시: `draft:note:todo-${todoId}`
-  const handleDraft = () => {};
-
-  const handleSubmit = async () => {
-    if (!isValid) return;
-    if (props.mode === 'edit' && initialNote) {
-      // PATCH는 linkUrl을 항상 포함해야 null 전송이 "링크 제거" 의미를 가짐 (Swagger: linkUrl nullable, 생략 시 유지)
-      await updateNote({ noteId: initialNote.id, body: { title, content, linkUrl } });
-      router.back();
-      return;
-    }
-    await createNote({
-      todoId: props.todoId,
-      title,
-      content,
-      ...(linkUrl ? { linkUrl } : {}),
-    });
-    router.back();
-  };
-
   const headingText = props.mode === 'edit' ? '노트 수정하기' : '노트 작성하기';
   const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
 
@@ -158,9 +199,9 @@ export default function NoteForm(props: NoteFormProps) {
           isEmbedOpen ? 'xl:mx-0 xl:max-w-[768px]' : 'xl:max-w-[768px]'
         }`}
       >
-        <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-          {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
-          <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
+        {/* 모바일은 Topbar 우측 슬롯이 액션을 담당하므로 헤더 전체를 sm 이상에서만 노출 */}
+        <header className="hidden h-10 items-center justify-between gap-3 sm:mb-3 sm:flex">
+          <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
             {headingText}
           </h1>
           <div className="flex shrink-0 gap-2">
