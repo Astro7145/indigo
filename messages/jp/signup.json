@@ -1,0 +1,10 @@
+{
+  "submit": "会員登録する",
+  "submitting": "処理中...",
+  "loginPrompt": "すでに会員ですか？",
+  "loginLink": "ログイン",
+  "passwordConfirmLabel": "パスワードの確認",
+  "passwordConfirmPlaceholder": "パスワードをもう一度入力してください",
+  "nicknameTaken": "すでに使用されているニックネームです。",
+  "completeAlert": "会員登録が完了しました。"
+}

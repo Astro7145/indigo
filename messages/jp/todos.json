@@ -1,0 +1,50 @@
+{
+  "title": "すべてのTODO",
+  "addButton": "TODOを追加",
+  "empty": {
+    "all": "まだTODOが登録されていません",
+    "todo": "TODOがまだありません",
+    "done": "完了したことがまだありません"
+  },
+  "fields": {
+    "title": "タイトル",
+    "goal": "目標",
+    "dueDate": "締め切り",
+    "tag": "タグ",
+    "link": "リンク",
+    "image": "画像",
+    "status": "ステータス"
+  },
+  "form": {
+    "titlePlaceholder": "TODOのタイトルを入力してください",
+    "goalPlaceholder": "目標を選択してください",
+    "goalNone": "目標なし",
+    "datePlaceholder": "日付を選択してください",
+    "tagPlaceholder": "入力後にEnter",
+    "tagAdd": "タグを追加",
+    "tagDuplicate": "すでに追加されているタグです",
+    "tagMax": "タグは最大10個まで追加できます",
+    "imageHint": "画像は最大1枚まで添付できます。",
+    "statusError": "ステータスを選択してください。"
+  },
+  "detail": {
+    "attachment": "添付資料",
+    "notes": "作成されたノート"
+  },
+  "create": {
+    "title": "TODOを作成",
+    "success": "TODOが追加されました。",
+    "error": "TODOの作成に失敗しました。"
+  },
+  "update": {
+    "title": "TODOを編集",
+    "success": "TODOが編集されました。",
+    "error": "TODOの編集に失敗しました。"
+  },
+  "delete": {
+    "warning": "削除したTODOは復元できません。",
+    "success": "TODOが削除されました。",
+    "error": "TODOの削除に失敗しました。"
+  },
+  "imageUploadError": "画像のアップロードに失敗しました。"
+}

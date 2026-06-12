@@ -1,0 +1,107 @@
+{
+  "state": {
+    "loading": "불러오는 중…",
+    "loadError": "불러오지 못했어요",
+    "noSearchResults": "검색 결과가 없어요"
+  },
+  "tabs": {
+    "all": "ALL",
+    "todo": "TO DO",
+    "done": "DONE"
+  },
+  "actions": {
+    "edit": "수정하기",
+    "update": "수정",
+    "delete": "삭제하기",
+    "cancel": "취소",
+    "confirm": "확인",
+    "close": "닫기",
+    "save": "저장하기",
+    "more": "더보기",
+    "writeNote": "노트 작성",
+    "viewAll": "모두 보기"
+  },
+  "fields": {
+    "email": "이메일",
+    "password": "비밀번호",
+    "name": "이름"
+  },
+  "placeholders": {
+    "email": "이메일을 입력해주세요",
+    "password": "비밀번호를 입력해주세요",
+    "name": "이름을 입력해주세요"
+  },
+  "social": {
+    "divider": "SNS 계정으로 로그인",
+    "google": "구글로 로그인",
+    "kakao": "카카오로 로그인"
+  },
+  "toast": {
+    "saved": "저장되었습니다.",
+    "saveError": "저장에 실패했습니다. 다시 시도해주세요."
+  },
+  "discard": {
+    "title": "정말 나가시겠어요?",
+    "warning": "작성 중인 내용이 사라집니다.",
+    "confirm": "예",
+    "cancel": "아니오"
+  },
+  "deleteConfirm": {
+    "title": "정말 삭제하시겠어요?"
+  },
+  "charCount": "공백포함 {total}자 | 공백제외 {nonSpace}자",
+  "cancelWarning": "작성하신 모든 내용이 사라집니다.",
+  "moreMenu": "더보기 메뉴",
+  "linkDelete": "링크 삭제",
+  "imageDelete": "이미지 삭제",
+  "linkUploadPlaceholder": "링크를 업로드해주세요",
+  "relativeTime": {
+    "justNow": "방금 전",
+    "minutes": "{count}분 전",
+    "hours": "{count}시간 전",
+    "days": "{count}일 전",
+    "weeks": "{count}주 전",
+    "months": "{count}달 전"
+  },
+  "search": {
+    "placeholder": "할 일을 검색해주세요",
+    "label": "할 일 검색",
+    "button": "검색"
+  },
+  "passwordToggle": {
+    "show": "비밀번호 표시",
+    "hide": "비밀번호 숨기기"
+  },
+  "file": {
+    "selected": "{fileName} 선택됨",
+    "removed": "파일이 삭제되었습니다",
+    "placeholder": "파일을 선택해주세요",
+    "delete": "파일 삭제"
+  },
+  "image": {
+    "attachmentAlt": "첨부 이미지",
+    "removed": "이미지가 삭제되었습니다",
+    "selectedAlt": "선택된 이미지: {fileName}",
+    "existingAlt": "기존 이미지",
+    "attach": "이미지 첨부"
+  },
+  "editor": {
+    "bold": "굵게",
+    "italic": "기울임",
+    "underline": "밑줄",
+    "alignLeft": "왼쪽 정렬",
+    "alignCenter": "가운데 정렬",
+    "alignRight": "오른쪽 정렬",
+    "bulletList": "목록",
+    "insertImage": "이미지 삽입",
+    "insertLink": "링크 삽입"
+  },
+  "todoList": {
+    "note": "노트",
+    "link": "링크"
+  },
+  "favorite": {
+    "add": "즐겨찾기",
+    "remove": "즐겨찾기 해제"
+  }
+}
