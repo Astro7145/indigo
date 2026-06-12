@@ -112,11 +112,3 @@ export const prefetchCalendarMonth = (qc: QueryClient, month: CalendarDate) => {
     },
   });
 };
-
-/** 대시보드 전체 — 무한 목표 첫 페이지를 받은 뒤 그 목표들의 보드까지 병렬 prefetch. */
-export async function prefetchDashboard(qc: QueryClient) {
-  await Promise.all([prefetchRecentTodos(qc), prefetchAllGoals(qc), prefetchInfiniteGoals(qc, 2)]);
-  const goals = qc.getQueryData<{ pages: GoalListResponse[] }>([...goalKeys.list({ limit: 2 }), 'infinite']);
-  const first = goals?.pages?.[0]?.goals ?? [];
-  await Promise.all(first.map((g) => prefetchGoalBoard(qc, g.id)));
-}
