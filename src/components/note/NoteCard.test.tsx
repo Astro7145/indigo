@@ -23,21 +23,21 @@ const note: Note = {
 };
 
 it('제목·연결된 할일·링크 아이콘을 렌더한다', async () => {
-  await renderWithIntl(<NoteCard note={note} />);
+  await renderWithIntl(<NoteCard noteId={note.id} note={note} />);
   expect(screen.getByText('노트 제목')).toBeInTheDocument();
   expect(screen.getByText('연결된 할일')).toBeInTheDocument();
   expect(screen.getByLabelText('첨부 링크')).toBeInTheDocument();
 });
 
 it('todo.done=true여도 제목에 취소선을 적용하지 않는다', async () => {
-  await renderWithIntl(<NoteCard note={{ ...note, todo: { ...note.todo, done: true } }} />);
+  await renderWithIntl(<NoteCard noteId={note.id} note={{ ...note, todo: { ...note.todo, done: true } }} />);
   expect(screen.getByText('연결된 할일')).not.toHaveClass('line-through');
 });
 
 it('onMore 제공 시 더보기 클릭으로 onMore를 호출하고 카드 onClick으로 버블링하지 않는다', async () => {
   const onMore = jest.fn();
   const onClick = jest.fn();
-  await renderWithIntl(<NoteCard note={note} onClick={onClick} onMore={onMore} />);
+  await renderWithIntl(<NoteCard noteId={note.id} note={note} onClick={onClick} onMore={onMore} />);
   fireEvent.click(screen.getByLabelText('더보기 메뉴'));
   expect(onMore).toHaveBeenCalledTimes(1);
   expect(onClick).not.toHaveBeenCalled();
@@ -47,6 +47,7 @@ it('menu 제공 시 케밥 클릭으로 드롭다운이 열리고 카드 onClick
   const onClick = jest.fn();
   await renderWithIntl(
     <NoteCard
+      noteId={note.id}
       note={note}
       onClick={onClick}
       menu={

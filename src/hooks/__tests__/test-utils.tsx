@@ -5,6 +5,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { Suspense } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 
+import type { Locale } from '@/src/i18n/routing';
+
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
@@ -39,7 +41,7 @@ const MESSAGE_NAMESPACES = [
   'validation',
 ] as const;
 
-export async function renderWithIntl(ui: ReactElement, locale: string = 'ko') {
+export async function renderWithIntl(ui: ReactElement, locale: Locale = 'ko') {
   const loaded = await Promise.all(
     MESSAGE_NAMESPACES.map((ns) => import(`@/messages/${locale}/${ns}.json`).then((m) => [ns, m.default] as const)),
   );
