@@ -1,0 +1,52 @@
+{
+  "title": "{name}さんの目標",
+  "loadError": "目標情報を読み込めませんでした",
+  "moreMenu": "目標のもっと見るメニュー",
+  "progress": "目標の進捗",
+  "calendarView": "カレンダー表示",
+  "createError": "目標の作成に失敗しました",
+  "edit": {
+    "title": "目標を編集",
+    "placeholder": "目標を入力してください"
+  },
+  "delete": {
+    "warning": "削除した目標は復元できません。"
+  },
+  "note": {
+    "collectTitle": "ノートをまとめて見る",
+    "searchPlaceholder": "ノートを検索してください",
+    "searchLabel": "ノート検索",
+    "sortLatest": "新しい順",
+    "sortOldest": "古い順",
+    "empty": "まだノートがありません",
+    "loadError": "ノートを読み込めませんでした",
+    "notFound": "編集するノートが見つかりません",
+    "linkBadge": "添付リンク",
+    "goalLabel": "目標",
+    "dateLabel": "作成日",
+    "todoLabel": "TODO",
+    "tagLabel": "タグ",
+    "createTitle": "ノートを書く",
+    "editTitle": "ノートを編集する",
+    "submit": "登録する",
+    "draft": "下書き保存",
+    "titlePlaceholder": "ノートのタイトルを入力してください",
+    "titleLabel": "タイトル",
+    "contentPlaceholder": "ここからノートの作成を始めてください",
+    "linkUploadTitle": "リンクのアップロード",
+    "linkPlaceholder": "リンクを入力してください",
+    "linkLabel": "リンクURL",
+    "linkError": "http:// または https:// で始める必要があります",
+    "cancelTitle": "ノートの作成をキャンセルしますか？",
+    "embedLabel": "リンク埋め込みパネル",
+    "embedExpand": "パネルを展開",
+    "embedCollapse": "パネルを折りたたむ",
+    "embedClose": "パネルを閉じる",
+    "embedEmpty": "ここに埋め込みが表示されます",
+    "embedPreview": "リンクプレビュー",
+    "linkPreviewOpen": "リンクプレビューを開く",
+    "openNewTab": "新しいタブで開く",
+    "embedPreviewTitle": "添付リンクのプレビュー",
+    "drawerLabel": "ノートの詳細"
+  }
+}
