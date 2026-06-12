@@ -31,6 +31,7 @@ jest.mock('@/src/components/todo/TodoFormSheet', () => ({
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getLocalTimeZone, startOfMonth, startOfWeek, today } from '@internationalized/date';
 
 import * as goalApi from '@/src/api/goal';
 import * as todoApi from '@/src/api/todo';
@@ -141,6 +142,19 @@ it('칩을 클릭하면 상세 시트가 열린다', async () => {
   renderWithClient(<CalendarView />);
   fireEvent.click((await screen.findAllByText('오늘 할일'))[0]);
   expect(screen.getByTestId('detail-sheet')).toHaveTextContent('오늘 할일');
+});
+
+it('월 이동으로 선택 날짜가 그리드 범위를 벗어나면 범위 안으로 클램프된다', async () => {
+  renderWithClient(<CalendarView />);
+  await screen.findAllByText('오늘 할일');
+  // 두 달 이동 — 오늘은 어떤 날짜여도 +2개월 그리드 범위 밖이라 클램프가 항상 발생한다.
+  fireEvent.click(screen.getByRole('button', { name: '다음 달' }));
+  fireEvent.click(screen.getByRole('button', { name: '다음 달' }));
+  const expected = startOfWeek(startOfMonth(today(getLocalTimeZone()).add({ months: 2 })), 'en-US', 'mon');
+  const pad = (n: number) => String(n).padStart(2, '0');
+  expect(
+    await screen.findByRole('heading', { name: `${expected.year}. ${pad(expected.month)}. ${pad(expected.day)}` }),
+  ).toBeInTheDocument();
 });
 
 it('할 일 추가를 누르면 선택 날짜(기본 오늘)가 프리필된 생성 시트가 열린다', async () => {

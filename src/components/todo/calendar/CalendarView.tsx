@@ -60,9 +60,18 @@ export default function CalendarView() {
     setGoalId(id);
     window.history.replaceState(null, '', id === null ? '/calendar' : `/calendar?goalId=${id}`);
   };
+  const { locale } = useLocale();
   const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
   // 보이는 달의 기준(react-aria 포커스 날짜) — 월 범위 쿼리의 suspense 리마운트에도 보이는 달을 보존한다.
   const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
+  // 월 이동으로 선택 날짜가 새 그리드 범위를 벗어나면 범위 안으로 클램프 —
+  // 범위 밖 날짜의 할일은 보이는 달 쿼리에 없어 선택 리스트가 거짓 빈 상태가 된다.
+  const handleFocusChange = (date: CalendarDate) => {
+    setFocusedDate(date);
+    const { start, end } = gridBoundsOf(date, locale);
+    if (selectedDate.compare(start) < 0) setSelectedDate(start);
+    else if (selectedDate.compare(end) > 0) setSelectedDate(end);
+  };
   const [creating, setCreating] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
@@ -100,7 +109,7 @@ export default function CalendarView() {
             selectedDate={selectedDate}
             onChangeSelectedDate={setSelectedDate}
             focusedDate={focusedDate}
-            onFocusChange={setFocusedDate}
+            onFocusChange={handleFocusChange}
             onSelectTodo={setSelectedTodo}
           />
         </AsyncBoundary>
@@ -129,13 +138,16 @@ export default function CalendarView() {
   );
 }
 
-/** 해당 달의 그리드 표시 범위(앞뒤 달 날짜 포함, 월요일 시작 주 단위)를 KST date 문자열로 반환. */
-function gridRangeOf(month: CalendarDate, locale: string): { from: string; to: string } {
+/** 해당 달의 그리드 표시 범위(앞뒤 달 날짜 포함, 월요일 시작 주 단위). */
+function gridBoundsOf(month: CalendarDate, locale: string): { start: CalendarDate; end: CalendarDate } {
   const start = startOfMonth(month);
-  return {
-    from: startOfWeek(start, locale, 'mon').toString(),
-    to: endOfWeek(endOfMonth(start), locale, 'mon').toString(),
-  };
+  return { start: startOfWeek(start, locale, 'mon'), end: endOfWeek(endOfMonth(start), locale, 'mon') };
+}
+
+/** 그리드 표시 범위를 KST date 문자열(from/to)로 반환. */
+function gridRangeOf(month: CalendarDate, locale: string): { from: string; to: string } {
+  const { start, end } = gridBoundsOf(month, locale);
+  return { from: start.toString(), to: end.toString() };
 }
 
 function CalendarContent({
