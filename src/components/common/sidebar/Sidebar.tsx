@@ -10,6 +10,7 @@ const isTypingTarget = (target: EventTarget | null) => {
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 };
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import { useModalStore } from '@/src/stores/modal';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { Logo, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
@@ -38,6 +39,9 @@ export default function Sidebar() {
       if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
       if (event.key !== 'n' && event.key !== 'N') return;
       if (isTypingTarget(event.target)) return;
+      // 모달이 떠 있는 동안은 무시 — 모달 안 포커스(닫기 버튼 등)는 typing 가드에 안 걸려
+      // N이 열린 폼 위에 생성 폼을 계속 적층한다
+      if (useModalStore.getState().modals.length > 0) return;
       event.preventDefault();
       openCreate();
     };

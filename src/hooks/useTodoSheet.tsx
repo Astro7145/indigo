@@ -28,25 +28,51 @@ export function useTodoSheet() {
       className: EXIT_CONFIRM_CLASS,
     });
 
-  const openCreate = (opts?: { goalId?: number; dueDate?: string }) =>
+  // 폼 하나 분량의 제출 진행 플래그 — 진행 중(업로드·뮤테이션)에는 ESC·백드롭·취소의 이탈 확인을
+  // 막는다. 이탈 확인이 폼 위에 쌓인 채 제출이 성공하면 close()가 최상단(=이탈 확인)만 닫아
+  // 폼이 입력값 그대로 남고, 다시 제출하면 중복 생성된다.
+  const formGuard = () => {
+    const pending = { current: false };
+    return {
+      confirmExit: () => {
+        if (!pending.current) openExitConfirm();
+      },
+      setPending: (value: boolean) => {
+        pending.current = value;
+      },
+    };
+  };
+
+  const openCreate = (opts?: { goalId?: number; dueDate?: string }) => {
+    const guard = formGuard();
     open(
       (c) => (
         <TodoCreateContainer
           defaultGoalId={opts?.goalId}
           defaultDueDate={opts?.dueDate}
           onClose={c.close}
-          onCancel={openExitConfirm}
+          onCancel={guard.confirmExit}
+          onPendingChange={guard.setPending}
         />
       ),
-      { variant: 'auto', onClose: openExitConfirm, className: FORM_CLASS },
+      { variant: 'auto', onClose: guard.confirmExit, className: FORM_CLASS },
     );
+  };
 
-  const openEdit = (todo: Todo) =>
-    open((c) => <TodoUpdateContainer todo={todo} onClose={c.close} onCancel={openExitConfirm} />, {
-      variant: 'auto',
-      onClose: openExitConfirm,
-      className: FORM_CLASS,
-    });
+  const openEdit = (todo: Todo) => {
+    const guard = formGuard();
+    open(
+      (c) => (
+        <TodoUpdateContainer
+          todo={todo}
+          onClose={c.close}
+          onCancel={guard.confirmExit}
+          onPendingChange={guard.setPending}
+        />
+      ),
+      { variant: 'auto', onClose: guard.confirmExit, className: FORM_CLASS },
+    );
+  };
 
   const openDetail = (todo: Todo) =>
     open((c) => <TodoDetailContent todo={todo} onClose={c.close} />, {

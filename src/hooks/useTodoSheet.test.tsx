@@ -40,6 +40,22 @@ it('생성 폼의 ESC/백드롭(onClose)은 이탈 확인을 스택 위에 쌓�
   expect(confirmEl.type).toBe(TodoExitConfirm);
 });
 
+it('제출 진행 중에는 ESC/백드롭(onClose)이 이탈 확인을 열지 않고, 끝나면 다시 연다', () => {
+  const { result } = renderHook(() => useTodoSheet());
+  act(() => result.current.openCreate());
+  const [entry] = useModalStore.getState().modals;
+  const el = entry.render(controls) as ReactElement;
+  const { onPendingChange } = el.props as { onPendingChange: (pending: boolean) => void };
+
+  act(() => onPendingChange(true));
+  act(() => entry.onClose!());
+  expect(useModalStore.getState().modals).toHaveLength(1); // 진행 중 — 이탈 확인이 쌓이지 않는다
+
+  act(() => onPendingChange(false));
+  act(() => entry.onClose!());
+  expect(useModalStore.getState().modals).toHaveLength(2); // 끝난 뒤에는 정상적으로 열린다
+});
+
 it('openEdit은 수정 컨테이너에 todo를 전달한다', () => {
   const { result } = renderHook(() => useTodoSheet());
   act(() => result.current.openEdit(makeTodo()));
