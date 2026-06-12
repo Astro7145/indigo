@@ -47,7 +47,7 @@ const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
 export default function NoteCard({ noteId, note, onClick, onMore, menu, className }: NoteCardProps) {
   const t = useTranslations('goals');
   const tc = useTranslations('common');
-  const query = useNote(note ? undefined : noteId);
+  const query = useNote(noteId);
   const resolved = note ?? query.data;
   const isLoading = !note && query.isLoading;
   const isError = !note && query.isError;
