@@ -45,7 +45,6 @@ export function usePageTitle(): string {
   const tDashboard = useTranslations('dashboard');
   const tFavorites = useTranslations('favorites');
   const tGoals = useTranslations('goals');
-  const tMe = useTranslations('me');
   const tTodos = useTranslations('todos');
 
   const { data: user } = useMe();
@@ -79,7 +78,7 @@ export function usePageTitle(): string {
     case 'calendar':
       return tCalendar('title', { name });
     case 'me':
-      return tMe('title');
+      return '내 정보 관리';
     default:
       return '';
   }

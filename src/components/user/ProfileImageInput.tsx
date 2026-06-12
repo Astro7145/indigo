@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { IcPencil } from '@/src/components/common/icons/IcPencil';
 import { useToast } from '@/src/hooks/useToast';
@@ -11,8 +10,6 @@ import { useProfileImageStore } from '@/src/stores/profileImage';
 const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
 
 export default function ProfileImageInput() {
-  const tCommon = useTranslations('common');
-  const tMe = useTranslations('me');
   const inputRef = useRef<HTMLInputElement>(null);
   // 이전 blob URL을 revokeObjectURL로 해제하기 위한 참조
   const prevUrlRef = useRef<string | null>(null);
@@ -33,7 +30,7 @@ export default function ProfileImageInput() {
     // 허용된 이미지 확장자만 받는다 (accept는 우회 가능하므로 직접 검증).
     const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
     if (!ALLOWED_EXTENSIONS.includes(extension)) {
-      showToast(tMe('image.unsupported'), 'error');
+      showToast('지원하지 않는 이미지 형식입니다. (jpg, jpeg, png, gif, webp, svg)', 'error');
       e.currentTarget.value = '';
       return;
     }
@@ -43,7 +40,7 @@ export default function ProfileImageInput() {
     const url = URL.createObjectURL(file);
     prevUrlRef.current = url;
     setImageUrl(url);
-    setStatusMessage(tCommon('file.selected', { fileName: file.name }));
+    setStatusMessage(`${file.name} 선택됨`);
 
     // 선택한 파일을 스토어에 저장만 한다.
     // 업로드 URL 발급·S3 업로드는 ProfileForm 제출 시점에 함께 수행한다.
@@ -66,14 +63,14 @@ export default function ProfileImageInput() {
       </span>
 
       {displayUrl ? (
-        <Image src={displayUrl} alt={tMe('image.alt')} fill className="rounded-full object-cover" />
+        <Image src={displayUrl} alt="프로필 사진" fill className="rounded-full object-cover" />
       ) : (
-        <div role="img" aria-label={tMe('image.alt')} className="size-full rounded-full bg-indigo-600" />
+        <div role="img" aria-label="프로필 사진" className="size-full rounded-full bg-indigo-600" />
       )}
 
       <button
         type="button"
-        aria-label={tMe('image.change')}
+        aria-label="프로필 사진 변경"
         onClick={() => inputRef.current?.click()}
         className="absolute right-0 bottom-0 flex size-9 cursor-pointer items-center justify-center rounded-full border border-white bg-indigo-500 transition-colors hover:bg-indigo-600"
       >
@@ -84,7 +81,7 @@ export default function ProfileImageInput() {
         ref={inputRef}
         type="file"
         accept=".jpg,.jpeg,.png,.gif,.webp,.svg"
-        aria-label={tMe('image.select')}
+        aria-label="프로필 사진 파일 선택"
         className="sr-only"
         onChange={handleChange}
       />

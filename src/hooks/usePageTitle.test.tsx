@@ -57,11 +57,8 @@ describe('usePageTitle', () => {
     expect(titleFor('/calendar')).toBe('calendar.title 체다치즈');
   });
 
-  it('/me 경로면 me 카탈로그의 title 키로 타이틀을 만든다', () => {
-    expect(titleFor('/me')).toBe('me.title');
-  });
-
   it('타 담당 경로의 타이틀은 기존 문구를 유지한다', () => {
     expect(titleFor('/posts')).toBe('소통 게시판');
+    expect(titleFor('/me')).toBe('내 정보 관리');
   });
 });

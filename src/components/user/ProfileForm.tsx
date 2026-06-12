@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -13,22 +12,18 @@ import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload'
 import { useChangePassword, useMe, useUpdateMe } from '@/src/hooks/user';
 import { useProfileImageStore } from '@/src/stores/profileImage';
 import { ApiError } from '@/src/types/common';
-import { createMeSchema } from '@/src/utils/schema';
+import { meSchema } from '@/src/utils/schema';
 
-type MeFields = z.infer<ReturnType<typeof createMeSchema>>;
+type MeFields = z.infer<typeof meSchema>;
 
 export default function ProfileForm() {
-  const tCommon = useTranslations('common');
-  const tMe = useTranslations('me');
-  const tValidation = useTranslations('validation');
-
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting, isSubmitted, errors, isValid, isDirty },
   } = useForm<MeFields>({
-    resolver: zodResolver(createMeSchema(tValidation)),
+    resolver: zodResolver(meSchema),
     defaultValues: {
       name: '',
       currentPassword: '',
@@ -76,16 +71,16 @@ export default function ProfileForm() {
         } catch (error) {
           // 401: 현재 비밀번호 불일치 → 인라인 토스트로 안내하고 종료한다.
           if (error instanceof ApiError && error.code === 'INVALID_CREDENTIALS') {
-            showToast(tMe('password.mismatch'), 'error');
+            showToast('현재 비밀번호가 일치하지 않습니다.', 'error');
             return;
           }
           throw error;
         }
       }
 
-      showToast(tCommon('toast.saved'));
+      showToast('저장되었습니다.');
     } catch {
-      showToast(tCommon('toast.saveError'), 'error');
+      showToast('저장에 실패했습니다. 다시 시도해주세요.', 'error');
     }
   };
 
@@ -96,26 +91,26 @@ export default function ProfileForm() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <label htmlFor="email" className="pl-1 text-base font-semibold text-slate-700">
-              {tCommon('fields.email')}
+              이메일
             </label>
             <Input
               id="email"
               name="email"
               type="email"
               value={isLoading ? '' : (me?.email ?? '')}
-              placeholder={isLoading ? tCommon('state.loading') : undefined}
+              placeholder={isLoading ? 'Loading...' : undefined}
               disabled
               className="cursor-not-allowed bg-slate-50"
             />
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="name" className="pl-1 text-base font-semibold text-slate-700">
-              {tCommon('fields.name')}
+              이름
             </label>
             <Input
               id="name"
               type="text"
-              placeholder={isLoading ? tCommon('state.loading') : tCommon('placeholders.name')}
+              placeholder={isLoading ? 'Loading...' : '이름을 입력해주세요'}
               disabled={isLoading}
               variant={errors.name ? 'error' : 'default'}
               aria-invalid={isSubmitted ? (errors.name ? 'true' : 'false') : undefined}
@@ -131,29 +126,20 @@ export default function ProfileForm() {
 
         {/* 비밀번호 변경 */}
         <fieldset>
-          <legend className="mb-2 pl-1 text-base font-semibold text-slate-700">{tMe('password.section')}</legend>
+          <legend className="mb-2 pl-1 text-base font-semibold text-slate-700">비밀번호 변경</legend>
           <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-2">
-              <PasswordInput
-                id="currentPassword"
-                placeholder={tMe('password.currentPlaceholder')}
-                aria-label={tMe('password.currentLabel')}
-                autoComplete="current-password"
-                variant={errors.currentPassword ? 'error' : 'default'}
-                aria-invalid={isSubmitted ? (errors.currentPassword ? 'true' : 'false') : undefined}
-                {...register('currentPassword')}
-              />
-              {errors.currentPassword && (
-                <small className="text-destructive pl-1 text-sm font-medium" role="alert">
-                  {errors.currentPassword.message}
-                </small>
-              )}
-            </div>
+            <PasswordInput
+              id="currentPassword"
+              placeholder="현재 비밀번호를 입력해주세요"
+              aria-label="현재 비밀번호"
+              autoComplete="current-password"
+              {...register('currentPassword')}
+            />
             <div className="flex flex-col gap-2">
               <PasswordInput
                 id="newPassword"
-                placeholder={tMe('password.newPlaceholder')}
-                aria-label={tMe('password.newLabel')}
+                placeholder="새 비밀번호를 입력해주세요"
+                aria-label="새 비밀번호"
                 autoComplete="new-password"
                 variant={errors.password ? 'error' : 'default'}
                 aria-invalid={isSubmitted ? (errors.password ? 'true' : 'false') : undefined}
@@ -168,8 +154,8 @@ export default function ProfileForm() {
             <div className="flex flex-col gap-2">
               <PasswordInput
                 id="confirmPassword"
-                placeholder={tMe('password.confirmPlaceholder')}
-                aria-label={tMe('password.confirmLabel')}
+                placeholder="새 비밀번호를 다시 입력해주세요"
+                aria-label="새 비밀번호 확인"
                 autoComplete="new-password"
                 variant={errors.passwordConfirm ? 'error' : 'default'}
                 aria-invalid={isSubmitted ? (errors.passwordConfirm ? 'true' : 'false') : undefined}
@@ -186,7 +172,7 @@ export default function ProfileForm() {
       </div>
 
       <Button type="submit" disabled={isSubmitting || !isValid} className="h-12 w-full text-base sm:h-14 sm:text-lg">
-        {tCommon('actions.save')}
+        저장하기
       </Button>
     </form>
   );

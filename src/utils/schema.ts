@@ -41,40 +41,30 @@ export const signupSchema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
-// 다국어 메시지를 위해 t(validation 네임스페이스 번역 함수)를 받아 스키마를 생성한다.
-type MeValidationKey =
-  | 'nameRequired'
-  | 'currentPasswordRequired'
-  | 'passwordMin'
-  | 'passwordConfirmRequired'
-  | 'passwordMismatch'
-  | 'passwordSameAsOld';
+export const meSchema = z
+  .object({
+    name: z.string().min(1, { error: '이름을 입력해주세요.' }),
+    currentPassword: z.string(),
+    password: z.string(),
+    passwordConfirm: z.string(),
+  })
+  .superRefine(({ currentPassword, password, passwordConfirm }, ctx) => {
+    // 비밀번호 필드가 모두 비어있으면 비밀번호 미변경으로 보고 검증을 생략한다.
+    if (currentPassword === '' && password === '' && passwordConfirm === '') return;
 
-export const createMeSchema = (t: (key: MeValidationKey) => string) =>
-  z
-    .object({
-      name: z.string().min(1, { error: t('nameRequired') }),
-      currentPassword: z.string(),
-      password: z.string(),
-      passwordConfirm: z.string(),
-    })
-    .superRefine(({ currentPassword, password, passwordConfirm }, ctx) => {
-      // 비밀번호 필드가 모두 비어있으면 비밀번호 미변경으로 보고 검증을 생략한다.
-      if (currentPassword === '' && password === '' && passwordConfirm === '') return;
-
-      // 하나라도 입력되면 비밀번호 변경으로 보고 전체 규칙을 검증한다.
-      if (currentPassword === '') {
-        ctx.addIssue({ code: 'custom', path: ['currentPassword'], message: t('currentPasswordRequired') });
-      }
-      if (password.length < 8) {
-        ctx.addIssue({ code: 'custom', path: ['password'], message: t('passwordMin') });
-      }
-      if (passwordConfirm === '') {
-        ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: t('passwordConfirmRequired') });
-      } else if (password !== passwordConfirm) {
-        ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: t('passwordMismatch') });
-      }
-      if (currentPassword !== '' && currentPassword === password) {
-        ctx.addIssue({ code: 'custom', path: ['password'], message: t('passwordSameAsOld') });
-      }
-    });
+    // 하나라도 입력되면 비밀번호 변경으로 보고 전체 규칙을 검증한다.
+    if (currentPassword === '') {
+      ctx.addIssue({ code: 'custom', path: ['currentPassword'], message: '현재 비밀번호를 입력해주세요.' });
+    }
+    if (password.length < 8) {
+      ctx.addIssue({ code: 'custom', path: ['password'], message: '비밀번호가 8자 이상이 되도록 해 주세요.' });
+    }
+    if (passwordConfirm === '') {
+      ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: '비밀번호 확인을 입력해주세요.' });
+    } else if (password !== passwordConfirm) {
+      ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: '비밀번호가 일치하지 않습니다.' });
+    }
+    if (currentPassword !== '' && currentPassword === password) {
+      ctx.addIssue({ code: 'custom', path: ['password'], message: '기존과 다른 비밀번호를 입력해주세요.' });
+    }
+  });
