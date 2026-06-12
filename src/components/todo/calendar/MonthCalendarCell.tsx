@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import { useCalendarCell } from 'react-aria';
-import { getLocalTimeZone, isToday, type CalendarDate } from '@internationalized/date';
+import { isToday, type CalendarDate } from '@internationalized/date';
 import type { CalendarState } from 'react-stately';
 
 import CalendarTodoChip from '@/src/components/todo/calendar/CalendarTodoChip';
@@ -29,7 +29,8 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
 
   const visible = todos.slice(0, MAX_VISIBLE);
   const overflow = todos.length - MAX_VISIBLE;
-  const today = isToday(date, getLocalTimeZone());
+  // 제품 기준 KST 고정 — 서버(임의 TZ) 렌더와 클라 hydration이 같은 "오늘"을 봐야 한다
+  const today = isToday(date, 'Asia/Seoul');
 
   const content = (
     <>

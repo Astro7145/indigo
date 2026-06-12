@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { getLocalTimeZone, parseDate, startOfMonth, today, type CalendarDate } from '@internationalized/date';
+import { parseDate, startOfMonth, today, type CalendarDate } from '@internationalized/date';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -50,9 +50,11 @@ export default function CalendarView() {
     setGoalId(id);
     window.history.replaceState(null, '', id === null ? '/calendar' : `/calendar?goalId=${id}`);
   };
-  const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
+  // "오늘"은 제품 기준인 KST로 고정 — 서버(임의 TZ)와 클라가 같은 달을 계산해야
+  // SSR 렌더가 prefetch된 월 범위 키와 일치하고 hydration도 안정된다.
+  const [selectedDate, setSelectedDate] = useState<CalendarDate>(() => today('Asia/Seoul'));
   // 보이는 달의 기준(react-aria 포커스 날짜) — 월 범위 쿼리의 suspense 리마운트에도 보이는 달을 보존한다.
-  const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => today(getLocalTimeZone()));
+  const [focusedDate, setFocusedDate] = useState<CalendarDate>(() => today('Asia/Seoul'));
   // 월 이동으로 선택 날짜가 새 그리드 범위를 벗어나면 범위 안으로 클램프 —
   // 범위 밖 날짜의 할일은 보이는 달 쿼리에 없어 선택 리스트가 거짓 빈 상태가 된다.
   // (from/to는 YYYY-MM-DD라 문자열 비교가 날짜 순서와 일치)
