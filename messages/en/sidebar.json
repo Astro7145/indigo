@@ -1,4 +1,4 @@
-﻿{
+{
   "nav": {
     "dashboard": "Dashboard",
     "calendar": "Calendar",
@@ -10,7 +10,7 @@
   "expand": "Expand sidebar",
   "collapse": "Collapse sidebar",
   "menuCollapse": "Collapse menu",
-  "newTodo": "New TODO",
+  "newTodo": "Add TODO",
   "goal": {
     "title": "Goals",
     "add": "Add Goal",

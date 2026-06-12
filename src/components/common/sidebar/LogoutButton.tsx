@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useLogout } from '@/src/hooks/auth';
 import SidebarRow from './SidebarRow';
@@ -14,10 +15,11 @@ import SidebarRow from './SidebarRow';
 export default function LogoutButton({ collapsed }: { collapsed?: boolean }) {
   const { mutate } = useLogout();
   const router = useRouter();
+  const t = useTranslations('sidebar');
 
   const handleLogout = () => {
     mutate(undefined, { onSettled: () => router.replace('/login') });
   };
 
-  return <SidebarRow type="logout" text="로그아웃" collapsed={collapsed} onClick={handleLogout} />;
+  return <SidebarRow type="logout" text={t('nav.logout')} collapsed={collapsed} onClick={handleLogout} />;
 }

@@ -1,1 +1,15 @@
-{}
+{
+  "titleRequired": "タイトルを入力してください。",
+  "titleMax": "タイトルは30文字以内で入力してください。",
+  "dueDateRequired": "締め切り日を選択してください。",
+  "urlInvalid": "正しいURLを入力してください。",
+  "emailInvalid": "正しいメールアドレスを入力してください。",
+  "passwordRequired": "パスワードは必須入力です。",
+  "nameRequired": "名前を入力してください。",
+  "nameMax": "名前は20文字以内で入力してください。",
+  "passwordMin": "パスワードは8文字以上にしてください。",
+  "passwordConfirmRequired": "パスワードの確認を入力してください。",
+  "passwordMismatch": "パスワードが一致しません。",
+  "currentPasswordRequired": "現在のパスワードを入力してください。",
+  "passwordSameAsOld": "以前と異なるパスワードを入力してください。"
+}

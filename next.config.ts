@@ -3,6 +3,7 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  transpilePackages: ['next-intl'],
   allowedDevOrigins: ['192.168.*.*'],
   images: {
     // 업로드 이미지/아바타 호스트가 가변적이라 전체 https 허용. 호스트 확정 시 좁힐 것.

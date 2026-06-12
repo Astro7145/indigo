@@ -1,5 +1,5 @@
-﻿{
-  "title": "{name}\u0027s Dashboard",
+{
+  "title": "Dashboard",
   "recentTodos": {
     "title": "Recent TODOs",
     "empty": "No recent todos"

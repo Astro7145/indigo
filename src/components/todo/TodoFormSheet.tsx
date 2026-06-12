@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import BottomSheet from '@/src/components/common/BottomSheet';
@@ -17,6 +18,7 @@ export default function TodoFormSheet(props: TodoFormSheetProps) {
   const { isOpen, onClose } = props;
   const isMobile = useIsMobile();
   const [showConfirm, setShowConfirm] = useState(false);
+  const tc = useTranslations('common');
 
   const requestClose = () => setShowConfirm(true);
   const confirmClose = () => {
@@ -48,11 +50,11 @@ export default function TodoFormSheet(props: TodoFormSheetProps) {
         closeOnBackdropClick={false}
         className="w-[400px] pt-8 pb-6 sm:w-[400px] sm:pt-10 sm:pb-8"
       >
-        <Modal.Title className="text-center">정말 나가시겠어요?</Modal.Title>
-        <p className="my-5 text-center text-sm text-slate-500">작성 중인 내용이 사라집니다.</p>
+        <Modal.Title className="text-center">{tc('discard.title')}</Modal.Title>
+        <p className="my-5 text-center text-sm text-slate-500">{tc('discard.warning')}</p>
         <Modal.Actions className="mt-2">
-          <Modal.Cancel onClick={() => setShowConfirm(false)}>아니오</Modal.Cancel>
-          <Modal.Confirm onClick={confirmClose}>예</Modal.Confirm>
+          <Modal.Cancel onClick={() => setShowConfirm(false)}>{tc('discard.cancel')}</Modal.Cancel>
+          <Modal.Confirm onClick={confirmClose}>{tc('discard.confirm')}</Modal.Confirm>
         </Modal.Actions>
       </Modal>
     </>

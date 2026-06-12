@@ -1,1 +1,41 @@
-{}
+{
+  "title": "コミュニティ掲示板",
+  "viewCount": "閲覧 {count}",
+  "commentCount": "コメント {count}件",
+  "empty": "まだ投稿がありません。",
+  "loadError": "投稿を読み込めませんでした。",
+  "loadMoreError": "追加の読み込みに失敗しました。",
+  "searchPlaceholder": "気になる内容を検索してください",
+  "searchLabel": "投稿検索",
+  "sortLatest": "新しい順",
+  "sortPopular": "人気順",
+  "detail": {
+    "deleteTitle": "投稿を削除しますか？",
+    "deleteError": "投稿の削除に失敗しました。"
+  },
+  "form": {
+    "createTitle": "投稿",
+    "editTitle": "編集",
+    "submitCreate": "登録する",
+    "titlePlaceholder": "タイトルを入力してください",
+    "titleLabel": "タイトル",
+    "contentPlaceholder": "ここから内容を入力してください",
+    "imageSelect": "画像ファイルを選択",
+    "cancelTitle": "投稿の作成をキャンセルしますか？",
+    "createError": "投稿の登録に失敗しました。",
+    "updateError": "投稿の編集に失敗しました。"
+  },
+  "comment": {
+    "title": "コメント",
+    "empty": "まだコメントがありません。最初のコメントを残してみてください！",
+    "placeholder": "コメントを入力してください。",
+    "inputLabel": "コメント入力",
+    "submit": "登録",
+    "mine": "自分のコメント",
+    "editLabel": "コメントを編集",
+    "deleteTitle": "コメントを削除しますか？",
+    "createError": "コメントの登録に失敗しました。",
+    "updateError": "コメントの編集に失敗しました。",
+    "deleteError": "コメントの削除に失敗しました。"
+  }
+}

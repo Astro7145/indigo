@@ -1,1 +1,34 @@
-{}
+{
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "calendar": "カレンダー",
+    "posts": "コミュニティ",
+    "favorites": "お気に入り",
+    "settings": "設定",
+    "logout": "ログアウト"
+  },
+  "expand": "サイドバーを展開",
+  "collapse": "サイドバーを折りたたむ",
+  "menuCollapse": "メニューを折りたたむ",
+  "newTodo": "新しいTODO",
+  "goal": {
+    "title": "目標",
+    "add": "目標を追加",
+    "inputPlaceholder": "新しい目標を入力してください",
+    "inputLabel": "新しい目標の入力",
+    "empty": "目標がありません"
+  },
+  "notification": {
+    "title": "通知",
+    "refresh": "通知リストを更新",
+    "deleteAll": "すべて削除",
+    "readAll": "すべて既読",
+    "readAllLabel": "すべての通知を既読にする",
+    "listLabel": "通知リスト",
+    "loadMore": "もっと見る",
+    "loadMoreLabel": "過去の通知をさらに読み込む",
+    "empty": "まだ通知がありません",
+    "unreadLabel": "未読の通知: {message}",
+    "avatarAlt": "通知プロフィール画像"
+  }
+}

@@ -1,1 +1,107 @@
-{}
+{
+  "state": {
+    "loading": "読み込み中…",
+    "loadError": "読み込めませんでした",
+    "noSearchResults": "検索結果がありません"
+  },
+  "tabs": {
+    "all": "ALL",
+    "todo": "TO DO",
+    "done": "DONE"
+  },
+  "actions": {
+    "edit": "編集する",
+    "update": "編集",
+    "delete": "削除する",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "close": "閉じる",
+    "save": "保存する",
+    "more": "もっと見る",
+    "writeNote": "ノートを書く",
+    "viewAll": "すべて見る"
+  },
+  "fields": {
+    "email": "メール",
+    "password": "パスワード",
+    "name": "名前"
+  },
+  "placeholders": {
+    "email": "メールを入力してください",
+    "password": "パスワードを入力してください",
+    "name": "名前を入力してください"
+  },
+  "social": {
+    "divider": "SNSアカウントでログイン",
+    "google": "Googleでログイン",
+    "kakao": "Kakaoでログイン"
+  },
+  "toast": {
+    "saved": "保存されました。",
+    "saveError": "保存に失敗しました。もう一度お試しください。"
+  },
+  "discard": {
+    "title": "本当に離脱しますか？",
+    "warning": "作成中の内容が消えます。",
+    "confirm": "はい",
+    "cancel": "いいえ"
+  },
+  "deleteConfirm": {
+    "title": "本当に削除しますか？"
+  },
+  "charCount": "空白含む {total}文字 | 空白除く {nonSpace}文字",
+  "cancelWarning": "作成したすべての内容が消えます。",
+  "moreMenu": "もっと見るメニュー",
+  "linkDelete": "リンクを削除",
+  "imageDelete": "画像を削除",
+  "linkUploadPlaceholder": "リンクをアップロードしてください",
+  "relativeTime": {
+    "justNow": "たった今",
+    "minutes": "{count}分前",
+    "hours": "{count}時間前",
+    "days": "{count}日前",
+    "weeks": "{count}週間前",
+    "months": "{count}ヶ月前"
+  },
+  "search": {
+    "placeholder": "TODOを検索してください",
+    "label": "TODO検索",
+    "button": "検索"
+  },
+  "passwordToggle": {
+    "show": "パスワードを表示",
+    "hide": "パスワードを隠す"
+  },
+  "file": {
+    "selected": "{fileName} 選択済み",
+    "removed": "ファイルが削除されました",
+    "placeholder": "ファイルを選択してください",
+    "delete": "ファイルを削除"
+  },
+  "image": {
+    "attachmentAlt": "添付画像",
+    "removed": "画像が削除されました",
+    "selectedAlt": "選択された画像: {fileName}",
+    "existingAlt": "既存の画像",
+    "attach": "画像を添付"
+  },
+  "editor": {
+    "bold": "太字",
+    "italic": "斜体",
+    "underline": "下線",
+    "alignLeft": "左揃え",
+    "alignCenter": "中央揃え",
+    "alignRight": "右揃え",
+    "bulletList": "リスト",
+    "insertImage": "画像を挿入",
+    "insertLink": "リンクを挿入"
+  },
+  "todoList": {
+    "note": "ノート",
+    "link": "リンク"
+  },
+  "favorite": {
+    "add": "お気に入り",
+    "remove": "お気に入り解除"
+  }
+}
