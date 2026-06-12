@@ -1,3 +1,8 @@
+const mockSearchParams = new URLSearchParams();
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
 jest.mock('@/src/api/todo', () => ({
   ...jest.requireActual('@/src/api/todo'),
   getAllTodos: jest.fn(),
@@ -65,6 +70,7 @@ const isoToday = () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockSearchParams.delete('goalId');
   mockedUser.getMe.mockResolvedValue({
     id: 1,
     name: '체다치즈',
@@ -115,10 +121,20 @@ it('목표 필터를 선택하면 해당 목표의 할일만 남는다', async (
   expect(window.location.search).toBe('?goalId=5');
 });
 
-it('initialGoalId 프리셋으로 진입하면 해당 목표만 표시한다', async () => {
-  renderWithClient(<CalendarView initialGoalId={5} />);
+it('goalId 쿼리로 진입하면 해당 목표만 표시한다', async () => {
+  mockSearchParams.set('goalId', '5');
+  renderWithClient(<CalendarView />);
   expect((await screen.findAllByText('목표 할일')).length).toBeGreaterThan(0);
   expect(screen.queryAllByText('오늘 할일')).toHaveLength(0);
+});
+
+it('뒤로가기 등으로 URL의 goalId가 바뀌면 필터가 따라간다', async () => {
+  const { rerender } = renderWithClient(<CalendarView />);
+  await screen.findAllByText('오늘 할일');
+  mockSearchParams.set('goalId', '5');
+  rerender(<CalendarView />);
+  await waitFor(() => expect(screen.queryAllByText('오늘 할일')).toHaveLength(0));
+  expect(screen.getAllByText('목표 할일').length).toBeGreaterThan(0);
 });
 
 it('칩을 클릭하면 상세 시트가 열린다', async () => {

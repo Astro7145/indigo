@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useLocale } from 'react-aria';
 import {
   endOfMonth,
@@ -31,9 +32,10 @@ import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
 
 const statusMessageClass = 'py-16 text-center text-sm text-slate-400';
 
-export interface CalendarViewProps {
-  /** 목표 상세 "캘린더 보기" 진입(`/calendar?goalId=X`) 프리셋 — 파싱·검증과 변경 시 리마운트(key)는 page 담당 */
-  initialGoalId?: number;
+/** `?goalId=` 파싱 — 잘못된 값(비정수·0 이하)은 전체 목표 */
+function parseGoalId(raw: string | null): number | null {
+  const n = Number(raw);
+  return raw !== null && Number.isInteger(n) && n > 0 ? n : null;
 }
 
 /**
@@ -42,8 +44,17 @@ export interface CalendarViewProps {
  * (월 네비는 react-aria 상태와 결합돼 있어 chrome으로 분리하지 않음 — GoalTodoBoard의 전체 경계와 동일 판단).
  * 모바일 페이지 타이틀은 GNB(usePageTitle)가 담당 → 헤더는 sm+ 노출, 모바일은 하단 풀폭 추가 버튼.
  */
-export default function CalendarView({ initialGoalId }: CalendarViewProps) {
-  const [goalId, setGoalId] = useState<number | null>(initialGoalId ?? null);
+export default function CalendarView() {
+  // 목표 필터의 단일 소스는 URL — prop으로 받으면 뒤로가기 시 라우터 캐시의 옛 RSC 페이로드(옛 prop)와
+  // 현재 URL이 어긋나 필터가 적용되지 않는다. 동적 라우트라 useSearchParams는 SSR에서도 실제 값을 준다.
+  const urlGoalId = parseGoalId(useSearchParams().get('goalId'));
+  const [goalId, setGoalId] = useState<number | null>(urlGoalId);
+  const [syncedGoalId, setSyncedGoalId] = useState<number | null>(urlGoalId);
+  // 뒤로가기/앞으로가기로 URL이 바뀌면 필터를 URL에 맞춘다 (렌더 중 보정 — derived state 패턴)
+  if (urlGoalId !== syncedGoalId) {
+    setSyncedGoalId(urlGoalId);
+    setGoalId(urlGoalId);
+  }
   // 필터 변경을 URL에도 반영(셸로우) — 서버 왕복·리마운트 없이 새로고침/공유 시 현재 필터가 보존된다.
   const changeGoalId = (id: number | null) => {
     setGoalId(id);
