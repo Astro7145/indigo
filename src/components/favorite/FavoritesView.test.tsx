@@ -1,3 +1,8 @@
+const mockSearchParams = new URLSearchParams();
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
 const mockOpenCreate = jest.fn();
 const mockOpenEdit = jest.fn();
 const mockOpenDetail = jest.fn();
@@ -102,6 +107,7 @@ const makeGoal = (id: number, title: string): GoalListItem => ({
 const goalPage = (goals: GoalListItem[]): GoalListResponse => ({ goals, nextCursor: null, totalCount: goals.length });
 
 beforeEach(() => {
+  mockSearchParams.delete('tab');
   jest.resetAllMocks();
   // 기본값: 목표 목록은 비어 있음.
   goal.getAllGoals.mockResolvedValue(goalPage([]));
@@ -223,17 +229,18 @@ it('행을 클릭하면 상세 시트가 열린다', async () => {
   expect(mockOpenDetail).toHaveBeenCalledTimes(1);
 });
 
-it('initialTab=todo면 TO DO 탭으로 시작해 미완료만 보인다 (#104)', async () => {
+it('?tab=todo로 진입하면 TO DO 탭으로 시작해 미완료만 보인다', async () => {
+  mockSearchParams.set('tab', 'todo');
   goal.getAllGoals.mockResolvedValue(goalPage([]));
   fav.getFavoriteTodos.mockResolvedValue(
     favList([makeFav(1, 101, '미완료 A', false), makeFav(2, 102, '완료 B', true)]),
   );
-  renderWithClient(<FavoritesView initialTab="todo" />);
+  renderWithClient(<FavoritesView />);
   expect(await screen.findByText('미완료 A')).toBeInTheDocument();
   expect(screen.queryByText('완료 B')).not.toBeInTheDocument();
 });
 
-it('탭을 바꾸면 URL이 셸로우로 동기화된다 (#104)', async () => {
+it('탭을 바꾸면 URL이 셸로우로 동기화된다', async () => {
   goal.getAllGoals.mockResolvedValue(goalPage([]));
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '미완료 A', false)]));
   renderWithClient(<FavoritesView />);

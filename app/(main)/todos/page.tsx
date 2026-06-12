@@ -7,7 +7,7 @@ import { todosListParams, parseTodosTab } from '@/src/components/todo/todosTab';
 
 /**
  * 모든 할 일 라우트(`/todos`). 서버 셸 — `?tab=`을 파싱해 해당 탭의 첫 페이지를
- * prefetch하고, `key`로 쿼리 변경 시 본문을 리마운트해 탭 초기값이 항상 URL과 일치한다.
+ * prefetch한다. 탭 상태 자체는 본문이 useSearchParams로 직접 읽는다(뒤로가기 시 prop 어긋남 방지).
  */
 export default async function TodosPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { tab: raw } = await searchParams;
@@ -18,7 +18,7 @@ export default async function TodosPage({ searchParams }: { searchParams: Promis
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <TodosView key={tab} initialTab={tab} />
+      <TodosView />
     </HydrationBoundary>
   );
 }

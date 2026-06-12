@@ -1,3 +1,8 @@
+const mockSearchParams = new URLSearchParams();
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
 const mockOpenCreate = jest.fn();
 const mockOpenEdit = jest.fn();
 const mockOpenDetail = jest.fn();
@@ -85,6 +90,7 @@ class MockIO {
 
 beforeEach(() => {
   jest.resetAllMocks();
+  mockSearchParams.delete('tab');
   lastIoCallback = null;
   (globalThis as unknown as { IntersectionObserver: typeof IntersectionObserver }).IntersectionObserver =
     MockIO as unknown as typeof IntersectionObserver;
@@ -183,14 +189,15 @@ it('sentinel 교차 시 fetchNextPage가 호출되어 두 번째 페이지를 �
   expect(await screen.findByText('할일 B')).toBeInTheDocument();
 });
 
-it('initialTab=done이면 DONE 탭이 활성화되고 done 파라미터로 조회한다 (#104)', async () => {
+it('?tab=done으로 진입하면 DONE 탭이 활성화되고 done 파라미터로 조회한다', async () => {
+  mockSearchParams.set('tab', 'done');
   mocked.getTodos.mockResolvedValue(page([], null, 0));
-  renderWithClient(<TodosView initialTab="done" />);
+  renderWithClient(<TodosView />);
   await screen.findByText('완료한 일이 아직 없어요');
   expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ done: 'true' }));
 });
 
-it('탭을 바꾸면 URL이 셸로우로 동기화된다 (#104)', async () => {
+it('탭을 바꾸면 URL이 셸로우로 동기화된다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
   renderWithClient(<TodosView />);
   await screen.findByText('아직 등록한 할 일이 없어요');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -10,7 +11,7 @@ import TodoList from '@/src/components/common/todo-list/TodoList';
 import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import { todosListParams as listParams, type TodosTab } from '@/src/components/todo/todosTab';
+import { parseTodosTab, todosListParams as listParams, type TodosTab } from '@/src/components/todo/todosTab';
 
 type Tab = TodosTab;
 const EMPTY_MSG_BY_TAP = {
@@ -24,8 +25,16 @@ const EMPTY_MSG_BY_TAP = {
  * ALL/TO DO/DONE 탭으로 `done` 파라미터 매핑, 40개씩 무한 스크롤, 행 등장 애니메이션.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
-export default function TodosView({ initialTab = 'all' }: { initialTab?: TodosTab }) {
-  const [tab, setTab] = useState<Tab>(initialTab);
+export default function TodosView() {
+  // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
+  const urlTab = parseTodosTab(useSearchParams().get('tab') ?? undefined);
+  const [tab, setTab] = useState<Tab>(urlTab);
+  const [syncedTab, setSyncedTab] = useState<Tab>(urlTab);
+  // 뒤로가기/앞으로가기로 URL이 바뀌면 탭을 URL에 맞춘다 (렌더 중 보정)
+  if (urlTab !== syncedTab) {
+    setSyncedTab(urlTab);
+    setTab(urlTab);
+  }
   // 탭을 URL에도 반영(셸로우) — 서버 왕복 없이 새로고침/공유 시 현재 탭이 보존된다.
   const changeTab = (next: Tab) => {
     setTab(next);

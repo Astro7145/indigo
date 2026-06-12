@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
@@ -12,7 +13,7 @@ import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import type { FavoritesTab } from '@/src/components/favorite/favoritesTab';
+import { parseFavoritesTab, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
 import type { FavoriteTodo } from '@/src/types/favorite';
 
 type Tab = FavoritesTab;
@@ -35,8 +36,16 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  * 불러와(`limit: 100`) 탭·목표 필터를 **클라이언트**에서 처리한다 — 전체가 로드돼 있어 필터·카운트가 정확하다.
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
-export default function FavoritesView({ initialTab = 'all' }: { initialTab?: FavoritesTab }) {
-  const [tab, setTab] = useState<Tab>(initialTab);
+export default function FavoritesView() {
+  // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
+  const urlTab = parseFavoritesTab(useSearchParams().get('tab') ?? undefined);
+  const [tab, setTab] = useState<Tab>(urlTab);
+  const [syncedTab, setSyncedTab] = useState<Tab>(urlTab);
+  // 뒤로가기/앞으로가기로 URL이 바뀌면 탭을 URL에 맞춘다 (렌더 중 보정)
+  if (urlTab !== syncedTab) {
+    setSyncedTab(urlTab);
+    setTab(urlTab);
+  }
   // 탭을 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없음.
   const changeTab = (next: Tab) => {
     setTab(next);
