@@ -1,6 +1,8 @@
 import type { JSONContent } from '@tiptap/core';
 import { act, renderHook } from '@testing-library/react';
+import type { ReactElement } from 'react';
 
+import { useModalStore } from '@/src/stores/modal';
 import { useToastStore } from '@/src/stores/toast';
 
 import { loadDraft, saveDraft } from './noteDraftStorage';
@@ -11,68 +13,80 @@ const content: JSONContent = {
   content: [{ type: 'paragraph', content: [{ type: 'text', text: '임시 본문' }] }],
 };
 
+// 최상단 스택 엔트리의 render를 controls와 함께 호출해 콘텐츠(NoteDraftPrompt)의 props를 꺼낸다.
+type PromptProps = { onDismiss: () => void; onConfirm: () => void };
+const renderTopEntry = () => {
+  const { modals } = useModalStore.getState();
+  const entry = modals[modals.length - 1];
+  return entry.render({
+    close: () => useModalStore.getState().close(),
+    closeWithParent: () => useModalStore.getState().closeWithParent(),
+  }) as ReactElement<PromptProps>;
+};
+
 beforeEach(() => {
   localStorage.clear();
+  useModalStore.setState({ modals: [] });
   useToastStore.setState({ isOpen: false, message: '', variant: 'success' });
 });
 
-it('편집 진입 시 저장된 초안이 있으면 불러오기 프롬프트가 열린다', () => {
+it('편집 진입 시 저장된 초안이 있으면 불러오기 프롬프트가 스택에 열린다', () => {
   saveDraft(12, { title: '임시 제목', content });
 
-  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft: jest.fn() }));
+  renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft: jest.fn() }));
 
-  expect(result.current.promptOpen).toBe(true);
+  expect(useModalStore.getState().modals).toHaveLength(1);
 });
 
 it('저장된 초안이 없으면 프롬프트가 열리지 않는다', () => {
-  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft: jest.fn() }));
+  renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft: jest.fn() }));
 
-  expect(result.current.promptOpen).toBe(false);
+  expect(useModalStore.getState().modals).toHaveLength(0);
 });
 
 it('읽기 모드에선 초안이 있어도 프롬프트가 열리지 않는다', () => {
   saveDraft(12, { title: '임시 제목', content });
 
-  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: false, applyDraft: jest.fn() }));
+  renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: false, applyDraft: jest.fn() }));
 
-  expect(result.current.promptOpen).toBe(false);
+  expect(useModalStore.getState().modals).toHaveLength(0);
 });
 
 it('읽기→편집 전환 시 저장된 초안이 있으면 프롬프트가 열린다', () => {
   saveDraft(12, { title: '임시 제목', content });
 
-  const { result, rerender } = renderHook(
+  const { rerender } = renderHook(
     ({ editing }) => useNoteDraftPersistence({ todoId: 12, editing, applyDraft: jest.fn() }),
     { initialProps: { editing: false } },
   );
-  expect(result.current.promptOpen).toBe(false);
+  expect(useModalStore.getState().modals).toHaveLength(0);
 
   rerender({ editing: true });
-  expect(result.current.promptOpen).toBe(true);
+  expect(useModalStore.getState().modals).toHaveLength(1);
 });
 
 it('불러오기 확인 시 저장된 초안을 적용하고 프롬프트를 닫는다', () => {
   saveDraft(12, { title: '임시 제목', content });
   const applyDraft = jest.fn();
 
-  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft }));
+  renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft }));
 
-  act(() => result.current.confirmLoad());
+  act(() => renderTopEntry().props.onConfirm());
 
   expect(applyDraft).toHaveBeenCalledWith(expect.objectContaining({ title: '임시 제목', content }));
-  expect(result.current.promptOpen).toBe(false);
+  expect(useModalStore.getState().modals).toHaveLength(0);
 });
 
 it('불러오기를 닫으면 초안을 적용하지 않고 프롬프트만 닫는다', () => {
   saveDraft(12, { title: '임시 제목', content });
   const applyDraft = jest.fn();
 
-  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft }));
+  renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft }));
 
-  act(() => result.current.dismissPrompt());
+  act(() => renderTopEntry().props.onDismiss());
 
   expect(applyDraft).not.toHaveBeenCalled();
-  expect(result.current.promptOpen).toBe(false);
+  expect(useModalStore.getState().modals).toHaveLength(0);
   // 닫아도 초안 자체는 유지된다
   expect(loadDraft(12)).not.toBeNull();
 });

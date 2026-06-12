@@ -1,16 +1,17 @@
 'use client';
 
 import type { JSONContent } from '@tiptap/core';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
 import Button from '@/src/components/common/buttons/Button';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
-import Modal from '@/src/components/common/modal/Modal';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
+import NoteCancelConfirm from '@/src/components/note/todo-note/NoteCancelConfirm';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
 import { useNoteDraft } from '@/src/components/note/todo-note/useNoteDraft';
 import { useNoteDraftPersistence } from '@/src/components/note/todo-note/useNoteDraftPersistence';
 import { useNoteSubmit } from '@/src/components/note/todo-note/useNoteSubmit';
+import { useModalStore } from '@/src/stores/modal';
 import type { Note } from '@/src/types/note';
 import type { Todo } from '@/src/types/todo';
 
@@ -71,15 +72,28 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
       onComplete();
     },
   });
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const editorRef = useRef<NoteContentEditorHandle>(null);
 
   const handleCancel = () => {
-    if (isDirty) {
-      setIsCancelModalOpen(true);
+    if (!isDirty) {
+      onCancel();
       return;
     }
-    onCancel();
+    // 작성 내용이 있으면 곧장 닫지 않고 취소 확인을 모달 스택에 띄운다.
+    useModalStore.getState().open(
+      (controls) => (
+        <NoteCancelConfirm
+          isCreate={isCreate}
+          onStay={controls.close}
+          // onCancel은 모달을 닫지 않으므로(모드 토글/라우팅) 엔트리를 직접 pop 한다.
+          onLeave={() => {
+            controls.close();
+            onCancel();
+          }}
+        />
+      ),
+      { variant: 'modal', className: 'h-[178px] sm:h-[250px]' },
+    );
   };
 
   const handleSubmit = () => {
@@ -210,40 +224,6 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
           공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
         </div>
       </div>
-
-      <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">
-          {isCreate ? '노트 작성을 취소하시겠어요?' : '노트 수정을 취소하시겠어요?'}
-        </Modal.Title>
-        <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
-          <span
-            aria-hidden
-            className="inline-flex size-4 items-center justify-center rounded-full border border-red-500 text-[10px] sm:size-5 sm:text-xs"
-          >
-            !
-          </span>
-          작성하신 모든 내용이 사라집니다.
-        </p>
-        <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
-          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={onCancel}>
-            확인
-          </Modal.Confirm>
-        </Modal.Actions>
-      </Modal>
-
-      <Modal open={draft.promptOpen} onClose={draft.dismissPrompt} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">임시 저장된 노트가 있어요</Modal.Title>
-        <p className="mt-1 mb-6 text-center text-xs font-medium text-slate-500 sm:mb-10 sm:text-base">
-          이어서 작성하시겠어요?
-        </p>
-        <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">새로 쓰기</Modal.Cancel>
-          <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={draft.confirmLoad}>
-            불러오기
-          </Modal.Confirm>
-        </Modal.Actions>
-      </Modal>
     </div>
   );
 }

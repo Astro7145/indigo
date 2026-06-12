@@ -41,12 +41,31 @@ jest.mock('./NoteContentEditor', () => ({
   ),
 }));
 
+// 모달은 전역 스택(ModalStack)을 통해 렌더된다. auto variant를 데스크탑(Modal)로 고정하고,
+// BottomSheet 내부 motion/react-aria를 jsdom에서 단순화한다(ModalStack.test와 동일).
+jest.mock('@/src/hooks/useIsMobile', () => ({ useIsMobile: () => false }));
+jest.mock('motion/react', () => ({
+  motion: {
+    div: ({ children, onClick, onKeyDown, className, style }: React.HTMLAttributes<HTMLDivElement>) => (
+      <div onClick={onClick} onKeyDown={onKeyDown} className={className} style={style}>
+        {children}
+      </div>
+    ),
+  },
+  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useDragControls: () => ({ start: jest.fn() }),
+  usePresence: () => [true, () => {}],
+}));
+jest.mock('react-aria', () => ({ usePreventScroll: jest.fn() }));
+
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { createNote, patchNote } from '@/src/api/note';
+import ModalStack from '@/src/components/common/modal/ModalStack';
 import NoteWorkspace from './NoteWorkspace';
 import { loadDraft, saveDraft } from './noteDraftStorage';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
+import { useModalStore } from '@/src/stores/modal';
 import { useToastStore } from '@/src/stores/toast';
 import type { Note } from '@/src/types/note';
 
@@ -90,6 +109,7 @@ const existingNote: Note = {
 beforeEach(() => {
   jest.clearAllMocks();
   localStorage.clear();
+  useModalStore.setState({ modals: [] });
   useToastStore.setState({ isOpen: false, message: '', variant: 'success' });
 });
 
@@ -215,14 +235,17 @@ it('수정: 변경한 채로 취소하면 확인 후 취소 콜백을 부른다'
   const onCancel = jest.fn();
 
   renderWithClient(
-    <NoteWorkspace
-      todoId={12}
-      note={existingNote}
-      mode="edit"
-      onEdit={() => {}}
-      onComplete={() => {}}
-      onCancel={onCancel}
-    />,
+    <>
+      <NoteWorkspace
+        todoId={12}
+        note={existingNote}
+        mode="edit"
+        onEdit={() => {}}
+        onComplete={() => {}}
+        onCancel={onCancel}
+      />
+      <ModalStack />
+    </>,
   );
 
   fireEvent.change(screen.getByLabelText('제목'), { target: { value: '바뀐 제목' } });
@@ -280,7 +303,10 @@ it('저장된 초안이 있으면 작성 진입 시 불러오기를 묻고, 불�
   });
 
   renderWithClient(
-    <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />,
+    <>
+      <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />
+      <ModalStack />
+    </>,
   );
 
   fireEvent.click(screen.getByRole('button', { name: '불러오기' }));
