@@ -63,6 +63,19 @@ describe('ProfileForm i18n', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('validation.nameRequired');
   });
 
+  it('새 비밀번호만 입력하고 현재 비밀번호를 비워 두면 currentPasswordRequired 메시지를 보여준다', async () => {
+    render(<ProfileForm />);
+
+    await screen.findByDisplayValue('체다치즈');
+    fireEvent.change(screen.getByPlaceholderText('me.password.newPlaceholder'), { target: { value: 'newpass123' } });
+    const currentPasswordInput = screen.getByPlaceholderText('me.password.currentPlaceholder');
+    fireEvent.focus(currentPasswordInput);
+    fireEvent.blur(currentPasswordInput);
+
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts.map((el) => el.textContent)).toContain('validation.currentPasswordRequired');
+  });
+
   it('저장 성공 시 common 카탈로그의 saved 토스트를 띄운다', async () => {
     render(<ProfileForm />);
 

@@ -133,13 +133,22 @@ export default function ProfileForm() {
         <fieldset>
           <legend className="mb-2 pl-1 text-base font-semibold text-slate-700">{tMe('password.section')}</legend>
           <div className="flex flex-col gap-3">
-            <PasswordInput
-              id="currentPassword"
-              placeholder={tMe('password.currentPlaceholder')}
-              aria-label={tMe('password.currentLabel')}
-              autoComplete="current-password"
-              {...register('currentPassword')}
-            />
+            <div className="flex flex-col gap-2">
+              <PasswordInput
+                id="currentPassword"
+                placeholder={tMe('password.currentPlaceholder')}
+                aria-label={tMe('password.currentLabel')}
+                autoComplete="current-password"
+                variant={errors.currentPassword ? 'error' : 'default'}
+                aria-invalid={isSubmitted ? (errors.currentPassword ? 'true' : 'false') : undefined}
+                {...register('currentPassword')}
+              />
+              {errors.currentPassword && (
+                <small className="text-destructive pl-1 text-sm font-medium" role="alert">
+                  {errors.currentPassword.message}
+                </small>
+              )}
+            </div>
             <div className="flex flex-col gap-2">
               <PasswordInput
                 id="newPassword"
