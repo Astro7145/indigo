@@ -10,7 +10,7 @@ import { useIsMobile } from '@/src/hooks/useIsMobile';
 import type { Todo } from '@/src/types/todo';
 
 type TodoFormSheetProps =
-  | { mode: 'create'; isOpen: boolean; onClose: () => void; defaultGoalId?: number }
+  | { mode: 'create'; isOpen: boolean; onClose: () => void; defaultGoalId?: number; defaultDueDate?: string }
   | { mode: 'update'; isOpen: boolean; onClose: () => void; todo: Todo | null };
 
 export default function TodoFormSheet(props: TodoFormSheetProps) {
@@ -26,7 +26,12 @@ export default function TodoFormSheet(props: TodoFormSheetProps) {
 
   const content =
     props.mode === 'create' ? (
-      <TodoCreateContainer defaultGoalId={props.defaultGoalId} onClose={onClose} onCancel={requestClose} />
+      <TodoCreateContainer
+        defaultGoalId={props.defaultGoalId}
+        defaultDueDate={props.defaultDueDate}
+        onClose={onClose}
+        onCancel={requestClose}
+      />
     ) : props.todo ? (
       <TodoUpdateContainer todo={props.todo} onClose={onClose} onCancel={requestClose} />
     ) : null;
