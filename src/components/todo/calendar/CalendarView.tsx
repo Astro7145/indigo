@@ -29,7 +29,7 @@ function parseGoalId(raw: string | null): number | null {
 }
 
 /**
- * /calendar 본문 — 월 그리드에 dueDate 기준으로 할일 표시. 이슈 #150.
+ * /calendar 본문 — 월 그리드에 dueDate 기준으로 할일 표시.
  * 선택 날짜·목표 필터·시트 상태를 소유하고, 데이터 본문(월 네비+그리드+선택 리스트)을 AsyncBoundary로 감싼다
  * (월 네비는 react-aria 상태와 결합돼 있어 chrome으로 분리하지 않음 — GoalTodoBoard의 전체 경계와 동일 판단).
  * 모바일 페이지 타이틀은 GNB(usePageTitle)가 담당 → 헤더는 sm+ 노출, 모바일은 하단 풀폭 추가 버튼.
@@ -148,7 +148,7 @@ function CalendarContent({
     calendarGridRange(startOfMonth(focusedDate).subtract({ months: 1 })),
     calendarGridRange(startOfMonth(focusedDate).add({ months: 1 })),
   ]);
-  // 필터 드롭다운 — favorites 페이지와 동일 패턴 (공용 추출은 #150 범위 제외)
+  // 필터 드롭다운 — favorites 페이지와 동일 패턴
   const { data: goalData } = useGoalList({ limit: 100 });
   const goals = goalData?.goals ?? [];
   const selectedGoal = goals.find((g) => g.id === goalId) ?? null;
