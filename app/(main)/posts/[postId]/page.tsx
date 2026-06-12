@@ -11,7 +11,7 @@ import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import Modal from '@/src/components/common/modal/Modal';
 import CommentSection from '@/src/components/post/CommentSection';
-import { useComments } from '@/src/hooks/comment';
+import { useInfiniteComments } from '@/src/hooks/comment';
 import { useDeletePost, usePost } from '@/src/hooks/post';
 import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
@@ -22,13 +22,22 @@ export default function PostDetailPage() {
   const id = Number(postId);
 
   const { data: post, isPending: postPending } = usePost(id);
-  const { data: commentsData } = useComments(id);
+  // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
+  const {
+    data: commentsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteComments(id, { parentId: 'null' });
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
   const { showToast } = useToast();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const comments = commentsData?.comments ?? [];
+  // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
+  const comments = (commentsData?.pages.flatMap((p) => p.comments) ?? []).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt),
+  );
 
   const handleDelete = () => {
     deletePost(id, {
@@ -39,7 +48,7 @@ export default function PostDetailPage() {
 
   if (postPending || !post) {
     return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
+      <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
         <p className="text-sm text-slate-400">불러오는 중…</p>
       </div>
     );
@@ -47,7 +56,7 @@ export default function PostDetailPage() {
 
   return (
     <>
-      <article className="mx-auto min-h-full w-full max-w-[343px] rounded bg-white p-4 shadow-sm sm:max-w-[636px] sm:p-10 xl:max-w-[768px] xl:p-14">
+      <article className="mx-2 min-h-full rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
           <h1 className="text-lg font-bold text-slate-900 sm:text-2xl">{post.title}</h1>
           {me?.id === post.writer.id && (
@@ -104,7 +113,15 @@ export default function PostDetailPage() {
           {post.createdAt.slice(0, 10).replace(/-/g, '.')} · 조회 {post.viewCount}
         </div>
 
-        <CommentSection postId={id} comments={comments} currentUserId={me?.id} />
+        <CommentSection
+          postId={id}
+          comments={comments}
+          totalCount={post.commentCount}
+          currentUserId={me?.id}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+        />
       </article>
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
