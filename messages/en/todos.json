@@ -20,6 +20,7 @@
     "goalPlaceholder": "Select a goal",
     "goalNone": "No goal",
     "datePlaceholder": "Select a date",
+    "dateDialogLabel": "Select date",
     "tagPlaceholder": "Enter and press Enter",
     "tagAdd": "Add tag",
     "tagDuplicate": "Tag already added",

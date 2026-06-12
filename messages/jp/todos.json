@@ -20,6 +20,7 @@
     "goalPlaceholder": "目標を選択してください",
     "goalNone": "目標なし",
     "datePlaceholder": "日付を選択してください",
+    "dateDialogLabel": "日付の選択",
     "tagPlaceholder": "入力後にEnter",
     "tagAdd": "タグを追加",
     "tagDuplicate": "すでに追加されているタグです",

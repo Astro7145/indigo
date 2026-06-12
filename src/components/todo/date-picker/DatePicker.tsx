@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDate } from '@internationalized/date';
+import { useTranslations } from 'next-intl';
 import { AriaCalendarGridProps, FocusScope } from 'react-aria';
 import { IcCalendarOutline } from '@/src/components/common/icons';
 import BottomSheet from '@/src/components/common/BottomSheet';
@@ -20,12 +21,12 @@ interface DatePickerProps {
 const pickerCardClass =
   'rounded-2xl border border-black/8 bg-white shadow-[0px_20px_24px_-4px_rgba(10,13,18,0.08),0px_8px_8px_-4px_rgba(10,13,18,0.03),0px_3px_3px_-1.5px_rgba(10,13,18,0.04)]';
 
-function formatDate(date: CalendarDate | null): string {
-  if (!date) return '날짜를 선택해주세요';
+function formatDate(date: CalendarDate): string {
   return `${date.year}. ${String(date.month).padStart(2, '0')}. ${String(date.day).padStart(2, '0')}`;
 }
 
 export default function DatePicker(props: DatePickerProps) {
+  const tTodos = useTranslations('todos');
   const {
     isOpen,
     pendingDate,
@@ -42,6 +43,7 @@ export default function DatePicker(props: DatePickerProps) {
   } = useDatePicker(props);
 
   const isMobile = useIsMobile();
+  const displayDate = isOpen ? pendingDate : props.value;
 
   return (
     <div ref={containerRef} className="relative flex w-full flex-col">
@@ -56,7 +58,7 @@ export default function DatePicker(props: DatePickerProps) {
         )}
       >
         <IcCalendarOutline className="size-5 shrink-0 sm:size-6" />
-        {formatDate(isOpen ? pendingDate : props.value)}
+        {displayDate ? formatDate(displayDate) : tTodos('form.datePlaceholder')}
       </button>
 
       {isMobile ? (

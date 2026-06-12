@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import TodoList from '@/src/components/common/todo-list/TodoList';
@@ -28,6 +29,9 @@ const statusMessageClass = 'text-md m-auto text-center text-slate-500';
  * 상시 표시는 즐겨찾기 별, Note/Link는 hover 시 노출.
  */
 export default function RecentTodos({ className }: RecentTodosProps) {
+  const tCommon = useTranslations('common');
+  const tDashboard = useTranslations('dashboard');
+
   return (
     <div className={cn(rootClass, className)}>
       {/* 좁은 폭(2열 셀이 ~260px대로 떨어지는 sm 구간)에서 제목·모두보기가 둘 다 wrap돼 카드가 밀리는 걸 방지:
@@ -36,21 +40,21 @@ export default function RecentTodos({ className }: RecentTodosProps) {
         <div className="flex min-w-0 items-center gap-3">
           <IcTask aria-hidden className="size-8 shrink-0 xl:size-10" />
           <h3 className="truncate text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
-            최근 등록한 할일
+            {tDashboard('recentTodos.title')}
           </h3>
         </div>
         <Link
           href="/todos"
           className="flex shrink-0 items-center text-base font-semibold whitespace-nowrap text-indigo-600"
         >
-          모두 보기
+          {tCommon('actions.viewAll')}
           <IcChevron direction="right" className="size-5 text-indigo-600" />
         </Link>
       </div>
       <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)]">
         <AsyncBoundary
-          fallback={<p className={statusMessageClass}>불러오는 중…</p>}
-          errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
+          fallback={<p className={statusMessageClass}>{tCommon('state.loading')}</p>}
+          errorFallback={<p className={statusMessageClass}>{tCommon('state.loadError')}</p>}
         >
           <RecentTodosContent />
         </AsyncBoundary>
@@ -60,13 +64,14 @@ export default function RecentTodos({ className }: RecentTodosProps) {
 }
 
 function RecentTodosContent() {
+  const tDashboard = useTranslations('dashboard');
   const { openEdit, openDetail } = useTodoSheet();
   const { data } = useTodoList({ sort: 'latest', limit: 4 });
   const todos = data.todos;
 
   if (todos.length === 0) {
     // figma: 빈 상태는 카드 정중앙에 안내 문구
-    return <p className={statusMessageClass}>최근에 등록한 할 일이 없어요</p>;
+    return <p className={statusMessageClass}>{tDashboard('recentTodos.empty')}</p>;
   }
 
   return (

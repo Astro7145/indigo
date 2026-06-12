@@ -1,4 +1,4 @@
-import { createMeSchema, loginSchema, signupSchema } from './schema';
+import { createMeSchema, createTodoCreateSchema, loginSchema, signupSchema } from './schema';
 
 describe('loginSchema', () => {
   describe('email 필드', () => {
@@ -207,5 +207,54 @@ describe('createMeSchema', () => {
       passwordConfirm: 'newpass123',
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('createTodoCreateSchema', () => {
+  const todoSchema = createTodoCreateSchema(fakeT);
+  const validTodo = { title: '운동하기', dueDate: '2026-06-12' };
+
+  it('유효한 입력이면 통과한다', () => {
+    expect(todoSchema.safeParse(validTodo).success).toBe(true);
+  });
+
+  it('제목이 비어 있으면 titleRequired 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, title: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.title?.[0]).toBe('t:titleRequired');
+    }
+  });
+
+  it('제목이 30자를 초과하면 titleMax 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, title: 'a'.repeat(31) });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.title?.[0]).toBe('t:titleMax');
+    }
+  });
+
+  it('마감일이 비어 있으면 dueDateRequired 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, dueDate: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.dueDate?.[0]).toBe('t:dueDateRequired');
+    }
+  });
+
+  it('URL 형식이 아니면 urlInvalid 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'not a url' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.linkUrl?.[0]).toBe('t:urlInvalid');
+    }
+  });
+
+  it('프로토콜 없는 링크는 https://를 붙여 통과시킨다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'example.com' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.linkUrl).toBe('https://example.com');
+    }
   });
 });

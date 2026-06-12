@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -14,11 +15,6 @@ import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { parseTodosTab, todosListParams as listParams, type TodosTab } from '@/src/components/todo/todosTab';
 
 type Tab = TodosTab;
-const EMPTY_MSG_BY_TAP = {
-  all: '아직 등록한 할 일이 없어요',
-  todo: '해야할 일이 아직 없어요',
-  done: '완료한 일이 아직 없어요',
-};
 
 /**
  * /todos 클라 본문 — 탭 상태가 카운트·리스트를 묶으므로 한 덩어리의 클라 섬이다(서버 셸은 page).
@@ -26,6 +22,8 @@ const EMPTY_MSG_BY_TAP = {
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function TodosView() {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
   const urlTab = parseTodosTab(useSearchParams().get('tab') ?? undefined);
   const [tab, setTab] = useState<Tab>(urlTab);
@@ -47,7 +45,7 @@ export default function TodosView() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:54371) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">모든 할 일</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{tTodos('title')}</h1>
         {/* aria-label 미부착 — 스크린리더가 h1 "모든 할 일" + 숫자 텍스트를 그대로 이어 읽도록 둔다 */}
         <AsyncBoundary
           fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
@@ -72,14 +70,14 @@ export default function TodosView() {
             startIcon={<IcPlus className="size-5 text-slate-500" />}
             onClick={() => openCreate()}
           >
-            할 일 추가
+            {tTodos('addButton')}
           </Button>
         </div>
 
         <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
           <AsyncBoundary
-            fallback={<p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>}
-            errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+            fallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+            errorFallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
             resetKeys={[tab]}
           >
             <TodosList tab={tab} />
@@ -97,6 +95,8 @@ function TodosCount({ tab }: { tab: Tab }) {
 }
 
 function TodosList({ tab }: { tab: Tab }) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const { openEdit, openDetail } = useTodoSheet();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteTodoList(
     listParams(tab),
@@ -120,14 +120,14 @@ function TodosList({ tab }: { tab: Tab }) {
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   if (todos.length === 0) {
-    return <p className="py-20 text-center text-sm text-slate-500">{EMPTY_MSG_BY_TAP[tab]}</p>;
+    return <p className="py-20 text-center text-sm text-slate-500">{tTodos(`empty.${tab}`)}</p>;
   }
 
   return (
     <>
       <TodoList className="flex flex-col gap-2" todos={todos} size="large" onEdit={openEdit} onSelect={openDetail} />
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
     </>
   );
 }

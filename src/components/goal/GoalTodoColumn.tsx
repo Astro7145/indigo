@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -29,7 +30,10 @@ export interface GoalTodoColumnProps {
  * `캘린더 보기`는 목표 필터가 프리셋된 `/calendar?goalId=`로 이동한다. Figma 21209:54510(To do) / 21209:54528(Done).
  */
 export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColumnProps) {
-  const label = done ? 'DONE' : 'TO DO';
+  const tCommon = useTranslations('common');
+  const tGoals = useTranslations('goals');
+  const tTodos = useTranslations('todos');
+  const label = done ? tCommon('tabs.done') : tCommon('tabs.todo');
   const router = useRouter();
   const { openCreate } = useTodoSheet();
 
@@ -48,7 +52,7 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
               className="h-10 whitespace-nowrap"
               onClick={() => router.push(`/calendar?goalId=${goalId}`)}
             >
-              캘린더 보기
+              {tGoals('calendarView')}
             </Button>
             <Button
               variant="primary"
@@ -57,7 +61,7 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
               className="h-10 whitespace-nowrap"
               onClick={() => openCreate({ goalId })}
             >
-              할 일 추가
+              {tTodos('addButton')}
             </Button>
           </div>
         )}
@@ -73,12 +77,12 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
         <AsyncBoundary
           fallback={
             <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-              불러오는 중…
+              {tCommon('state.loading')}
             </p>
           }
           errorFallback={
             <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-              불러오지 못했어요
+              {tCommon('state.loadError')}
             </p>
           }
         >
@@ -90,6 +94,8 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
 }
 
 function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goalId' | 'done'>) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const { openEdit, openDetail } = useTodoSheet();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteTodoList({
     goalId,
@@ -120,7 +126,7 @@ function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goal
   if (todos.length === 0) {
     return (
       <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
-        {done ? '완료한 일이 아직 없어요' : '해야할 일이 아직 없어요'}
+        {done ? tTodos('empty.done') : tTodos('empty.todo')}
       </p>
     );
   }
@@ -135,7 +141,7 @@ function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goal
       onSelect={openDetail}
     >
       {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
-      {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">불러오는 중…</li>}
+      {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</li>}
     </TodoList>
   );
 }
