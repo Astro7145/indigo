@@ -31,13 +31,14 @@ const todo = todoApi as jest.Mocked<typeof todoApi>;
 const favorite = favoriteApi as jest.Mocked<typeof favoriteApi>;
 const user = userApi as jest.Mocked<typeof userApi>;
 
-const makeFav = (id: number, done: boolean): FavoriteTodo =>
-  ({ id, todoId: id, todo: { id, done, goal: null } }) as never;
+const makeFav = (id: number, done: boolean, goalId: number | null = null): FavoriteTodo =>
+  ({ id, todoId: id, todo: { id, done, goal: goalId === null ? null : { id: goalId } } }) as never;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockPathname = '/';
   mockSearchParams.delete('tab');
+  mockSearchParams.delete('goalId');
   user.getMe.mockResolvedValue({ name: '홍길동' } as never);
 });
 
@@ -68,6 +69,19 @@ it('/favorites에서 카운트는 탭으로 필터된 개수다 (?tab=done → �
   });
   const { result } = renderHookWithClient(() => usePageTitle());
   // totalCount(42)가 아니라 done 필터된 2 — 데스크탑 헤더와 동일 기준
+  await waitFor(() => expect(result.current).toBe('찜한 할일 2'));
+});
+
+it('/favorites에서 goalId 필터도 카운트에 반영된다 (?goalId=1 → 해당 목표만)', async () => {
+  mockPathname = '/favorites';
+  mockSearchParams.set('goalId', '1');
+  favorite.getFavoriteTodos.mockResolvedValue({
+    favorites: [makeFav(1, false, 1), makeFav(2, false, 2), makeFav(3, true, 1)],
+    totalCount: 42,
+    nextCursor: null,
+  });
+  const { result } = renderHookWithClient(() => usePageTitle());
+  // goalId=1인 찜만 — 데스크탑 헤더(filterFavorites)와 동일 기준
   await waitFor(() => expect(result.current).toBe('찜한 할일 2'));
 });
 

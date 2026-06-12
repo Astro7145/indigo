@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { parseFavoritesTab } from '@/src/components/favorite/favoritesTab';
+import { parseFavoritesTab, parseGoalId } from '@/src/components/favorite/favoritesTab';
 import { parseTodosTab, todosListParams } from '@/src/components/todo/todosTab';
 import { useMe } from '@/src/hooks/user';
 import { useTodoCount } from '@/src/hooks/todo';
@@ -46,11 +46,16 @@ export function usePageTitle(): string {
   const { data: user } = useMe();
   const name = user?.name ?? '';
 
-  // 카운트는 데스크탑/태블릿 헤더와 동일하게 현재 탭(?tab=) 기준 —
-  // 페이지의 탭 셸로우 동기화(replaceState)를 Next가 useSearchParams에 반영해 탭 전환 시 함께 갱신된다.
-  const tabParam = useSearchParams().get('tab') ?? undefined;
+  // 카운트는 데스크탑/태블릿 헤더와 동일하게 현재 필터(?tab=·?goalId=) 기준 —
+  // 페이지의 셸로우 동기화(replaceState)를 Next가 useSearchParams에 반영해 필터 전환 시 함께 갱신된다.
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab') ?? undefined;
   const { data: todoCount } = useTodoCount(route === 'todos', { done: todosListParams(parseTodosTab(tabParam)).done });
-  const { data: favoriteCount } = useFavoriteCount(route === 'favorites', parseFavoritesTab(tabParam));
+  const { data: favoriteCount } = useFavoriteCount(
+    route === 'favorites',
+    parseFavoritesTab(tabParam),
+    parseGoalId(searchParams.get('goalId')),
+  );
 
   switch (route) {
     case 'dashboard':
