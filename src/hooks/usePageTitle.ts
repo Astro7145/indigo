@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useMe } from '@/src/hooks/user';
 import { useTodoCount } from '@/src/hooks/todo';
 import { useFavoriteCount } from '@/src/hooks/favorite';
@@ -40,6 +41,7 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
+  const tPosts = useTranslations('posts');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
@@ -61,11 +63,11 @@ export function usePageTitle(): string {
     case 'goal-notes':
       return '노트 모아보기';
     case 'posts-write':
-      return '게시물 작성하기';
+      return tPosts('form.createTitle');
     case 'posts-edit':
-      return '게시물 수정하기';
+      return tPosts('form.editTitle');
     case 'posts':
-      return '소통 게시판';
+      return tPosts('title');
     case 'favorites':
       return favoriteCount != null ? `찜한 할일 ${favoriteCount}` : '찜한 할일';
     case 'calendar':

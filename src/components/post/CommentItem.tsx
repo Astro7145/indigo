@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type KeyboardEvent } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -49,6 +50,8 @@ export default function CommentItem({
   onReplySubmit,
   isReplySubmitting = false,
 }: CommentItemProps) {
+  const t = useTranslations('posts');
+  const tCommon = useTranslations('common');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -66,9 +69,9 @@ export default function CommentItem({
   // 현재 isLiked 상태에 따라 like/unlike로 분기. 즉시 토글은 훅의 onMutate에서 처리
   const handleLikeToggle = () => {
     if (comment.isLiked) {
-      unlikeComment(comment.id, { onError: () => showToast('좋아요 취소에 실패했어요.', 'error') });
+      unlikeComment(comment.id, { onError: () => showToast(t('comment.unlikeError'), 'error') });
     } else {
-      likeComment(comment.id, { onError: () => showToast('좋아요에 실패했어요.', 'error') });
+      likeComment(comment.id, { onError: () => showToast(t('comment.likeError'), 'error') });
     }
   };
 
@@ -83,7 +86,7 @@ export default function CommentItem({
       { commentId: comment.id, body: { content: draft } },
       {
         onSuccess: () => setIsEditing(false),
-        onError: () => showToast('댓글 수정에 실패했어요.', 'error'),
+        onError: () => showToast(t('comment.updateError'), 'error'),
       },
     );
   };
@@ -124,7 +127,7 @@ export default function CommentItem({
             <span className="text-sm text-slate-700 sm:text-base">{comment.writer.name}</span>
             {isMine && (
               <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
-                내 댓글
+                {t('comment.mine')}
               </span>
             )}
           </div>
@@ -136,9 +139,9 @@ export default function CommentItem({
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
-                <Dropdown.Item onClick={handleStartEdit}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={handleStartEdit}>{tCommon('actions.edit')}</Dropdown.Item>
                 <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                  삭제하기
+                  {tCommon('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -152,7 +155,7 @@ export default function CommentItem({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleEditKeyDown}
-              aria-label="댓글 수정"
+              aria-label={t('comment.editLabel')}
               disabled={isUpdating}
               className="field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:px-4 sm:py-2.5"
             />
@@ -161,10 +164,10 @@ export default function CommentItem({
               <span className="text-xs text-slate-400">{formattedDate}</span>
               <div className="flex gap-2">
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
-                  취소
+                  {tCommon('actions.cancel')}
                 </Button>
                 <Button type="submit" size="small" disabled={draft.trim().length === 0 || isUpdating}>
-                  수정
+                  {tCommon('actions.update')}
                 </Button>
               </div>
             </div>
@@ -178,7 +181,7 @@ export default function CommentItem({
                 type="button"
                 onClick={handleLikeToggle}
                 aria-pressed={comment.isLiked}
-                aria-label={comment.isLiked ? '좋아요 취소' : '좋아요'}
+                aria-label={comment.isLiked ? t('comment.unlike') : t('comment.like')}
                 className="flex cursor-pointer items-center gap-1"
               >
                 <IcThumbUp
@@ -198,7 +201,7 @@ export default function CommentItem({
                       activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
                     )}
                   >
-                    답글 달기
+                    {t('comment.reply')}
                   </button>
                   {comment.replyCount != null && comment.replyCount > 0 && (
                     <button
@@ -209,7 +212,7 @@ export default function CommentItem({
                         repliesOpen && 'font-semibold text-indigo-500',
                       )}
                     >
-                      {repliesOpen ? '답글 숨기기' : `답글 ${comment.replyCount}개 보기`}
+                      {repliesOpen ? t('comment.hideReplies') : t('comment.showReplies', { count: comment.replyCount })}
                     </button>
                   )}
                 </>
@@ -222,8 +225,8 @@ export default function CommentItem({
           <div className="mt-3">
             <CommentInput
               autoFocus
-              placeholder="답글을 입력해주세요."
-              ariaLabel="답글 입력"
+              placeholder={t('comment.replyPlaceholder')}
+              ariaLabel={t('comment.replyInputLabel')}
               onSubmit={onReplySubmit}
               disabled={isReplySubmitting}
             />
@@ -233,7 +236,7 @@ export default function CommentItem({
         {!isReply && repliesOpen && (
           <div className="mt-3 border-l-2 border-slate-200 pl-4">
             {!replies ? (
-              <p className="text-xs text-slate-400">답글을 불러오는 중…</p>
+              <p className="text-xs text-slate-400">{t('comment.replyLoading')}</p>
             ) : (
               <ul className="space-y-3">
                 {replies.comments.map((reply) => (
@@ -255,17 +258,17 @@ export default function CommentItem({
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>댓글을 삭제하시겠어요?</Modal.Title>
+          <Modal.Title>{t('comment.deleteTitle')}</Modal.Title>
         </div>
         <Modal.Actions>
-          <Modal.Cancel>취소</Modal.Cancel>
+          <Modal.Cancel>{tCommon('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm
             onClick={() => {
-              deleteComment(comment.id, { onError: () => showToast('댓글 삭제에 실패했어요.', 'error') });
+              deleteComment(comment.id, { onError: () => showToast(t('comment.deleteError'), 'error') });
               setDeleteOpen(false);
             }}
           >
-            삭제하기
+            {tCommon('actions.delete')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

@@ -17,11 +17,16 @@
     "createTitle": "게시물 작성하기",
     "editTitle": "게시물 수정하기",
     "submitCreate": "등록하기",
+    "submitUpdate": "수정하기",
     "titlePlaceholder": "게시물의 제목을 입력해주세요",
     "titleLabel": "제목",
     "contentPlaceholder": "이 곳을 통해 내용을 작성해주세요",
     "imageSelect": "이미지 파일 선택",
+    "imageAlt": "첨부 이미지",
+    "imageDeleteLabel": "이미지 삭제",
+    "charCount": "공백포함 {total}자 | 공백제외 {nonSpace}자",
     "cancelTitle": "게시물 작성을 취소하시겠어요?",
+    "cancelWarning": "작성하신 모든 내용이 사라집니다.",
     "createError": "게시물 등록에 실패했어요.",
     "updateError": "게시물 수정에 실패했어요."
   },
@@ -36,6 +41,18 @@
     "deleteTitle": "댓글을 삭제하시겠어요?",
     "createError": "댓글 등록에 실패했어요.",
     "updateError": "댓글 수정에 실패했어요.",
-    "deleteError": "댓글 삭제에 실패했어요."
+    "deleteError": "댓글 삭제에 실패했어요.",
+    "loadMore": "{count}개 댓글 더 불러오기",
+    "like": "좋아요",
+    "unlike": "좋아요 취소",
+    "likeError": "좋아요에 실패했어요.",
+    "unlikeError": "좋아요 취소에 실패했어요.",
+    "reply": "답글 달기",
+    "showReplies": "답글 {count}개 보기",
+    "hideReplies": "답글 숨기기",
+    "replyPlaceholder": "답글을 입력해주세요.",
+    "replyInputLabel": "답글 입력",
+    "replyLoading": "답글을 불러오는 중…",
+    "replyCreateError": "답글 등록에 실패했어요."
   }
 }

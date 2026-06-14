@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import DOMPurify from 'dompurify';
+import { useTranslations } from 'next-intl';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
@@ -21,6 +22,8 @@ export default function PostDetailPage() {
   const router = useRouter();
   const id = Number(postId);
 
+  const t = useTranslations('posts');
+  const tCommon = useTranslations('common');
   const { data: post, isPending: postPending } = usePost(id);
   // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
   const {
@@ -42,14 +45,14 @@ export default function PostDetailPage() {
   const handleDelete = () => {
     deletePost(id, {
       onSuccess: () => router.push('/posts'),
-      onError: () => showToast('게시물 삭제에 실패했어요.', 'error'),
+      onError: () => showToast(t('detail.deleteError'), 'error'),
     });
   };
 
   if (postPending || !post) {
     return (
       <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
+        <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
       </div>
     );
   }
@@ -68,9 +71,11 @@ export default function PostDetailPage() {
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
                 {/* 수정 페이지(/posts/[id]/edit)는 별도 작업 — 라우트 생성 후 연결 */}
-                <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>수정하기</Dropdown.Item>
+                <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>
+                  {tCommon('actions.edit')}
+                </Dropdown.Item>
                 <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                  삭제하기
+                  {tCommon('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -110,7 +115,7 @@ export default function PostDetailPage() {
 
         {/* 메타 */}
         <div className="mb-8 text-xs text-slate-500">
-          {post.createdAt.slice(0, 10).replace(/-/g, '.')} · 조회 {post.viewCount}
+          {post.createdAt.slice(0, 10).replace(/-/g, '.')} · {t('viewCount', { count: post.viewCount })}
         </div>
 
         <CommentSection
@@ -126,11 +131,11 @@ export default function PostDetailPage() {
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>게시물을 삭제하시겠어요?</Modal.Title>
+          <Modal.Title>{t('detail.deleteTitle')}</Modal.Title>
         </div>
         <Modal.Actions>
-          <Modal.Cancel>취소</Modal.Cancel>
-          <Modal.Confirm onClick={handleDelete}>삭제하기</Modal.Confirm>
+          <Modal.Cancel>{tCommon('actions.cancel')}</Modal.Cancel>
+          <Modal.Confirm onClick={handleDelete}>{tCommon('actions.delete')}</Modal.Confirm>
         </Modal.Actions>
       </Modal>
     </>

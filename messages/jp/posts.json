@@ -17,11 +17,16 @@
     "createTitle": "投稿",
     "editTitle": "編集",
     "submitCreate": "登録する",
+    "submitUpdate": "更新する",
     "titlePlaceholder": "タイトルを入力してください",
     "titleLabel": "タイトル",
     "contentPlaceholder": "ここから内容を入力してください",
     "imageSelect": "画像ファイルを選択",
+    "imageAlt": "添付画像",
+    "imageDeleteLabel": "画像を削除",
+    "charCount": "空白含む {total}字 | 空白除く {nonSpace}字",
     "cancelTitle": "投稿の作成をキャンセルしますか？",
+    "cancelWarning": "作成したすべての内容が消えます。",
     "createError": "投稿の登録に失敗しました。",
     "updateError": "投稿の編集に失敗しました。"
   },
@@ -36,6 +41,18 @@
     "deleteTitle": "コメントを削除しますか？",
     "createError": "コメントの登録に失敗しました。",
     "updateError": "コメントの編集に失敗しました。",
-    "deleteError": "コメントの削除に失敗しました。"
+    "deleteError": "コメントの削除に失敗しました。",
+    "loadMore": "{count}件のコメントをさらに読み込む",
+    "like": "いいね",
+    "unlike": "いいね取り消し",
+    "likeError": "いいねに失敗しました。",
+    "unlikeError": "いいね取り消しに失敗しました。",
+    "reply": "返信する",
+    "showReplies": "返信 {count}件を表示",
+    "hideReplies": "返信を非表示",
+    "replyPlaceholder": "返信を入力してください。",
+    "replyInputLabel": "返信入力",
+    "replyLoading": "返信を読み込んでいます…",
+    "replyCreateError": "返信の登録に失敗しました。"
   }
 }

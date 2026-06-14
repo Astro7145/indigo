@@ -17,11 +17,16 @@
     "createTitle": "Write Post",
     "editTitle": "Edit Post",
     "submitCreate": "Register",
+    "submitUpdate": "Update",
     "titlePlaceholder": "Enter post title",
     "titleLabel": "Title",
     "contentPlaceholder": "Write your content here",
     "imageSelect": "Select image file",
+    "imageAlt": "Attached image",
+    "imageDeleteLabel": "Remove image",
+    "charCount": "{total} chars (w/ spaces) | {nonSpace} chars (w/o spaces)",
     "cancelTitle": "Cancel writing post?",
+    "cancelWarning": "All content you've written will be lost.",
     "createError": "Failed to create post.",
     "updateError": "Failed to update post."
   },
@@ -36,6 +41,18 @@
     "deleteTitle": "Delete this comment?",
     "createError": "Failed to create comment.",
     "updateError": "Failed to update comment.",
-    "deleteError": "Failed to delete comment."
+    "deleteError": "Failed to delete comment.",
+    "loadMore": "Load {count} more comments",
+    "like": "Like",
+    "unlike": "Unlike",
+    "likeError": "Failed to like.",
+    "unlikeError": "Failed to unlike.",
+    "reply": "Reply",
+    "showReplies": "View {count} replies",
+    "hideReplies": "Hide replies",
+    "replyPlaceholder": "Enter a reply.",
+    "replyInputLabel": "Reply input",
+    "replyLoading": "Loading replies…",
+    "replyCreateError": "Failed to post reply."
   }
 }
