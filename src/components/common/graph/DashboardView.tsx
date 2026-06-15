@@ -79,7 +79,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
         </div>
       ) : (
         <div
-          className="-mx-4 -my-6 h-[calc(100dvh-56px)] overflow-hidden sm:-mx-6 sm:-my-12 md:h-dvh xl:-mx-10 xl:-my-20"
+          className="-mx-4 -my-6 h-[calc(100dvh-56px)] overflow-hidden sm:-mx-6 sm:-my-12 sm:h-dvh xl:-mx-10 xl:-my-20"
           style={{ background: GRAPH_BACKGROUND_VAR }}
         >
           <GraphView />

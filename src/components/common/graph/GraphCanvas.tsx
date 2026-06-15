@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { motion } from 'motion/react';
 import { getGraphColors } from '@/src/components/common/graph/palette';
 import GraphScene from '@/src/components/common/graph/GraphScene';
 import type { GoalListItem } from '@/src/types/goal';
@@ -23,7 +24,13 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
   const colors = getGraphColors();
 
   return (
-    <div className="h-full w-full">
+    // 로딩 셸 → 캔버스 전환이 툭 튀지 않도록 어두운 배경 위로 부드럽게 페이드인
+    <motion.div
+      className="h-full w-full"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
+    >
       <Canvas camera={{ position: [0, 6, 18], fov: 55 }} dpr={[1, 2]}>
         <color attach="background" args={[colors.background]} />
         <ambientLight intensity={0.6} />
@@ -36,6 +43,6 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
           <Bloom intensity={1.1} luminanceThreshold={0.2} luminanceSmoothing={0.9} mipmapBlur radius={0.7} />
         </EffectComposer>
       </Canvas>
-    </div>
+    </motion.div>
   );
 }
