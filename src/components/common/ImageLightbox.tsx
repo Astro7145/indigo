@@ -91,6 +91,8 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
       <img
         src={src}
         alt={alt}
+        // <img>는 기본 draggable=true라 마우스로 끌면 native HTML5 drag-and-drop이 발동해 pointer 핸들러를 가로챈다 — 끄지 않으면 데스크탑에서 드래그 팬이 동작하지 않음
+        draggable={false}
         role="button"
         tabIndex={0}
         onLoad={() => setLoaded(true)}
