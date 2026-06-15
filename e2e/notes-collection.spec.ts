@@ -31,8 +31,10 @@ async function navigateToNotesCollection(
     return { reachedNotesPage: false, reason: '등록된 목표가 없어 노트 모아보기 진입 불가 — 데이터 필요' };
   }
 
-  // 첫 번째 목표 카드(role=button)를 클릭해 목표 상세로 이동한다
-  await section.getByRole('button').first().click();
+  // 첫 번째 목표 카드를 클릭해 목표 상세로 이동한다. 카드(role=button) 중앙 클릭은
+  // 내부 인터랙티브 요소(검색창·할 일 추가·할일 행 — 전부 stopPropagation)에 떨어질 수 있어
+  // 데이터·브라우저 레이아웃에 따라 플레이키하다 — 목표 제목(h3)을 클릭해 카드로 버블링시킨다.
+  await section.getByRole('heading', { level: 3 }).first().click();
   await expect(page).toHaveURL(/\/goals\/\d+$/, { timeout: 10_000 });
 
   // 목표 상세 페이지에서 "노트 모아보기" 카드를 클릭한다

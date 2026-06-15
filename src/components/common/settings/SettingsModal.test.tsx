@@ -1,3 +1,5 @@
+jest.mock('next/navigation', () => ({ useRouter: () => ({ refresh: jest.fn() }) }));
+
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import SettingsModal from './SettingsModal';

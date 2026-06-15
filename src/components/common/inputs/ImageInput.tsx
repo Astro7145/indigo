@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { IcUpload } from '../icons';
 import DeleteButton from '../buttons/DeleteButton';
 
@@ -15,6 +16,7 @@ interface ImageInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 type FileWithUrl = { file: File; url: string };
 
 export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemove, ...props }: ImageInputProps) {
+  const tCommon = useTranslations('common');
   const inputRef = useRef<HTMLInputElement>(null);
   // 이전 blob URL을 revokeObjectURL로 해제하기 위한 참조
   // 렌더를 유발할 필요가 없으므로 ref로 충분하다
@@ -37,7 +39,7 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
     prevUrlRef.current = url;
 
     setSelected({ file: selectedFile, url });
-    setStatusMessage(`${selectedFile.name} 선택됨`);
+    setStatusMessage(tCommon('file.selected', { fileName: selectedFile.name }));
     onFileChange?.(selectedFile);
   };
 
@@ -48,7 +50,7 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
     }
 
     setSelected(null);
-    setStatusMessage('이미지가 삭제되었습니다');
+    setStatusMessage(tCommon('image.removed'));
     onFileChange?.(null);
 
     if (inputRef.current) {
@@ -58,7 +60,7 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
 
   const handleRemoveInitialUrl = () => {
     setUrlRemoved(true);
-    setStatusMessage('이미지가 삭제되었습니다');
+    setStatusMessage(tCommon('image.removed'));
     onInitialUrlRemove?.();
   };
 
@@ -75,14 +77,19 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
       </span>
       {selected ? (
         <div className="relative h-25 w-40 overflow-hidden rounded-sm">
-          <Image src={selected.url} alt={`선택된 이미지: ${selected.file.name}`} fill className="object-cover" />
+          <Image
+            src={selected.url}
+            alt={tCommon('image.selectedAlt', { fileName: selected.file.name })}
+            fill
+            className="object-cover"
+          />
           <span className="absolute top-2.5 right-2.5">
             <DeleteButton className="cursor-pointer" onClick={handleRemoveFile} />
           </span>
         </div>
       ) : showInitialUrl ? (
         <div className="relative h-25 w-40 overflow-hidden rounded-sm">
-          <Image src={initialUrl!} alt="기존 이미지" fill className="object-cover" />
+          <Image src={initialUrl!} alt={tCommon('image.existingAlt')} fill className="object-cover" />
           <span className="absolute top-2.5 right-2.5">
             <DeleteButton className="cursor-pointer" onClick={handleRemoveInitialUrl} />
           </span>
@@ -90,7 +97,7 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
       ) : (
         <label className="flex flex-col items-center justify-center gap-y-0.5 rounded-sm border border-dashed border-slate-300 bg-slate-50 p-3 focus-within:border-indigo-500">
           <IcUpload />
-          <span className="text-base font-medium text-slate-500">이미지 첨부</span>
+          <span className="text-base font-medium text-slate-500">{tCommon('image.attach')}</span>
           <input
             ref={inputRef}
             type="file"

@@ -1,0 +1,24 @@
+{
+  "title": "マイページ",
+  "formLabel": "マイページフォーム",
+  "meta": {
+    "title": "マイページ | INdigo",
+    "description": "プロフィールアイコン、名前、パスワードを変更できます。"
+  },
+  "password": {
+    "section": "パスワード変更",
+    "currentPlaceholder": "現在のパスワードを入力してください",
+    "currentLabel": "現在のパスワード",
+    "newPlaceholder": "新しいパスワードを入力してください",
+    "newLabel": "新しいパスワード",
+    "confirmPlaceholder": "新しいパスワードをもう一度入力してください",
+    "confirmLabel": "新しいパスワードの確認",
+    "mismatch": "現在のパスワードが一致しません。"
+  },
+  "image": {
+    "alt": "プロフィールアイコン",
+    "change": "プロフィールアイコンを変更",
+    "select": "画像ファイルを選択",
+    "unsupported": "サポートされていない画像形式です。（jpg, jpeg, png, gif, webp, svg）"
+  }
+}

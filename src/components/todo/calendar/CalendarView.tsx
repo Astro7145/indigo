@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { parseDate, startOfMonth, today, type CalendarDate } from '@internationalized/date';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -35,6 +36,9 @@ function parseGoalId(raw: string | null): number | null {
  * 모바일 페이지 타이틀은 GNB(usePageTitle)가 담당 → 헤더는 sm+ 노출, 모바일은 하단 풀폭 추가 버튼.
  */
 export default function CalendarView() {
+  const tCalendar = useTranslations('calendar');
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   // 목표 필터의 단일 소스는 URL — prop으로 받으면 뒤로가기 시 라우터 캐시의 옛 RSC 페이로드(옛 prop)와
   // 현재 URL이 어긋나 필터가 적용되지 않는다. 동적 라우트라 useSearchParams는 SSR에서도 실제 값을 준다.
   const urlGoalId = parseGoalId(useSearchParams().get('goalId'));
@@ -75,7 +79,7 @@ export default function CalendarView() {
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+에서만 헤더 노출 (/todos와 동일 패턴) */}
       <div className="hidden items-center justify-between px-2 sm:flex">
         <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">
-          {me ? `${me.name}님의 캘린더` : '캘린더'}
+          {me ? tCalendar('title', { name: me.name }) : tCalendar('titleFallback')}
         </h1>
         <Button
           variant="primary"
@@ -86,15 +90,15 @@ export default function CalendarView() {
             openCreate({ goalId: goalId ?? undefined, dueDate: calendarDateToIso(selectedDate) ?? undefined })
           }
         >
-          할 일 추가
+          {tTodos('addButton')}
         </Button>
       </div>
 
       {/* 모바일은 풀블리드(시안), sm+는 카드 */}
       <Card className="-mx-4 overflow-hidden rounded-none border-y border-slate-200 p-0 shadow-[0_0_60px_0_rgba(0,0,0,0.05)] sm:mx-0 sm:rounded-[4px] sm:border">
         <AsyncBoundary
-          fallback={<p className={statusMessageClass}>불러오는 중…</p>}
-          errorFallback={<p className={statusMessageClass}>불러오지 못했어요</p>}
+          fallback={<p className={statusMessageClass}>{tCommon('state.loading')}</p>}
+          errorFallback={<p className={statusMessageClass}>{tCommon('state.loadError')}</p>}
           resetKeys={[goalId, visibleMonthKey]}
         >
           <CalendarContent
@@ -119,7 +123,7 @@ export default function CalendarView() {
           openCreate({ goalId: goalId ?? undefined, dueDate: calendarDateToIso(selectedDate) ?? undefined })
         }
       >
-        할 일 추가
+        {tTodos('addButton')}
       </Button>
     </section>
   );
@@ -142,6 +146,7 @@ function CalendarContent({
   onFocusChange: (date: CalendarDate) => void;
   onSelectTodo: (todo: Todo) => void;
 }) {
+  const tCalendar = useTranslations('calendar');
   // 보이는 달의 그리드 범위만 서버에서 조회 — 방문한 달은 캐시돼 재방문 즉시.
   const { from, to } = calendarGridRange(focusedDate);
   const { data } = useTodosInRange(from, to);
@@ -186,14 +191,14 @@ function CalendarContent({
               <span className="flex items-center gap-2">
                 <IcGoal className="size-8" />
                 <span className="text-sm font-semibold tracking-[-0.03em] text-slate-700">
-                  {selectedGoal ? selectedGoal.title : '전체 목표'}
+                  {selectedGoal ? selectedGoal.title : tCalendar('allGoals')}
                 </span>
               </span>
               <IcChevron direction="down" />
             </button>
           </Dropdown.Trigger>
           <Dropdown.Menu size="full">
-            <Dropdown.Item onClick={() => onChangeGoalId(null)}>전체 목표</Dropdown.Item>
+            <Dropdown.Item onClick={() => onChangeGoalId(null)}>{tCalendar('allGoals')}</Dropdown.Item>
             {goals.map((g) => (
               <Dropdown.Item key={g.id} onClick={() => onChangeGoalId(g.id)}>
                 {g.title}

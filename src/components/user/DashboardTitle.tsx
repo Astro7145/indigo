@@ -1,6 +1,7 @@
 'use client';
 
 import { useMe } from '@/src/hooks/user';
+import { useTranslations } from 'next-intl';
 
 /**
  * 대시보드 페이지 타이틀 — 유저명은 클라 쿼리(useMe)라 서버 셸에서 분리된 클라 섬.
@@ -8,6 +9,7 @@ import { useMe } from '@/src/hooks/user';
  */
 export default function DashboardTitle() {
   const { data: me } = useMe();
+  const t = useTranslations('dashboard');
 
   return (
     <div className="hidden h-8 sm:block">
@@ -15,7 +17,7 @@ export default function DashboardTitle() {
         <span data-testid="user-name" className="text-indigo-600">
           {me?.name}
         </span>
-        님의 대시보드
+        {t('title')}
       </h1>
     </div>
   );

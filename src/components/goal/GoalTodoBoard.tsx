@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { motion, useReducedMotion } from 'motion/react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -29,12 +30,14 @@ function percentOf(done: number, total: number): number {
 }
 
 function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
+  const tCommon = useTranslations('common');
   const isTodo = label === 'To do';
+  const labelText = isTodo ? tCommon('tabs.todo') : tCommon('tabs.done');
   const { openEdit, openDetail } = useTodoSheet();
   return (
     <div
       role="group"
-      aria-label={label}
+      aria-label={labelText}
       // 칼럼 내부 클릭/키 이벤트는 카드(목표 상세 이동)로 전파시키지 않는다 — 단,
       // 칼럼 사이 gap·빈 상태·로딩은 본문 wrapper에 그대로 두어 카드 클릭이 전파된다.
       onClick={(e) => e.stopPropagation()}
@@ -52,7 +55,7 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
           isTodo ? 'text-indigo-700' : 'text-slate-400',
         )}
       >
-        {isTodo ? 'TO DO' : 'DONE'}
+        {labelText}
       </span>
       <TodoList
         className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
@@ -66,6 +69,9 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
 }
 
 export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
+  const tCommon = useTranslations('common');
+  const tDashboard = useTranslations('dashboard');
+  const tTodos = useTranslations('todos');
   const { openCreate } = useTodoSheet();
   const router = useRouter();
   const [input, setInput] = useState('');
@@ -103,7 +109,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             <div className="flex items-center gap-2 pr-4 xl:min-w-0 xl:flex-[350]">
               <div
                 role="progressbar"
-                aria-label={`${goal.title} 진행률`}
+                aria-label={tDashboard('goalTodos.progressLabel', { title: goal.title })}
                 aria-valuenow={percent}
                 aria-valuemin={0}
                 aria-valuemax={100}
@@ -123,7 +129,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
           </div>
           {/* 할 일 추가 — 모바일 전용 아이콘 버튼 */}
           <IconButton
-            aria-label="할 일 추가"
+            aria-label={tTodos('addButton')}
             className="size-9 shrink-0 rounded border border-indigo-500 sm:hidden"
             onClick={(e) => {
               e.stopPropagation();
@@ -153,7 +159,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
             className="hidden h-10 shrink-0 whitespace-nowrap sm:inline-flex"
             onClick={() => openCreate({ goalId: goal.id })}
           >
-            할 일 추가
+            {tTodos('addButton')}
           </Button>
         </div>
       </div>
@@ -166,8 +172,8 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
         <AsyncBoundary
-          fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
-          errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+          fallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+          errorFallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
           resetKeys={[keyword]}
         >
           <GoalTodoBoardContent goalId={goal.id} keyword={keyword} />
@@ -178,6 +184,8 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
 }
 
 function GoalTodoBoardContent({ goalId, keyword }: { goalId: number; keyword: string }) {
+  const tCommon = useTranslations('common');
+  const tDashboard = useTranslations('dashboard');
   const { data } = useTodoList({ goalId, keyword: keyword || undefined });
 
   const todos = data.todos;
@@ -186,9 +194,9 @@ function GoalTodoBoardContent({ goalId, keyword }: { goalId: number; keyword: st
 
   if (todos.length === 0) {
     return keyword ? (
-      <p className="py-10 text-center text-sm text-slate-500">검색 결과가 없어요</p>
+      <p className="py-10 text-center text-sm text-slate-500">{tCommon('state.noSearchResults')}</p>
     ) : (
-      <p className="py-10 text-center text-sm text-slate-500">아직 할 일이 없어요</p>
+      <p className="py-10 text-center text-sm text-slate-500">{tDashboard('goalTodos.boardEmpty')}</p>
     );
   }
 

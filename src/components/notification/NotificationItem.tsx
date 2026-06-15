@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { Notification } from '@/src/types/notification';
 import { cn } from '@/src/utils/cn';
 import Image from 'next/image';
@@ -11,19 +12,23 @@ export interface NotificationItemProps {
   onClick?: (notification: Notification) => void;
 }
 
-function formatRelativeTime(dateStr: string): string {
+// 상대시간을 메시지 키 + count로 분해한다. Date.now()를 모듈 스코프 순수 함수에 가둬
+// 컴포넌트 렌더의 purity 규칙을 어기지 않게 하고, 실제 번역은 컴포넌트에서 수행한다.
+type RelativeTimeParts = { key: 'justNow' | 'minutes' | 'hours' | 'days' | 'weeks' | 'months'; count?: number };
+
+function getRelativeTimeParts(dateStr: string): RelativeTimeParts {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const minutes = Math.floor(diffMs / 60_000);
   const hours = Math.floor(diffMs / 3_600_000);
   const days = Math.floor(diffMs / 86_400_000);
   const weeks = Math.floor(days / 7);
 
-  if (minutes < 1) return '방금 전';
-  if (minutes < 60) return `${minutes}분 전`;
-  if (hours < 24) return `${hours}시간 전`;
-  if (days < 7) return `${days}일 전`;
-  if (weeks < 5) return `${weeks}주 전`;
-  return `${Math.floor(days / 30)}달 전`;
+  if (minutes < 1) return { key: 'justNow' };
+  if (minutes < 60) return { key: 'minutes', count: minutes };
+  if (hours < 24) return { key: 'hours', count: hours };
+  if (days < 7) return { key: 'days', count: days };
+  if (weeks < 5) return { key: 'weeks', count: weeks };
+  return { key: 'months', count: Math.floor(days / 30) };
 }
 
 /**
@@ -33,8 +38,13 @@ function formatRelativeTime(dateStr: string): string {
  * 클릭 시 onClick 콜백을 호출하며, 키보드(Enter/Space)로도 동작합니다.
  */
 export default function NotificationItem({ notification, subtext, onClick }: NotificationItemProps) {
+  const t = useTranslations('sidebar.notification');
+  const tRelative = useTranslations('common.relativeTime');
   const { isRead, message, createdAt, data } = notification;
   const isInteractive = Boolean(onClick);
+
+  const time = getRelativeTimeParts(createdAt);
+  const relativeTime = time.count != null ? tRelative(time.key, { count: time.count }) : tRelative(time.key);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -47,7 +57,7 @@ export default function NotificationItem({ notification, subtext, onClick }: Not
     <li
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
-      aria-label={isRead ? message : `읽지 않은 알림: ${message}`}
+      aria-label={isRead ? message : t('unreadLabel', { message })}
       onClick={() => onClick?.(notification)}
       onKeyDown={isInteractive ? handleKeyDown : undefined}
       className={cn(
@@ -71,7 +81,7 @@ export default function NotificationItem({ notification, subtext, onClick }: Not
             <p className={cn('font-medium wrap-break-word text-slate-700', !subtext && 'line-clamp-2')}>{message}</p>
             {subtext && <p className="truncate font-normal text-slate-500">{subtext}</p>}
           </div>
-          <p className="text-xs leading-4 text-slate-400">{formatRelativeTime(createdAt)}</p>
+          <p className="text-xs leading-4 text-slate-400">{relativeTime}</p>
         </div>
 
         {/* 아바타 (장식 이미지) */}
@@ -81,7 +91,7 @@ export default function NotificationItem({ notification, subtext, onClick }: Not
         >
           {data?.userImage ? (
             // 아바타 외부 도메인은 가변적 — next.config images.remotePatterns에서 https 전체 허용
-            <Image src={data.userImage} alt="알림 프로필 이미지" fill sizes="40px" className="object-cover" />
+            <Image src={data.userImage} alt={t('avatarAlt')} fill sizes="40px" className="object-cover" />
           ) : (
             <div className="size-full bg-slate-100" />
           )}

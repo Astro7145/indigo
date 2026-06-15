@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -28,6 +29,8 @@ const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700';
 const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base';
 
 export default function TodoDetailContent({ todo, onClose }: TodoDetailContentProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const dueDate = formatDotDate(todo.dueDate);
   const hasAttachment = Boolean(todo.linkUrl || todo.fileUrl);
   const openImageLightbox = useImageLightbox();
@@ -47,7 +50,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
           </h2>
           <Chip type={todo.done ? 'done' : 'todo'} className="shrink-0" />
         </div>
-        <IconButton aria-label="닫기" onClick={onClose} className="shrink-0">
+        <IconButton aria-label={tCommon('actions.close')} onClick={onClose} className="shrink-0">
           <IcDelete aria-hidden className="size-6 text-slate-400" />
         </IconButton>
       </div>
@@ -58,7 +61,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
               <IcFlagOutline aria-hidden size="small" className="size-[18px] text-slate-400" />
-              <span className={metaLabelClass}>목표</span>
+              <span className={metaLabelClass}>{tTodos('fields.goal')}</span>
             </div>
             <p className={metaValueClass}>{todo.goal.title}</p>
           </div>
@@ -68,7 +71,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
               <IcCalendarOutline aria-hidden className="size-[18px] text-slate-400" />
-              <span className={metaLabelClass}>마감기한</span>
+              <span className={metaLabelClass}>{tTodos('fields.dueDate')}</span>
             </div>
             <p className={metaValueClass}>{dueDate}</p>
           </div>
@@ -78,7 +81,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
           <div className="flex w-full items-start gap-2">
             <div className="flex shrink-0 items-center gap-1 text-slate-400">
               <span className="w-[17px] text-center text-base font-semibold">#</span>
-              <span className="text-sm font-medium whitespace-nowrap">태그</span>
+              <span className="text-sm font-medium whitespace-nowrap">{tTodos('fields.tag')}</span>
             </div>
             <div className="flex min-w-0 flex-1 flex-wrap gap-1">
               {todo.tags.map((tag, i) => (
@@ -94,7 +97,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
       {/* 첨부자료 (링크/이미지 둘 다 없으면 섹션 생략) */}
       {hasAttachment && (
         <section className="flex w-full flex-col gap-2">
-          <h3 className={sectionTitleClass}>첨부자료</h3>
+          <h3 className={sectionTitleClass}>{tTodos('detail.attachment')}</h3>
           <div className="flex flex-col gap-3">
             {todo.linkUrl && (
               <a
@@ -114,7 +117,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 aria-label="첨부 이미지 확대 보기"
                 className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200"
               >
-                <Image src={todo.fileUrl} alt="첨부 이미지" fill className="object-cover" />
+                <Image src={todo.fileUrl} alt={tCommon('image.attachmentAlt')} fill className="object-cover" />
               </button>
             )}
           </div>
@@ -124,7 +127,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
       {/* 작성된 노트 (없으면 섹션 생략) */}
       {notes.length > 0 && (
         <section className="flex w-full flex-col gap-2">
-          <h3 className={sectionTitleClass}>작성된 노트</h3>
+          <h3 className={sectionTitleClass}>{tTodos('detail.notes')}</h3>
           <ul className="flex flex-col gap-2">
             {notes.map((note) => (
               <li key={note.id}>

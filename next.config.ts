@@ -1,7 +1,9 @@
 import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  transpilePackages: ['next-intl'],
   allowedDevOrigins: ['192.168.*.*'],
   images: {
     // 업로드 이미지/아바타 호스트가 가변적이라 전체 https 허용. 호스트 확정 시 좁힐 것.
@@ -13,4 +15,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin(
+  // request.ts 경로 지정 (next.config는 번들링 대상이 아니라 @/ 별칭 사용 불가)
+  './src/i18n/request.ts',
+);
+
+export default withNextIntl(nextConfig);

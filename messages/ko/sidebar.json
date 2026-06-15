@@ -1,0 +1,34 @@
+{
+  "nav": {
+    "dashboard": "대시보드",
+    "calendar": "캘린더",
+    "posts": "소통 게시판",
+    "favorites": "찜한 할일",
+    "settings": "설정",
+    "logout": "로그아웃"
+  },
+  "expand": "사이드바 확장",
+  "collapse": "사이드바 축소",
+  "menuCollapse": "메뉴 접기",
+  "newTodo": "새 할일",
+  "goal": {
+    "title": "목표",
+    "add": "목표 추가",
+    "inputPlaceholder": "새 목표를 입력하세요",
+    "inputLabel": "새 목표 입력",
+    "empty": "목표가 없어요"
+  },
+  "notification": {
+    "title": "알림",
+    "refresh": "알림 목록 새로고침",
+    "deleteAll": "모두 삭제",
+    "readAll": "모두 읽기",
+    "readAllLabel": "모든 알림을 읽음으로 표시",
+    "listLabel": "알림 목록",
+    "loadMore": "더 보기",
+    "loadMoreLabel": "이전 알림 더 불러오기",
+    "empty": "아직 알림이 없어요",
+    "unreadLabel": "읽지 않은 알림: {message}",
+    "avatarAlt": "알림 프로필 이미지"
+  }
+}
