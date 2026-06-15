@@ -29,7 +29,7 @@ export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) 
     <>
       <mesh scale={hovered ? 0.5 : 0.38} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
         <sphereGeometry args={[1, 20, 20]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={hovered ? 1.6 : done ? 0.5 : 1} />
+        <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {hovered && (
         <Html center distanceFactor={18} className="pointer-events-none">

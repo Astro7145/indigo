@@ -28,7 +28,7 @@ export default function GoalNode({ size, title, onPointerDown }: GoalNodeProps) 
     <>
       <mesh scale={hovered ? size * 1.25 : size} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial color={colors.goal} emissive={colors.goal} emissiveIntensity={hovered ? 1.2 : 0.7} />
+        <meshBasicMaterial color={colors.goal} toneMapped={false} />
       </mesh>
       {hovered && (
         <Html center distanceFactor={24} className="pointer-events-none">

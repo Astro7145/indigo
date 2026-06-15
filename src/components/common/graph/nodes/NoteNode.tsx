@@ -9,7 +9,7 @@ export default function NoteNode() {
   return (
     <mesh scale={0.18}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshStandardMaterial color={colors.note} emissive={colors.note} emissiveIntensity={0.9} />
+      <meshBasicMaterial color={colors.note} toneMapped={false} />
     </mesh>
   );
 }

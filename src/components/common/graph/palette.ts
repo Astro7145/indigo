@@ -7,7 +7,6 @@
 export interface GraphColors {
   background: string;
   moon: string;
-  moonGlow: string;
   goal: string;
   todo: string;
   todoDone: string;
@@ -19,7 +18,6 @@ export interface GraphColors {
 const TOKENS: Record<keyof GraphColors, string> = {
   background: '--color-slate-900',
   moon: '--color-indigo-100',
-  moonGlow: '--color-indigo-400',
   goal: '--color-indigo-500',
   todo: '--color-indigo-400',
   todoDone: '--color-indigo-700',
