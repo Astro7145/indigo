@@ -1,4 +1,10 @@
-import { loginSchema, signupSchema } from './schema';
+import koValidation from '@/messages/ko/validation.json';
+import { createLoginSchema, createSignupSchema } from './schema';
+
+// ko 검증 메시지를 주입해 기존 한글 단언을 그대로 검증한다.
+const t = (key: string) => (koValidation as Record<string, string>)[key];
+const loginSchema = createLoginSchema(t);
+const signupSchema = createSignupSchema(t);
 
 describe('loginSchema', () => {
   describe('email 필드', () => {

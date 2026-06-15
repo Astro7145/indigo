@@ -17,22 +17,31 @@ export const todoCreateSchema = z.object({
 
 export type TodoCreateValues = z.infer<typeof todoCreateSchema>;
 
-export const loginSchema = z.object({
-  email: z.email({ error: '올바른 이메일을 입력해주세요.' }),
-  password: z.string().min(1, { error: '비밀번호는 필수 입력입니다.' }),
-});
+// 검증 메시지를 i18n으로 전환하기 위해 translator(useTranslations('validation'))를 받아 스키마를 만든다.
+// 컴포넌트는 useTranslations('validation')의 t를 주입해 선택된 언어로 에러 메시지를 표시한다.
+type Translator = (key: string) => string;
 
-export const signupSchema = z
-  .object({
-    name: z.string().min(1, { error: '이름을 입력해주세요.' }).max(20, { error: '이름은 20자 이하로 입력해주세요.' }),
-    email: z.email({ error: '올바른 이메일을 입력해주세요.' }),
-    password: z.string().min(8, { error: '비밀번호가 8자 이상이 되도록 해 주세요.' }),
-    passwordConfirm: z.string().min(1, { error: '비밀번호 확인을 입력해주세요.' }),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    path: ['passwordConfirm'],
-    message: '비밀번호가 일치하지 않습니다.',
+export const createLoginSchema = (t: Translator) =>
+  z.object({
+    email: z.email({ error: t('emailInvalid') }),
+    password: z.string().min(1, { error: t('passwordRequired') }),
   });
+
+export const createSignupSchema = (t: Translator) =>
+  z
+    .object({
+      name: z
+        .string()
+        .min(1, { error: t('nameRequired') })
+        .max(20, { error: t('nameMax') }),
+      email: z.email({ error: t('emailInvalid') }),
+      password: z.string().min(8, { error: t('passwordMin') }),
+      passwordConfirm: z.string().min(1, { error: t('passwordConfirmRequired') }),
+    })
+    .refine((data) => data.password === data.passwordConfirm, {
+      path: ['passwordConfirm'],
+      message: t('passwordMismatch'),
+    });
 
 export const meSchema = z
   .object({
