@@ -54,19 +54,34 @@ function unit(v: Vec3): Vec3 {
   return [v[0] / len, v[1] / len, v[2] / len];
 }
 
-/** n에 수직인 단위 벡터(부채꼴을 펼칠 접선축). */
+/** n에 수직인 단위 벡터(콘을 펼칠 접선축). */
 function perpendicular(n: Vec3): Vec3 {
   const up: Vec3 = Math.abs(n[1]) < 0.99 ? [0, 1, 0] : [1, 0, 0];
   return unit([n[1] * up[2] - n[2] * up[1], n[2] * up[0] - n[0] * up[2], n[0] * up[1] - n[1] * up[0]]);
 }
 
-/** 바깥 방향 n을 중심으로 count개를 부채꼴로 편 i번째 단위 방향(n·cos + 접선·sin). */
-const FAN_SPREAD = 2.4; // 전체 펼침 각(rad)
-function fanDirection(n: Vec3, u: Vec3, i: number, count: number): Vec3 {
-  const a = count <= 1 ? 0 : (i / (count - 1) - 0.5) * FAN_SPREAD;
-  const c = Math.cos(a);
-  const s = Math.sin(a);
-  return [n[0] * c + u[0] * s, n[1] * c + u[1] * s, n[2] * c + u[2] * s];
+function cross(a: Vec3, b: Vec3): Vec3 {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+/**
+ * 바깥축 n을 중심으로 count개를 원뿔(콘)로 펼친 i번째 단위 방향(해바라기 분포).
+ * n·cos(θ) + (접선축 u,w로 만든 방위)·sin(θ). θ는 축에서의 벌어짐, 방위각은 황금각.
+ */
+const CONE_HALF = 1.0; // 콘 반각(rad) ≈ 57°
+function coneDirection(n: Vec3, u: Vec3, w: Vec3, i: number, count: number): Vec3 {
+  if (count <= 1) return n;
+  const theta = Math.sqrt((i + 0.5) / count) * CONE_HALF; // 면적 균등(가운데가 덜 몰리게)
+  const phi = i * GOLDEN_ANGLE;
+  const st = Math.sin(theta);
+  const ct = Math.cos(theta);
+  const cp = Math.cos(phi);
+  const sp = Math.sin(phi);
+  return [
+    ct * n[0] + st * (cp * u[0] + sp * w[0]),
+    ct * n[1] + st * (cp * u[1] + sp * w[1]),
+    ct * n[2] + st * (cp * u[2] + sp * w[2]),
+  ];
 }
 
 /** 목표마다 중심까지의 거리를 다르게 — golden-ratio 소수부로 deterministic하게 분산(R_GOAL의 0.7~1.3배). */
@@ -77,7 +92,7 @@ function goalRadius(i: number): number {
 
 /**
  * 목표·할일·노트를 궤도형 3D 좌표로 배치(deterministic).
- * - 달: 원점 / 목표: 달 주위 피보나치 구(목표마다 거리 다름) / 할일: 목표에서 바깥(원점 반대)으로 R_TODO 부채꼴 / 노트: 할일에서 바깥으로 R_NOTE 부채꼴
+ * - 달: 원점 / 목표: 달 주위 피보나치 구(목표마다 거리 다름) / 할일: 목표에서 바깥(원점 반대)으로 R_TODO 원뿔 / 노트: 할일에서 바깥으로 R_NOTE 원뿔
  * - goalId가 null이거나 목표 목록에 없는 할일은 제외.
  */
 export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphLayout {
@@ -113,22 +128,24 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
     // 완료(done)를 앞쪽에 모아 정렬 → 고리에서 밝은 할일이 연속된 호로 보여 진행도가 자연스럽게 읽힌다.
     const list = (todosByGoal.get(goalNode.id) ?? []).slice().sort((a, b) => Number(b.done) - Number(a.done));
     const m = list.length;
-    // 목표의 '바깥'(원점 반대) 방향과 접선축 — 할일을 그쪽으로 부채꼴로 편다.
+    // 목표의 '바깥'(원점 반대) 방향과 접선 기저(u, w) — 할일을 그쪽으로 원뿔로 편다.
     const gOut = unit(goalNode.position);
-    const gTan = perpendicular(gOut);
+    const gU = perpendicular(gOut);
+    const gW = cross(gOut, gU);
     list.forEach((t, ti) => {
-      const dir = fanDirection(gOut, gTan, ti, m);
+      const dir = coneDirection(gOut, gU, gW, ti, m);
       const position = add(goalNode.position, [dir[0] * R_TODO, dir[1] * R_TODO, dir[2] * R_TODO]);
       todoNodes.push({ id: t.id, goalId: goalNode.id, position });
       links.push([goalNode.position, position]);
 
       const noteIds = t.noteIds ?? [];
       const k = noteIds.length;
-      // 노트도 할일에서 '바깥'(원점 반대) 방향으로 부채꼴.
+      // 노트도 할일에서 '바깥'(원점 반대) 방향으로 원뿔.
       const tOut = unit(position);
-      const tTan = perpendicular(tOut);
+      const tU = perpendicular(tOut);
+      const tW = cross(tOut, tU);
       noteIds.forEach((noteId, ni) => {
-        const ndir = fanDirection(tOut, tTan, ni, k);
+        const ndir = coneDirection(tOut, tU, tW, ni, k);
         const notePos = add(position, [ndir[0] * R_NOTE, ndir[1] * R_NOTE, ndir[2] * R_NOTE]);
         noteNodes.push({ id: noteId, todoId: t.id, position: notePos });
         links.push([position, notePos]);
