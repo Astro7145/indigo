@@ -21,7 +21,7 @@ export default function GoalNode({ size, title, progress, onPointerDown }: GoalN
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
   const colors = getGraphColors();
-  const color = new Color(colors.goal).multiplyScalar(0.5 + progress * 0.85);
+  const color = new Color(colors.goal).multiplyScalar(0.75 + progress * 0.6);
 
   const over = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();

@@ -17,8 +17,8 @@ interface ProgressRingProps {
  */
 export default function ProgressRing({ nodeRadius, progress }: ProgressRingProps) {
   const colors = getGraphColors();
-  const inner = nodeRadius * 1.3;
-  const outer = nodeRadius * 1.5;
+  const inner = nodeRadius * 1.12;
+  const outer = nodeRadius * 1.2;
   const p = Math.max(0, Math.min(1, progress));
 
   return (

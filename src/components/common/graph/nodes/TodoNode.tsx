@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
+import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
 
 interface TodoNodeProps {
@@ -12,12 +13,13 @@ interface TodoNodeProps {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
-/** 할일 = 작은 발광 구. 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). done이면 차분한 색. */
+/** 할일 = 작은 발광 구. 완료(Done)면 밝게, 미완료(Todo)면 어둡게. 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). */
 export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
   const colors = getGraphColors();
-  const color = done ? colors.todoDone : colors.todo;
+  // done이면 밝게(발광↑), 미완료면 어둡게.
+  const color = new Color(colors.todo).multiplyScalar(done ? 1.35 : 0.5);
 
   const over = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
