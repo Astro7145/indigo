@@ -34,7 +34,7 @@ function ToggleTab({ label, active, onClick, children }: ToggleTabProps) {
       aria-checked={active}
       onClick={onClick}
       className={cn(
-        'flex cursor-pointer items-center justify-center rounded-full px-6 py-1.5 transition-colors sm:px-7 sm:py-2',
+        'flex cursor-pointer items-center justify-center rounded-full px-6 py-1.5 sm:px-7 sm:py-2',
         active ? 'dark:bg-indigo-dark-300 bg-white shadow-md' : 'bg-transparent',
       )}
     >

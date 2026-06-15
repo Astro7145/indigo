@@ -329,8 +329,10 @@ function Item({ onClick, disabled = false, selected = false, className, children
           textSize,
           innerPadding,
           innerRadius,
+          !disabled && selected && 'dark:bg-indigo-dark-500 bg-indigo-300 focus-visible:outline-none',
           !disabled &&
-            'dark:bg-indigo-dark-300 dark:hover:bg-indigo-dark-500 dark:focus-visible:bg-indigo-dark-500 bg-white hover:bg-indigo-300 focus-visible:bg-indigo-300 focus-visible:outline-none',
+            !selected &&
+            'dark:hover:bg-indigo-dark-400 dark:focus-visible:bg-indigo-dark-400 hover:bg-indigo-100 focus-visible:bg-indigo-100 focus-visible:outline-none',
           disabled && 'dark:bg-indigo-dark-300 cursor-not-allowed bg-white opacity-40',
           className,
         )}
