@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -19,6 +20,7 @@ const ZOOM_LEVELS = [1, 2, 4] as const;
 type ZoomLevel = (typeof ZOOM_LEVELS)[number];
 
 export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxProps) {
+  const tCommon = useTranslations('common');
   const [scale, setScale] = useState<ZoomLevel>(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   // raw img는 다운로드 전 0×0이라 그대로 두면 마운트 직후 자연 크기로 layout shift가 일어나 "접혔다 펴지는" 인상을 준다.
@@ -116,7 +118,7 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
           cursor: scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'zoom-in',
         }}
       />
-      <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4">
+      <IconButton aria-label={tCommon('actions.close')} onClick={onClose} className="absolute top-4 right-4">
         <IcDelete className="size-6 text-white" />
       </IconButton>
     </div>
