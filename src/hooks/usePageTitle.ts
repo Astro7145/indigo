@@ -43,12 +43,7 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
-  const tCalendar = useTranslations('calendar');
-  const tDashboard = useTranslations('dashboard');
-  const tFavorites = useTranslations('favorites');
-  const tGoals = useTranslations('goals');
-  const tMe = useTranslations('me');
-  const tTodos = useTranslations('todos');
+  const t = useTranslations('common');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
@@ -66,30 +61,29 @@ export function usePageTitle(): string {
 
   switch (route) {
     case 'dashboard':
-      // DashboardTitle과 동일하게 이름 + 접미사(title) 조합
-      return `${name}${tDashboard('title')}`;
+      return t('pageTitle.dashboard', { name });
     case 'todos':
-      return todoCount != null ? `${tTodos('title')} ${todoCount}` : tTodos('title');
+      return todoCount != null ? t('pageTitle.todosCount', { count: todoCount }) : t('pageTitle.todos');
     case 'notes-write':
-      return '노트 작성하기';
+      return t('pageTitle.notesWrite');
     case 'notes-edit':
-      return '노트 수정하기';
+      return t('pageTitle.notesEdit');
     case 'goal':
-      return tGoals('title', { name });
+      return t('pageTitle.goal', { name });
     case 'goal-notes':
-      return '노트 모아보기';
+      return t('pageTitle.goalNotes');
     case 'posts-write':
-      return '게시물 작성하기';
+      return t('pageTitle.postsWrite');
     case 'posts-edit':
-      return '게시물 수정하기';
+      return t('pageTitle.postsEdit');
     case 'posts':
-      return '소통 게시판';
+      return t('pageTitle.posts');
     case 'favorites':
-      return favoriteCount != null ? `${tFavorites('title')} ${favoriteCount}` : tFavorites('title');
+      return favoriteCount != null ? t('pageTitle.favoritesCount', { count: favoriteCount }) : t('pageTitle.favorites');
     case 'calendar':
-      return tCalendar('title', { name });
+      return t('pageTitle.calendar', { name });
     case 'me':
-      return tMe('title');
+      return t('pageTitle.me');
     default:
       return '';
   }

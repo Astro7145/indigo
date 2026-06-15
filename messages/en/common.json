@@ -103,5 +103,21 @@
   "favorite": {
     "add": "Add to favorites",
     "remove": "Remove from favorites"
+  },
+  "pageTitle": {
+    "dashboard": "{name}'s Dashboard",
+    "todos": "All TODOs",
+    "todosCount": "All TODOs {count}",
+    "notesWrite": "Write Note",
+    "notesEdit": "Edit Note",
+    "goal": "{name}'s Goals",
+    "goalNotes": "All Notes",
+    "postsWrite": "Write Post",
+    "postsEdit": "Edit Post",
+    "posts": "Posts",
+    "favorites": "Favorites",
+    "favoritesCount": "Favorites {count}",
+    "calendar": "{name}'s Calendar",
+    "me": "My Profile"
   }
 }

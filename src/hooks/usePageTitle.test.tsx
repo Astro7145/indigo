@@ -95,3 +95,39 @@ it('/favorites에서 탭이 없으면(ALL) 전체 찜 개수를 쓴다', async (
   const { result } = renderHookWithClient(() => usePageTitle());
   await waitFor(() => expect(result.current).toBe('찜한 할일 2'));
 });
+
+it('대시보드(/)는 유저명 인사말을 보여준다', async () => {
+  mockPathname = '/';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('홍길동님의 대시보드'));
+});
+
+it('캘린더(/calendar)는 유저명 인사말을 보여준다', async () => {
+  mockPathname = '/calendar';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('홍길동님의 캘린더'));
+});
+
+it('목표(/goals/:id)는 유저명 인사말을 보여준다', async () => {
+  mockPathname = '/goals/5';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('홍길동님의 목표'));
+});
+
+it('내 정보(/me) 타이틀', async () => {
+  mockPathname = '/me';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('내 정보 관리'));
+});
+
+it('소통 게시판(/posts) 타이틀', async () => {
+  mockPathname = '/posts';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('소통 게시판'));
+});
+
+it('노트 작성(/todos/:id/notes/write) 타이틀', async () => {
+  mockPathname = '/todos/1/notes/write';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('노트 작성하기'));
+});

@@ -103,5 +103,21 @@
   "favorite": {
     "add": "お気に入り",
     "remove": "お気に入り解除"
+  },
+  "pageTitle": {
+    "dashboard": "{name}さんのダッシュボード",
+    "todos": "すべてのTODO",
+    "todosCount": "すべてのTODO {count}",
+    "notesWrite": "ノートを作成",
+    "notesEdit": "ノートを編集",
+    "goal": "{name}さんの目標",
+    "goalNotes": "ノート一覧",
+    "postsWrite": "投稿を作成",
+    "postsEdit": "投稿を編集",
+    "posts": "コミュニティ掲示板",
+    "favorites": "お気に入りのTODO",
+    "favoritesCount": "お気に入りのTODO {count}",
+    "calendar": "{name}さんのカレンダー",
+    "me": "マイページ"
   }
 }
