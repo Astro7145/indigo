@@ -3,7 +3,7 @@
  * globals.css `@theme` 의 indigo 스케일 값을 여기서 리터럴로 단일 정의해 매핑한다.
  */
 export const GRAPH_COLORS = {
-  background: '#161b4b', // indigo-900
+  background: '#0a0d26', // indigo-900(#161b4b)보다 더 어두운 딥 인디고(밤하늘 배경, 토큰엔 없는 커스텀)
   moon: '#faf7ff', // indigo-100
   moonGlow: '#d9ceff', // indigo-400
   goal: '#b3aaff', // indigo-500

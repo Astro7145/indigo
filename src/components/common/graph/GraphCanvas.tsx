@@ -22,7 +22,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
     .join(',')}`;
 
   return (
-    <div className="h-[60dvh] min-h-[440px] w-full overflow-hidden rounded-2xl bg-indigo-900 sm:h-[70dvh]">
+    <div className="h-full w-full">
       <Canvas camera={{ position: [0, 6, 18], fov: 55 }} dpr={[1, 2]}>
         <color attach="background" args={[GRAPH_COLORS.background]} />
         <ambientLight intensity={0.6} />

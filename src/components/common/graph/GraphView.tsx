@@ -9,13 +9,9 @@ const GraphCanvas = dynamic(() => import('@/src/components/common/graph/GraphCan
   loading: () => <GraphShell>우주를 그리는 중…</GraphShell>,
 });
 
-/** 그래프 영역과 동일 크기의 다크 셸 — 로딩/에러/빈 상태 공용. */
+/** 부모(풀블리드 컨테이너)를 채우는 다크 셸 — 로딩/에러/빈 상태 공용. */
 function GraphShell({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex h-[70dvh] min-h-[480px] w-full items-center justify-center rounded-2xl bg-indigo-900 text-sm text-indigo-300">
-      {children}
-    </div>
-  );
+  return <div className="flex h-full w-full items-center justify-center text-sm text-indigo-300">{children}</div>;
 }
 
 /**
