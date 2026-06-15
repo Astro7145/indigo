@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Html, useCursor } from '@react-three/drei';
+import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { getGraphColors } from '@/src/components/common/graph/palette';
+import { SPARKLE_GEOMETRY } from '@/src/components/common/graph/sparkleGeometry';
 import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
 
 interface GoalNodeProps {
@@ -15,11 +16,11 @@ interface GoalNodeProps {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
-/** 목표 = 행성/큰 별. 끌어서 이동, 짧게 탭하면 목표상세로 이동(부모가 처리). 위치는 부모 group이 잡는다. */
+/** 목표 = 큰 반짝이 별(빌보드 스파클). 끌어서 이동, 짧게 탭하면 목표상세 확인 모달(부모가 처리). */
 export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const matRef = useTwinkle(hovered ? 1.4 : 0.7, seed);
+  const matRef = useTwinkle(hovered ? 1.6 : 0.9, seed);
   const colors = getGraphColors();
 
   const over = (e: ThreeEvent<PointerEvent>) => {
@@ -29,10 +30,15 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
   const out = () => setHovered(false);
 
   return (
-    <>
-      <mesh scale={hovered ? size * 1.25 : size} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
-        <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial ref={matRef} color={colors.goal} emissive={colors.goal} emissiveIntensity={0.7} />
+    <Billboard>
+      <mesh
+        geometry={SPARKLE_GEOMETRY}
+        scale={hovered ? size * 1.25 : size}
+        onPointerOver={over}
+        onPointerOut={out}
+        onPointerDown={onPointerDown}
+      >
+        <meshStandardMaterial ref={matRef} color={colors.goal} emissive={colors.goal} emissiveIntensity={0.9} />
       </mesh>
       {hovered && (
         <Html center distanceFactor={24} className="pointer-events-none">
@@ -41,6 +47,6 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
           </span>
         </Html>
       )}
-    </>
+    </Billboard>
   );
 }

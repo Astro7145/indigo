@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Html, useCursor } from '@react-three/drei';
+import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { getGraphColors } from '@/src/components/common/graph/palette';
+import { SPARKLE_GEOMETRY } from '@/src/components/common/graph/sparkleGeometry';
 import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
 
 interface TodoNodeProps {
@@ -15,14 +16,14 @@ interface TodoNodeProps {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
-/** 할일 = 작은 별. 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). done이면 차분한 색. */
+/** 할일 = 작은 반짝이 별(빌보드 스파클). 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). done이면 차분한 색. */
 export default function TodoNode({ title, done, seed, onPointerDown }: TodoNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
   const colors = getGraphColors();
   const color = done ? colors.todoDone : colors.todo;
   // done은 더 차분하게(낮은 진폭) 깜빡인다.
-  const matRef = useTwinkle(hovered ? 1.6 : done ? 0.5 : 1, seed, done ? 0.15 : 0.35);
+  const matRef = useTwinkle(hovered ? 1.8 : done ? 0.6 : 1.1, seed, done ? 0.15 : 0.35);
 
   const over = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -31,16 +32,21 @@ export default function TodoNode({ title, done, seed, onPointerDown }: TodoNodeP
   const out = () => setHovered(false);
 
   return (
-    <>
-      <mesh scale={hovered ? 0.5 : 0.38} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
-        <sphereGeometry args={[1, 20, 20]} />
-        <meshStandardMaterial ref={matRef} color={color} emissive={color} emissiveIntensity={done ? 0.5 : 1} />
+    <Billboard>
+      <mesh
+        geometry={SPARKLE_GEOMETRY}
+        scale={hovered ? 0.55 : 0.42}
+        onPointerOver={over}
+        onPointerOut={out}
+        onPointerDown={onPointerDown}
+      >
+        <meshStandardMaterial ref={matRef} color={color} emissive={color} emissiveIntensity={done ? 0.6 : 1.1} />
       </mesh>
       {hovered && (
         <Html center distanceFactor={18} className="pointer-events-none">
           <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs whitespace-nowrap text-indigo-100">{title}</span>
         </Html>
       )}
-    </>
+    </Billboard>
   );
 }
