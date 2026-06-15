@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* 다크모드: next-themes가 <html>에 붙이는 .dark 클래스를 기준으로 dark: 유틸리티 활성화 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Design tokens */
 @theme {
   /* ---- Color: indigo ---- */
@@ -30,6 +33,18 @@
   --color-slate-700: #333333;
   --color-slate-800: #262626;
   --color-slate-900: #121212;
+
+  /* ---- Color: indigo-dark (다크모드 surface/accent 스케일) ---- */
+  /* surface 100~400: 명도 차이로 깊이 표현 / accent 600~900: 라이트 indigo 700~400 재사용 */
+  --color-indigo-dark-100: #161523; /* section bg (가장 어두움) */
+  --color-indigo-dark-200: #1a1b2e; /* sidebar */
+  --color-indigo-dark-300: #1f1e2e; /* card */
+  --color-indigo-dark-400: #252438; /* page bg */
+  --color-indigo-dark-500: #3d3677; /* deep */
+  --color-indigo-dark-600: #6a65b4; /* accent (= light indigo-700) */
+  --color-indigo-dark-700: #8e86d9; /* primary (= light indigo-600) */
+  --color-indigo-dark-800: #b3aaff; /* bright (= light indigo-500) */
+  --color-indigo-dark-900: #d9ceff; /* glow (= light indigo-400) */
 
   /* ---- Color: destructive ---- */
   --color-destructive: #ef4444;

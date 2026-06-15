@@ -29,6 +29,7 @@ export { IcLogout } from './IcLogout';
 export { IcMeetballs } from './IcMeetballs';
 export { IcMessageCircle } from './IcMessageCircle';
 export { IcMessageSquare } from './IcMessageSquare';
+export { IcMonitor } from './IcMonitor';
 export { IcMoon } from './IcMoon';
 export { IcNote } from './IcNote';
 export { IcNoteWrite } from './IcNoteWrite';
