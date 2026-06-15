@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDate } from '@internationalized/date';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +17,7 @@ import DatePicker from '@/src/components/todo/date-picker/DatePicker';
 import TagInput, { type Tag } from '@/src/components/todo/TagInput';
 import { useGoalList } from '@/src/hooks/goal';
 import { calendarDateToIso, isoToCalendarDate } from '@/src/utils/date';
-import { todoCreateSchema, type TodoCreateValues } from '@/src/utils/schema';
+import { createTodoCreateSchema, type TodoCreateValues } from '@/src/utils/schema';
 
 export interface TodoFormValues {
   title: string;
@@ -49,6 +50,10 @@ export default function TodoFormUI({
   disableSubmitUntilValid,
   isPending,
 }: TodoFormUIProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
+  const tValidation = useTranslations('validation');
+
   const {
     register,
     handleSubmit,
@@ -57,7 +62,7 @@ export default function TodoFormUI({
     trigger,
     formState: { errors, isValid, isSubmitting },
   } = useForm<TodoCreateValues>({
-    resolver: zodResolver(todoCreateSchema),
+    resolver: zodResolver(createTodoCreateSchema(tValidation)),
     mode: 'onChange',
     defaultValues: {
       title: initialValues?.title ?? '',
@@ -106,7 +111,7 @@ export default function TodoFormUI({
     <>
       <div className="flex shrink-0 items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-800">{title}</h2>
-        <button type="button" onClick={onClose} aria-label="닫기">
+        <button type="button" onClick={onClose} aria-label={tCommon('actions.close')}>
           <IcDelete className="size-6 text-slate-400" />
         </button>
       </div>
@@ -130,10 +135,10 @@ export default function TodoFormUI({
         {/* 제목 */}
         <div className="flex flex-col gap-2">
           <label className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
-            제목 <span className="text-destructive">*</span>
+            {tTodos('fields.title')} <span className="text-destructive">*</span>
           </label>
           <Input
-            placeholder="할 일의 제목을 적어주세요"
+            placeholder={tTodos('form.titlePlaceholder')}
             variant={errors.title ? 'error' : 'default'}
             {...register('title')}
           />
@@ -144,20 +149,20 @@ export default function TodoFormUI({
 
         {/* 목표 */}
         <div className="flex flex-col gap-2 pb-8">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">목표</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.goal')}</span>
           <Dropdown>
             <Dropdown.Trigger asChild>
               <button
                 type="button"
                 className="flex w-full items-center justify-between rounded-sm border border-slate-300 p-3 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base"
               >
-                {selectedGoal?.title ?? '목표를 선택해주세요'}
+                {selectedGoal?.title ?? tTodos('form.goalPlaceholder')}
                 <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
               </button>
             </Dropdown.Trigger>
             {/* 폼은 모달 스택(z-100+) 안에서 열리므로 메뉴를 그 위로 — 기본 z-50은 페이지 맥락용으로 유지 */}
             <Dropdown.Menu size="full" className="z-[120]">
-              <Dropdown.Item onClick={() => setValue('goalId', undefined)}>목표 없음</Dropdown.Item>
+              <Dropdown.Item onClick={() => setValue('goalId', undefined)}>{tTodos('form.goalNone')}</Dropdown.Item>
               {goalData?.goals.map((goal) => (
                 <Dropdown.Item key={goal.id} onClick={() => setValue('goalId', goal.id)}>
                   {goal.title}
@@ -170,7 +175,7 @@ export default function TodoFormUI({
         {/* 마감기한 */}
         <div className="flex flex-col gap-2">
           <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
-            마감기한 <span className="text-destructive">*</span>
+            {tTodos('fields.dueDate')} <span className="text-destructive">*</span>
           </span>
           <DatePicker
             value={selectedDate}
@@ -187,14 +192,14 @@ export default function TodoFormUI({
 
         {/* 태그 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">태그</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.tag')}</span>
           <TagInput value={tags} onChange={setTags} />
         </div>
 
         {/* 링크 */}
         <div className="flex flex-col gap-2">
           <label htmlFor="link-input" className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
-            링크
+            {tTodos('fields.link')}
           </label>
           <LinkInput
             id="link-input"
@@ -209,14 +214,14 @@ export default function TodoFormUI({
 
         {/* 이미지 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">이미지</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.image')}</span>
           <ImageInput onFileChange={setImageFile} initialUrl={fileUrl} onInitialUrlRemove={() => setFileUrl(null)} />
-          <p className="text-sm font-medium text-slate-400">이미지는 최대 1개만 첨부할 수 있습니다.</p>
+          <p className="text-sm font-medium text-slate-400">{tTodos('form.imageHint')}</p>
         </div>
       </form>
       <div className="mt-10 flex w-full shrink-0 items-center gap-2 sm:gap-3 [&>*]:flex-1">
         <Button variant="tertiary" size="small" className="py-3 text-base sm:py-[14px] sm:text-lg" onClick={onClose}>
-          취소
+          {tCommon('actions.cancel')}
         </Button>
         <Button
           variant="primary"

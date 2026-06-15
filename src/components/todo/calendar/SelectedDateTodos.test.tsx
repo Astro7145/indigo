@@ -38,7 +38,7 @@ it('선택 날짜를 yyyy. mm. dd로 표시하고 할일을 렌더한다', () =>
 
 it('할일이 없으면 안내 문구를 표시한다', () => {
   render(<SelectedDateTodos date={new CalendarDate(2025, 1, 10)} todos={[]} onSelectTodo={() => {}} />);
-  expect(screen.getByText('등록된 할 일이 없어요')).toBeInTheDocument();
+  expect(screen.getByText('등록된 할일이 없어요')).toBeInTheDocument();
 });
 
 it('항목을 클릭하면 해당 todo로 onSelectTodo를 호출한다', () => {
