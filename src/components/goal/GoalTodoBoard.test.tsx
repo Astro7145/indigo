@@ -93,7 +93,7 @@ it('노트가 없으면 노트 작성(연필) 액션을, 있으면 노트 인디
 it('할일이 없으면 빈 UI 메시지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
-  expect(await screen.findByText('아직 할 일이 없어요')).toBeInTheDocument();
+  expect(await screen.findByText('아직 할일이 없어요')).toBeInTheDocument();
 });
 
 it('조회 실패 시 에러 메시지를 렌더한다', async () => {
@@ -105,12 +105,12 @@ it('조회 실패 시 에러 메시지를 렌더한다', async () => {
 it('검색어가 있고 결과가 없으면 "검색 결과가 없어요"를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
-  await screen.findByText('아직 할 일이 없어요');
-  const input = screen.getByLabelText('할 일 검색');
+  await screen.findByText('아직 할일이 없어요');
+  const input = screen.getByLabelText('할일 검색');
   fireEvent.change(input, { target: { value: '없는키워드' } });
   fireEvent.keyUp(input, { key: 'Enter' });
   expect(await screen.findByText('검색 결과가 없어요')).toBeInTheDocument();
-  expect(screen.queryByText('아직 할 일이 없어요')).not.toBeInTheDocument();
+  expect(screen.queryByText('아직 할일이 없어요')).not.toBeInTheDocument();
 });
 
 it('체크박스 클릭 시 patchTodo로 done을 토글한다', async () => {
@@ -135,7 +135,7 @@ it('검색어 입력 후 Enter 시 keyword로 getTodos를 호출한다', async (
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
   await screen.findByText('디자인 시스템 정복하기');
-  const input = screen.getByLabelText('할 일 검색');
+  const input = screen.getByLabelText('할일 검색');
   fireEvent.change(input, { target: { value: '실습' } });
   fireEvent.keyUp(input, { key: 'Enter' });
   await waitFor(() =>
@@ -155,7 +155,7 @@ it('"할일 추가" 버튼 클릭은 카드 네비게이션을 트리거하지 �
   renderBoard();
   await screen.findByText('디자인 시스템 정복하기');
   // 모바일 +아이콘 버튼과 태블릿+ 텍스트 버튼 둘 다 카드 이동을 막아야 한다
-  screen.getAllByRole('button', { name: '할 일 추가' }).forEach((btn) => fireEvent.click(btn));
+  screen.getAllByRole('button', { name: '할일 추가' }).forEach((btn) => fireEvent.click(btn));
   expect(mockPush).not.toHaveBeenCalled();
 });
 

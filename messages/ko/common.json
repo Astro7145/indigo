@@ -64,8 +64,8 @@
     "months": "{count}달 전"
   },
   "search": {
-    "placeholder": "할 일을 검색해주세요",
-    "label": "할 일 검색",
+    "placeholder": "할일을 검색해주세요",
+    "label": "할일 검색",
     "button": "검색"
   },
   "passwordToggle": {

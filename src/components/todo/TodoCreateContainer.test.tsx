@@ -121,7 +121,7 @@ describe('TodoCreateContainer', () => {
     await act(async () => {
       await capturedOnSubmit!(baseValues);
     });
-    expect(mockShowToast).toHaveBeenCalledWith('할 일이 추가되었습니다.');
+    expect(mockShowToast).toHaveBeenCalledWith('할일이 추가되었습니다.');
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -134,7 +134,7 @@ describe('TodoCreateContainer', () => {
     await act(async () => {
       await capturedOnSubmit!(baseValues);
     });
-    expect(mockShowToast).toHaveBeenCalledWith('할 일 생성에 실패했습니다.');
+    expect(mockShowToast).toHaveBeenCalledWith('할일 생성에 실패했습니다.');
     expect(onClose).not.toHaveBeenCalled();
   });
 

@@ -24,9 +24,9 @@ afterAll(() => {
   jest.restoreAllMocks();
 });
 
-it('"할 일을 검색해주세요" placeholder인 input을 렌더링한다', () => {
+it('"할일을 검색해주세요" placeholder인 input을 렌더링한다', () => {
   render(<SearchInput />);
-  expect(screen.getByPlaceholderText('할 일을 검색해주세요')).toBeInTheDocument();
+  expect(screen.getByPlaceholderText('할일을 검색해주세요')).toBeInTheDocument();
 });
 
 it('검색 버튼을 렌더링한다', () => {
