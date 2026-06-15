@@ -45,6 +45,8 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
+    // 이전 드래그가 click 없이 끝났을 수 있어(예: pointercancel) skipNextClick이 stuck되면 다음 정상 클릭 1회를 잘못 무시한다. 매 down에서 리셋.
+    skipNextClick.current = false;
     if (scale === 1) return;
     dragStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
     setDragging(true);
@@ -87,11 +89,22 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
       <img
         src={src}
         alt={alt}
+        role="button"
+        tabIndex={0}
         onLoad={() => setLoaded(true)}
         onClick={handleClick}
+        onKeyDown={(e) => {
+          // 키보드 사용자가 Enter/Space로 줌 토글할 수 있게 — img는 native 인터랙티브가 아니므로 명시
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        // 모바일에서 시스템 제스처·알림 등으로 pointerCancel이 발생해도 dragging 상태가 stuck되지 않도록 pointerUp 흐름과 동일 처리
+        onPointerCancel={handlePointerUp}
         className="max-h-[90vh] max-w-[90vw] object-contain"
         style={{
           // native pinch는 viewport 전체를 zoom해 뒤 페이지·모달 셸까지 같이 확대되므로 모든 상태에서 끄고 우리 사이클·드래그 팬으로만 처리한다.
