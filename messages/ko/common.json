@@ -103,21 +103,5 @@
   "favorite": {
     "add": "즐겨찾기",
     "remove": "즐겨찾기 해제"
-  },
-  "pageTitle": {
-    "dashboard": "{name}님의 대시보드",
-    "todos": "모든 할일",
-    "todosCount": "모든 할일 {count}",
-    "notesWrite": "노트 작성하기",
-    "notesEdit": "노트 수정하기",
-    "goal": "{name}님의 목표",
-    "goalNotes": "노트 모아보기",
-    "postsWrite": "게시물 작성하기",
-    "postsEdit": "게시물 수정하기",
-    "posts": "소통 게시판",
-    "favorites": "찜한 할일",
-    "favoritesCount": "찜한 할일 {count}",
-    "calendar": "{name}님의 캘린더",
-    "me": "내 정보 관리"
   }
 }

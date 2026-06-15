@@ -131,3 +131,27 @@ it('노트 작성(/todos/:id/notes/write) 타이틀', async () => {
   const { result } = renderHookWithClient(() => usePageTitle());
   await waitFor(() => expect(result.current).toBe('노트 작성하기'));
 });
+
+it('노트 수정(/todos/:id/notes/edit) 타이틀', async () => {
+  mockPathname = '/todos/1/notes/edit';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('노트 수정하기'));
+});
+
+it('노트 모아보기(/goals/:id/notes) 타이틀', async () => {
+  mockPathname = '/goals/1/notes';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('노트 모아보기'));
+});
+
+it('게시물 작성(/posts/write) 타이틀', async () => {
+  mockPathname = '/posts/write';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('게시물 작성하기'));
+});
+
+it('게시물 수정(/posts/:id/edit) 타이틀', async () => {
+  mockPathname = '/posts/1/edit';
+  const { result } = renderHookWithClient(() => usePageTitle());
+  await waitFor(() => expect(result.current).toBe('게시물 수정하기'));
+});

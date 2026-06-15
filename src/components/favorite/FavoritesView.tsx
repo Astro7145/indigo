@@ -33,6 +33,8 @@ type Tab = FavoritesTab;
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesView() {
+  const tCommon = useTranslations('common');
+  const tFavorites = useTranslations('favorites');
   // 탭·목표 필터의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
   const searchParams = useSearchParams();
   const urlTab = parseFavoritesTab(searchParams.get('tab') ?? undefined);
@@ -105,7 +107,7 @@ export default function FavoritesView() {
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
-              <Dropdown.Item onClick={() => changeGoalId(null)}>전체 목표</Dropdown.Item>
+              <Dropdown.Item onClick={() => changeGoalId(null)}>{tFavorites('goalFilter.all')}</Dropdown.Item>
               {goals.map((g) => (
                 <Dropdown.Item key={g.id} onClick={() => changeGoalId(g.id)}>
                   {g.title}

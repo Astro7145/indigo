@@ -43,7 +43,13 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
-  const t = useTranslations('common');
+  const tCalendar = useTranslations('calendar');
+  const tDashboard = useTranslations('dashboard');
+  const tFavorites = useTranslations('favorites');
+  const tGoals = useTranslations('goals');
+  const tMe = useTranslations('me');
+  const tPosts = useTranslations('posts');
+  const tTodos = useTranslations('todos');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
@@ -61,29 +67,30 @@ export function usePageTitle(): string {
 
   switch (route) {
     case 'dashboard':
-      return t('pageTitle.dashboard', { name });
+      // DashboardTitle과 동일하게 이름 + 접미사(title) 조합
+      return `${name}${tDashboard('title')}`;
     case 'todos':
-      return todoCount != null ? t('pageTitle.todosCount', { count: todoCount }) : t('pageTitle.todos');
+      return todoCount != null ? `${tTodos('title')} ${todoCount}` : tTodos('title');
     case 'notes-write':
-      return t('pageTitle.notesWrite');
+      return tGoals('note.createTitle');
     case 'notes-edit':
-      return t('pageTitle.notesEdit');
+      return tGoals('note.editTitle');
     case 'goal':
-      return t('pageTitle.goal', { name });
+      return tGoals('title', { name });
     case 'goal-notes':
-      return t('pageTitle.goalNotes');
+      return tGoals('note.collectTitle');
     case 'posts-write':
-      return t('pageTitle.postsWrite');
+      return tPosts('form.createTitle');
     case 'posts-edit':
-      return t('pageTitle.postsEdit');
+      return tPosts('form.editTitle');
     case 'posts':
-      return t('pageTitle.posts');
+      return tPosts('title');
     case 'favorites':
-      return favoriteCount != null ? t('pageTitle.favoritesCount', { count: favoriteCount }) : t('pageTitle.favorites');
+      return favoriteCount != null ? `${tFavorites('title')} ${favoriteCount}` : tFavorites('title');
     case 'calendar':
-      return t('pageTitle.calendar', { name });
+      return tCalendar('title', { name });
     case 'me':
-      return t('pageTitle.me');
+      return tMe('title');
     default:
       return '';
   }
