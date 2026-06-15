@@ -3,7 +3,7 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, Bounds } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { getGraphColors } from '@/src/components/common/graph/palette';
 import GraphScene from '@/src/components/common/graph/GraphScene';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
@@ -20,13 +20,14 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
   const graphKey = `${goals.map((g) => g.id).join(',')}|${todos
     .map((t) => `${t.id}:${t.goalId}:${t.noteIds?.length ?? 0}`)
     .join(',')}`;
+  const colors = getGraphColors();
 
   return (
     <div className="h-full w-full">
       <Canvas camera={{ position: [0, 6, 18], fov: 55 }} dpr={[1, 2]}>
-        <color attach="background" args={[GRAPH_COLORS.background]} />
+        <color attach="background" args={[colors.background]} />
         <ambientLight intensity={0.6} />
-        <pointLight position={[0, 0, 0]} intensity={140} distance={80} color={GRAPH_COLORS.moonGlow} />
+        <pointLight position={[0, 0, 0]} intensity={140} distance={80} color={colors.moonGlow} />
         <Stars radius={120} depth={60} count={4000} factor={4} saturation={0} fade speed={0.5} />
         {/* 콘텐츠를 캔버스 크기에 맞춰 자동 프레이밍하고 리사이즈 시 재적합(반응형) */}
         <Bounds fit observe margin={1.2}>

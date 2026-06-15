@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/src/utils/cn';
 import { IcDashboard, IcMoon } from '@/src/components/common/icons';
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { GRAPH_BACKGROUND_VAR } from '@/src/components/common/graph/palette';
 import GraphView from '@/src/components/common/graph/GraphView';
 
 type View = 'dashboard' | 'graph';
@@ -32,7 +32,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
     if (view !== 'graph') return;
     const el = document.documentElement;
     const prev = el.style.background;
-    el.style.background = GRAPH_COLORS.background;
+    el.style.background = GRAPH_BACKGROUND_VAR;
     return () => {
       el.style.background = prev;
     };
@@ -79,7 +79,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
       ) : (
         <div
           className="-mx-4 -my-6 h-[calc(100dvh-56px)] overflow-hidden sm:-mx-6 sm:-my-12 md:h-dvh xl:-mx-10 xl:-my-20"
-          style={{ background: GRAPH_COLORS.background }}
+          style={{ background: GRAPH_BACKGROUND_VAR }}
         >
           <GraphView />
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { getGraphColors } from '@/src/components/common/graph/palette';
 import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
 
 interface NoteNodeProps {
@@ -12,15 +12,11 @@ interface NoteNodeProps {
 export default function NoteNode({ seed }: NoteNodeProps) {
   // 노트 클릭/연결 지점: 노트 라우트 확정 시 onPointerDown/탭 액션 추가.
   const matRef = useTwinkle(0.9, seed, 0.25);
+  const colors = getGraphColors();
   return (
     <mesh scale={0.18}>
       <sphereGeometry args={[1, 16, 16]} />
-      <meshStandardMaterial
-        ref={matRef}
-        color={GRAPH_COLORS.note}
-        emissive={GRAPH_COLORS.note}
-        emissiveIntensity={0.9}
-      />
+      <meshStandardMaterial ref={matRef} color={colors.note} emissive={colors.note} emissiveIntensity={0.9} />
     </mesh>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { getGraphColors } from '@/src/components/common/graph/palette';
 import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
 
 interface TodoNodeProps {
@@ -19,7 +19,8 @@ interface TodoNodeProps {
 export default function TodoNode({ title, done, seed, onPointerDown }: TodoNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const color = done ? GRAPH_COLORS.todoDone : GRAPH_COLORS.todo;
+  const colors = getGraphColors();
+  const color = done ? colors.todoDone : colors.todo;
   // done은 더 차분하게(낮은 진폭) 깜빡인다.
   const matRef = useTwinkle(hovered ? 1.6 : done ? 0.5 : 1, seed, done ? 0.15 : 0.35);
 

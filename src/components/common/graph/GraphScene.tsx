@@ -7,7 +7,7 @@ import { Group, Plane, Raycaster, Vector2, Vector3, type BufferGeometry } from '
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { GraphSim } from '@/src/components/common/graph/graphPhysics';
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { getGraphColors } from '@/src/components/common/graph/palette';
 import MoonNode from '@/src/components/common/graph/nodes/MoonNode';
 import GoalNode from '@/src/components/common/graph/nodes/GoalNode';
 import TodoNode from '@/src/components/common/graph/nodes/TodoNode';
@@ -23,6 +23,7 @@ interface GraphSceneProps {
 /** 시뮬레이션의 라이브 위치로 링크 선을 매 프레임 갱신한다(단일 lineSegments, 버퍼는 ref로 변형). */
 function PhysicsLinks({ sim }: { sim: GraphSim }) {
   const geomRef = useRef<BufferGeometry>(null);
+  const colors = getGraphColors();
   useFrame(() => {
     const geo = geomRef.current;
     if (!geo) return;
@@ -46,7 +47,7 @@ function PhysicsLinks({ sim }: { sim: GraphSim }) {
       <bufferGeometry ref={geomRef}>
         <bufferAttribute attach="attributes-position" args={[new Float32Array(sim.edges.length * 6), 3]} />
       </bufferGeometry>
-      <lineBasicMaterial color={GRAPH_COLORS.link} transparent opacity={0.35} />
+      <lineBasicMaterial color={colors.link} transparent opacity={0.35} />
     </lineSegments>
   );
 }

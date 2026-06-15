@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
-import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import { getGraphColors } from '@/src/components/common/graph/palette';
 import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
 
 interface GoalNodeProps {
@@ -20,6 +20,7 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
   const matRef = useTwinkle(hovered ? 1.4 : 0.7, seed);
+  const colors = getGraphColors();
 
   const over = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -31,12 +32,7 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
     <>
       <mesh scale={hovered ? size * 1.25 : size} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshStandardMaterial
-          ref={matRef}
-          color={GRAPH_COLORS.goal}
-          emissive={GRAPH_COLORS.goal}
-          emissiveIntensity={0.7}
-        />
+        <meshStandardMaterial ref={matRef} color={colors.goal} emissive={colors.goal} emissiveIntensity={0.7} />
       </mesh>
       {hovered && (
         <Html center distanceFactor={24} className="pointer-events-none">

@@ -1,14 +1,45 @@
 /**
- * 3D 그래프 색 — three.js 머티리얼/배경은 Tailwind 토큰 유틸을 쓸 수 없어(WebGL),
- * globals.css `@theme` 의 indigo 스케일 값을 여기서 리터럴로 단일 정의해 매핑한다.
+ * 3D 그래프 색 — 값은 globals.css `@theme` 토큰이 단일 출처다(여기에 hex를 직접 박지 않는다).
+ * three.js 머티리얼/배경은 `var(...)`를 못 받으므로(WebGL) 런타임에 CSS 변수 값을 읽어 실제 색으로 해석한다.
+ * GraphCanvas가 dynamic(ssr:false)라 그래프 트리는 브라우저에서만 렌더되므로 getComputedStyle이 안전하다.
+ * DOM 요소(컨테이너 배경 등)는 `var(--color-...)`를 인라인 스타일에 직접 쓰면 된다.
  */
-export const GRAPH_COLORS = {
-  background: '#0a0d26', // indigo-900(#161b4b)보다 더 어두운 딥 인디고(밤하늘 배경, 토큰엔 없는 커스텀)
-  moon: '#faf7ff', // indigo-100
-  moonGlow: '#d9ceff', // indigo-400
-  goal: '#b3aaff', // indigo-500
-  todo: '#d9ceff', // indigo-400
-  todoDone: '#6a65b4', // indigo-700
-  note: '#8e86d9', // indigo-600
-  link: '#464590', // indigo-800
-} as const;
+export interface GraphColors {
+  background: string;
+  moon: string;
+  moonGlow: string;
+  goal: string;
+  todo: string;
+  todoDone: string;
+  note: string;
+  link: string;
+}
+
+/** globals.css @theme 토큰 이름 매핑. 배경은 가장 어두운 slate, 그 외는 브랜드 indigo 스케일. */
+const TOKENS: Record<keyof GraphColors, string> = {
+  background: '--color-slate-900',
+  moon: '--color-indigo-100',
+  moonGlow: '--color-indigo-400',
+  goal: '--color-indigo-500',
+  todo: '--color-indigo-400',
+  todoDone: '--color-indigo-700',
+  note: '--color-indigo-600',
+  link: '--color-indigo-800',
+};
+
+let cache: GraphColors | null = null;
+
+/** @theme 토큰 값을 런타임에 읽어 해석한다(클라이언트 전용, 1회 캐시). */
+export function getGraphColors(): GraphColors {
+  if (cache) return cache;
+  const style = getComputedStyle(document.documentElement);
+  const resolved = {} as GraphColors;
+  for (const key of Object.keys(TOKENS) as (keyof GraphColors)[]) {
+    resolved[key] = style.getPropertyValue(TOKENS[key]).trim();
+  }
+  cache = resolved;
+  return resolved;
+}
+
+/** DOM 요소(컨테이너 배경 등)에서 인라인 스타일로 쓸 배경 토큰 참조. */
+export const GRAPH_BACKGROUND_VAR = `var(${TOKENS.background})`;
