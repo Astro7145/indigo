@@ -60,10 +60,21 @@ function PhysicsLinks({ sim }: { sim: GraphSim }) {
  * 짧은 탭은 클릭(목표상세/할일상세), 드래그는 이동으로 구분한다.
  * (데이터 구성이 바뀌면 부모가 key로 리마운트해 시뮬레이션을 새로 만든다.)
  */
+/** 0~1 진행도(완료/전체). 전체 할일이 없으면 0. */
+function ratio(done: number, total: number): number {
+  return total > 0 ? done / total : 0;
+}
+
 export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
   const openModal = useModalStore((s) => s.open);
+
+  // 전체 진행도(달) — 모든 목표의 완료/전체 합계.
+  const overallProgress = ratio(
+    goals.reduce((s, g) => s + g.completedCount, 0),
+    goals.reduce((s, g) => s + g.todoCount, 0),
+  );
 
   // 목표 노드 탭 — 바로 이동하지 않고 확인 모달을 한 번 띄운다(뎁스 추가).
   const confirmGoalNav = (goalId: number, goalTitle: string) =>
@@ -169,7 +180,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
 
   return (
     <group>
-      <MoonNode position={[0, 0, 0]} />
+      <MoonNode position={[0, 0, 0]} progress={overallProgress} />
       <PhysicsLinks sim={sim} />
 
       {layout.goals.map((g) => {
@@ -181,6 +192,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
             <GoalNode
               size={g.size}
               title={goal.title}
+              progress={ratio(goal.completedCount, goal.todoCount)}
               onPointerDown={grab(key, () => confirmGoalNav(g.id, goal.title))}
             />
           </group>
