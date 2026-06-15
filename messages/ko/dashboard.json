@@ -2,12 +2,12 @@
   "title": "님의 대시보드",
   "recentTodos": {
     "title": "최근 등록한 할일",
-    "empty": "최근에 등록한 할 일이 없어요"
+    "empty": "최근에 등록한 할일이 없어요"
   },
   "goalTodos": {
-    "title": "목표 별 할일",
+    "title": "목표별 할일",
     "empty": "등록한 목표가 없어요",
-    "boardEmpty": "아직 할 일이 없어요",
+    "boardEmpty": "아직 할일이 없어요",
     "progressLabel": "{title} 진행률"
   },
   "progress": {

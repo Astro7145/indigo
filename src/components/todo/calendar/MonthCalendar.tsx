@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { useButton, useCalendar, useCalendarGrid, useLocale } from 'react-aria';
 import { useCalendarState, type CalendarState } from 'react-stately';
 import { createCalendar, type CalendarDate } from '@internationalized/date';
@@ -10,8 +11,8 @@ import { IcDoubleArrow } from '@/src/components/common/icons/IcDoubleArrow';
 import MonthCalendarCell from '@/src/components/todo/calendar/MonthCalendarCell';
 import type { Todo } from '@/src/types/todo';
 
-/** 시안이 월요일 시작 — 요일 라벨도 mon 순서로 고정한다(로케일 비의존). */
-const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
+/** 시안이 월요일 시작 — 요일 라벨도 mon 순서로 고정한다(라벨 문구는 calendar.weekdays 카탈로그). */
+const WEEKDAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
 export interface MonthCalendarProps {
   /** 선택 날짜 (controlled) */
@@ -44,6 +45,7 @@ export default function MonthCalendar({
   onSelectTodo,
   children,
 }: MonthCalendarProps) {
+  const tCalendar = useTranslations('calendar');
   const { locale } = useLocale();
   // firstDayOfWeek는 state에 줘야 셀 배치(getDatesInWeek)가 월요일 시작이 된다 — grid 옵션만으로는
   // 요일 라벨·주 수 계산만 바뀌고 날짜가 로케일 기준(ko/en=일요일)으로 깔려 한 칸 어긋난다.
@@ -70,13 +72,23 @@ export default function MonthCalendar({
     <div {...calendarProps} className="flex w-full flex-col">
       <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-8">
         <div className="flex items-center justify-center gap-4 xl:justify-start">
-          <IconButton {...prevDomProps} ref={prevRef} aria-label="이전 달" className="size-8 rounded-[6px] p-1">
+          <IconButton
+            {...prevDomProps}
+            ref={prevRef}
+            aria-label={tCalendar('nav.prevMonth')}
+            className="size-8 rounded-[6px] p-1"
+          >
             <IcDoubleArrow state="fold" className="size-6 text-slate-600" />
           </IconButton>
           <h2 className="text-lg leading-7 font-bold text-slate-700">
-            {month.year}년 {month.month}월
+            {tCalendar('monthYear', { year: month.year, month: String(month.month) })}
           </h2>
-          <IconButton {...nextDomProps} ref={nextRef} aria-label="다음 달" className="size-8 rounded-[6px] p-1">
+          <IconButton
+            {...nextDomProps}
+            ref={nextRef}
+            aria-label={tCalendar('nav.nextMonth')}
+            className="size-8 rounded-[6px] p-1"
+          >
             <IcDoubleArrow state="expand" className="size-6 text-slate-600" />
           </IconButton>
         </div>
@@ -85,12 +97,12 @@ export default function MonthCalendar({
       <table {...gridProps} className="w-full table-fixed border-collapse">
         <thead {...headerProps}>
           <tr>
-            {WEEKDAY_LABELS.map((day) => (
+            {WEEKDAY_KEYS.map((day) => (
               <th
                 key={day}
                 className="border-r border-b border-slate-200 p-2 text-center text-xs leading-4 font-medium text-slate-500 last:border-r-0"
               >
-                {day}
+                {tCalendar(`weekdays.${day}`)}
               </th>
             ))}
           </tr>

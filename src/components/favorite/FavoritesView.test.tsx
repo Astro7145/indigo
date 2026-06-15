@@ -118,15 +118,15 @@ it('헤더 숫자는 현재 보이는 찜 개수를 렌더한다(전체 totalCou
   fav.getFavoriteTodos.mockResolvedValue(favList([makeFav(1, 101, '찜 A')], 42));
   renderWithClient(<FavoritesView />);
   expect(await screen.findByText('찜 A')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: '찜한 할 일' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '찜한 할일' })).toBeInTheDocument();
   expect(screen.getByText('1')).toBeInTheDocument();
   expect(screen.queryByText('42')).not.toBeInTheDocument();
 });
 
-it('찜한 할 일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
+it('찜한 할일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
   fav.getFavoriteTodos.mockResolvedValue(favList([], 0));
   renderWithClient(<FavoritesView />);
-  expect(await screen.findByText('아직 찜한 할 일이 없어요')).toBeInTheDocument();
+  expect(await screen.findByText('아직 찜한 할일이 없어요')).toBeInTheDocument();
 });
 
 it('TO DO 탭 클릭 시 완료되지 않은 항목만 보인다(클라이언트 필터)', async () => {

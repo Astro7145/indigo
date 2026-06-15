@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
@@ -37,6 +38,8 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesView() {
+  const tCommon = useTranslations('common');
+  const tFavorites = useTranslations('favorites');
   // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
   const urlTab = parseFavoritesTab(useSearchParams().get('tab') ?? undefined);
   const [tab, setTab] = useState<Tab>(urlTab);
@@ -62,7 +65,7 @@ export default function FavoritesView() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:61509) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">찜한 할 일</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{tFavorites('title')}</h1>
         {/* 카운트는 현재 보이는(필터된) 찜 개수 — 탭·목표 필터에 따라 갱신. aria-label 미부착으로 h1+숫자를 이어 읽힘 */}
         <AsyncBoundary
           fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
@@ -91,14 +94,14 @@ export default function FavoritesView() {
                 <span className="flex items-center gap-3">
                   <IcGoal className="size-8" />
                   <span className="text-base font-semibold tracking-[-0.03em] text-slate-800">
-                    {selectedGoal ? selectedGoal.title : '전체 목표'}
+                    {selectedGoal ? selectedGoal.title : tFavorites('goalFilter.all')}
                   </span>
                 </span>
                 <IcChevron direction="down" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
-              <Dropdown.Item onClick={() => setGoalId(null)}>전체 목표</Dropdown.Item>
+              <Dropdown.Item onClick={() => setGoalId(null)}>{tFavorites('goalFilter.all')}</Dropdown.Item>
               {goals.map((g) => (
                 <Dropdown.Item key={g.id} onClick={() => setGoalId(g.id)}>
                   {g.title}
@@ -108,8 +111,8 @@ export default function FavoritesView() {
           </Dropdown>
 
           <AsyncBoundary
-            fallback={<p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>}
-            errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+            fallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+            errorFallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
             resetKeys={[tab, goalId]}
           >
             <FavoritesList tab={tab} goalId={goalId} />
@@ -127,13 +130,14 @@ function FavoritesCount({ tab, goalId }: { tab: Tab; goalId: number | null }) {
 }
 
 function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
+  const tFavorites = useTranslations('favorites');
   const { openEdit, openDetail } = useTodoSheet();
   const { data } = useFavoriteTodoList({ limit: 100 });
 
   const visible = filterFavorites(data.favorites, tab, goalId);
 
   if (visible.length === 0) {
-    return <p className="py-20 text-center text-sm text-slate-500">아직 찜한 할 일이 없어요</p>;
+    return <p className="py-20 text-center text-sm text-slate-500">{tFavorites('empty')}</p>;
   }
 
   // 즐겨찾기 응답의 todo는 isFavorite=true인 완전한 Todo — 별 클릭은 TodoList의 일반 토글로 해제가 된다.

@@ -12,6 +12,7 @@ import {
   type Ref,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 
 import Button, { type ButtonProps } from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -55,6 +56,7 @@ export default function Modal({
   zIndex,
   scrollLock = true,
 }: ModalProps) {
+  const tCommon = useTranslations('common');
   const [titleId, setTitleId] = useState<string | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -153,7 +155,11 @@ export default function Modal({
           {children}
           {/* 닫기 버튼은 DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
           {showCloseButton && (
-            <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4 sm:top-8 sm:right-8">
+            <IconButton
+              aria-label={tCommon('actions.close')}
+              onClick={onClose}
+              className="absolute top-4 right-4 sm:top-8 sm:right-8"
+            >
               <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
             </IconButton>
           )}

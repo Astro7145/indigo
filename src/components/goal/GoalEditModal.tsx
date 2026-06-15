@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState, type KeyboardEvent } from 'react';
 
 import Modal from '@/src/components/common/modal/Modal';
@@ -17,6 +18,8 @@ export interface GoalEditModalProps {
  * 열릴 때마다 새로 마운트되어(부모가 조건부 렌더) 현재 목표명으로 초기화된다.
  */
 export default function GoalEditModal({ onClose, goalId, currentTitle }: GoalEditModalProps) {
+  const tCommon = useTranslations('common');
+  const tGoals = useTranslations('goals');
   const [title, setTitle] = useState(currentTitle);
   const update = useUpdateGoal();
 
@@ -37,21 +40,21 @@ export default function GoalEditModal({ onClose, goalId, currentTitle }: GoalEdi
 
   return (
     <Modal open onClose={onClose} showCloseButton>
-      <Modal.Title>목표 수정</Modal.Title>
+      <Modal.Title>{tGoals('edit.title')}</Modal.Title>
       <Input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
           if (e.key === 'Enter') submit();
         }}
-        placeholder="목표를 입력해주세요"
+        placeholder={tGoals('edit.placeholder')}
         autoFocus
         className="mt-4"
       />
       <Modal.Actions className="mt-6">
-        <Modal.Cancel onClick={onClose}>취소</Modal.Cancel>
+        <Modal.Cancel onClick={onClose}>{tCommon('actions.cancel')}</Modal.Cancel>
         <Modal.Confirm onClick={submit} disabled={!canSubmit}>
-          확인
+          {tCommon('actions.confirm')}
         </Modal.Confirm>
       </Modal.Actions>
     </Modal>
