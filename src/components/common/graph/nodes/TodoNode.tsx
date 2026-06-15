@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Html } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
-import { GRAPH_COLORS } from '@/src/components/graph/palette';
+import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
 import type { Vec3 } from '@/src/utils/graphLayout';
 
 interface TodoNodeProps {

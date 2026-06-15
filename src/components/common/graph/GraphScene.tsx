@@ -8,11 +8,11 @@ import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
-import MoonNode from '@/src/components/graph/nodes/MoonNode';
-import GoalNode from '@/src/components/graph/nodes/GoalNode';
-import TodoNode from '@/src/components/graph/nodes/TodoNode';
-import NoteNode from '@/src/components/graph/nodes/NoteNode';
-import OrbitLink from '@/src/components/graph/OrbitLink';
+import MoonNode from '@/src/components/common/graph/nodes/MoonNode';
+import GoalNode from '@/src/components/common/graph/nodes/GoalNode';
+import TodoNode from '@/src/components/common/graph/nodes/TodoNode';
+import NoteNode from '@/src/components/common/graph/nodes/NoteNode';
+import OrbitLink from '@/src/components/common/graph/OrbitLink';
 
 interface GraphSceneProps {
   goals: GoalListItem[];

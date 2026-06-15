@@ -1,7 +1,7 @@
 'use client';
 
 import { Line } from '@react-three/drei';
-import { GRAPH_COLORS } from '@/src/components/graph/palette';
+import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
 import type { Vec3 } from '@/src/utils/graphLayout';
 
 /** 부모→자식 노드를 잇는 은은한 발광 선. */

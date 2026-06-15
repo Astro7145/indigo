@@ -3,8 +3,8 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { GRAPH_COLORS } from '@/src/components/graph/palette';
-import GraphScene from '@/src/components/graph/GraphScene';
+import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
+import GraphScene from '@/src/components/common/graph/GraphScene';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
 

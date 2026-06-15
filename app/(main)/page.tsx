@@ -11,7 +11,7 @@ import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import ProgressCard from '@/src/components/goal/ProgressCard';
 import RecentTodos from '@/src/components/todo/RecentTodos';
 import DashboardTitle from '@/src/components/user/DashboardTitle';
-import DashboardView from '@/src/components/graph/DashboardView';
+import DashboardView from '@/src/components/common/graph/DashboardView';
 
 /**
  * 대시보드 라우트(`/`). 서버 셸 — 핵심 쿼리를 prefetch해 하이드레이션하고,

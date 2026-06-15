@@ -1,11 +1,11 @@
-jest.mock('@/src/components/graph/GraphView', () => ({
+jest.mock('@/src/components/common/graph/GraphView', () => ({
   __esModule: true,
   default: () => <div data-testid="graph-view">graph</div>,
 }));
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DashboardView from '@/src/components/graph/DashboardView';
+import DashboardView from '@/src/components/common/graph/DashboardView';
 
 it('기본은 대시보드를 보여주고 그래프는 숨긴다', () => {
   render(<DashboardView dashboard={<div data-testid="dash">dash</div>} />);

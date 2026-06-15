@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/src/utils/cn';
-import GraphView from '@/src/components/graph/GraphView';
+import GraphView from '@/src/components/common/graph/GraphView';
 
 type View = 'dashboard' | 'graph';
 

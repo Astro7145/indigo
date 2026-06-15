@@ -1,6 +1,6 @@
 'use client';
 
-import { GRAPH_COLORS } from '@/src/components/graph/palette';
+import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
 import type { Vec3 } from '@/src/utils/graphLayout';
 
 /** 노트 = 위성. 클릭/연결은 노트 작업 완료 후 추가 예정(현재 표시 전용). */

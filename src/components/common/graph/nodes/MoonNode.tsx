@@ -1,6 +1,6 @@
 'use client';
 
-import { GRAPH_COLORS } from '@/src/components/graph/palette';
+import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
 import type { Vec3 } from '@/src/utils/graphLayout';
 
 /** 중앙 달(나) — 은은히 발광하는 구. */
