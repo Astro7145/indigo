@@ -66,12 +66,13 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
   );
 
   return (
-    <div className="relative w-full">
+    // flow-root: 자식 상단 마진의 margin collapse를 막아 루트 상단(=토글 기준점)을 두 뷰에서 동일하게 고정
+    <div className="relative flow-root w-full">
       {/* 토글 — 두 뷰 공통: 콘텐츠 영역 우상단 고정 */}
       <div className="absolute top-0 right-0 z-20">{toggle}</div>
 
       {view === 'dashboard' ? (
-        <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:my-3 sm:gap-8">
+        <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:gap-8">
           {/* 타이틀 행 — 모바일에서도 토글이 콘텐츠를 가리지 않도록 높이를 예약 */}
           <div className="flex h-10 items-center">{title}</div>
           {dashboard}
