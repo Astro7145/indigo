@@ -44,14 +44,9 @@ export default function LanguageSelect() {
           <IcChevron direction={open ? 'up' : 'down'} className="size-6 shrink-0 text-slate-400 dark:text-white/40" />
         </button>
       </Dropdown.Trigger>
-      <Dropdown.Menu size="full" className="dark:bg-indigo-dark-300 dark:border dark:border-white/10">
+      <Dropdown.Menu size="full">
         {locales.map((locale) => (
-          <Dropdown.Item
-            key={locale}
-            selected={locale === activeLocale}
-            onClick={() => handleSelect(locale)}
-            className="dark:bg-indigo-dark-300 dark:hover:bg-indigo-dark-500 dark:focus-visible:bg-indigo-dark-500 dark:text-white"
-          >
+          <Dropdown.Item key={locale} selected={locale === activeLocale} onClick={() => handleSelect(locale)}>
             {LANGUAGE_LABELS[locale]}
           </Dropdown.Item>
         ))}

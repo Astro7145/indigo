@@ -279,7 +279,7 @@ function Menu({ placement = 'bottom-start', size = 'large', className, children 
         onKeyDown={handleArrowKey}
         style={position ? { top: position.top, left: position.left, width: position.width } : undefined}
         className={cn(
-          'scrollbar-slate fixed z-50 max-h-60 overflow-y-auto rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)]',
+          'scrollbar-slate dark:bg-indigo-dark-300 fixed z-50 max-h-60 overflow-y-auto rounded bg-white shadow-[0px_4px_8px_rgba(0,0,0,0.1)] dark:border dark:border-white/10',
           className,
         )}
       >
@@ -325,12 +325,13 @@ function Item({ onClick, disabled = false, selected = false, className, children
           if (!disabled) e.currentTarget.focus({ preventScroll: true });
         }}
         className={cn(
-          'cursor-pointer font-medium text-slate-700',
+          'cursor-pointer font-medium text-slate-700 dark:text-white',
           textSize,
           innerPadding,
           innerRadius,
-          !disabled && 'bg-white hover:bg-indigo-300 focus-visible:bg-indigo-300 focus-visible:outline-none',
-          disabled && 'cursor-not-allowed bg-white opacity-40',
+          !disabled &&
+            'dark:bg-indigo-dark-300 dark:hover:bg-indigo-dark-500 dark:focus-visible:bg-indigo-dark-500 bg-white hover:bg-indigo-300 focus-visible:bg-indigo-300 focus-visible:outline-none',
+          disabled && 'dark:bg-indigo-dark-300 cursor-not-allowed bg-white opacity-40',
           className,
         )}
       >
