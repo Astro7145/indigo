@@ -27,10 +27,16 @@ function todo(id: number, goalId: number | null, noteIds: number[] = []): Todo {
 type V = [number, number, number];
 const dist = (a: V, b: V) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
-it('목표는 모두 노드가 되고 달에서 R_GOAL 거리에 놓인다', () => {
+it('목표는 모두 노드가 되고 달에서의 거리가 목표마다 다르다(R_GOAL의 0.7~1.3배)', () => {
   const { goals, moon } = computeGraphLayout([goal(1), goal(2), goal(3)], []);
   expect(goals).toHaveLength(3);
-  for (const g of goals) expect(dist(g.position, moon)).toBeCloseTo(R_GOAL, 5);
+  const dists = goals.map((g) => dist(g.position, moon));
+  for (const d of dists) {
+    expect(d).toBeGreaterThanOrEqual(R_GOAL * 0.7 - 1e-6);
+    expect(d).toBeLessThanOrEqual(R_GOAL * 1.3 + 1e-6);
+  }
+  // 거리가 전부 같지 않아야 한다(목표마다 다름)
+  expect(new Set(dists.map((d) => d.toFixed(4))).size).toBeGreaterThan(1);
 });
 
 it('할일은 부모 목표에서 R_TODO 거리에 놓인다', () => {

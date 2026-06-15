@@ -9,6 +9,8 @@ interface SimNode {
   force: Vector3;
   /** 고정 노드(달)는 힘·적분에서 제외된다. */
   fixed: boolean;
+  /** false면 홈 복귀 스프링을 적용하지 않는다(목표는 홈 없이 링크로만 묶임). */
+  anchored: boolean;
 }
 interface SimEdge {
   a: number;
@@ -46,13 +48,14 @@ export class GraphSim {
   }
 
   constructor(layout: GraphLayout) {
-    const add = (key: string, p: readonly [number, number, number], fixed = false) => {
+    const add = (key: string, p: readonly [number, number, number], fixed = false, anchored = true) => {
       const home = new Vector3(p[0], p[1], p[2]);
       this.index.set(key, this.nodes.length);
-      this.nodes.push({ key, home, pos: home.clone(), vel: new Vector3(), force: new Vector3(), fixed });
+      this.nodes.push({ key, home, pos: home.clone(), vel: new Vector3(), force: new Vector3(), fixed, anchored });
     };
     add('moon', layout.moon, true);
-    layout.goals.forEach((g) => add(`goal-${g.id}`, g.position));
+    // 목표는 홈 없이(anchored=false) 달과의 링크로만 묶인다 — 끌면 그 자리에 머물고 거리는 링크가 유지.
+    layout.goals.forEach((g) => add(`goal-${g.id}`, g.position, false, false));
     layout.todos.forEach((t) => add(`todo-${t.id}`, t.position));
     layout.notes.forEach((n) => add(`note-${n.todoId}-${n.id}`, n.position));
 
@@ -75,7 +78,7 @@ export class GraphSim {
     for (const n of nodes) n.force.set(0, 0, 0);
 
     for (const n of nodes) {
-      if (n.fixed) continue;
+      if (n.fixed || !n.anchored) continue;
       tmp.copy(n.home).sub(n.pos).multiplyScalar(K_HOME);
       n.force.add(tmp);
     }

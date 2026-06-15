@@ -48,9 +48,15 @@ function add(base: Vec3, off: Vec3): Vec3 {
   return [base[0] + off[0], base[1] + off[1], base[2] + off[2]];
 }
 
+/** 목표마다 중심까지의 거리를 다르게 — golden-ratio 소수부로 deterministic하게 분산(R_GOAL의 0.7~1.3배). */
+function goalRadius(i: number): number {
+  const t = (i * 0.61803398875) % 1; // 0~1 균등 분산
+  return R_GOAL * (0.7 + 0.6 * t);
+}
+
 /**
  * 목표·할일·노트를 궤도형 3D 좌표로 배치(deterministic).
- * - 달: 원점 / 목표: 달 주위 R_GOAL 피보나치 구 / 할일: 각 목표 주위 R_TODO 구면 / 노트: 부모 할일 주위 R_NOTE 구면
+ * - 달: 원점 / 목표: 달 주위 피보나치 구(목표마다 거리 다름) / 할일: 각 목표 주위 R_TODO 구면 / 노트: 부모 할일 주위 R_NOTE 구면
  * - goalId가 null이거나 목표 목록에 없는 할일은 제외.
  */
 export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphLayout {
@@ -59,10 +65,11 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
 
   const goalNodes: GoalLayoutNode[] = goals.map((g, i) => {
     const u = fibonacciSpherePoint(i, n);
+    const radius = goalRadius(i);
     return {
       id: g.id,
-      // 목표 크기는 할일 수와 무관하게 균일(부해 보이지 않도록)
-      position: [u[0] * R_GOAL, u[1] * R_GOAL, u[2] * R_GOAL],
+      // 거리는 목표마다 다르게(goalRadius), 크기는 할일 수와 무관하게 균일(부해 보이지 않도록)
+      position: [u[0] * radius, u[1] * radius, u[2] * radius],
       size: 0.85,
     };
   });

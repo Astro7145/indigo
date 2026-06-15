@@ -35,12 +35,12 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
         <color attach="background" args={[colors.background]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[0, 0, 0]} intensity={140} distance={80} color={colors.moonGlow} />
-        <Stars radius={120} depth={60} count={4000} factor={4} saturation={0} fade speed={0.5} />
+        <Stars radius={120} depth={60} count={3000} factor={4} saturation={0} fade speed={0.5} />
         <GraphScene key={graphKey} goals={goals} todos={todos} />
         {/* 회전 중심을 달(원점)로 고정 */}
         <OrbitControls makeDefault enablePan enableZoom target={[0, 0, 0]} minDistance={6} maxDistance={48} />
         <EffectComposer>
-          <Bloom intensity={0.8} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur radius={0.8} />
+          <Bloom intensity={0.7} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur radius={0.6} />
         </EffectComposer>
       </Canvas>
     </motion.div>
