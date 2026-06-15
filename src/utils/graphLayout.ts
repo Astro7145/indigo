@@ -50,7 +50,7 @@ function add(base: Vec3, off: Vec3): Vec3 {
 
 /**
  * 목표·할일·노트를 궤도형 3D 좌표로 배치(deterministic).
- * - 달: 원점 / 목표: 달 주위 R_GOAL 피보나치 구 / 할일: 각 목표 주위 R_TODO 기운 궤도 / 노트: 부모 할일 주위 R_NOTE
+ * - 달: 원점 / 목표: 달 주위 R_GOAL 피보나치 구 / 할일: 각 목표 주위 R_TODO 구면 / 노트: 부모 할일 주위 R_NOTE 구면
  * - goalId가 null이거나 목표 목록에 없는 할일은 제외.
  */
 export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphLayout {
@@ -79,30 +79,23 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
   const noteNodes: NoteLayoutNode[] = [];
   const links: [Vec3, Vec3][] = [];
 
-  goalNodes.forEach((goalNode, gi) => {
+  goalNodes.forEach((goalNode) => {
     links.push([moon, goalNode.position]);
     const list = todosByGoal.get(goalNode.id) ?? [];
     const m = list.length;
-    const tilt = 0.5 + 0.35 * Math.sin(gi); // 목표마다 기운 궤도 평면
     list.forEach((t, ti) => {
-      const a = (ti / Math.max(m, 1)) * Math.PI * 2 + GOLDEN_ANGLE * gi;
-      // |offset| === R_TODO (sin²+cos² 항등식)
-      const offset: Vec3 = [
-        Math.cos(a) * R_TODO,
-        Math.sin(a) * R_TODO * Math.sin(tilt),
-        Math.sin(a) * R_TODO * Math.cos(tilt),
-      ];
-      const position = add(goalNode.position, offset);
+      // 할일을 목표 주위 구면(피보나치)에 3D로 분포 — |offset| === R_TODO
+      const u = fibonacciSpherePoint(ti, m);
+      const position = add(goalNode.position, [u[0] * R_TODO, u[1] * R_TODO, u[2] * R_TODO]);
       todoNodes.push({ id: t.id, goalId: goalNode.id, position });
       links.push([goalNode.position, position]);
 
       const noteIds = t.noteIds ?? [];
       const k = noteIds.length;
       noteIds.forEach((noteId, ni) => {
-        const b = (ni / Math.max(k, 1)) * Math.PI * 2;
-        // 평면 원(|offset| === R_NOTE)
-        const noteOffset: Vec3 = [Math.cos(b) * R_NOTE, Math.sin(b) * R_NOTE, 0];
-        const notePos = add(position, noteOffset);
+        // 노트도 부모 할일 주위 구면에 3D로 분포 — |offset| === R_NOTE
+        const v = fibonacciSpherePoint(ni, k);
+        const notePos = add(position, [v[0] * R_NOTE, v[1] * R_NOTE, v[2] * R_NOTE]);
         noteNodes.push({ id: noteId, todoId: t.id, position: notePos });
         links.push([position, notePos]);
       });

@@ -44,6 +44,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
             position={g.position}
             size={g.size}
             title={goal.title}
+            seed={goal.id}
             onClick={() => router.push(`/goals/${goal.id}`)}
           />
         );
@@ -58,13 +59,14 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
             position={t.position}
             title={todo.title}
             done={todo.done}
+            seed={todo.id}
             onClick={() => openDetail(todo)}
           />
         );
       })}
 
       {layout.notes.map((n) => (
-        <NoteNode key={`${n.todoId}-${n.id}`} position={n.position} />
+        <NoteNode key={`${n.todoId}-${n.id}`} position={n.position} seed={n.id} />
       ))}
     </group>
   );
