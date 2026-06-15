@@ -30,8 +30,8 @@ export interface GraphLayout {
 }
 
 /** 궤도 반경(월드 단위) */
-export const R_GOAL = 6;
-export const R_TODO = 2;
+export const R_GOAL = 10;
+export const R_TODO = 3.5;
 export const R_NOTE = 0.7;
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
