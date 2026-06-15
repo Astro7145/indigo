@@ -89,12 +89,13 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
 
   goalNodes.forEach((goalNode) => {
     links.push([moon, goalNode.position]);
-    const list = todosByGoal.get(goalNode.id) ?? [];
+    // 완료(done)를 앞쪽에 모아 정렬 → 고리에서 밝은 할일이 연속된 호로 보여 진행도가 자연스럽게 읽힌다.
+    const list = (todosByGoal.get(goalNode.id) ?? []).slice().sort((a, b) => Number(b.done) - Number(a.done));
     const m = list.length;
     list.forEach((t, ti) => {
-      // 할일을 목표 주위 구면(피보나치)에 3D로 분포 — |offset| === R_TODO
-      const u = fibonacciSpherePoint(ti, m);
-      const position = add(goalNode.position, [u[0] * R_TODO, u[1] * R_TODO, u[2] * R_TODO]);
+      // 할일을 목표 둘레 고리(평면 링, 목성 위성처럼)에 배치 — |offset| === R_TODO
+      const angle = (ti / m) * Math.PI * 2;
+      const position = add(goalNode.position, [Math.cos(angle) * R_TODO, 0, Math.sin(angle) * R_TODO]);
       todoNodes.push({ id: t.id, goalId: goalNode.id, position });
       links.push([goalNode.position, position]);
 

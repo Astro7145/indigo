@@ -5,18 +5,17 @@ import { Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
-import ProgressRing from '@/src/components/common/graph/ProgressRing';
 
 interface GoalNodeProps {
   size: number;
   title: string;
-  /** 0~1 진행도(완료/전체 할일) — 밝기와 진행도 링에 반영. */
+  /** 0~1 진행도(완료/전체 할일) — 구의 발광 밝기에 반영(진행도 자체는 할일 고리로 표현). */
   progress: number;
   /** 드래그 시작(부모가 이동/탭 구분을 처리). */
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
-/** 목표 = 발광 구 + 진행도 링. 진행도만큼 밝아진다. 끌어서 이동, 짧게 탭하면 목표상세 확인 모달(부모가 처리). */
+/** 목표 = 발광 구. 진행도만큼 밝아지고, 진행도 자체는 둘레의 할일 고리(완료=밝음)로 읽는다. 탭하면 목표상세 확인 모달. */
 export default function GoalNode({ size, title, progress, onPointerDown }: GoalNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
@@ -35,7 +34,6 @@ export default function GoalNode({ size, title, progress, onPointerDown }: GoalN
         <sphereGeometry args={[1, 32, 32]} />
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
-      <ProgressRing nodeRadius={size} progress={progress} />
       {hovered && (
         <Html center distanceFactor={24} className="pointer-events-none">
           <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
