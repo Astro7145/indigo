@@ -89,10 +89,7 @@ export default function Sidebar() {
       </AnimatePresence>
       {isTablet && <span className="w-18 shrink-0" />}
       <aside
-        className={cn(
-          'scrollbar-slate top-0 left-0 z-50 h-screen w-fit bg-[#1A1B2E] transition-[width] duration-300',
-          isTablet ? 'fixed' : 'sticky',
-        )}
+        className={cn('scrollbar-slate top-0 left-0 z-50 h-screen w-fit bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
       >
         <div
           className={cn(

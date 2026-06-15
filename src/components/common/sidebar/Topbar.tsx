@@ -110,14 +110,17 @@ export default function Topbar() {
           }`}
         >
           <div className="flex flex-col gap-y-8">
-            <button
-              type="button"
-              onClick={collapse}
-              aria-label={t('menuCollapse')}
-              className="flex w-fit cursor-pointer"
-            >
+            <div className="flex items-center justify-between">
               <LogoFull type="white" />
-            </button>
+              <button
+                type="button"
+                onClick={collapse}
+                aria-label={t('menuCollapse')}
+                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+              >
+                <IcHamburger className="size-8 text-current" />
+              </button>
+            </div>
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text={t('nav.dashboard')} />
