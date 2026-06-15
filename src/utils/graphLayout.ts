@@ -6,7 +6,7 @@ export type Vec3 = [number, number, number];
 export interface GoalLayoutNode {
   id: number;
   position: Vec3;
-  /** 할일 수에 비례한 별 크기 배수 */
+  /** 노드 크기 배수(목표는 균일) */
   size: number;
 }
 export interface TodoLayoutNode {
@@ -61,8 +61,9 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
     const u = fibonacciSpherePoint(i, n);
     return {
       id: g.id,
+      // 목표 크기는 할일 수와 무관하게 균일(부해 보이지 않도록)
       position: [u[0] * R_GOAL, u[1] * R_GOAL, u[2] * R_GOAL],
-      size: 0.6 + Math.min(g.todoCount, 10) * 0.06,
+      size: 0.85,
     };
   });
   const goalPosById = new Map(goalNodes.map((g) => [g.id, g.position] as const));
