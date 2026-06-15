@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import type { MeshStandardMaterial } from 'three';
+import type { MeshStandardMaterial, SpriteMaterial } from 'three';
 
 /**
  * 머티리얼 emissiveIntensity를 base 주위로 은은히 진동시켜 '별이 깜빡이는' 느낌을 준다.
@@ -16,6 +16,20 @@ export function useTwinkle(base: number, seed: number, amplitude = 0.35, speed =
     const mat = ref.current;
     if (!mat) return;
     mat.emissiveIntensity = base + amplitude * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * speed + seed));
+  });
+  return ref;
+}
+
+/**
+ * 위와 동일하지만 스프라이트(별) 머티리얼의 opacity를 진동시킨다(가산 혼합 글로우의 밝기 깜빡임).
+ * 반환한 ref를 `<spriteMaterial ref={...} />`에 연결한다.
+ */
+export function useTwinkleOpacity(base: number, seed: number, amplitude = 0.3, speed = 1.6) {
+  const ref = useRef<SpriteMaterial>(null);
+  useFrame((state) => {
+    const mat = ref.current;
+    if (!mat) return;
+    mat.opacity = base + amplitude * (0.5 + 0.5 * Math.sin(state.clock.elapsedTime * speed + seed));
   });
   return ref;
 }

@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Billboard, Html, useCursor } from '@react-three/drei';
+import { Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
+import { AdditiveBlending } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
-import { SPARKLE_GEOMETRY } from '@/src/components/common/graph/sparkleGeometry';
-import { useTwinkle } from '@/src/components/common/graph/useTwinkle';
+import { getStarTexture } from '@/src/components/common/graph/starTexture';
+import { useTwinkleOpacity } from '@/src/components/common/graph/useTwinkle';
 
 interface GoalNodeProps {
   size: number;
@@ -16,11 +17,11 @@ interface GoalNodeProps {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
-/** 목표 = 큰 반짝이 별(빌보드 스파클). 끌어서 이동, 짧게 탭하면 목표상세 확인 모달(부모가 처리). */
+/** 목표 = 큰 발광 별(글로우 스프라이트). 끌어서 이동, 짧게 탭하면 목표상세 확인 모달(부모가 처리). */
 export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const matRef = useTwinkle(hovered ? 1.6 : 0.9, seed);
+  const matRef = useTwinkleOpacity(0.8, seed);
   const colors = getGraphColors();
 
   const over = (e: ThreeEvent<PointerEvent>) => {
@@ -30,16 +31,22 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
   const out = () => setHovered(false);
 
   return (
-    <Billboard>
-      <mesh
-        geometry={SPARKLE_GEOMETRY}
-        scale={hovered ? size * 1.25 : size}
+    <>
+      <sprite
+        scale={hovered ? size * 2.8 : size * 2.4}
         onPointerOver={over}
         onPointerOut={out}
         onPointerDown={onPointerDown}
       >
-        <meshStandardMaterial ref={matRef} color={colors.goal} emissive={colors.goal} emissiveIntensity={0.9} />
-      </mesh>
+        <spriteMaterial
+          ref={matRef}
+          map={getStarTexture()}
+          color={colors.goal}
+          transparent
+          depthWrite={false}
+          blending={AdditiveBlending}
+        />
+      </sprite>
       {hovered && (
         <Html center distanceFactor={24} className="pointer-events-none">
           <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
@@ -47,6 +54,6 @@ export default function GoalNode({ size, title, seed, onPointerDown }: GoalNodeP
           </span>
         </Html>
       )}
-    </Billboard>
+    </>
   );
 }

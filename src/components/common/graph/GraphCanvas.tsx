@@ -40,7 +40,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
         {/* 회전 중심을 달(원점)로 고정 */}
         <OrbitControls makeDefault enablePan enableZoom target={[0, 0, 0]} minDistance={6} maxDistance={48} />
         <EffectComposer>
-          <Bloom intensity={1.1} luminanceThreshold={0.2} luminanceSmoothing={0.9} mipmapBlur radius={0.7} />
+          <Bloom intensity={0.8} luminanceThreshold={0.15} luminanceSmoothing={0.9} mipmapBlur radius={0.8} />
         </EffectComposer>
       </Canvas>
     </motion.div>
