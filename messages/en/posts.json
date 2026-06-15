@@ -18,6 +18,8 @@
     "editTitle": "Edit Post",
     "submitCreate": "Register",
     "submitUpdate": "Update",
+    "submitCreateShort": "Create",
+    "submitUpdateShort": "Update",
     "titlePlaceholder": "Enter post title",
     "titleLabel": "Title",
     "contentPlaceholder": "Write your content here",

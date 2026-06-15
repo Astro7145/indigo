@@ -18,6 +18,8 @@
     "editTitle": "게시물 수정하기",
     "submitCreate": "등록하기",
     "submitUpdate": "수정하기",
+    "submitCreateShort": "등록",
+    "submitUpdateShort": "수정",
     "titlePlaceholder": "게시물의 제목을 입력해주세요",
     "titleLabel": "제목",
     "contentPlaceholder": "이 곳을 통해 내용을 작성해주세요",

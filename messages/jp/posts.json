@@ -18,6 +18,8 @@
     "editTitle": "編集",
     "submitCreate": "登録する",
     "submitUpdate": "更新する",
+    "submitCreateShort": "登録",
+    "submitUpdateShort": "更新",
     "titlePlaceholder": "タイトルを入力してください",
     "titleLabel": "タイトル",
     "contentPlaceholder": "ここから内容を入力してください",

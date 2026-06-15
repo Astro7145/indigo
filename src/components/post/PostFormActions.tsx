@@ -15,7 +15,8 @@ interface PostFormActionsProps {
 export default function PostFormActions({ mode, isValid, isSubmitting, onSubmit, onCancel }: PostFormActionsProps) {
   const t = useTranslations('posts');
   const tCommon = useTranslations('common');
-  const submitText = mode === 'edit' ? tCommon('actions.update') : t('comment.submit');
+  // 모바일 탑바 슬롯이 좁아 데스크탑(form.submitCreate/Update, "등록하기/수정하기")보다 짧은 도메인 전용 키를 쓴다.
+  const submitText = mode === 'edit' ? t('form.submitUpdateShort') : t('form.submitCreateShort');
   return (
     <div className="flex items-center gap-1">
       <button
