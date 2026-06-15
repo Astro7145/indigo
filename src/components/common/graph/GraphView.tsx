@@ -3,10 +3,15 @@
 import dynamic from 'next/dynamic';
 import { useGoalList } from '@/src/hooks/goal';
 import { useAllTodos } from '@/src/hooks/todo';
+import MoonLoader from '@/src/components/common/graph/MoonLoader';
 
 const GraphCanvas = dynamic(() => import('@/src/components/common/graph/GraphCanvas'), {
   ssr: false,
-  loading: () => <GraphShell>우주를 그리는 중…</GraphShell>,
+  loading: () => (
+    <GraphShell>
+      <MoonLoader />
+    </GraphShell>
+  ),
 });
 
 /** 부모(풀블리드 컨테이너)를 채우는 다크 셸 — 로딩/에러/빈 상태 공용. */
@@ -22,7 +27,12 @@ export default function GraphView() {
   const goalsQuery = useGoalList();
   const todosQuery = useAllTodos();
 
-  if (goalsQuery.isPending || todosQuery.isPending) return <GraphShell>우주를 그리는 중…</GraphShell>;
+  if (goalsQuery.isPending || todosQuery.isPending)
+    return (
+      <GraphShell>
+        <MoonLoader />
+      </GraphShell>
+    );
   if (goalsQuery.isError || todosQuery.isError) return <GraphShell>그래프를 불러오지 못했어요</GraphShell>;
 
   const goals = goalsQuery.data?.goals ?? [];
