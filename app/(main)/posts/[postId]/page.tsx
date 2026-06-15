@@ -65,7 +65,7 @@ export default function PostDetailPage() {
           {me?.id === post.writer.id && (
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기">
+                <IconButton aria-label={tCommon('actions.more')}>
                   <IcMeetballs className="size-5 text-slate-400" />
                 </IconButton>
               </Dropdown.Trigger>
