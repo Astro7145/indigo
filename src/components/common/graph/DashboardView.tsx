@@ -15,7 +15,7 @@ interface DashboardViewProps {
   dashboard: ReactNode;
 }
 
-const TAB_BASE = 'rounded-full p-1.5 transition-colors';
+const TAB_BASE = 'rounded p-1.5 transition-colors';
 
 /**
  * 대시보드 ↔ 3D 그래프 인플레이스 토글.
@@ -39,11 +39,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
   }, [view]);
 
   const toggle = (
-    <div
-      role="group"
-      aria-label="화면 전환"
-      className="inline-flex shrink-0 gap-1 rounded-full bg-slate-200 p-1 shadow-sm"
-    >
+    <div role="group" aria-label="화면 전환" className="inline-flex shrink-0 gap-1 rounded bg-slate-200 p-1 shadow-sm">
       <button
         type="button"
         aria-label="대시보드"
