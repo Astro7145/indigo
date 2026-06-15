@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { Group, Plane, Raycaster, Vector2, Vector3, type BufferGeometry } from 'three';
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import { useModalStore } from '@/src/stores/modal';
 import { GraphSim } from '@/src/components/common/graph/graphPhysics';
 import { getGraphColors } from '@/src/components/common/graph/palette';
+import GoalNavConfirm from '@/src/components/common/graph/GoalNavConfirm';
 import MoonNode from '@/src/components/common/graph/nodes/MoonNode';
 import GoalNode from '@/src/components/common/graph/nodes/GoalNode';
 import TodoNode from '@/src/components/common/graph/nodes/TodoNode';
@@ -61,6 +63,23 @@ function PhysicsLinks({ sim }: { sim: GraphSim }) {
 export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
+  const openModal = useModalStore((s) => s.open);
+
+  // 목표 노드 탭 — 바로 이동하지 않고 확인 모달을 한 번 띄운다(뎁스 추가).
+  const confirmGoalNav = (goalId: number, goalTitle: string) =>
+    openModal(
+      (c) => (
+        <GoalNavConfirm
+          goalTitle={goalTitle}
+          onCancel={c.close}
+          onConfirm={() => {
+            c.close();
+            router.push(`/goals/${goalId}`);
+          }}
+        />
+      ),
+      { variant: 'modal' },
+    );
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls);
@@ -163,7 +182,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
               size={g.size}
               title={goal.title}
               seed={g.id}
-              onPointerDown={grab(key, () => router.push(`/goals/${g.id}`))}
+              onPointerDown={grab(key, () => confirmGoalNav(g.id, goal.title))}
             />
           </group>
         );
