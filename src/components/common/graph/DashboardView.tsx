@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/src/utils/cn';
 import { IcDashboard, IcMoon } from '@/src/components/common/icons';
 import { GRAPH_COLORS } from '@/src/components/common/graph/palette';
@@ -19,12 +19,24 @@ const TAB_BASE = 'rounded-full p-1.5 transition-colors';
 
 /**
  * 대시보드 ↔ 3D 그래프 인플레이스 토글.
- * - 대시보드 뷰: 타이틀과 같은 행 우측에 아이콘 토글.
- * - 그래프 뷰: main 패딩을 상쇄해 콘텐츠 영역(사이드바 제외)을 캔버스로 꽉 채우고, 토글만 위에 띄운다.
+ * 토글은 두 뷰에서 동일하게 콘텐츠 영역(main) 우상단에 절대배치돼 전환 시 위치가 바뀌지 않는다.
+ * - 그래프 뷰: main 패딩을 음수 마진으로 상쇄해 콘텐츠 영역(사이드바 제외)을 캔버스로 꽉 채운다(라운드 없음).
  * 그래프 선택 시에만 GraphView(three.js 지연 로드)가 마운트된다.
  */
 export default function DashboardView({ title, dashboard }: DashboardViewProps) {
   const [view, setView] = useState<View>('dashboard');
+
+  // 그래프 뷰에서는 html 배경을 캔버스 색(딥 인디고)으로 — scrollbar-gutter(stable)로 예약된
+  // 우측 거터 띠가 밝게 보이지 않게 한다. 떠날 때 원래 배경으로 복원.
+  useEffect(() => {
+    if (view !== 'graph') return;
+    const el = document.documentElement;
+    const prev = el.style.background;
+    el.style.background = GRAPH_COLORS.background;
+    return () => {
+      el.style.background = prev;
+    };
+  }, [view]);
 
   const toggle = (
     <div
@@ -53,27 +65,25 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
     </div>
   );
 
-  // 그래프 뷰 — main 패딩을 음수 마진으로 상쇄해 콘텐츠 영역을 꽉 채운다(라운드 없음, 가로 스크롤 차단).
-  // 높이: 모바일/태블릿(<md)은 56px 탑바 스페이서만큼 빼고, md+는 뷰포트 전체.
-  if (view === 'graph') {
-    return (
-      <div
-        className="relative -mx-4 -my-6 h-[calc(100dvh-56px)] overflow-hidden sm:-mx-6 sm:-my-12 md:h-dvh xl:-mx-10 xl:-my-20"
-        style={{ background: GRAPH_COLORS.background }}
-      >
-        <GraphView />
-        <div className="absolute top-4 right-4 z-10">{toggle}</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:my-3 sm:gap-8">
-      <div className="flex items-center">
-        {title}
-        <span className="ml-auto">{toggle}</span>
-      </div>
-      {dashboard}
+    <div className="relative w-full">
+      {/* 토글 — 두 뷰 공통: 콘텐츠 영역 우상단 고정 */}
+      <div className="absolute top-0 right-0 z-20">{toggle}</div>
+
+      {view === 'dashboard' ? (
+        <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:my-3 sm:gap-8">
+          {/* 타이틀 행 — 모바일에서도 토글이 콘텐츠를 가리지 않도록 높이를 예약 */}
+          <div className="flex h-10 items-center">{title}</div>
+          {dashboard}
+        </div>
+      ) : (
+        <div
+          className="-mx-4 -my-6 h-[calc(100dvh-56px)] overflow-hidden sm:-mx-6 sm:-my-12 md:h-dvh xl:-mx-10 xl:-my-20"
+          style={{ background: GRAPH_COLORS.background }}
+        >
+          <GraphView />
+        </div>
+      )}
     </div>
   );
 }
