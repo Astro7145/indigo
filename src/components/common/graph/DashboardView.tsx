@@ -68,8 +68,12 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
   return (
     // flow-root: 자식 상단 마진의 margin collapse를 막아 루트 상단(=토글 기준점)을 두 뷰에서 동일하게 고정
     <div className="relative flow-root w-full">
-      {/* 토글 — 두 뷰 공통: 콘텐츠 영역 우상단 고정 */}
-      <div className="absolute top-0 right-0 z-20">{toggle}</div>
+      {/* 토글 — 콘텐츠 폭(max-w-328) 우측 끝에 맞춰 두 뷰 공통 배치(기본 마진 위치). 빈 영역은 클릭 통과 */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20">
+        <div className="mx-auto flex w-full max-w-328 justify-end">
+          <div className="pointer-events-auto">{toggle}</div>
+        </div>
+      </div>
 
       {view === 'dashboard' ? (
         <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:gap-8">
