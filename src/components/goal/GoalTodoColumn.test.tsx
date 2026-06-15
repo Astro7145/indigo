@@ -85,17 +85,17 @@ it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린
   expect(await screen.findByText('정말 삭제하시겠어요?')).toBeInTheDocument();
 });
 
-it('To do 컬럼에서 "할 일 추가"를 누르면 이 목표에 할 일 추가가 시작된다', async () => {
+it('To do 컬럼에서 "할일 추가"를 누르면 이 목표에 할일 추가가 시작된다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderColumn();
   await screen.findByText('해야할 일이 아직 없어요');
-  fireEvent.click(screen.getByRole('button', { name: '할 일 추가' }));
+  fireEvent.click(screen.getByRole('button', { name: '할일 추가' }));
   expect(mockOpenCreate).toHaveBeenCalledWith({ goalId: 3 });
 });
 
-it('Done 컬럼에는 "할 일 추가" 버튼이 없다', async () => {
+it('Done 컬럼에는 "할일 추가" 버튼이 없다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderColumn({ done: true });
   await screen.findByText('완료한 일이 아직 없어요');
-  expect(screen.queryByRole('button', { name: '할 일 추가' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: '할일 추가' })).not.toBeInTheDocument();
 });

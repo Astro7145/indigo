@@ -218,7 +218,7 @@ describe('TodoUpdateContainer', () => {
       await act(async () => {
         await capturedOnSubmit!(baseSubmitValues);
       });
-      expect(mockShowToast).toHaveBeenCalledWith('할 일이 수정되었습니다.');
+      expect(mockShowToast).toHaveBeenCalledWith('할일이 수정되었습니다.');
       expect(onClose).toHaveBeenCalled();
     });
 
@@ -231,7 +231,7 @@ describe('TodoUpdateContainer', () => {
       await act(async () => {
         await capturedOnSubmit!(baseSubmitValues);
       });
-      expect(mockShowToast).toHaveBeenCalledWith('할 일 수정에 실패했습니다.');
+      expect(mockShowToast).toHaveBeenCalledWith('할일 수정에 실패했습니다.');
       expect(onClose).not.toHaveBeenCalled();
     });
 

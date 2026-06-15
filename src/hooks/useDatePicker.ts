@@ -2,6 +2,7 @@
 
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { CalendarDate } from '@internationalized/date';
+import { useTranslations } from 'next-intl';
 import { AriaCalendarGridProps, useButton, useDialog, useOverlay } from 'react-aria';
 
 interface UseDatePickerProps {
@@ -13,6 +14,7 @@ interface UseDatePickerProps {
 }
 
 export function useDatePicker({ value, onChange, onBlur, ref, firstDayOfWeek = 'sun' }: UseDatePickerProps) {
+  const tTodos = useTranslations('todos');
   const [isOpen, setIsOpen] = useState(false);
   const [pendingDate, setPendingDate] = useState<CalendarDate | null>(value ?? null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +64,7 @@ export function useDatePicker({ value, onChange, onBlur, ref, firstDayOfWeek = '
     popupRef,
   );
 
-  const { dialogProps } = useDialog({ 'aria-label': '날짜 선택' }, popupRef);
+  const { dialogProps } = useDialog({ 'aria-label': tTodos('form.dateDialogLabel') }, popupRef);
 
   return {
     isOpen,

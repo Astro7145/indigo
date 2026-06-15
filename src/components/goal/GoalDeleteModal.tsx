@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import Modal from '@/src/components/common/modal/Modal';
 import { IcReport } from '@/src/components/common/icons';
 import { useDeleteGoal } from '@/src/hooks/goal';
@@ -16,6 +18,8 @@ export interface GoalDeleteModalProps {
  * "확인" 시 useDeleteGoal로 실제 삭제 후 onDeleted를 호출한다.
  */
 export default function GoalDeleteModal({ onClose, goalId, onDeleted }: GoalDeleteModalProps) {
+  const tCommon = useTranslations('common');
+  const tGoals = useTranslations('goals');
   const del = useDeleteGoal();
 
   const handleDelete = () => {
@@ -30,16 +34,16 @@ export default function GoalDeleteModal({ onClose, goalId, onDeleted }: GoalDele
     <Modal open onClose={onClose}>
       <div className="flex flex-col gap-8 sm:gap-10">
         <div className="flex flex-col gap-1 text-center">
-          <Modal.Title className="text-center">정말 삭제하시겠어요?</Modal.Title>
+          <Modal.Title className="text-center">{tCommon('deleteConfirm.title')}</Modal.Title>
           <p className="text-destructive flex items-center justify-center gap-1 text-base font-medium">
             <IcReport aria-hidden className="text-destructive size-5" />
-            삭제된 목표는 복구할 수 없습니다.
+            {tGoals('delete.warning')}
           </p>
         </div>
         <Modal.Actions>
-          <Modal.Cancel onClick={onClose}>취소</Modal.Cancel>
+          <Modal.Cancel onClick={onClose}>{tCommon('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm onClick={handleDelete} disabled={del.isPending}>
-            확인
+            {tCommon('actions.confirm')}
           </Modal.Confirm>
         </Modal.Actions>
       </div>
