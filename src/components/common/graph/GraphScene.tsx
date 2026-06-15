@@ -181,7 +181,6 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
             <GoalNode
               size={g.size}
               title={goal.title}
-              seed={g.id}
               onPointerDown={grab(key, () => confirmGoalNav(g.id, goal.title))}
             />
           </group>
@@ -194,12 +193,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `todo-${t.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={t.position}>
-            <TodoNode
-              title={todo.title}
-              done={todo.done}
-              seed={t.id}
-              onPointerDown={grab(key, () => openDetail(todo))}
-            />
+            <TodoNode title={todo.title} done={todo.done} onPointerDown={grab(key, () => openDetail(todo))} />
           </group>
         );
       })}
@@ -208,7 +202,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `note-${n.todoId}-${n.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={n.position}>
-            <NoteNode seed={n.id} />
+            <NoteNode />
           </group>
         );
       })}
