@@ -94,8 +94,8 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
         onPointerUp={handlePointerUp}
         className="max-h-[90vh] max-w-[90vw] object-contain"
         style={{
-          // 줌인 상태에선 native touch(스크롤·pinch)를 끄고 우리 pointer 핸들러로만 처리한다. 1x일 땐 모바일 핀치 줌 허용.
-          touchAction: scale > 1 ? 'none' : 'pinch-zoom',
+          // native pinch는 viewport 전체를 zoom해 뒤 페이지·모달 셸까지 같이 확대되므로 모든 상태에서 끄고 우리 사이클·드래그 팬으로만 처리한다.
+          touchAction: 'none',
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           opacity: loaded ? 1 : 0,
           // 드래그 중에는 transform transition을 끄고 손가락을 즉시 따라가게 한다 — transition 켜져 있으면 끌리는 느낌
