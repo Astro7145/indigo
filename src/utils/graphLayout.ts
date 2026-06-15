@@ -1,0 +1,113 @@
+import type { GoalListItem } from '@/src/types/goal';
+import type { Todo } from '@/src/types/todo';
+
+export type Vec3 = [number, number, number];
+
+export interface GoalLayoutNode {
+  id: number;
+  position: Vec3;
+  /** 할일 수에 비례한 별 크기 배수 */
+  size: number;
+}
+export interface TodoLayoutNode {
+  id: number;
+  goalId: number;
+  position: Vec3;
+}
+export interface NoteLayoutNode {
+  /** 노트 id (todo.noteIds 원소) */
+  id: number;
+  todoId: number;
+  position: Vec3;
+}
+export interface GraphLayout {
+  moon: Vec3;
+  goals: GoalLayoutNode[];
+  todos: TodoLayoutNode[];
+  notes: NoteLayoutNode[];
+  /** [부모, 자식] 좌표 쌍 — 달→목표, 목표→할일, 할일→노트 */
+  links: [Vec3, Vec3][];
+}
+
+/** 궤도 반경(월드 단위) */
+export const R_GOAL = 6;
+export const R_TODO = 2;
+export const R_NOTE = 0.7;
+
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
+/** 단위 구면 균등 분포(피보나치 구)의 i번째 점 — 항상 길이 1 */
+function fibonacciSpherePoint(i: number, n: number): Vec3 {
+  const y = n === 1 ? 0.2 : 1 - (i / (n - 1)) * 2; // 1 → -1
+  const r = Math.sqrt(Math.max(0, 1 - y * y));
+  const theta = GOLDEN_ANGLE * i;
+  return [Math.cos(theta) * r, y, Math.sin(theta) * r];
+}
+
+function add(base: Vec3, off: Vec3): Vec3 {
+  return [base[0] + off[0], base[1] + off[1], base[2] + off[2]];
+}
+
+/**
+ * 목표·할일·노트를 궤도형 3D 좌표로 배치(deterministic).
+ * - 달: 원점 / 목표: 달 주위 R_GOAL 피보나치 구 / 할일: 각 목표 주위 R_TODO 기운 궤도 / 노트: 부모 할일 주위 R_NOTE
+ * - goalId가 null이거나 목표 목록에 없는 할일은 제외.
+ */
+export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphLayout {
+  const moon: Vec3 = [0, 0, 0];
+  const n = goals.length;
+
+  const goalNodes: GoalLayoutNode[] = goals.map((g, i) => {
+    const u = fibonacciSpherePoint(i, n);
+    return {
+      id: g.id,
+      position: [u[0] * R_GOAL, u[1] * R_GOAL, u[2] * R_GOAL],
+      size: 0.6 + Math.min(g.todoCount, 10) * 0.06,
+    };
+  });
+  const goalPosById = new Map(goalNodes.map((g) => [g.id, g.position] as const));
+
+  const todosByGoal = new Map<number, Todo[]>();
+  for (const t of todos) {
+    if (t.goalId == null || !goalPosById.has(t.goalId)) continue;
+    const arr = todosByGoal.get(t.goalId) ?? [];
+    arr.push(t);
+    todosByGoal.set(t.goalId, arr);
+  }
+
+  const todoNodes: TodoLayoutNode[] = [];
+  const noteNodes: NoteLayoutNode[] = [];
+  const links: [Vec3, Vec3][] = [];
+
+  goalNodes.forEach((goalNode, gi) => {
+    links.push([moon, goalNode.position]);
+    const list = todosByGoal.get(goalNode.id) ?? [];
+    const m = list.length;
+    const tilt = 0.5 + 0.35 * Math.sin(gi); // 목표마다 기운 궤도 평면
+    list.forEach((t, ti) => {
+      const a = (ti / Math.max(m, 1)) * Math.PI * 2 + GOLDEN_ANGLE * gi;
+      // |offset| === R_TODO (sin²+cos² 항등식)
+      const offset: Vec3 = [
+        Math.cos(a) * R_TODO,
+        Math.sin(a) * R_TODO * Math.sin(tilt),
+        Math.sin(a) * R_TODO * Math.cos(tilt),
+      ];
+      const position = add(goalNode.position, offset);
+      todoNodes.push({ id: t.id, goalId: goalNode.id, position });
+      links.push([goalNode.position, position]);
+
+      const noteIds = t.noteIds ?? [];
+      const k = noteIds.length;
+      noteIds.forEach((noteId, ni) => {
+        const b = (ni / Math.max(k, 1)) * Math.PI * 2;
+        // 평면 원(|offset| === R_NOTE)
+        const noteOffset: Vec3 = [Math.cos(b) * R_NOTE, Math.sin(b) * R_NOTE, 0];
+        const notePos = add(position, noteOffset);
+        noteNodes.push({ id: noteId, todoId: t.id, position: notePos });
+        links.push([position, notePos]);
+      });
+    });
+  });
+
+  return { moon, goals: goalNodes, todos: todoNodes, notes: noteNodes, links };
+}
