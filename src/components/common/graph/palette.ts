@@ -17,9 +17,9 @@ export interface GraphColors {
 const TOKENS: Record<keyof GraphColors, string> = {
   background: '--color-slate-900',
   moon: '--color-indigo-100',
-  goal: '--color-indigo-500',
+  goal: '--color-indigo-300',
   todo: '--color-indigo-400',
-  note: '--color-indigo-600',
+  note: '--color-indigo-500',
   link: '--color-indigo-800',
 };
 

@@ -19,7 +19,7 @@ export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) 
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
   const colors = getGraphColors();
   // done이면 밝게(발광↑), 미완료면 어둡게.
-  const color = new Color(colors.todo).multiplyScalar(done ? 1.35 : 0.5);
+  const color = new Color(colors.todo).multiplyScalar(done ? 1.3 : 0.1);
 
   const over = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();

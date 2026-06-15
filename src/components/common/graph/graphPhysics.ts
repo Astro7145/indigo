@@ -21,7 +21,7 @@ interface SimEdge {
 /** 자식이 부모 기준 자리(고리)로 복귀하는 스프링 세기. */
 const K_HOME = 4;
 /** 프레임당 속도 감쇠(0~1). */
-const DAMP = 0.84;
+const DAMP = 0.95;
 
 /**
  * 가벼운 스프링 시뮬레이션.
