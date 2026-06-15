@@ -26,7 +26,8 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <Topbar />
         <Sidebar />
         <Settings />
-        <div className="flex flex-1 flex-col">
+        {/* min-w-0: 콘텐츠 컬럼이 자식(예: 3D 캔버스)의 폭 아래로도 줄어들 수 있게 해 화면 축소 시 반응형 보장 */}
+        <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
           <div id="toast-portal" />
         </div>
