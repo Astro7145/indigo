@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons/IcDelete';
@@ -11,11 +11,64 @@ interface ImageLightboxProps {
   onClose: () => void;
 }
 
+// 드래그로 인식할 최소 이동 거리(px). 이 이하의 미세 흔들림은 클릭으로 본다 — 줌 토글 클릭이 드래그에 안 잡혀야 한다.
+const DRAG_THRESHOLD_PX = 5;
+
+// 줌 단계 사이클 — 클릭마다 다음 단계로, 마지막 다음은 다시 1x. 디테일(4x)까지 들어갔다가 한 번 더 클릭으로 리셋.
+const ZOOM_LEVELS = [1, 2, 4] as const;
+type ZoomLevel = (typeof ZOOM_LEVELS)[number];
+
 export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxProps) {
-  const [zoomed, setZoomed] = useState(false);
+  const [scale, setScale] = useState<ZoomLevel>(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
   // raw img는 다운로드 전 0×0이라 그대로 두면 마운트 직후 자연 크기로 layout shift가 일어나 "접혔다 펴지는" 인상을 준다.
   // 로드 완료 전에는 opacity 0으로 감추고, onLoad 시점에 fade-in 시킨다.
   const [loaded, setLoaded] = useState(false);
+  // cursor·transition 분기에 쓰는 상태. dragStart ref와는 별개로 render에서 안전하게 읽기 위한 state.
+  const [dragging, setDragging] = useState(false);
+  // 드래그 시작 위치 + 시작 시점 pan 값. ref로 두어 setState 리렌더 없이 즉시 갱신.
+  const dragStart = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
+  // pointerUp 직후의 click이 줌 토글로 잡히는 false-positive를 막기 위한 1회용 가드.
+  const skipNextClick = useRef(false);
+
+  const handleClick = () => {
+    if (skipNextClick.current) {
+      skipNextClick.current = false;
+      return;
+    }
+    setScale((s) => {
+      const next = ZOOM_LEVELS[(ZOOM_LEVELS.indexOf(s) + 1) % ZOOM_LEVELS.length];
+      // 사이클이 1x로 돌아갈 때 pan을 0으로 리셋해 다음 줌인 때 가운데에서 시작
+      if (next === 1) setPan({ x: 0, y: 0 });
+      return next;
+    });
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (scale === 1) return;
+    dragStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+    setDragging(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (!dragStart.current) return;
+    setPan({
+      x: dragStart.current.panX + (e.clientX - dragStart.current.x),
+      y: dragStart.current.panY + (e.clientY - dragStart.current.y),
+    });
+  };
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLImageElement>) => {
+    if (dragStart.current) {
+      const dx = e.clientX - dragStart.current.x;
+      const dy = e.clientY - dragStart.current.y;
+      if (Math.hypot(dx, dy) > DRAG_THRESHOLD_PX) skipNextClick.current = true;
+    }
+    dragStart.current = null;
+    setDragging(false);
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
 
   return (
     <div
@@ -35,13 +88,19 @@ export default function ImageLightbox({ src, alt = '', onClose }: ImageLightboxP
         src={src}
         alt={alt}
         onLoad={() => setLoaded(true)}
-        onClick={() => setZoomed((z) => !z)}
-        className={`max-h-[90vh] max-w-[90vw] object-contain ${zoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        className="max-h-[90vh] max-w-[90vw] object-contain"
         style={{
-          touchAction: 'pinch-zoom',
-          transform: zoomed ? 'scale(2)' : 'scale(1)',
+          // 줌인 상태에선 native touch(스크롤·pinch)를 끄고 우리 pointer 핸들러로만 처리한다. 1x일 땐 모바일 핀치 줌 허용.
+          touchAction: scale > 1 ? 'none' : 'pinch-zoom',
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
           opacity: loaded ? 1 : 0,
-          transition: 'opacity 200ms ease-out, transform 200ms ease-out',
+          // 드래그 중에는 transform transition을 끄고 손가락을 즉시 따라가게 한다 — transition 켜져 있으면 끌리는 느낌
+          transition: dragging ? 'opacity 200ms ease-out' : 'opacity 200ms ease-out, transform 200ms ease-out',
+          cursor: scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'zoom-in',
         }}
       />
       <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4">
