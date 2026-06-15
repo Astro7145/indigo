@@ -1,3 +1,4 @@
+import type validationMessages from '@/messages/ko/validation.json';
 import z from 'zod';
 
 export const todoCreateSchema = z.object({
@@ -19,7 +20,8 @@ export type TodoCreateValues = z.infer<typeof todoCreateSchema>;
 
 // 검증 메시지를 i18n으로 전환하기 위해 translator(useTranslations('validation'))를 받아 스키마를 만든다.
 // 컴포넌트는 useTranslations('validation')의 t를 주입해 선택된 언어로 에러 메시지를 표시한다.
-type Translator = (key: string) => string;
+// 키 타입은 next-intl 증강(src/i18n/global.d.ts)과 동일하게 ko validation.json을 SSOT로 좁힌다.
+type Translator = (key: keyof typeof validationMessages) => string;
 
 export const createLoginSchema = (t: Translator) =>
   z.object({
