@@ -23,7 +23,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
         <pointLight position={[0, 0, 0]} intensity={140} distance={80} color={GRAPH_COLORS.moonGlow} />
         <Stars radius={120} depth={60} count={4000} factor={4} saturation={0} fade speed={0.5} />
         <GraphScene goals={goals} todos={todos} />
-        <OrbitControls enablePan enableZoom autoRotate autoRotateSpeed={0.4} minDistance={6} maxDistance={48} />
+        <OrbitControls enablePan enableZoom minDistance={6} maxDistance={48} />
         <EffectComposer>
           <Bloom intensity={1.1} luminanceThreshold={0.2} luminanceSmoothing={0.9} mipmapBlur radius={0.7} />
         </EffectComposer>

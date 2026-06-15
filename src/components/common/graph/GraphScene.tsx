@@ -1,9 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
 import { useRouter } from 'next/navigation';
-import type { Group } from 'three';
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { GoalListItem } from '@/src/types/goal';
@@ -20,8 +17,8 @@ interface GraphSceneProps {
 }
 
 /**
- * 레이아웃 좌표로 달·목표·할일·노트·링크를 렌더하고, 전체를 하나의 group으로
- * 아주 느리게 강체 자전시킨다(링크가 같은 group 내라 항상 붙어 있음).
+ * 레이아웃 좌표로 달·목표·할일·노트·링크를 렌더한다. 자동 회전은 하지 않고
+ * 카메라 조작(OrbitControls)으로 사용자가 직접 돌린다.
  */
 export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const router = useRouter();
@@ -29,14 +26,9 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const layout = computeGraphLayout(goals, todos);
   const goalById = new Map(goals.map((g) => [g.id, g] as const));
   const todoById = new Map(todos.map((t) => [t.id, t] as const));
-  const groupRef = useRef<Group>(null);
-
-  useFrame((_, delta) => {
-    if (groupRef.current) groupRef.current.rotation.y += delta * 0.03;
-  });
 
   return (
-    <group ref={groupRef}>
+    <group>
       <MoonNode position={layout.moon} />
 
       {layout.links.map((link) => (

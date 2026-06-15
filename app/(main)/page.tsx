@@ -32,9 +32,9 @@ export default async function DashboardPage() {
     <HydrationBoundary state={dehydrate(qc)}>
       <div id="toast-portal" />
       <DashboardView
+        title={<DashboardTitle />}
         dashboard={
-          <div className="flex flex-col gap-10 sm:my-3 sm:gap-8">
-            <DashboardTitle />
+          <div className="flex flex-col gap-10 sm:gap-8">
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-3 xl:gap-8">
               <RecentTodos />
               <ProgressCard />
