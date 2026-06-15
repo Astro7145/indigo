@@ -22,7 +22,7 @@ interface TopbarNotificationProps {
  * (벨·패널이 pointer-events-none 영역 안에 있으므로 둘 다 pointer-events-auto로 되살린다)
  */
 export default function TopbarNotification({ active }: TopbarNotificationProps) {
-  const t = useTranslations('sidebar');
+  const t = useTranslations('sidebar.notification');
   const [isOpen, setIsOpen] = useState(false);
   const [prevActive, setPrevActive] = useState(active);
   const bellRef = useRef<HTMLButtonElement>(null);
@@ -71,7 +71,7 @@ export default function TopbarNotification({ active }: TopbarNotificationProps) 
       <button
         ref={bellRef}
         type="button"
-        aria-label={t('notification.title')}
+        aria-label={t('title')}
         aria-haspopup="true"
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
