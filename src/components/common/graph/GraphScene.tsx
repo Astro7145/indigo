@@ -65,6 +65,21 @@ function ratio(done: number, total: number): number {
   return total > 0 ? done / total : 0;
 }
 
+// 터치 탭은 pointerup 직후 같은 좌표에서 합성 click(ghost click)을 한 번 더 발생시킨다(마우스엔 없음).
+// 노드 탭이 연 모달/시트의 백드롭에 이 click이 떨어지면 오버레이가 즉시 닫힌다. 탭 좌표 근처의
+// '다음 click 한 번'만 캡처 단계에서 삼켜 막는다(다른 위치의 의도된 클릭은 통과). 안 오면 타이머로 정리.
+function suppressGhostClick(x: number, y: number) {
+  const swallow = (e: MouseEvent) => {
+    window.removeEventListener('click', swallow, true);
+    if (Math.hypot(e.clientX - x, e.clientY - y) <= 8) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+  };
+  window.addEventListener('click', swallow, true);
+  setTimeout(() => window.removeEventListener('click', swallow, true), 350);
+}
+
 export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
@@ -171,7 +186,11 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
     const end = (ev: PointerEvent, tap: boolean) => {
       if (!drag.current) return;
       el.releasePointerCapture?.(ev.pointerId);
-      if (tap && !moved.current && tapAction.current) tapAction.current();
+      if (tap && !moved.current && tapAction.current) {
+        tapAction.current();
+        // 터치 탭이 연 모달/시트를 직후의 합성 click(ghost click)이 백드롭째 닫는 걸 막는다(마우스엔 불필요).
+        if (ev.pointerType === 'touch') suppressGhostClick(ev.clientX, ev.clientY);
+      }
       drag.current = null;
       tapAction.current = null;
       enableControls(true);
