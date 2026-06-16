@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/src/utils/cn';
-import { IcDashboard, IcMoon } from '@/src/components/common/icons';
+import { IcDashboard, IcGraph } from '@/src/components/common/icons';
 import { GRAPH_BACKGROUND_VAR } from '@/src/components/common/graph/palette';
 import GraphView from '@/src/components/common/graph/GraphView';
 import { useIsMobile } from '@/src/hooks/useIsMobile';
@@ -69,7 +69,7 @@ function ViewToggle({
         onClick={() => onChange('graph')}
         className={cn(TAB_BASE, buttonPad, view === 'graph' ? 'bg-white shadow-sm' : hover)}
       >
-        <IcMoon aria-hidden className={cn(iconSize, view === 'graph' ? 'text-indigo-600' : inactiveIcon)} />
+        <IcGraph aria-hidden className={cn(iconSize, view === 'graph' ? 'text-indigo-600' : inactiveIcon)} />
       </button>
     </div>
   );
