@@ -34,7 +34,7 @@ export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) 
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {hovered && (
-        <Html center pointerEvents="none">
+        <Html center className="pointer-events-none">
           <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs whitespace-nowrap text-indigo-100">{title}</span>
         </Html>
       )}
