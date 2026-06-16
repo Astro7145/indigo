@@ -8,7 +8,12 @@ interface IcLinkProps extends SVGProps<SVGSVGElement> {
 export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
   if (state === 'default') {
     return (
-      <svg viewBox="0 0 24 24" fill="none" className={cn('size-6 text-indigo-600', className)} {...rest}>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        className={cn('dark:text-indigo-dark-600 size-6 text-indigo-600', className)}
+        {...rest}
+      >
         <circle cx="12" cy="12" r="12" fill="var(--color-white)" fillOpacity="0.4" />
         <path
           d="M13.3332 10.6663L10.6665 13.333"
@@ -28,7 +33,12 @@ export function IcLink({ state = 'default', className, ...rest }: IcLinkProps) {
   }
 
   return (
-    <svg viewBox="0 0 24 24" fill="none" className={cn('size-6 text-indigo-700', className)} {...rest}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={cn('dark:text-indigo-dark-600 size-6 text-indigo-700', className)}
+      {...rest}
+    >
       <circle cx="12" cy="12" r="12" fill="currentColor" fillOpacity="0.2" />
       <path
         d="M13.3332 10.6663L10.6665 13.333"

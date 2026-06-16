@@ -13,8 +13,8 @@ export default function DashboardTitle() {
 
   return (
     <div className="hidden h-8 sm:block">
-      <h1 className="pl-1 text-2xl font-semibold text-slate-800">
-        <span data-testid="user-name" className="text-indigo-600">
+      <h1 className="pl-1 text-2xl font-semibold text-slate-800 dark:text-white">
+        <span data-testid="user-name" className="dark:text-indigo-dark-800 text-indigo-600">
           {me?.name}
         </span>
         {t('title')}
