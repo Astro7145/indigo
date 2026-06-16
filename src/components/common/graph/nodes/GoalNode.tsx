@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Html, useCursor } from '@react-three/drei';
+import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
@@ -35,11 +35,15 @@ export default function GoalNode({ size, title, progress, onPointerDown }: GoalN
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {hovered && (
-        <Html center className="pointer-events-none">
-          <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
-            {title}
-          </span>
-        </Html>
+        // 라벨을 노드 아래에 띄운다 — Billboard로 항상 카메라를 향하게 해 '아래(−Y)'가 카메라 각도와
+        // 무관하게 늘 화면 아래로 가고, 오프셋은 월드 단위라 줌과 상관없이 노드를 항상 비킨다.
+        <Billboard>
+          <Html center position={[0, -1.5, 0]} className="pointer-events-none">
+            <span className="bg-indigo-alpha-20 rounded px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
+              {title}
+            </span>
+          </Html>
+        </Billboard>
       )}
     </>
   );

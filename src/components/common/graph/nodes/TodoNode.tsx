@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Html, useCursor } from '@react-three/drei';
+import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
@@ -34,9 +34,14 @@ export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) 
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {hovered && (
-        <Html center className="pointer-events-none">
-          <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs whitespace-nowrap text-indigo-100">{title}</span>
-        </Html>
+        // 라벨을 노드 아래에 띄운다 — Billboard로 '아래(−Y)'가 카메라 각도와 무관하게 늘 화면 아래로 향한다.
+        <Billboard>
+          <Html center position={[0, -0.8, 0]} className="pointer-events-none">
+            <span className="bg-indigo-alpha-30 rounded px-2 py-1 text-xs whitespace-nowrap text-indigo-100">
+              {title}
+            </span>
+          </Html>
+        </Billboard>
       )}
     </>
   );
