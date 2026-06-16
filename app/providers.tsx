@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { SessionProvider } from 'next-auth/react';
+import { ThemeProvider } from 'next-themes';
 import { useState, type ReactNode } from 'react';
 
 // QueryClient는 컴포넌트 인스턴스마다 한 번만 생성한다 (useState 초기값).
@@ -26,7 +27,9 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
         {process.env.NODE_ENV === 'development' && (
           <ReactQueryDevtools initialIsOpen={false} position="top" buttonPosition="bottom-right" />
         )}
