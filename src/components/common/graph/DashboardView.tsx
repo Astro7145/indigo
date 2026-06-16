@@ -37,7 +37,9 @@ function ViewToggle({
   const isTopbar = variant === 'topbar';
   const track = isTopbar ? 'bg-white/10' : 'bg-slate-200';
   const hover = isTopbar ? 'hover:bg-white/10' : 'hover:bg-white/60';
-  const inactiveIcon = isTopbar ? 'text-white/60' : 'text-slate-500';
+  const inactiveIcon = isTopbar ? 'text-white/80' : 'text-slate-500';
+  // 활성 셀: 라이트는 순백, 다크 Topbar는 살짝 톤다운해 다크 바와 덜 튀게
+  const activeCell = isTopbar ? 'bg-white/90 shadow-sm' : 'bg-white shadow-sm';
   // 모바일 Topbar 바(56px)에 맞게 토픽바 변형은 패딩을 줄여 컴팩트하게(제목·햄버거와 높이 비율 맞춤).
   const containerPad = isTopbar ? 'p-0.5' : 'p-1';
   const buttonPad = isTopbar ? 'p-0.5' : 'p-1.5';
@@ -54,7 +56,7 @@ function ViewToggle({
         aria-label="대시보드"
         aria-pressed={view === 'dashboard'}
         onClick={() => onChange('dashboard')}
-        className={cn(TAB_BASE, buttonPad, view === 'dashboard' ? 'bg-white shadow-sm' : hover)}
+        className={cn(TAB_BASE, buttonPad, view === 'dashboard' ? activeCell : hover)}
       >
         <IcDashboard
           aria-hidden
@@ -67,7 +69,7 @@ function ViewToggle({
         aria-label="우주"
         aria-pressed={view === 'graph'}
         onClick={() => onChange('graph')}
-        className={cn(TAB_BASE, buttonPad, view === 'graph' ? 'bg-white shadow-sm' : hover)}
+        className={cn(TAB_BASE, buttonPad, view === 'graph' ? activeCell : hover)}
       >
         <IcGraph aria-hidden className={cn(iconSize, view === 'graph' ? 'text-indigo-600' : inactiveIcon)} />
       </button>
