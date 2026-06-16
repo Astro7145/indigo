@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import Modal from '@/src/components/common/modal/Modal';
 import { IcReport } from '@/src/components/common/icons';
 import { useDeleteTodo } from '@/src/hooks/todo';
@@ -17,6 +19,8 @@ interface TodoDeleteConfirmProps {
  * 삭제 뮤테이션·토스트·pending을 자체 소유하는 자기완결 컴포넌트 — 호출 측은 open/todo/onClose만 전달.
  */
 export default function TodoDeleteConfirm({ open, todo, onClose }: TodoDeleteConfirmProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const del = useDeleteTodo();
   const { showToast } = useToast();
 
@@ -24,26 +28,26 @@ export default function TodoDeleteConfirm({ open, todo, onClose }: TodoDeleteCon
     if (!todo) return;
     del.mutate(todo.id, {
       onSuccess: () => {
-        showToast('할 일이 삭제되었습니다.');
+        showToast(tTodos('delete.success'));
         onClose();
       },
-      onError: () => showToast('할 일 삭제에 실패했습니다.'),
+      onError: () => showToast(tTodos('delete.error')),
     });
   };
 
   return (
     <Modal open={open && todo !== null} onClose={onClose}>
       <div className="flex flex-col gap-1">
-        <Modal.Title className="text-center">정말 삭제하시겠어요?</Modal.Title>
+        <Modal.Title className="text-center">{tCommon('deleteConfirm.title')}</Modal.Title>
         <p className="text-destructive flex items-center justify-center gap-1 text-base font-medium">
           <IcReport aria-hidden className="text-destructive size-5" />
-          <span>삭제된 할 일은 복구할 수 없습니다.</span>
+          <span>{tTodos('delete.warning')}</span>
         </p>
       </div>
       <Modal.Actions className="mt-10">
-        <Modal.Cancel>취소</Modal.Cancel>
+        <Modal.Cancel>{tCommon('actions.cancel')}</Modal.Cancel>
         <Modal.Confirm onClick={handleConfirm} disabled={del.isPending}>
-          확인
+          {tCommon('actions.confirm')}
         </Modal.Confirm>
       </Modal.Actions>
     </Modal>

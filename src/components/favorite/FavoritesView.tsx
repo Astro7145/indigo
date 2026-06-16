@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
@@ -13,20 +14,15 @@ import CategoryTab from '@/src/components/todo/CategoryTab';
 import { useFavoriteTodoList } from '@/src/hooks/favorite';
 import { useGoalList } from '@/src/hooks/goal';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
-import { parseFavoritesTab, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
-import type { FavoriteTodo } from '@/src/types/favorite';
+import {
+  favoritesUrl,
+  filterFavorites,
+  parseFavoritesTab,
+  parseGoalId,
+  type FavoritesTab,
+} from '@/src/components/favorite/favoritesTab';
 
 type Tab = FavoritesTab;
-
-// 클라이언트 필터 (favorites API가 done/goalId 미지원). 카운트·목록이 공유한다.
-function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | null): FavoriteTodo[] {
-  return favorites.filter((f) => {
-    if (tab === 'todo' && f.todo.done) return false;
-    if (tab === 'done' && !f.todo.done) return false;
-    if (goalId !== null && f.todo.goal?.id !== goalId) return false;
-    return true;
-  });
-}
 
 /**
  * /favorites — 찜한 할 일 페이지
@@ -37,8 +33,11 @@ function filterFavorites(favorites: FavoriteTodo[], tab: Tab, goalId: number | n
  * 모바일은 GNB가 페이지 타이틀을 담당해 헤더 영역을 숨긴다.
  */
 export default function FavoritesView() {
-  // 탭의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
-  const urlTab = parseFavoritesTab(useSearchParams().get('tab') ?? undefined);
+  const tCommon = useTranslations('common');
+  const tFavorites = useTranslations('favorites');
+  // 탭·목표 필터의 단일 소스는 URL — prop 주입은 뒤로가기 시 라우터 캐시의 옛 prop과 현재 URL이 어긋난다.
+  const searchParams = useSearchParams();
+  const urlTab = parseFavoritesTab(searchParams.get('tab') ?? undefined);
   const [tab, setTab] = useState<Tab>(urlTab);
   const [syncedTab, setSyncedTab] = useState<Tab>(urlTab);
   // 뒤로가기/앞으로가기로 URL이 바뀌면 탭을 URL에 맞춘다 (렌더 중 보정)
@@ -46,12 +45,22 @@ export default function FavoritesView() {
     setSyncedTab(urlTab);
     setTab(urlTab);
   }
-  // 탭을 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없음.
+  const urlGoalId = parseGoalId(searchParams.get('goalId'));
+  const [goalId, setGoalId] = useState<number | null>(urlGoalId);
+  const [syncedGoalId, setSyncedGoalId] = useState<number | null>(urlGoalId);
+  if (urlGoalId !== syncedGoalId) {
+    setSyncedGoalId(urlGoalId);
+    setGoalId(urlGoalId);
+  }
+  // 필터를 URL에도 반영(셸로우) — 찜 필터링은 클라이언트라 재페칭 없고, GNB 카운트·새로고침·공유가 따라온다.
   const changeTab = (next: Tab) => {
     setTab(next);
-    window.history.replaceState(null, '', next === 'all' ? '/favorites' : `/favorites?tab=${next}`);
+    window.history.replaceState(null, '', favoritesUrl(next, goalId));
   };
-  const [goalId, setGoalId] = useState<number | null>(null);
+  const changeGoalId = (id: number | null) => {
+    setGoalId(id);
+    window.history.replaceState(null, '', favoritesUrl(tab, id));
+  };
 
   // 목표 드롭다운 옵션 (목표는 보통 소수 — 단일 페이지로 충분)
   const { data: goalData } = useGoalList({ limit: 100 });
@@ -62,7 +71,7 @@ export default function FavoritesView() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:61509) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">찜한 할 일</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{tFavorites('title')}</h1>
         {/* 카운트는 현재 보이는(필터된) 찜 개수 — 탭·목표 필터에 따라 갱신. aria-label 미부착으로 h1+숫자를 이어 읽힘 */}
         <AsyncBoundary
           fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
@@ -91,16 +100,16 @@ export default function FavoritesView() {
                 <span className="flex items-center gap-3">
                   <IcGoal className="size-8" />
                   <span className="text-base font-semibold tracking-[-0.03em] text-slate-800">
-                    {selectedGoal ? selectedGoal.title : '전체 목표'}
+                    {selectedGoal ? selectedGoal.title : tFavorites('goalFilter.all')}
                   </span>
                 </span>
                 <IcChevron direction="down" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="full">
-              <Dropdown.Item onClick={() => setGoalId(null)}>전체 목표</Dropdown.Item>
+              <Dropdown.Item onClick={() => changeGoalId(null)}>{tFavorites('goalFilter.all')}</Dropdown.Item>
               {goals.map((g) => (
-                <Dropdown.Item key={g.id} onClick={() => setGoalId(g.id)}>
+                <Dropdown.Item key={g.id} onClick={() => changeGoalId(g.id)}>
                   {g.title}
                 </Dropdown.Item>
               ))}
@@ -108,8 +117,8 @@ export default function FavoritesView() {
           </Dropdown>
 
           <AsyncBoundary
-            fallback={<p className="py-12 text-center text-sm text-slate-400">불러오는 중…</p>}
-            errorFallback={<p className="py-12 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+            fallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+            errorFallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
             resetKeys={[tab, goalId]}
           >
             <FavoritesList tab={tab} goalId={goalId} />
@@ -127,13 +136,14 @@ function FavoritesCount({ tab, goalId }: { tab: Tab; goalId: number | null }) {
 }
 
 function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
+  const tFavorites = useTranslations('favorites');
   const { openEdit, openDetail } = useTodoSheet();
   const { data } = useFavoriteTodoList({ limit: 100 });
 
   const visible = filterFavorites(data.favorites, tab, goalId);
 
   if (visible.length === 0) {
-    return <p className="py-20 text-center text-sm text-slate-500">아직 찜한 할 일이 없어요</p>;
+    return <p className="py-20 text-center text-sm text-slate-500">{tFavorites('empty')}</p>;
   }
 
   // 즐겨찾기 응답의 todo는 isFavorite=true인 완전한 Todo — 별 클릭은 TodoList의 일반 토글로 해제가 된다.

@@ -34,14 +34,14 @@ beforeEach(() => {
 });
 
 function fillRequiredFields() {
-  fireEvent.change(screen.getByPlaceholderText('할 일의 제목을 적어주세요'), { target: { value: '운동하기' } });
+  fireEvent.change(screen.getByPlaceholderText('할일의 제목을 적어주세요'), { target: { value: '운동하기' } });
   fireEvent.click(screen.getByTestId('mock-datepicker'));
 }
 
 describe('TodoFormUI', () => {
   it('제목·목표·마감기한·태그·링크·이미지 필드와 취소·제출 버튼을 렌더링한다', () => {
     renderWithClient(<TodoFormUI onSubmit={jest.fn()} onClose={jest.fn()} title="할 일 생성" submitLabel="확인" />);
-    expect(screen.getByPlaceholderText('할 일의 제목을 적어주세요')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('할일의 제목을 적어주세요')).toBeInTheDocument();
     expect(screen.getByText('목표를 선택해주세요')).toBeInTheDocument();
     expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('입력 후 Enter')).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('TodoFormUI', () => {
 
   it('제목을 30자 초과로 입력하면 에러 메시지가 표시된다', async () => {
     renderWithClient(<TodoFormUI onSubmit={jest.fn()} onClose={jest.fn()} title="할 일 생성" submitLabel="확인" />);
-    fireEvent.change(screen.getByPlaceholderText('할 일의 제목을 적어주세요'), {
+    fireEvent.change(screen.getByPlaceholderText('할일의 제목을 적어주세요'), {
       target: { value: 'a'.repeat(31) },
     });
     expect(await screen.findByText('제목은 30자 이하로 입력해주세요.')).toBeInTheDocument();
@@ -186,7 +186,7 @@ describe('TodoFormUI', () => {
         initialValues={{ title: '기존 할 일', dueDate: '2026-06-01T00:00:00.000Z', linkUrl: 'https://example.com' }}
       />,
     );
-    expect(screen.getByPlaceholderText('할 일의 제목을 적어주세요')).toHaveValue('기존 할 일');
+    expect(screen.getByPlaceholderText('할일의 제목을 적어주세요')).toHaveValue('기존 할 일');
     expect(screen.getByLabelText('링크')).toHaveValue('https://example.com');
   });
 });

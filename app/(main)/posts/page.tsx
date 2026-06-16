@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { getTranslations } from 'next-intl/server';
 
 import { prefetchPosts } from '@/src/api/server/prefetch';
 import { getQueryClient } from '@/src/api/server/query-client';
@@ -21,11 +22,13 @@ export default async function PostsPage({
   const qc = getQueryClient();
   await prefetchPosts(qc, { ...(search ? { search } : {}), type });
 
+  const t = await getTranslations('posts');
+
   return (
     <div>
       {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
       <header className="mx-auto mb-6 hidden max-w-[1200px] sm:block">
-        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">소통 게시판</h1>
+        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">{t('title')}</h1>
       </header>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense fallback={<div />}>

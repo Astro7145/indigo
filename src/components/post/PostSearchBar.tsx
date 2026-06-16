@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcFilter } from '@/src/components/common/icons/IcFilter';
@@ -9,17 +10,18 @@ import SearchInput from '@/src/components/common/inputs/SearchInput';
 
 type SortBy = 'latest' | 'popular';
 
-const SORT_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'latest', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-];
-
 export default function PostSearchBar() {
+  const t = useTranslations('posts');
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const sortBy = (searchParams.get('sortBy') as SortBy) ?? 'latest';
+
+  const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+    { value: 'latest', label: t('sortLatest') },
+    { value: 'popular', label: t('sortPopular') },
+  ];
 
   const [input, setInput] = useState(searchParams.get('search') ?? '');
 
@@ -46,8 +48,8 @@ export default function PostSearchBar() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onSearch={() => updateParam('search', input)}
-          placeholder="궁금한 내용을 검색해주세요"
-          aria-label="게시글 검색"
+          placeholder={t('searchPlaceholder')}
+          aria-label={t('searchLabel')}
         />
       </div>
 
