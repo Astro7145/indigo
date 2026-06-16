@@ -32,7 +32,7 @@ export interface GraphLayout {
 /** 궤도 반경(월드 단위) */
 export const R_GOAL = 10;
 export const R_TODO = 3.5;
-export const R_NOTE = 0.7;
+export const R_NOTE = 2;
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
@@ -125,8 +125,7 @@ export function computeGraphLayout(goals: GoalListItem[], todos: Todo[]): GraphL
 
   goalNodes.forEach((goalNode) => {
     links.push([moon, goalNode.position]);
-    // 완료(done)를 앞쪽에 모아 정렬 → 고리에서 밝은 할일이 연속된 호로 보여 진행도가 자연스럽게 읽힌다.
-    const list = (todosByGoal.get(goalNode.id) ?? []).slice().sort((a, b) => Number(b.done) - Number(a.done));
+    const list = todosByGoal.get(goalNode.id) ?? [];
     const m = list.length;
     // 목표의 '바깥'(원점 반대) 방향과 접선 기저(u, w) — 할일을 그쪽으로 원뿔로 편다.
     const gOut = unit(goalNode.position);
