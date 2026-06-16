@@ -32,10 +32,11 @@ it('새 할일 버튼을 누르면 생성 시트를 연다', () => {
 
 it('햄버거를 누르면 메뉴가 펼쳐진다', () => {
   render(<Topbar />);
-  const menu = screen.getByLabelText('메뉴 접기').closest('[aria-hidden]');
-  expect(menu).toHaveAttribute('aria-hidden', 'true');
+  const menu = screen.getByLabelText('메뉴 접기').closest('.overflow-y-auto');
+  // 접힘 상태: 펼침 메뉴는 inert(비활성). 펼치면 inert가 제거된다
+  expect(menu).toHaveAttribute('inert');
   fireEvent.click(screen.getByLabelText('메뉴 열기'));
-  expect(menu).toHaveAttribute('aria-hidden', 'false');
+  expect(menu).not.toHaveAttribute('inert');
 });
 
 it('store에 등록된 rightSlot이 우측 영역에 노출된다', () => {

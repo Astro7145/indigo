@@ -76,7 +76,9 @@ export default function Topbar() {
         <motion.div
           initial={false}
           animate={{ opacity: collapsed ? 1 : 0 }}
-          aria-hidden={!collapsed}
+          // inert: 펼침 상태에선 접힘 바를 비활성화(포커스·AT·포인터 제거). aria-hidden은 내부 버튼이
+          // 포커스를 쥔 채 막혀 경고가 나므로 inert를 쓴다(포커스도 함께 빠져나간다).
+          inert={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
           <div className="flex items-center gap-x-2">
@@ -111,7 +113,9 @@ export default function Topbar() {
         <motion.div
           initial={false}
           animate={{ opacity: collapsed ? 0 : 1 }}
-          aria-hidden={collapsed}
+          // 접힘 상태에선 펼침 메뉴를 inert 처리. 메뉴 접기 버튼이 포커스를 쥔 채 aria-hidden이
+          // 막히던 경고를 해소한다(inert가 포커스를 빼낸다).
+          inert={collapsed}
           className={`flex h-full min-h-0 flex-col justify-between overflow-y-auto px-5 pt-4 pb-12 ${
             !collapsed ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
