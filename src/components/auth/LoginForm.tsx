@@ -85,8 +85,8 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           {isSubmitting ? t('submitting') : t('submit')}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
-          <span className="font-medium text-slate-700">{t('signupPrompt')}</span>
-          <Link href="/signup" className="font-semibold text-indigo-600">
+          <span className="font-medium text-slate-700 dark:text-white/70">{t('signupPrompt')}</span>
+          <Link href="/signup" className="dark:text-indigo-dark-900 font-semibold text-indigo-600">
             {t('signupLink')}
           </Link>
         </div>

@@ -129,8 +129,8 @@ export default function SignupForm() {
           {isSubmitting ? t('submitting') : t('submit')}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
-          <span className="font-medium text-slate-700">{t('loginPrompt')}</span>
-          <Link href="/login" className="font-semibold text-indigo-600">
+          <span className="font-medium text-slate-700 dark:text-white/70">{t('loginPrompt')}</span>
+          <Link href="/login" className="dark:text-indigo-dark-900 font-semibold text-indigo-600">
             {t('loginLink')}
           </Link>
         </div>
@@ -150,7 +150,7 @@ function InputSection({ label, htmlFor, error, children }: InputSectionProps) {
   return (
     <span className="flex flex-col gap-y-2">
       {label && (
-        <label htmlFor={htmlFor} className="text-base font-semibold text-slate-700">
+        <label htmlFor={htmlFor} className="text-base font-semibold text-slate-700 dark:text-white">
           {label}
         </label>
       )}
