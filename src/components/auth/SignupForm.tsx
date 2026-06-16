@@ -37,6 +37,7 @@ export default function SignupForm() {
       passwordConfirm: '',
     },
     mode: 'onChange',
+    delayError: 300,
   });
 
   const { mutate } = useSignup();
