@@ -20,8 +20,10 @@ export interface NoteDraft {
   /** 편집 중엔 초안을, 읽기 중엔 원본 노트를 보여주는 표시값 */
   title: string;
   content: JSONContent;
+  linkUrl: string | null;
   setTitle: (value: string) => void;
   setContent: (value: JSONContent) => void;
+  setLinkUrl: (value: string | null) => void;
   /** 초안이 원본과 달라졌는지 (취소 시 확인 모달 여부) */
   isDirty: boolean;
   /** 제목·본문이 모두 채워져 저장 가능한지 */
@@ -34,9 +36,11 @@ export interface NoteDraft {
 export function useNoteDraft(note: Note | undefined, editing: boolean): NoteDraft {
   const baseTitle = note?.title ?? '';
   const baseContent = (note?.content as JSONContent | undefined) ?? EMPTY_DOC;
+  const baseLinkUrl = note?.linkUrl ?? null;
 
   const [draftTitle, setDraftTitle] = useState(baseTitle);
   const [draftContent, setDraftContent] = useState<JSONContent>(baseContent);
+  const [draftLinkUrl, setDraftLinkUrl] = useState<string | null>(baseLinkUrl);
 
   const wasEditing = useRef(editing);
 
@@ -44,16 +48,19 @@ export function useNoteDraft(note: Note | undefined, editing: boolean): NoteDraf
     if (editing && !wasEditing.current) {
       setDraftTitle(baseTitle);
       setDraftContent(baseContent);
+      setDraftLinkUrl(baseLinkUrl);
     }
     wasEditing.current = editing;
-  }, [editing, baseTitle, baseContent]);
+  }, [editing, baseTitle, baseContent, baseLinkUrl]);
 
   return {
     title: editing ? draftTitle : baseTitle,
     content: editing ? draftContent : baseContent,
+    linkUrl: editing ? draftLinkUrl : baseLinkUrl,
     setTitle: setDraftTitle,
     setContent: setDraftContent,
-    isDirty: draftTitle !== baseTitle || !isSameJSON(draftContent, baseContent),
+    setLinkUrl: setDraftLinkUrl,
+    isDirty: draftTitle !== baseTitle || draftLinkUrl !== baseLinkUrl || !isSameJSON(draftContent, baseContent),
     isValid: draftTitle.trim().length > 0 && hasText(draftContent),
   };
 }

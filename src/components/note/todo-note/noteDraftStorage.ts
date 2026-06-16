@@ -3,6 +3,7 @@ import type { JSONContent } from '@tiptap/core';
 export interface StoredNoteDraft {
   title: string;
   content: JSONContent;
+  linkUrl?: string | null;
   /** 마지막 임시저장 시각(ISO) */
   savedAt: string;
 }
@@ -18,7 +19,10 @@ function getStorage(): Storage | null {
   return window.localStorage;
 }
 
-export function saveDraft(todoId: number, draft: { title: string; content: JSONContent }): void {
+export function saveDraft(
+  todoId: number,
+  draft: { title: string; content: JSONContent; linkUrl?: string | null },
+): void {
   const storage = getStorage();
   if (!storage) return;
   const stored: StoredNoteDraft = { ...draft, savedAt: new Date().toISOString() };

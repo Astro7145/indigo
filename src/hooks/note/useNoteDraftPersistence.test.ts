@@ -114,6 +114,14 @@ it('임시저장하면 현재 제목·본문이 보관되고 성공 토스트가
   expect(useToastStore.getState().variant).toBe('success');
 });
 
+it('임시저장하면 첨부 링크도 함께 보관된다', () => {
+  const { result } = renderHook(() => useNoteDraftPersistence({ todoId: 12, editing: true, applyDraft: jest.fn() }));
+
+  act(() => result.current.save({ title: '쓰던 제목', content, linkUrl: 'https://example.com' }));
+
+  expect(loadDraft(12)?.linkUrl).toBe('https://example.com');
+});
+
 it('초안을 비우면 저장된 초안이 사라진다', () => {
   saveDraft(12, { title: '임시 제목', content });
 

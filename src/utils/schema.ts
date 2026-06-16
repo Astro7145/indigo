@@ -1,16 +1,14 @@
 import z from 'zod';
 
+import { normalizeUrl } from '@/src/utils/url';
+
 export const todoCreateSchema = z.object({
   title: z.string().min(1, { error: '제목을 입력해주세요.' }).max(30, { error: '제목은 30자 이하로 입력해주세요.' }),
   goalId: z.number().optional(),
   dueDate: z.string().min(1, { error: '마감일을 선택해주세요.' }),
   linkUrl: z
     .string()
-    .transform((val) => {
-      if (!val) return val;
-      if (/^https?:\/\//i.test(val)) return val;
-      return `https://${val}`;
-    })
+    .transform(normalizeUrl)
     .pipe(z.union([z.url({ error: '올바른 URL을 입력해주세요.' }), z.literal('')]))
     .optional(),
 });

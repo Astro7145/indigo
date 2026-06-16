@@ -4,6 +4,11 @@ jest.mock('@/src/api/note', () => ({
   patchNote: jest.fn(),
 }));
 
+jest.mock('@/src/api/link-preview', () => ({
+  ...jest.requireActual('@/src/api/link-preview'),
+  getLinkPreview: jest.fn(),
+}));
+
 // NoteContentEditor는 별도 테스트됨. 여기선 wiring만 보므로, 편집 모드는 textarea로,
 // 읽기 모드는 본문 텍스트만 노출하는 가벼운 stub으로 대체한다.
 jest.mock('./NoteContentEditor', () => ({
@@ -12,12 +17,14 @@ jest.mock('./NoteContentEditor', () => ({
     value,
     onChange,
     editable,
+    onLink,
     titleSlot,
     attachmentSlot,
   }: {
     value?: { content?: { content?: { text?: string }[] }[] };
     onChange?: (json: unknown) => void;
     editable?: boolean;
+    onLink?: () => void;
     titleSlot?: React.ReactNode;
     attachmentSlot?: React.ReactNode;
   }) => (
@@ -25,15 +32,22 @@ jest.mock('./NoteContentEditor', () => ({
       {titleSlot}
       {attachmentSlot}
       {editable ? (
-        <textarea
-          aria-label="본문"
-          onChange={(e) =>
-            onChange?.({
-              type: 'doc',
-              content: [{ type: 'paragraph', content: [{ type: 'text', text: e.target.value }] }],
-            })
-          }
-        />
+        <>
+          <textarea
+            aria-label="본문"
+            onChange={(e) =>
+              onChange?.({
+                type: 'doc',
+                content: [{ type: 'paragraph', content: [{ type: 'text', text: e.target.value }] }],
+              })
+            }
+          />
+          {onLink && (
+            <button type="button" onClick={onLink}>
+              링크 삽입
+            </button>
+          )}
+        </>
       ) : (
         <div data-testid="note-body">{value?.content?.[0]?.content?.[0]?.text ?? ''}</div>
       )}
@@ -62,6 +76,7 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 import { createNote, patchNote } from '@/src/api/note';
+import { getLinkPreview } from '@/src/api/link-preview';
 import ModalStack from '@/src/components/common/modal/ModalStack';
 import NoteWorkspace, { type NoteWorkspaceHandle } from './NoteWorkspace';
 import { loadDraft, saveDraft } from './noteDraftStorage';
@@ -112,6 +127,7 @@ beforeEach(() => {
   localStorage.clear();
   useModalStore.setState({ modals: [] });
   useToastStore.setState({ isOpen: false, message: '', variant: 'success' });
+  jest.mocked(getLinkPreview).mockResolvedValue({ title: null, faviconUrl: null });
 });
 
 // --- 상세(읽기) 모드 ---
@@ -386,4 +402,117 @@ it('등록에 성공하면 임시저장해 둔 초안이 비워진다', async ()
 
   await waitFor(() => expect(createNote).toHaveBeenCalled());
   await waitFor(() => expect(loadDraft(12)).toBeNull());
+});
+
+// --- 링크 첨부 ---
+
+const noteWithLink: Note = { ...existingNote, linkUrl: 'https://example.com' };
+
+it('작성: 링크 삽입 버튼을 누르면 링크 입력 모달이 열린다', () => {
+  renderWithClient(
+    <>
+      <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />
+      <ModalStack />
+    </>,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: '링크 삽입' }));
+
+  expect(screen.getByText('링크 업로드')).toBeInTheDocument();
+});
+
+it('작성: 링크를 입력하고 확인하면 링크 카드가 보인다', () => {
+  renderWithClient(
+    <>
+      <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />
+      <ModalStack />
+    </>,
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: '링크 삽입' }));
+  fireEvent.change(screen.getByLabelText('링크 URL'), { target: { value: 'https://example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: '확인' }));
+
+  expect(screen.getByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
+});
+
+it('수정: 링크 카드의 삭제 버튼을 누르면 링크가 사라진다', () => {
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={noteWithLink}
+      mode="edit"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.getByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole('button', { name: '링크 삭제' }));
+
+  expect(screen.queryByRole('button', { name: '링크 미리보기 열기' })).not.toBeInTheDocument();
+});
+
+it('링크 카드에 가져온 제목과 favicon을 보여준다', async () => {
+  jest.mocked(getLinkPreview).mockResolvedValue({ title: '예시 페이지', faviconUrl: 'https://example.com/icon.png' });
+
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={noteWithLink}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(await screen.findByText('예시 페이지')).toBeInTheDocument();
+  const favicon = screen.getByRole('button', { name: '링크 미리보기 열기' }).querySelector('img');
+  expect(favicon).toHaveAttribute('src', 'https://example.com/icon.png');
+});
+
+it('상세: 링크가 있으면 카드를 보여주고 클릭하면 새 탭으로 연다', () => {
+  const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
+
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={noteWithLink}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.queryByRole('button', { name: '링크 삭제' })).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: '링크 미리보기 열기' }));
+
+  expect(openSpy).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
+  openSpy.mockRestore();
+});
+
+it('작성: 링크를 첨부하고 등록하면 링크도 함께 전송된다', async () => {
+  (createNote as jest.Mock).mockResolvedValue({ id: 99 });
+
+  renderWithClient(
+    <>
+      <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />
+      <ModalStack />
+    </>,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '제목' } });
+  fireEvent.change(screen.getByLabelText('본문'), { target: { value: '본문' } });
+  fireEvent.click(screen.getByRole('button', { name: '링크 삽입' }));
+  fireEvent.change(screen.getByLabelText('링크 URL'), { target: { value: 'https://example.com' } });
+  fireEvent.click(screen.getByRole('button', { name: '확인' }));
+  fireEvent.click(screen.getByRole('button', { name: '등록하기' }));
+
+  await waitFor(() =>
+    expect(createNote).toHaveBeenCalledWith(expect.objectContaining({ linkUrl: 'https://example.com' })),
+  );
 });

@@ -51,3 +51,15 @@ it('저장값이 깨져 있어도 불러오기가 터지지 않고 비어 있는
 
   expect(loadDraft(12)).toBeNull();
 });
+
+it('첨부 링크도 함께 임시저장되고 그대로 불러와진다', () => {
+  saveDraft(12, { title: '임시 제목', content, linkUrl: 'https://example.com' });
+
+  expect(loadDraft(12)?.linkUrl).toBe('https://example.com');
+});
+
+it('첨부 링크 없이 저장하면 불러올 때도 링크가 없다', () => {
+  saveDraft(12, { title: '임시 제목', content });
+
+  expect(loadDraft(12)?.linkUrl).toBeUndefined();
+});

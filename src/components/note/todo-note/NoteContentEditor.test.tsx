@@ -1,5 +1,5 @@
 import type { JSONContent } from '@tiptap/core';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import NoteContentEditor from './NoteContentEditor';
 
@@ -16,11 +16,25 @@ it('편집 가능 모드에서 툴바와 입력 영역을 함께 보여준다', 
   expect(container.querySelector('[contenteditable="true"]')).toBeInTheDocument();
 });
 
-it('링크 삽입 버튼과 이미지 삽입 버튼은 보이지 않는다', () => {
+it('onLink가 없으면 링크 삽입 버튼이 보이지 않는다', () => {
   render(<NoteContentEditor value={emptyDoc} onChange={() => {}} />);
 
   expect(screen.queryByRole('button', { name: '링크 삽입' })).not.toBeInTheDocument();
+});
+
+it('이미지 삽입 버튼은 항상 보이지 않는다', () => {
+  render(<NoteContentEditor value={emptyDoc} onChange={() => {}} />);
+
   expect(screen.queryByRole('button', { name: '이미지 삽입' })).not.toBeInTheDocument();
+});
+
+it('onLink가 있으면 링크 삽입 버튼이 보이고 클릭 시 onLink가 호출된다', () => {
+  const onLink = jest.fn();
+  render(<NoteContentEditor value={emptyDoc} onChange={() => {}} onLink={onLink} />);
+
+  fireEvent.click(screen.getByRole('button', { name: '링크 삽입' }));
+
+  expect(onLink).toHaveBeenCalledTimes(1);
 });
 
 it('읽기 전용 모드에서는 툴바 없이 본문만 보여준다', () => {

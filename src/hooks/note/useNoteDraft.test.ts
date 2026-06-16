@@ -80,3 +80,33 @@ it('읽기→편집 진입 시 이전 편집의 취소분을 버리고 원본으
 
   expect(result.current.title).toBe('원래 제목');
 });
+
+it('편집 모드에서 기존 노트의 링크로 초안이 채워진다', () => {
+  const noteWithLink: Note = { ...note, linkUrl: 'https://example.com' };
+  const { result } = renderHook(() => useNoteDraft(noteWithLink, true));
+
+  expect(result.current.linkUrl).toBe('https://example.com');
+});
+
+it('링크만 바꿔도 변경됨으로 표시된다', () => {
+  const { result } = renderHook(() => useNoteDraft(note, true));
+
+  act(() => result.current.setLinkUrl('https://example.com'));
+
+  expect(result.current.linkUrl).toBe('https://example.com');
+  expect(result.current.isDirty).toBe(true);
+});
+
+it('읽기→편집 진입 시 이전 편집에서 바꾼 링크도 원본으로 리셋된다', () => {
+  const { result, rerender } = renderHook(({ editing }) => useNoteDraft(note, editing), {
+    initialProps: { editing: true },
+  });
+
+  act(() => result.current.setLinkUrl('https://취소될-링크.com'));
+  expect(result.current.linkUrl).toBe('https://취소될-링크.com');
+
+  rerender({ editing: false });
+  rerender({ editing: true });
+
+  expect(result.current.linkUrl).toBe(note.linkUrl);
+});

@@ -4,11 +4,14 @@ import type { JSONContent } from '@tiptap/core';
 import { useImperativeHandle, useRef, type Ref } from 'react';
 
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
+import NoteLinkCard from '@/src/components/note/NoteLinkCard';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
 import { useNoteCloseGuard } from '@/src/hooks/note/useNoteCloseGuard';
 import { useNoteDraft } from '@/src/hooks/note/useNoteDraft';
 import { useNoteDraftPersistence } from '@/src/hooks/note/useNoteDraftPersistence';
+import { useLinkPreview } from '@/src/hooks/note/useLinkPreview';
+import { useNoteLink } from '@/src/hooks/note/useNoteLink';
 import { useNoteSubmit } from '@/src/hooks/note/useNoteSubmit';
 import NoteWorkspaceHeader from '@/src/components/note/todo-note/NoteWorkspaceHeader';
 import type { Note } from '@/src/types/note';
@@ -63,8 +66,12 @@ export default function NoteWorkspace({
   const editing = mode !== 'read';
   const isCreate = mode === 'create';
 
-  // 폼 초안(제목·본문)·dirty·valid 판별은 useNoteDraft가 전담한다.
-  const { title, content, setTitle, setContent, isDirty, isValid } = useNoteDraft(note, editing);
+  // 폼 초안(제목·본문·링크)·dirty·valid 판별은 useNoteDraft가 전담한다.
+  const { title, content, linkUrl, setTitle, setContent, setLinkUrl, isDirty, isValid } = useNoteDraft(note, editing);
+  // 링크 입력 모달 열기·삭제는 useNoteLink가 전담한다.
+  const link = useNoteLink({ linkUrl, setLinkUrl });
+  // 첨부된 링크의 title·favicon은 useLinkPreview가 전담한다.
+  const linkPreview = useLinkPreview(linkUrl);
   // 임시저장·불러오기(localStorage)는 useNoteDraftPersistence가 전담한다.
   const draft = useNoteDraftPersistence({
     todoId,
@@ -72,6 +79,7 @@ export default function NoteWorkspace({
     applyDraft: (stored) => {
       setTitle(stored.title);
       setContent(stored.content);
+      setLinkUrl(stored.linkUrl ?? null);
     },
   });
   // 등록/수정 분기·실패 토스트는 useNoteSubmit가 전담한다. 성공 시 보관된 초안을 비운다.
@@ -101,7 +109,7 @@ export default function NoteWorkspace({
 
   const handleSubmit = () => {
     if (!isValid) return;
-    submit({ title, content });
+    submit({ title, content, linkUrl });
   };
 
   const { total: contentCharCount, nonSpace: contentNoSpaceCount } = countText(content);
@@ -123,7 +131,7 @@ export default function NoteWorkspace({
         isValid={isValid}
         isSubmitting={isSubmitting}
         onCancel={requestClose}
-        onSaveDraft={() => draft.save({ title, content })}
+        onSaveDraft={() => draft.save({ title, content, linkUrl })}
         onSubmit={handleSubmit}
         onEdit={onEdit}
         onClose={onClose}
@@ -142,6 +150,7 @@ export default function NoteWorkspace({
           value={content}
           onChange={setContent}
           editable={editing}
+          onLink={editing ? link.openInput : undefined}
           placeholder={editing ? '이 곳을 통해 노트 작성을 시작해주세요' : undefined}
           contentClassName="prose max-w-none min-h-[400px] pt-5 text-sm text-slate-800 sm:min-h-[450px] sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
@@ -166,18 +175,25 @@ export default function NoteWorkspace({
             </div>
           }
           attachmentSlot={
-            <>
-              <div className="pt-6 sm:pt-[30px]">
-                <NoteMetaInfo
-                  goalTitle={goalTitle}
-                  todoTitle={todoTitle}
-                  todoDone={todoDone}
-                  tags={tags}
-                  createdAt={createdAt}
+            <div className="flex flex-col gap-3 pt-6 sm:pt-[30px]">
+              <NoteMetaInfo
+                goalTitle={goalTitle}
+                todoTitle={todoTitle}
+                todoDone={todoDone}
+                tags={tags}
+                createdAt={createdAt}
+              />
+              <div className="border-b border-slate-200" />
+              {linkUrl && (
+                <NoteLinkCard
+                  url={linkUrl}
+                  title={linkPreview.data?.title ?? undefined}
+                  faviconUrl={linkPreview.data?.faviconUrl ?? undefined}
+                  onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+                  onDelete={editing ? link.remove : undefined}
                 />
-              </div>
-              <div className="border-b border-slate-200 pt-4 sm:pt-6" />
-            </>
+              )}
+            </div>
           }
         />
 

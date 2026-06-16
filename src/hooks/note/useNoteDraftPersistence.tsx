@@ -21,8 +21,8 @@ export interface UseNoteDraftPersistenceParams {
 }
 
 export interface NoteDraftPersistence {
-  /** 현재 제목·본문을 localStorage에 임시저장하고 성공 토스트를 띄운다 */
-  save: (draft: { title: string; content: JSONContent }) => void;
+  /** 현재 제목·본문·링크를 localStorage에 임시저장하고 성공 토스트를 띄운다 */
+  save: (draft: { title: string; content: JSONContent; linkUrl?: string | null }) => void;
   /** 저장된 초안 삭제 (등록·수정 성공 시) */
   clear: () => void;
 }
@@ -58,8 +58,8 @@ export function useNoteDraftPersistence({
   }, [editing, todoId, applyDraft]);
 
   return {
-    save: ({ title, content }) => {
-      saveDraft(todoId, { title, content });
+    save: ({ title, content, linkUrl }) => {
+      saveDraft(todoId, { title, content, linkUrl });
       showToast('임시 저장되었어요.', 'success');
     },
     clear: () => clearDraft(todoId),

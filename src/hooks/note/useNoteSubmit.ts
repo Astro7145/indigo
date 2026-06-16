@@ -16,25 +16,25 @@ export interface UseNoteSubmitParams {
 }
 
 export interface NoteSubmit {
-  /** 제목·본문을 받아 모드에 맞는 mutation을 호출하고, 성공 시 onComplete를 부른다 */
-  submit: (draft: { title: string; content: JSONContent }) => void;
+  /** 제목·본문·링크를 받아 모드에 맞는 mutation을 호출하고, 성공 시 onComplete를 부른다 */
+  submit: (draft: { title: string; content: JSONContent; linkUrl: string | null }) => void;
   /** 생성·수정 중 하나라도 진행 중인지 */
   isSubmitting: boolean;
 }
 
 // NoteWorkspace의 등록/수정 분기와 실패 토스트를 전담한다.
-// edit이면 PATCH(기존 링크 보존), 그 외엔 신규 생성. mutation 선택만 모드 의존적이고
+// edit이면 PATCH, 그 외엔 신규 생성. mutation 선택만 모드 의존적이고
 // 나머지(셸·초안)는 NoteWorkspace/useNoteDraft가 따로 책임진다.
 export function useNoteSubmit({ todoId, note, mode, onComplete }: UseNoteSubmitParams): NoteSubmit {
   const { mutate: createNote, isPending: isCreating } = useCreateNote();
   const { mutate: updateNote, isPending: isUpdating } = useUpdateNote();
   const { showToast } = useToast();
 
-  const submit = ({ title, content }: { title: string; content: JSONContent }) => {
+  const submit = ({ title, content, linkUrl }: { title: string; content: JSONContent; linkUrl: string | null }) => {
     if (mode === 'edit' && note) {
-      // linkUrl은 이 폼에서 다루지 않는다. PATCH는 생략 시 기존 값을 유지하므로 기존 링크는 보존된다.
+      // PATCH는 linkUrl을 항상 포함해야 한다 — nullable이라 null 전송이 "링크 제거" 의미를 갖는다(생략 시 기존 값 유지).
       updateNote(
-        { noteId: note.id, body: { title, content } },
+        { noteId: note.id, body: { title, content, linkUrl } },
         {
           onSuccess: () => {
             showToast('노트가 수정되었어요.', 'success');
@@ -47,7 +47,8 @@ export function useNoteSubmit({ todoId, note, mode, onComplete }: UseNoteSubmitP
       );
     } else {
       createNote(
-        { todoId, title, content },
+        // CreateNoteBody.linkUrl은 non-null이라 값이 있을 때만 포함한다.
+        { todoId, title, content, ...(linkUrl ? { linkUrl } : {}) },
         {
           onSuccess: () => {
             showToast('노트가 등록되었어요.', 'success');

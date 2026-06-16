@@ -21,6 +21,8 @@ export interface NoteContentEditorProps {
   /** false면 읽기 전용 렌더(툴바 없음). 기본 true */
   editable?: boolean;
   placeholder?: string;
+  /** 전달하면 툴바에 링크 삽입 버튼이 노출되고 클릭 시 호출된다 */
+  onLink?: () => void;
   /** 툴바 아래, 본문 위에 렌더할 영역 (제목 input 등) */
   titleSlot?: ReactNode;
   /** 제목과 본문 사이에 렌더할 영역 (메타 정보 등) */
@@ -36,6 +38,7 @@ export default function NoteContentEditor({
   onChange,
   editable = true,
   placeholder,
+  onLink,
   titleSlot,
   attachmentSlot,
   contentClassName,
@@ -108,7 +111,8 @@ export default function NoteContentEditor({
         <EditorToolbar
           state={state ?? {}}
           showImageUpload={false}
-          showLink={false}
+          showLink={!!onLink}
+          onLink={onLink}
           onBold={() => editor?.chain().focus().toggleBold().run()}
           onItalic={() => editor?.chain().focus().toggleItalic().run()}
           onUnderline={() => editor?.chain().focus().toggleUnderline().run()}

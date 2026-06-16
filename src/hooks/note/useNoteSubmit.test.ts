@@ -29,6 +29,7 @@ const note: Note = {
 const draft = {
   title: '제목',
   content: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: '본문' }] }] },
+  linkUrl: null,
 };
 
 beforeEach(() => {
@@ -92,4 +93,40 @@ it('수정에 실패하면 수정 실패 토스트를 띄운다', async () => {
   expect(onComplete).not.toHaveBeenCalled();
   expect(useToastStore.getState().message).toBe('노트 수정에 실패했어요.');
   expect(useToastStore.getState().variant).toBe('error');
+});
+
+it('작성 모드에서 링크가 있으면 생성 바디에 linkUrl이 포함된다', async () => {
+  (createNote as jest.Mock).mockResolvedValue({ id: 99 });
+  const { result } = renderHookWithClient(() => useNoteSubmit({ todoId: 12, mode: 'create', onComplete: jest.fn() }));
+
+  await act(async () => {
+    await result.current.submit({ ...draft, linkUrl: 'https://example.com' });
+  });
+
+  expect(createNote).toHaveBeenCalledWith(expect.objectContaining({ linkUrl: 'https://example.com' }));
+});
+
+it('작성 모드에서 링크가 없으면 생성 바디에 linkUrl을 보내지 않는다', async () => {
+  (createNote as jest.Mock).mockResolvedValue({ id: 99 });
+  const { result } = renderHookWithClient(() => useNoteSubmit({ todoId: 12, mode: 'create', onComplete: jest.fn() }));
+
+  await act(async () => {
+    await result.current.submit({ ...draft, linkUrl: null });
+  });
+
+  const body = (createNote as jest.Mock).mock.calls[0][0];
+  expect(body).not.toHaveProperty('linkUrl');
+});
+
+it('수정 모드에서 linkUrl을 null로 보내면 링크 제거 의도로 그대로 전송된다', async () => {
+  (patchNote as jest.Mock).mockResolvedValue({ id: 7 });
+  const { result } = renderHookWithClient(() =>
+    useNoteSubmit({ todoId: 12, note, mode: 'edit', onComplete: jest.fn() }),
+  );
+
+  await act(async () => {
+    await result.current.submit({ ...draft, linkUrl: null });
+  });
+
+  expect(patchNote).toHaveBeenCalledWith(7, expect.objectContaining({ linkUrl: null }));
 });
