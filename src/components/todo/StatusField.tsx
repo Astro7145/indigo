@@ -14,7 +14,7 @@ export default function StatusField({ value, onChange, error }: StatusFieldProps
 
   return (
     <div className="flex flex-col gap-2 pb-8">
-      <span className="px-1 text-base font-semibold text-slate-700">
+      <span className="px-1 text-base font-semibold text-slate-700 dark:text-white">
         {tTodos('fields.status')} <span className="text-destructive">*</span>
       </span>
       <div className="flex gap-4">
