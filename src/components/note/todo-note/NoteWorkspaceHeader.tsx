@@ -28,14 +28,12 @@ export default function NoteWorkspaceHeader({
   const tc = useTranslations('common');
   const editing = mode !== 'read';
   const isCreate = mode === 'create';
-  const headingText = isCreate ? t('heading.create') : t('heading.edit');
+  const headingText = isCreate ? t('heading.create') : mode === 'edit' ? t('heading.edit') : t('heading.detail');
   const submitText = isCreate ? t('submit') : tc('actions.edit');
 
   return (
     <header className="mb-4 flex h-10 items-center justify-between gap-3 sm:mb-3">
-      <h1
-        className={`min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl ${editing ? 'block' : 'hidden'}`}
-      >
+      <h1 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
         {headingText}
       </h1>
       {editing ? (

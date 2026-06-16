@@ -3,7 +3,8 @@
   "loadError": "ノートを読み込めませんでした",
   "heading": {
     "create": "ノート作成",
-    "edit": "ノート編集"
+    "edit": "ノート編集",
+    "detail": "ノート詳細"
   },
   "submit": "登録する",
   "saveDraft": "一時保存",

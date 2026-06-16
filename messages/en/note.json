@@ -3,7 +3,8 @@
   "loadError": "Failed to load the note",
   "heading": {
     "create": "Write Note",
-    "edit": "Edit Note"
+    "edit": "Edit Note",
+    "detail": "Note Details"
   },
   "submit": "Submit",
   "saveDraft": "Save Draft",

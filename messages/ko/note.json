@@ -3,7 +3,8 @@
   "loadError": "노트를 불러오지 못했어요",
   "heading": {
     "create": "노트 작성",
-    "edit": "노트 수정"
+    "edit": "노트 수정",
+    "detail": "노트 상세"
   },
   "submit": "등록하기",
   "saveDraft": "임시저장",

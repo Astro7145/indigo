@@ -132,7 +132,10 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         <Button
           size="small"
           startIcon={<IcPlus aria-hidden className="size-5 text-white" />}
-          onClick={() => openNote(todo.id, 'write')}
+          onClick={() => {
+            onClose();
+            openNote(todo.id, 'write');
+          }}
         >
           노트 추가하기
         </Button>
@@ -145,7 +148,10 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 <li key={note.id}>
                   <button
                     type="button"
-                    onClick={() => openNote(todo.id, 'detail')}
+                    onClick={() => {
+                      onClose();
+                      openNote(todo.id, 'detail');
+                    }}
                     className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
                   >
                     <IcSpringNote aria-hidden className="size-8 shrink-0" />

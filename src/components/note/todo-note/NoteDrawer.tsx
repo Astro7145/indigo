@@ -50,6 +50,7 @@ export default function NoteDrawer() {
           <motion.div
             className="absolute inset-0 bg-black/30"
             aria-hidden
+            onClick={() => workspaceRef.current?.requestClose()}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
