@@ -37,7 +37,7 @@ export default function MoonNode({ position, progress }: MoonNodeProps) {
         // 색은 링과 같은 todo 토큰(indigo-400). pointerEvents="none"으로 라벨이 포인터를 가로채 hover가
         // 깜빡이는 걸 막는다 — className의 pointer-events-none은 drei가 거는 인라인 스타일에 덮이므로 prop으로 줘야 한다.
         <Html transform sprite pointerEvents="none" className="select-none">
-          <span className="text-2xl font-semibold whitespace-nowrap text-indigo-400">
+          <span className="text-3xl font-semibold whitespace-nowrap text-indigo-400">
             {Math.round(progress * 100)}%
           </span>
         </Html>
