@@ -1,15 +1,15 @@
 'use client';
 
-import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
+import { motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
-import { LogoFull } from '../icons';
+import { IcHamburger, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
@@ -18,7 +18,7 @@ import TodoAddButton from './TodoAddButton';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import TopbarNotification from './TopbarNotification';
 
-const COLLAPSED_HEIGHT = 56; // pt-4(16) + h-6(24) + 핸들 h-4(16)
+const COLLAPSED_HEIGHT = 56; // 접힘 바 높이 — 본문 자리표시 h-14(56)와 일치
 const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 
 // 폼 페이지 경로 — 진입 시 곧 슬롯이 등록되므로 첫 페인트에 fallback(종)을 띄우지 않고 빈 자리를 둔다.
@@ -28,8 +28,6 @@ const FORM_ROUTE_PATTERNS: RegExp[] = [
   /^\/posts\/[^/]+\/edit$/,
   /^\/todos\/[^/]+\/notes\/(write|edit)$/,
 ];
-
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Topbar() {
   const t = useTranslations('sidebar');
@@ -41,24 +39,14 @@ export default function Topbar() {
   const isFormRoute = FORM_ROUTE_PATTERNS.some((p) => p.test(pathname));
   const [expandedHeight, setExpandedHeight] = useState(0);
   const [collapsed, setCollapsed] = useState(true);
-  const height = useMotionValue(COLLAPSED_HEIGHT);
-  const dragStartHeight = useRef(COLLAPSED_HEIGHT);
-
-  // 드래그로 높이가 늘어남에 따라 접힘(인사말)→펼침(메뉴) 레이아웃을 교차 페이드
-  const barOpacity = useTransform(height, [COLLAPSED_HEIGHT, COLLAPSED_HEIGHT + 80], [1, 0]);
-  const menuOpacity = useTransform(height, [COLLAPSED_HEIGHT + 60, COLLAPSED_HEIGHT + 200], [0, 1]);
 
   // 펼친 높이 = 뷰포트 높이 (전체 화면 메뉴)
   useEffect(() => {
-    const update = () => {
-      const next = window.innerHeight;
-      setExpandedHeight(next);
-      if (height.get() > COLLAPSED_HEIGHT) height.set(next);
-    };
+    const update = () => setExpandedHeight(window.innerHeight);
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
-  }, [height]);
+  }, []);
 
   // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
   useEffect(() => {
@@ -70,40 +58,8 @@ export default function Topbar() {
     };
   }, [collapsed]);
 
-  const expand = () => {
-    setCollapsed(false);
-    animate(height, expandedHeight, SPRING);
-  };
-
-  const collapse = () => {
-    setCollapsed(true);
-    animate(height, COLLAPSED_HEIGHT, SPRING);
-  };
-
-  // 추후 사이드바 및 탑 바 드래그 기능 제거 예정
-  const handleDragStart = () => {
-    dragStartHeight.current = height.get();
-  };
-
-  const handleDrag = (_event: unknown, info: PanInfo) => {
-    if (!expandedHeight) return;
-    height.set(clamp(dragStartHeight.current + info.offset.y, COLLAPSED_HEIGHT, expandedHeight));
-  };
-
-  const handleDragEnd = () => {
-    if (!expandedHeight) return;
-    const range = expandedHeight - COLLAPSED_HEIGHT;
-    const currentHeight = height.get();
-    if (collapsed) {
-      // collapsed 기준: 전체 범위의 25% 이상 아래로 드래그하면 expand
-      if (currentHeight >= COLLAPSED_HEIGHT + range * 0.25) expand();
-      else collapse();
-    } else {
-      // expanded 기준: 전체 범위의 25% 이상 위로 드래그하면 collapse
-      if (currentHeight <= expandedHeight - range * 0.25) collapse();
-      else expand();
-    }
-  };
+  // 메뉴를 여는 버튼은 후속 작업에서 추가한다 (#171). 닫기는 메뉴 내부 항목에서 호출한다.
+  const collapse = () => setCollapsed(true);
 
   return (
     <>
@@ -111,20 +67,31 @@ export default function Topbar() {
       <div aria-hidden className="h-14 shrink-0 md:hidden" />
 
       <motion.div
-        style={{ height }}
+        initial={false}
+        animate={{ height: collapsed ? COLLAPSED_HEIGHT : expandedHeight }}
+        transition={SPRING}
         className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
       >
         {/* 접힘 상태: 인사말 + 우측 슬롯(기본 알림, 페이지가 등록 시 액션) */}
         <motion.div
-          style={{ opacity: barOpacity }}
+          initial={false}
+          animate={{ opacity: collapsed ? 1 : 0 }}
           aria-hidden={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
-          <span className="text-base font-semibold text-slate-50">{title}</span>
+          <div className="flex items-center gap-x-2">
+            <button
+              type="button"
+              onClick={() => setCollapsed(false)}
+              aria-label={t('menuExpand')}
+              className="pointer-events-auto flex cursor-pointer"
+            >
+              <IcHamburger className="text-slate-50" />
+            </button>
+            <span className="text-base font-semibold text-slate-50">{title}</span>
+          </div>
           {rightSlot ? (
-            // 슬롯 내부 버튼은 드래그 핸들과 별개로 클릭 가능해야 함
-            // - pointer-events-auto: 부모의 pointer-events-none 해제
-            // - relative z-10: 같은 부모 내 bottom 드래그 핸들이 JSX 뒤라 stacking 상 위에 깔리는 걸 해제
+            // 슬롯 내부 버튼은 접힘 바 위에서 클릭 가능해야 함 (부모의 pointer-events-none 해제)
             <div className="pointer-events-auto relative z-10">{rightSlot}</div>
           ) : isFormRoute ? (
             // 폼 페이지는 곧 슬롯이 등록될 거라 빈 자리를 둬서 fallback(종) 깜빡임 방지
@@ -135,21 +102,25 @@ export default function Topbar() {
         </motion.div>
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
-          style={{ opacity: menuOpacity }}
+          initial={false}
+          animate={{ opacity: collapsed ? 0 : 1 }}
           aria-hidden={collapsed}
           className={`flex h-full min-h-0 flex-col justify-between overflow-y-auto px-5 pt-4 pb-12 ${
             !collapsed ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
         >
           <div className="flex flex-col gap-y-8">
-            <button
-              type="button"
-              onClick={collapse}
-              aria-label={t('menuCollapse')}
-              className="flex w-fit cursor-pointer"
-            >
+            <div className="flex items-center justify-between">
               <LogoFull type="white" />
-            </button>
+              <button
+                type="button"
+                onClick={collapse}
+                aria-label={t('menuCollapse')}
+                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+              >
+                <IcHamburger className="size-8 text-current" />
+              </button>
+            </div>
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text={t('nav.dashboard')} />
@@ -192,22 +163,6 @@ export default function Topbar() {
             </div>
           </div>
         </motion.div>
-        {/* // 추후 사이드바 및 탑 바 드래그 기능 제거 예정 */}
-        {/* 가장자리(하단) 드래그 핸들 — 사이드바의 세로 핸들과 대칭 */}
-        {/* <motion.div
-          drag="y"
-          dragConstraints={{ top: 0, bottom: 0 }}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
-          role="separator"
-          aria-orientation="horizontal"
-          className="absolute inset-x-0 bottom-0 flex h-19 touch-none items-end justify-center pb-2"
-        >
-          {collapsed && <span className="h-0.5 w-12 rounded-full bg-indigo-800" />}
-        </motion.div> */}
       </motion.div>
     </>
   );

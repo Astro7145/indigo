@@ -10,6 +10,7 @@
   "expand": "사이드바 확장",
   "collapse": "사이드바 축소",
   "menuCollapse": "메뉴 접기",
+  "menuExpand": "메뉴 열기",
   "newTodo": "새 할일",
   "goal": {
     "title": "목표",

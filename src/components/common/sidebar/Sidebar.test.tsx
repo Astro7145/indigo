@@ -35,6 +35,12 @@ it('새 할일 버튼을 누르면 생성 시트를 연다', () => {
   expect(mockOpenCreate).toHaveBeenCalledTimes(1);
 });
 
+it('토글 버튼을 누르면 접힘/펼침이 전환된다', () => {
+  render(<Sidebar />);
+  fireEvent.click(screen.getByLabelText('사이드바 축소'));
+  expect(screen.getByLabelText('사이드바 확장')).toBeInTheDocument();
+});
+
 it('N 단축키로 생성 시트를 연다', () => {
   render(<Sidebar />);
   fireEvent.keyDown(window, { key: 'n' });

@@ -1,8 +1,8 @@
 'use client';
 
-import { AnimatePresence, animate, motion, useMotionValue, type PanInfo } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/src/utils/cn';
 
 // 입력 중(input/textarea/contenteditable)에는 단축키가 글자 입력을 가로채지 않도록 제외한다
@@ -13,7 +13,7 @@ const isTypingTarget = (target: EventTarget | null) => {
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useModalStore } from '@/src/stores/modal';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
-import { Logo, LogoFull } from '../icons';
+import { IcDoubleArrow, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
 import SidebarRow from './SidebarRow';
 import SidebarProfileButton from './SidebarProfileButton';
@@ -22,13 +22,7 @@ import TodoAddButton from './TodoAddButton';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
 import { usePathname } from 'next/navigation';
 
-const EXPANDED_WIDTH = 360;
-const COLLAPSED_WIDTH = 96;
-const TABLET_COLLAPSED_WIDTH = 60;
 const TABLET_QUERY = '(max-width: 1280px)';
-const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
-
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Sidebar() {
   const t = useTranslations('sidebar');
@@ -55,11 +49,6 @@ export default function Sidebar() {
 
   const [collapsed, setCollapsed] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const width = useMotionValue(EXPANDED_WIDTH);
-  const dragStartWidth = useRef(EXPANDED_WIDTH);
-
-  const collapsedWidth = isTablet ? TABLET_COLLAPSED_WIDTH : COLLAPSED_WIDTH;
-  const snapWidth = (EXPANDED_WIDTH + collapsedWidth) / 2;
 
   useEffect(() => {
     const mql = window.matchMedia(TABLET_QUERY);
@@ -73,11 +62,6 @@ export default function Sidebar() {
     return () => mql.removeEventListener('change', handleChange);
   }, []);
 
-  // collapsed/브레이크포인트가 바뀌면 그에 맞는 폭으로 애니메이션한다
-  useEffect(() => {
-    animate(width, collapsed ? (isTablet ? TABLET_COLLAPSED_WIDTH : COLLAPSED_WIDTH) : EXPANDED_WIDTH, SPRING);
-  }, [isTablet, collapsed, width]);
-
   // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
   useEffect(() => {
     if (!isTablet || collapsed) return;
@@ -87,23 +71,6 @@ export default function Sidebar() {
       document.body.style.overflow = previousOverflow;
     };
   }, [isTablet, collapsed]);
-
-  const applyCollapsed = (next: boolean) => {
-    setCollapsed(next);
-    animate(width, next ? collapsedWidth : EXPANDED_WIDTH, SPRING);
-  };
-
-  const handleDragStart = () => {
-    dragStartWidth.current = width.get();
-  };
-
-  const handleDrag = (_event: unknown, info: PanInfo) => {
-    width.set(clamp(dragStartWidth.current + info.offset.x, collapsedWidth, EXPANDED_WIDTH));
-  };
-
-  const handleDragEnd = () => {
-    applyCollapsed(width.get() < snapWidth);
-  };
 
   return (
     <div className="hidden sm:contents">
@@ -115,31 +82,33 @@ export default function Sidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onClick={() => applyCollapsed(true)}
+            onClick={() => setCollapsed(true)}
             className="fixed inset-0 z-40 bg-black/40"
           />
         )}
       </AnimatePresence>
-      {isTablet && <span className="w-15" />}
-      <motion.aside
-        style={{ width }}
-        className={cn('scrollbar-slate top-0 left-0 z-50 flex h-screen bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
+      {isTablet && <span className="w-18 shrink-0" />}
+      <aside
+        className={cn('scrollbar-slate top-0 left-0 z-50 h-screen w-fit bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
       >
         <div
           className={cn(
-            'flex flex-1 flex-col justify-between gap-y-4',
-            collapsed ? (isTablet ? 'py-8 pl-2.5' : 'py-8 pr-1 pl-3') : 'pt-8 pr-4 pb-16 pl-8',
+            'flex h-full flex-col justify-between',
+            collapsed ? (isTablet ? 'px-2.5 py-8' : 'px-3 py-8') : 'px-8 pt-8 pb-16',
           )}
         >
           <div className="flex flex-col gap-y-8">
-            <button
-              type="button"
-              onClick={() => applyCollapsed(!collapsed)}
-              aria-label={collapsed ? t('expand') : t('collapse')}
-              className={cn('flex cursor-pointer', collapsed && 'justify-center')}
-            >
-              {collapsed ? <Logo size={isTablet ? 'sm' : 'md'} /> : <LogoFull type="white" />}
-            </button>
+            <div className="flex items-center justify-between">
+              {collapsed ? null : <LogoFull type="white" />}
+              <button
+                type="button"
+                onClick={() => setCollapsed((prev) => !prev)}
+                aria-label={collapsed ? t('expand') : t('collapse')}
+                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+              >
+                <IcDoubleArrow state={collapsed ? 'expand' : 'fold'} />
+              </button>
+            </div>
             <ul className="flex flex-col gap-y-3">
               <SidebarRow
                 type="dashboard"
@@ -150,9 +119,9 @@ export default function Sidebar() {
               />
               <GoalSidebarList
                 collapsed={collapsed}
-                onExpand={() => applyCollapsed(false)}
+                onExpand={() => setCollapsed(false)}
                 onSelected={() => {
-                  if (isTablet) applyCollapsed(true);
+                  if (isTablet) setCollapsed(true);
                 }}
               />
               <SidebarRow
@@ -188,7 +157,7 @@ export default function Sidebar() {
                 onClick={() => {
                   openCreate();
                   // 태블릿 오버레이 사이드바는 폼을 가리지 않도록 함께 접는다 (목표 선택과 동일 동작)
-                  if (isTablet) applyCollapsed(true);
+                  if (isTablet) setCollapsed(true);
                 }}
               />
               <div className="flex gap-x-2">
@@ -198,19 +167,7 @@ export default function Sidebar() {
             </div>
           )}
         </div>
-        <motion.span
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0}
-          dragMomentum={false}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
-          role="separator"
-          aria-orientation="vertical"
-          className="flex w-4 shrink-0 cursor-ew-resize items-center justify-center transition-colors after:h-15 after:w-1 after:rounded-full after:bg-indigo-800 hover:bg-indigo-600/10"
-        />
-      </motion.aside>
+      </aside>
     </div>
   );
 }
