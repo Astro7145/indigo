@@ -35,7 +35,7 @@ export default function GoalNode({ size, title, progress, onPointerDown }: GoalN
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
       {hovered && (
-        <Html center distanceFactor={24} className="pointer-events-none">
+        <Html center pointerEvents="none">
           <span className="rounded bg-indigo-900/80 px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
             {title}
           </span>

@@ -15,7 +15,9 @@ interface DashboardViewProps {
   dashboard: ReactNode;
 }
 
-const TAB_BASE = 'rounded p-1.5 transition-colors';
+const TAB_BASE = 'cursor-pointer rounded p-1.5 transition-colors';
+/** 비활성 탭 hover 시 옅은 흰 배경으로 눌릴 곳임을 표시(활성 탭은 이미 흰 배경이라 제외). */
+const TAB_HOVER = 'hover:bg-white/60';
 
 /**
  * 대시보드 ↔ 3D 그래프 인플레이스 토글.
@@ -45,7 +47,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
         aria-label="대시보드"
         aria-pressed={view === 'dashboard'}
         onClick={() => setView('dashboard')}
-        className={cn(TAB_BASE, view === 'dashboard' && 'bg-white shadow-sm')}
+        className={cn(TAB_BASE, view === 'dashboard' ? 'bg-white shadow-sm' : TAB_HOVER)}
       >
         <IcDashboard aria-hidden state={view === 'dashboard' ? 'active' : 'default'} className="size-5" />
       </button>
@@ -54,7 +56,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
         aria-label="우주"
         aria-pressed={view === 'graph'}
         onClick={() => setView('graph')}
-        className={cn(TAB_BASE, view === 'graph' && 'bg-white shadow-sm')}
+        className={cn(TAB_BASE, view === 'graph' ? 'bg-white shadow-sm' : TAB_HOVER)}
       >
         <IcMoon aria-hidden className={cn('size-5', view === 'graph' ? 'text-indigo-600' : 'text-slate-300')} />
       </button>
