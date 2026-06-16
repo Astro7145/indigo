@@ -27,7 +27,7 @@ export default function MoonNode({ position, progress }: MoonNodeProps) {
 
   return (
     <group position={position}>
-      <mesh onPointerOver={over} onPointerOut={out}>
+      <mesh onPointerOver={over} onPointerOut={out} onPointerDown={(e) => e.stopPropagation()}>
         <sphereGeometry args={[1.6, 48, 48]} />
         <meshBasicMaterial color={color} toneMapped={false} />
       </mesh>
