@@ -128,27 +128,8 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const moved = useRef(false);
   const tapAction = useRef<(() => void) | null>(null);
 
-  const onPointerMove = (ev: PointerEvent) => {
-    const d = drag.current;
-    if (!d) return;
-    const rect = gl.domElement.getBoundingClientRect();
-    ndc.current.set(((ev.clientX - rect.left) / rect.width) * 2 - 1, -((ev.clientY - rect.top) / rect.height) * 2 + 1);
-    ray.current.setFromCamera(ndc.current, camera);
-    ray.current.ray.intersectPlane(plane.current, d.target);
-    if (Math.hypot(ev.clientX - downXY.current.x, ev.clientY - downXY.current.y) > 4) moved.current = true;
-  };
-
-  const onPointerUp = (ev: PointerEvent) => {
-    gl.domElement.removeEventListener('pointermove', onPointerMove);
-    gl.domElement.removeEventListener('pointerup', onPointerUp);
-    gl.domElement.releasePointerCapture?.(ev.pointerId);
-    // 거의 움직이지 않았으면 탭(클릭)으로 간주해 액션 실행
-    if (!moved.current && tapAction.current) tapAction.current();
-    drag.current = null;
-    tapAction.current = null;
-  };
-
-  // key의 노드를 잡아 드래그 시작. action은 탭(클릭) 시 실행할 동작.
+  // key의 노드를 잡아 드래그 시작(상태만 세팅). action은 탭(클릭) 시 실행할 동작.
+  // 추적·종료 리스너는 아래 effect가 캔버스에 상시 등록한다.
   const grab = (key: string, action: (() => void) | null) => (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     const s = simRef.current;
@@ -163,9 +144,55 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
     downXY.current.set(e.nativeEvent.clientX, e.nativeEvent.clientY);
     setControlsEnabled(false); // 드래그 중 카메라 회전 방지
     gl.domElement.setPointerCapture?.(e.nativeEvent.pointerId);
-    gl.domElement.addEventListener('pointermove', onPointerMove);
-    gl.domElement.addEventListener('pointerup', onPointerUp);
   };
+
+  // 드래그 추적·종료 리스너를 캔버스에 한 번 등록하고 언마운트 시 해제한다.
+  // pointerup은 탭/이동을 구분해 액션을 실행하고, pointercancel(터치 제스처·OS 인터럽트)은 액션 없이 상태만 정리한다.
+  // 이 정리가 없으면 끌던 노드가 포인터에 붙은 채 멈추고 카메라 회전이 잠긴다.
+  useEffect(() => {
+    const el = gl.domElement;
+    const enableControls = (enabled: boolean) => {
+      const c = controlsRef.current as unknown as { enabled: boolean } | null;
+      if (c) c.enabled = enabled;
+    };
+    const onMove = (ev: PointerEvent) => {
+      const d = drag.current;
+      if (!d) return;
+      const rect = el.getBoundingClientRect();
+      ndc.current.set(
+        ((ev.clientX - rect.left) / rect.width) * 2 - 1,
+        -((ev.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      ray.current.setFromCamera(ndc.current, camera);
+      ray.current.ray.intersectPlane(plane.current, d.target);
+      if (Math.hypot(ev.clientX - downXY.current.x, ev.clientY - downXY.current.y) > 4) moved.current = true;
+    };
+    // tap=true(놓음)면 거의 안 움직였을 때 액션 실행, tap=false(취소)면 액션 없이 정리.
+    const end = (ev: PointerEvent, tap: boolean) => {
+      if (!drag.current) return;
+      el.releasePointerCapture?.(ev.pointerId);
+      if (tap && !moved.current && tapAction.current) tapAction.current();
+      drag.current = null;
+      tapAction.current = null;
+      enableControls(true);
+    };
+    const onUp = (ev: PointerEvent) => end(ev, true);
+    const onCancel = (ev: PointerEvent) => end(ev, false);
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onCancel);
+    return () => {
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onCancel);
+      // 드래그 도중 언마운트되면 상태를 비우고 컨트롤을 복구한다.
+      if (drag.current) {
+        drag.current = null;
+        tapAction.current = null;
+        enableControls(true);
+      }
+    };
+  }, [gl, camera]);
 
   useFrame((_, delta) => {
     const s = simRef.current;
