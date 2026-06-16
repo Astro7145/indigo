@@ -21,9 +21,9 @@ export default function SocialLoginSection() {
   return (
     <div className="flex flex-col items-center gap-4">
       <div className="flex w-full items-center gap-2">
-        <hr className="flex-1 border-slate-200" />
-        <span className="text-sm whitespace-nowrap text-slate-400">{t('social.divider')}</span>
-        <hr className="flex-1 border-slate-200" />
+        <hr className="flex-1 border-slate-200 dark:border-white/20" />
+        <span className="text-sm whitespace-nowrap text-slate-400 dark:text-white/40">{t('social.divider')}</span>
+        <hr className="flex-1 border-slate-200 dark:border-white/20" />
       </div>
       <div className="flex items-center justify-center gap-4">
         <IconButton
