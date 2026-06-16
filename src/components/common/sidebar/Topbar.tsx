@@ -1,6 +1,7 @@
 'use client';
 
 import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -31,6 +32,7 @@ const FORM_ROUTE_PATTERNS: RegExp[] = [
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
 export default function Topbar() {
+  const t = useTranslations('sidebar');
   const title = usePageTitle();
   const pathname = usePathname();
   const rightSlot = useTopbarSlotStore((s) => s.rightSlot);
@@ -140,28 +142,33 @@ export default function Topbar() {
           }`}
         >
           <div className="flex flex-col gap-y-8">
-            <button type="button" onClick={collapse} aria-label="메뉴 접기" className="flex w-fit cursor-pointer">
+            <button
+              type="button"
+              onClick={collapse}
+              aria-label={t('menuCollapse')}
+              className="flex w-fit cursor-pointer"
+            >
               <LogoFull type="white" />
             </button>
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
-                <SidebarRow type="dashboard" text="대시보드" />
+                <SidebarRow type="dashboard" text={t('nav.dashboard')} />
               </Link>
               <GoalSidebarList onSelected={collapse} />
               <Link href="/calendar" className="group" onClick={collapse}>
-                <SidebarRow type="calendar" text="캘린더" />
+                <SidebarRow type="calendar" text={t('nav.calendar')} />
               </Link>
               <Link href="/posts" className="group" onClick={collapse}>
-                <SidebarRow type="posts" text="소통 게시판" />
+                <SidebarRow type="posts" text={t('nav.posts')} />
               </Link>
               <Link href="/favorites" className="group" onClick={collapse}>
-                <SidebarRow type="favorites" text="찜한 할일" />
+                <SidebarRow type="favorites" text={t('nav.favorites')} />
               </Link>
             </ul>
             <div className="flex flex-col">
               <SidebarRow
                 type="settings"
-                text="설정"
+                text={t('nav.settings')}
                 onClick={() => {
                   collapse();
                   openSettings();

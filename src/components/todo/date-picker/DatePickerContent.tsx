@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarDate, DateValue, toCalendarDate } from '@internationalized/date';
+import { useTranslations } from 'next-intl';
 import { AriaCalendarGridProps } from 'react-aria';
 import Calendar from '@/src/components/common/calendar/Calendar';
 import Button from '@/src/components/common/buttons/Button';
@@ -20,6 +21,8 @@ export default function DatePickerContent({
   onCancel,
   onConfirm,
 }: DatePickerContentProps) {
+  const tCommon = useTranslations('common');
+
   return (
     <>
       <div className="flex flex-col items-center px-6 py-5">
@@ -31,10 +34,10 @@ export default function DatePickerContent({
       </div>
       <div className="flex gap-3 px-4 pb-4">
         <Button type="button" variant="tertiary" size="small" className="flex-1" onClick={onCancel}>
-          취소
+          {tCommon('actions.cancel')}
         </Button>
         <Button type="button" variant="primary" size="small" className="flex-1" onClick={onConfirm}>
-          확인
+          {tCommon('actions.confirm')}
         </Button>
       </div>
     </>

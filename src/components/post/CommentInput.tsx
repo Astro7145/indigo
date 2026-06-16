@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Button from '@/src/components/common/buttons/Button';
 
@@ -17,11 +18,12 @@ interface CommentInputProps {
 
 export default function CommentInput({
   onSubmit,
-  placeholder = '댓글을 입력해주세요.',
-  ariaLabel = '댓글 입력',
+  placeholder,
+  ariaLabel,
   autoFocus = false,
   disabled = false,
 }: CommentInputProps) {
+  const t = useTranslations('posts');
   const [text, setText] = useState('');
   const isEmpty = text.trim().length === 0;
 
@@ -48,8 +50,8 @@ export default function CommentInput({
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        aria-label={ariaLabel}
+        placeholder={placeholder ?? t('comment.placeholder')}
+        aria-label={ariaLabel ?? t('comment.inputLabel')}
         disabled={disabled}
         // field-sizing-content: 입력 높이가 내용에 맞춰 자동 증가 (Chrome 123+, Safari 17.4+, Firefox 미지원은 1줄 고정 + 내부 스크롤)
         className="field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:min-h-12 sm:px-4 sm:py-3 sm:text-base"
@@ -60,7 +62,7 @@ export default function CommentInput({
         disabled={isEmpty || disabled}
         className="h-10 w-[64px] shrink-0 px-0 sm:h-12 sm:w-[80px]"
       >
-        등록
+        {t('comment.submit')}
       </Button>
     </form>
   );

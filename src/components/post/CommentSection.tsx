@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { IcPlus } from '@/src/components/common/icons';
 import { useCreateComment } from '@/src/hooks/comment';
@@ -34,6 +35,8 @@ export default function CommentSection({
   fetchNextPage,
   isFetchingNextPage,
 }: CommentSectionProps) {
+  const t = useTranslations('posts');
+  const tCommon = useTranslations('common');
   const { mutate: createComment, isPending: isCreating } = useCreateComment(postId);
   const { showToast } = useToast();
   // 댓글 id → 답글 영역 펼침 여부. 각 CommentItem이 자기 상태를 들지 않고 상위에서 통합 관리
@@ -47,7 +50,7 @@ export default function CommentSection({
       { content },
       {
         onSuccess: () => clearInput(),
-        onError: () => showToast('댓글 등록에 실패했어요.', 'error'),
+        onError: () => showToast(t('comment.createError'), 'error'),
       },
     );
   };
@@ -64,7 +67,7 @@ export default function CommentSection({
           setReplyTargetId(null);
           clearInput();
         },
-        onError: () => showToast('답글 등록에 실패했어요.', 'error'),
+        onError: () => showToast(t('comment.replyCreateError'), 'error'),
       },
     );
   };
@@ -77,7 +80,7 @@ export default function CommentSection({
   return (
     <section className="mt-6">
       <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
-        댓글 <span className="text-indigo-500">{totalCount}</span>
+        {t('comment.title')} <span className="text-indigo-500">{totalCount}</span>
       </h2>
       <CommentInput onSubmit={handleTopLevelSubmit} disabled={isCreating} />
       {/* 작성순(오래된 것이 위) 정렬이라 다음 페이지가 위에 누적된다. 시선·데이터 추가 위치를 맞추려고 버튼을 목록 위에 둠 */}
@@ -88,13 +91,15 @@ export default function CommentSection({
           disabled={isFetchingNextPage}
           className="mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
         >
-          <span>{isFetchingNextPage ? '불러오는 중…' : `${COMMENT_PAGE_SIZE}개 댓글 더 불러오기`}</span>
+          <span>
+            {isFetchingNextPage ? tCommon('state.loading') : t('comment.loadMore', { count: COMMENT_PAGE_SIZE })}
+          </span>
           <IcPlus className="size-4 text-slate-600 sm:size-6" />
         </button>
       )}
       {comments.length === 0 ? (
         <div className="mt-6 flex h-20 items-center justify-center">
-          <p className="text-sm text-slate-400">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>
+          <p className="text-sm text-slate-400">{t('comment.empty')}</p>
         </div>
       ) : (
         <ul className="mt-6 space-y-4">

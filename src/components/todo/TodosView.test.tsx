@@ -96,18 +96,18 @@ beforeEach(() => {
     MockIO as unknown as typeof IntersectionObserver;
 });
 
-it('헤더에 "모든 할 일" 제목과 totalCount 배지를 렌더한다', async () => {
+it('헤더에 "모든 할일" 제목과 totalCount 배지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 42));
   renderWithClient(<TodosView />);
   expect(await screen.findByText('할일 A')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: '모든 할 일' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '모든 할일' })).toBeInTheDocument();
   expect(screen.getByText('42')).toBeInTheDocument();
 });
 
 it('할일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
   renderWithClient(<TodosView />);
-  expect(await screen.findByText('아직 등록한 할 일이 없어요')).toBeInTheDocument();
+  expect(await screen.findByText('아직 등록한 할일이 없어요')).toBeInTheDocument();
 });
 
 it('초기 호출은 done 미지정·sort=latest·limit=40으로 한다', async () => {
@@ -142,11 +142,11 @@ it('DONE 탭 클릭 시 done=true 파라미터로 다시 조회한다', async ()
   });
 });
 
-it('할 일 추가 버튼을 누르면 생성 시트가 열린다', async () => {
+it('할일 추가 버튼을 누르면 생성 시트가 열린다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
   renderWithClient(<TodosView />);
-  await screen.findByText('아직 등록한 할 일이 없어요');
-  fireEvent.click(screen.getByRole('button', { name: '할 일 추가' }));
+  await screen.findByText('아직 등록한 할일이 없어요');
+  fireEvent.click(screen.getByRole('button', { name: '할일 추가' }));
   expect(mockOpenCreate).toHaveBeenCalledTimes(1);
 });
 
@@ -200,7 +200,7 @@ it('?tab=done으로 진입하면 DONE 탭이 활성화되고 done 파라미터�
 it('탭을 바꾸면 URL이 셸로우로 동기화된다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
   renderWithClient(<TodosView />);
-  await screen.findByText('아직 등록한 할 일이 없어요');
+  await screen.findByText('아직 등록한 할일이 없어요');
   fireEvent.click(screen.getByText('TO DO'));
   expect(window.location.pathname + window.location.search).toBe('/todos?tab=todo');
   fireEvent.click(screen.getByText('ALL'));

@@ -150,9 +150,9 @@ it('월 이동으로 선택 날짜가 그리드 범위를 벗어나면 범위 �
   ).toBeInTheDocument();
 });
 
-it('할 일 추가를 누르면 선택 날짜(기본 오늘)가 프리필된 생성 시트가 열린다', async () => {
+it('할일 추가를 누르면 선택 날짜(기본 오늘)가 프리필된 생성 시트가 열린다', async () => {
   renderWithClient(<CalendarView />);
   await screen.findAllByText('오늘 할일');
-  fireEvent.click(screen.getAllByRole('button', { name: /할 일 추가/ })[0]);
+  fireEvent.click(screen.getAllByRole('button', { name: /할일 추가/ })[0]);
   expect(mockOpenCreate.mock.calls[0][0].dueDate).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00/);
 });

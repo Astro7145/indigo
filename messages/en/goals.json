@@ -13,7 +13,7 @@
     "warning": "Deleted goals cannot be recovered."
   },
   "note": {
-    "collectTitle": "Notes",
+    "collectTitle": "View Notes",
     "searchPlaceholder": "Search notes",
     "searchLabel": "Search notes",
     "sortLatest": "Latest",

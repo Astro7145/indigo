@@ -1,5 +1,5 @@
 import koValidation from '@/messages/ko/validation.json';
-import { createLoginSchema, createSignupSchema } from './schema';
+import { createMeSchema, createTodoCreateSchema, createLoginSchema, createSignupSchema } from './schema';
 
 // ko 검증 메시지를 주입해 기존 한글 단언을 그대로 검증한다.
 const t = (key: string) => (koValidation as Record<string, string>)[key];
@@ -141,5 +141,126 @@ describe('signupSchema', () => {
         expect(fieldErrors.passwordConfirm?.[0]).toBe('비밀번호가 일치하지 않습니다.');
       }
     });
+  });
+});
+
+// 번역 키를 그대로 돌려주는 가짜 t — 메시지가 validation 카탈로그 키로 연결되는지 검증한다.
+const fakeT = (key: string) => `t:${key}`;
+
+describe('createMeSchema', () => {
+  const meSchema = createMeSchema(fakeT);
+  const validMe = { name: '홍길동', currentPassword: '', password: '', passwordConfirm: '' };
+
+  function fieldErrorsOf(input: Record<string, string>) {
+    const result = meSchema.safeParse(input);
+    expect(result.success).toBe(false);
+    return result.success ? {} : result.error.flatten().fieldErrors;
+  }
+
+  it('이름이 있고 비밀번호 필드가 모두 비어 있으면 통과한다', () => {
+    expect(meSchema.safeParse(validMe).success).toBe(true);
+  });
+
+  it('이름이 비어 있으면 nameRequired 키 메시지를 반환한다', () => {
+    expect(fieldErrorsOf({ ...validMe, name: '' }).name?.[0]).toBe('t:nameRequired');
+  });
+
+  it('비밀번호 변경 시 현재 비밀번호가 비어 있으면 currentPasswordRequired 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({ ...validMe, password: 'newpass123', passwordConfirm: 'newpass123' });
+    expect(errors.currentPassword?.[0]).toBe('t:currentPasswordRequired');
+  });
+
+  it('새 비밀번호가 8자 미만이면 passwordMin 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'short',
+      passwordConfirm: 'short',
+    });
+    expect(errors.password?.[0]).toBe('t:passwordMin');
+  });
+
+  it('비밀번호 확인이 비어 있으면 passwordConfirmRequired 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({ ...validMe, currentPassword: 'oldpass123', password: 'newpass123' });
+    expect(errors.passwordConfirm?.[0]).toBe('t:passwordConfirmRequired');
+  });
+
+  it('비밀번호 확인이 다르면 passwordMismatch 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'newpass123',
+      passwordConfirm: 'different123',
+    });
+    expect(errors.passwordConfirm?.[0]).toBe('t:passwordMismatch');
+  });
+
+  it('새 비밀번호가 기존과 같으면 passwordSameAsOld 키 메시지를 반환한다', () => {
+    const errors = fieldErrorsOf({
+      ...validMe,
+      currentPassword: 'samepass123',
+      password: 'samepass123',
+      passwordConfirm: 'samepass123',
+    });
+    expect(errors.password?.[0]).toBe('t:passwordSameAsOld');
+  });
+
+  it('유효한 비밀번호 변경 입력이면 통과한다', () => {
+    const result = meSchema.safeParse({
+      ...validMe,
+      currentPassword: 'oldpass123',
+      password: 'newpass123',
+      passwordConfirm: 'newpass123',
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe('createTodoCreateSchema', () => {
+  const todoSchema = createTodoCreateSchema(fakeT);
+  const validTodo = { title: '운동하기', dueDate: '2026-06-12' };
+
+  it('유효한 입력이면 통과한다', () => {
+    expect(todoSchema.safeParse(validTodo).success).toBe(true);
+  });
+
+  it('제목이 비어 있으면 titleRequired 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, title: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.title?.[0]).toBe('t:titleRequired');
+    }
+  });
+
+  it('제목이 30자를 초과하면 titleMax 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, title: 'a'.repeat(31) });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.title?.[0]).toBe('t:titleMax');
+    }
+  });
+
+  it('마감일이 비어 있으면 dueDateRequired 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, dueDate: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.dueDate?.[0]).toBe('t:dueDateRequired');
+    }
+  });
+
+  it('URL 형식이 아니면 urlInvalid 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'not a url' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.linkUrl?.[0]).toBe('t:urlInvalid');
+    }
+  });
+
+  it('프로토콜 없는 링크는 https://를 붙여 통과시킨다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'example.com' });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.linkUrl).toBe('https://example.com');
+    }
   });
 });
