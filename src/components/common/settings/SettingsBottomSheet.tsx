@@ -34,10 +34,7 @@ export default function SettingsBottomSheet() {
               onClick={close}
               className="dark:border-white/20 dark:text-white/70 dark:hover:border-white/40 dark:hover:text-white"
             >
-              취소
-            </Button>
-            <Button variant="primary" size="large" onClick={close}>
-              확인
+              닫기
             </Button>
           </div>
         </div>
