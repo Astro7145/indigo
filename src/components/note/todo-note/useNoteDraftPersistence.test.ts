@@ -65,6 +65,19 @@ it('읽기→편집 전환 시 저장된 초안이 있으면 프롬프트가 열
   expect(useModalStore.getState().modals).toHaveLength(1);
 });
 
+it('편집 종료(editing true→false) 시 열려 있던 프롬프트가 닫힌다', () => {
+  saveDraft(12, { title: '임시 제목', content });
+
+  const { rerender } = renderHook(
+    ({ editing }) => useNoteDraftPersistence({ todoId: 12, editing, applyDraft: jest.fn() }),
+    { initialProps: { editing: true } },
+  );
+  expect(useModalStore.getState().modals).toHaveLength(1);
+
+  rerender({ editing: false });
+  expect(useModalStore.getState().modals).toHaveLength(0);
+});
+
 it('불러오기 확인 시 저장된 초안을 적용하고 프롬프트를 닫는다', () => {
   saveDraft(12, { title: '임시 제목', content });
   const applyDraft = jest.fn();

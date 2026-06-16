@@ -1,28 +1,30 @@
 'use client';
 
 import type { JSONContent } from '@tiptap/core';
-import { useRef } from 'react';
+import { useImperativeHandle, useRef, type Ref } from 'react';
 
-import Button from '@/src/components/common/buttons/Button';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
-import NoteCancelConfirm from '@/src/components/note/todo-note/NoteCancelConfirm';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
+import { useNoteCloseGuard } from '@/src/components/note/todo-note/useNoteCloseGuard';
 import { useNoteDraft } from '@/src/components/note/todo-note/useNoteDraft';
 import { useNoteDraftPersistence } from '@/src/components/note/todo-note/useNoteDraftPersistence';
 import { useNoteSubmit } from '@/src/components/note/todo-note/useNoteSubmit';
-import { useModalStore } from '@/src/stores/modal';
+import NoteWorkspaceHeader from '@/src/components/note/todo-note/NoteWorkspaceHeader';
 import type { Note } from '@/src/types/note';
 import type { Todo } from '@/src/types/todo';
 
 /** create=신규 작성, edit=기존 노트 수정, read=상세(읽기) */
 export type NoteWorkspaceMode = 'create' | 'edit' | 'read';
 
+export interface NoteWorkspaceHandle {
+  /** ESC 등 외부 닫기 트리거가 호출. dirty면 확인 모달, 아니면 즉시 이탈. */
+  requestClose: () => void;
+}
+
 export interface NoteWorkspaceProps {
   todoId: number;
-  /** create 모드에선 없고, edit·read 모드에선 대상 노트 */
   note?: Note;
-  /** 메타(목표·할일·태그)용 full todo. 로딩 중엔 없을 수 있어 note.todo로 폴백한다. */
   todo?: Todo;
   /** 작성/수정/상세를 가르는 단일 모드 */
   mode: NoteWorkspaceMode;
@@ -32,6 +34,9 @@ export interface NoteWorkspaceProps {
   onComplete: () => void;
   /** 취소 확정 시 호출 */
   onCancel: () => void;
+  /** 상세(read) 모드에서 드로어를 닫을 때 호출 */
+  onClose?: () => void;
+  ref?: Ref<NoteWorkspaceHandle>;
 }
 
 function countText(node: JSONContent, acc = { total: 0, nonSpace: 0 }): { total: number; nonSpace: number } {
@@ -44,10 +49,17 @@ function countText(node: JSONContent, acc = { total: 0, nonSpace: 0 }): { total:
 }
 
 // 상세(NoteView)와 작성/수정(NoteWriteForm)을 하나의 셸로 통합한 컴포넌트.
-// editing만 토글하면 같은 NoteContentEditor 인스턴스를 유지한 채 전환되므로,
-// 툴바가 자연스럽게 펼쳐지고(예약 공간 불필요) 에디터 재마운트로 인한 깜빡임도 없다.
-export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComplete, onCancel }: NoteWorkspaceProps) {
-  // 모든 분기는 mode 한 곳에서 파생한다 — read만 읽기, 나머지는 편집. create만 신규 생성.
+export default function NoteWorkspace({
+  todoId,
+  note,
+  todo,
+  mode,
+  onEdit,
+  onComplete,
+  onCancel,
+  onClose,
+  ref,
+}: NoteWorkspaceProps) {
   const editing = mode !== 'read';
   const isCreate = mode === 'create';
 
@@ -72,37 +84,26 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
       onComplete();
     },
   });
+
   const editorRef = useRef<NoteContentEditorHandle>(null);
 
-  const handleCancel = () => {
-    if (!isDirty) {
-      onCancel();
-      return;
-    }
-    // 작성 내용이 있으면 곧장 닫지 않고 취소 확인을 모달 스택에 띄운다.
-    useModalStore.getState().open(
-      (controls) => (
-        <NoteCancelConfirm
-          isCreate={isCreate}
-          onStay={controls.close}
-          // onCancel은 모달을 닫지 않으므로(모드 토글/라우팅) 엔트리를 직접 pop 한다.
-          onLeave={() => {
-            controls.close();
-            onCancel();
-          }}
-        />
-      ),
-      { variant: 'modal', className: 'h-[178px] sm:h-[250px]' },
-    );
-  };
+  // dirty 판단·확인 모달은 useNoteCloseGuard가 전담한다.
+  // ESC 트리거는 NoteDrawer가 소유하고, requestClose를 ref로 노출해 드로어가 호출한다.
+  const { requestClose } = useNoteCloseGuard({
+    editing,
+    isDirty,
+    isCreate,
+    onCancel,
+    onClose: onClose ?? onCancel,
+  });
+
+  useImperativeHandle(ref, () => ({ requestClose }), [requestClose]);
 
   const handleSubmit = () => {
     if (!isValid) return;
     submit({ title, content });
   };
 
-  const headingText = isCreate ? '노트 작성하기' : '노트 수정하기';
-  const submitText = isCreate ? '등록하기' : '수정하기';
   const { total: contentCharCount, nonSpace: contentNoSpaceCount } = countText(content);
 
   // full todo(note.todo embedded ref는 tags 미포함)를 우선 쓰되, 로딩 중엔 note.todo로 폴백해
@@ -116,54 +117,17 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
   const createdAt = note?.updatedAt ?? new Date().toISOString();
 
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[343px] flex-col sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-        <h1
-          className={`truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl ${editing ? 'hidden sm:block' : 'hidden'}`}
-        >
-          {headingText}
-        </h1>
-        {editing ? (
-          <div className="flex shrink-0 gap-2">
-            <Button
-              variant="tertiary"
-              size="small"
-              onClick={handleCancel}
-              disabled={isSubmitting}
-              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-            >
-              취소
-            </Button>
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={() => draft.save({ title, content })}
-              disabled={isSubmitting}
-              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-            >
-              임시저장
-            </Button>
-            <Button
-              variant="primary"
-              size="small"
-              disabled={!isValid || isSubmitting}
-              onClick={handleSubmit}
-              className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-            >
-              {submitText}
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="primary"
-            size="small"
-            onClick={onEdit}
-            className="shrink-0 sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
-          >
-            수정
-          </Button>
-        )}
-      </header>
+    <div className="flex min-h-full w-full flex-col">
+      <NoteWorkspaceHeader
+        mode={mode}
+        isValid={isValid}
+        isSubmitting={isSubmitting}
+        onCancel={requestClose}
+        onSaveDraft={() => draft.save({ title, content })}
+        onSubmit={handleSubmit}
+        onEdit={onEdit}
+        onClose={onClose}
+      />
 
       <div
         onClick={(e) => {
@@ -171,7 +135,7 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
           if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
           editorRef.current?.focus();
         }}
-        className="flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
+        className="flex flex-1 flex-col rounded-[4px] border border-slate-200 bg-white px-4 py-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:px-[30px] sm:py-8 xl:px-[34px]"
       >
         <NoteContentEditor
           ref={editorRef}
@@ -179,34 +143,31 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
           onChange={setContent}
           editable={editing}
           placeholder={editing ? '이 곳을 통해 노트 작성을 시작해주세요' : undefined}
-          contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          contentClassName="prose max-w-none min-h-[400px] pt-5 text-sm text-slate-800 sm:min-h-[450px] sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
-            <div className="pt-[29px]">
-              <div className="flex items-center gap-2 pb-3 sm:gap-3 sm:pb-4">
-                <IcSpringNote aria-hidden className="size-8 shrink-0 sm:size-10" />
-                {editing ? (
-                  <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    maxLength={30}
-                    placeholder="노트의 제목을 입력해주세요"
-                    aria-label="제목"
-                    className="h-8 min-w-0 flex-1 py-0 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:h-10 sm:text-2xl"
-                  />
-                ) : (
-                  <h2 className="flex h-8 min-w-0 flex-1 items-center truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:h-10 sm:text-2xl">
-                    {title}
-                  </h2>
-                )}
-                {editing && <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>}
-              </div>
-              <div className="border-b border-slate-200" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <IcSpringNote aria-hidden className="size-8 shrink-0 sm:size-10" />
+              {editing ? (
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  maxLength={30}
+                  placeholder="노트의 제목을 입력해주세요"
+                  aria-label="제목"
+                  className="h-8 min-w-0 flex-1 py-0 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:h-10 sm:text-2xl"
+                />
+              ) : (
+                <h2 className="flex h-8 min-w-0 flex-1 items-center truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:h-10 sm:text-2xl">
+                  {title}
+                </h2>
+              )}
+              {editing && <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>}
             </div>
           }
           attachmentSlot={
             <>
-              <div className="pt-3 sm:pt-4">
+              <div className="pt-6 sm:pt-[30px]">
                 <NoteMetaInfo
                   goalTitle={goalTitle}
                   todoTitle={todoTitle}
@@ -215,14 +176,16 @@ export default function NoteWorkspace({ todoId, note, todo, mode, onEdit, onComp
                   createdAt={createdAt}
                 />
               </div>
-              <div className="border-b border-slate-200 pt-3 sm:pt-4" />
+              <div className="border-b border-slate-200 pt-4 sm:pt-6" />
             </>
           }
         />
 
-        <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-          공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
-        </div>
+        {editing && (
+          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
+            공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+          </div>
+        )}
       </div>
     </div>
   );

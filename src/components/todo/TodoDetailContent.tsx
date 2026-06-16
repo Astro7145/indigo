@@ -3,9 +3,18 @@
 import Image from 'next/image';
 
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
+import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Chip from '@/src/components/common/chips/Chip';
-import { IcCalendarOutline, IcDelete, IcFlagOutline, IcLink, IcSpringNote } from '@/src/components/common/icons';
+import {
+  IcCalendarOutline,
+  IcDelete,
+  IcFlagOutline,
+  IcLink,
+  IcPlus,
+  IcSpringNote,
+} from '@/src/components/common/icons';
+import { useNoteDrawer } from '@/src/components/note/todo-note/useNoteDrawer';
 import { useNoteList } from '@/src/hooks/note';
 import type { Todo } from '@/src/types/todo';
 import { formatDotDate } from '@/src/utils/date';
@@ -27,6 +36,7 @@ const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700';
 const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base';
 
 export default function TodoDetailContent({ todo, onClose }: TodoDetailContentProps) {
+  const { openNote } = useNoteDrawer();
   const dueDate = formatDotDate(todo.dueDate);
   const hasAttachment = Boolean(todo.linkUrl || todo.fileUrl);
 
@@ -114,25 +124,37 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         </section>
       )}
 
-      {/* 작성된 노트 (없으면 섹션 생략) */}
-      {notes.length > 0 && (
+      {/* 작성된 노트 / 노트 없을 때 추가 버튼 */}
+      {!hasNotes ? (
+        <Button
+          size="small"
+          startIcon={<IcPlus aria-hidden className="size-5 text-white" />}
+          onClick={() => openNote(todo.id, 'write')}
+        >
+          노트 추가하기
+        </Button>
+      ) : (
         <section className="flex w-full flex-col gap-2">
           <h3 className={sectionTitleClass}>작성된 노트</h3>
-          <ul className="flex flex-col gap-2">
-            {notes.map((note) => (
-              <li key={note.id}>
-                <button
-                  type="button"
-                  // 노트 수정 라우트 미정 — 라우트 생기면 router.push(`/notes/${note.id}`)로 연결.
-                  onClick={() => {}}
-                  className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
-                >
-                  <IcSpringNote aria-hidden className="size-8 shrink-0" />
-                  <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700">{note.title}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          {notes.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {notes.map((note) => (
+                <li key={note.id}>
+                  <button
+                    type="button"
+                    onClick={() => openNote(todo.id, 'detail')}
+                    className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
+                  >
+                    <IcSpringNote aria-hidden className="size-8 shrink-0" />
+                    <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700">{note.title}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            // 로딩 중: 노트가 들어올 자리를 미리 확보해 시프트 방지 (노트 1개 높이 ≈ 64px)
+            <div className="min-h-16" aria-hidden />
+          )}
         </section>
       )}
     </div>

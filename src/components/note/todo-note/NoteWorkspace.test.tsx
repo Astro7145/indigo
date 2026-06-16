@@ -58,11 +58,12 @@ jest.mock('motion/react', () => ({
 }));
 jest.mock('react-aria', () => ({ usePreventScroll: jest.fn() }));
 
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 
 import { createNote, patchNote } from '@/src/api/note';
 import ModalStack from '@/src/components/common/modal/ModalStack';
-import NoteWorkspace from './NoteWorkspace';
+import NoteWorkspace, { type NoteWorkspaceHandle } from './NoteWorkspace';
 import { loadDraft, saveDraft } from './noteDraftStorage';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import { useModalStore } from '@/src/stores/modal';
@@ -149,7 +150,7 @@ it('상세: 수정 버튼을 누르면 수정 전환 콜백을 부른다', () =>
     />,
   );
 
-  fireEvent.click(screen.getByRole('button', { name: '수정' }));
+  fireEvent.click(screen.getByRole('button', { name: '수정하기' }));
 
   expect(onEdit).toHaveBeenCalledTimes(1);
 });
@@ -252,6 +253,61 @@ it('수정: 변경한 채로 취소하면 확인 후 취소 콜백을 부른다'
   fireEvent.click(screen.getByRole('button', { name: '취소' }));
 
   // 변경사항이 있으므로 확인 모달이 뜬다
+  fireEvent.click(screen.getByRole('button', { name: '확인' }));
+
+  expect(onCancel).toHaveBeenCalledTimes(1);
+});
+
+// --- requestClose (ESC 등 외부 트리거가 NoteDrawer를 통해 호출) ---
+
+it('상세: requestClose()를 호출하면 onClose를 부른다', () => {
+  const onClose = jest.fn();
+  const ref = { current: null } as React.RefObject<NoteWorkspaceHandle | null>;
+  renderWithClient(
+    <NoteWorkspace
+      ref={ref}
+      todoId={12}
+      note={existingNote}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+      onClose={onClose}
+    />,
+  );
+
+  act(() => ref.current?.requestClose());
+
+  expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+it('작성: 내용 없이 requestClose()를 호출하면 모달 없이 onCancel을 바로 호출한다', () => {
+  const onCancel = jest.fn();
+  const ref = { current: null } as React.RefObject<NoteWorkspaceHandle | null>;
+  renderWithClient(
+    <NoteWorkspace ref={ref} todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={onCancel} />,
+  );
+
+  act(() => ref.current?.requestClose());
+
+  expect(onCancel).toHaveBeenCalledTimes(1);
+  expect(screen.queryByText('노트 작성을 취소하시겠어요?')).not.toBeInTheDocument();
+});
+
+it('작성: 내용 입력 후 requestClose()를 호출하면 취소 확인 모달을 띄우고 확인하면 onCancel을 호출한다', () => {
+  const onCancel = jest.fn();
+  const ref = { current: null } as React.RefObject<NoteWorkspaceHandle | null>;
+  renderWithClient(
+    <>
+      <NoteWorkspace ref={ref} todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={onCancel} />
+      <ModalStack />
+    </>,
+  );
+
+  fireEvent.change(screen.getByLabelText('제목'), { target: { value: '입력 중인 제목' } });
+  act(() => ref.current?.requestClose());
+
+  expect(screen.getByText('노트 작성을 취소하시겠어요?')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
   expect(onCancel).toHaveBeenCalledTimes(1);

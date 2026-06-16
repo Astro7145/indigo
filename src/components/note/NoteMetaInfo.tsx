@@ -19,7 +19,7 @@ const TAG_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, createdAt }: NoteMetaInfoProps) {
   return (
-    <dl className="grid grid-cols-1 gap-y-3 text-xs sm:grid-cols-2 sm:gap-x-8 sm:text-sm">
+    <dl className="grid grid-cols-1 gap-y-2 text-xs sm:grid-cols-2 sm:gap-x-3 sm:gap-y-3 sm:text-sm">
       {/* 모바일 순서는 JSX 순서로 흐르고, 데스크탑/태블릿(2col)은 명시적 grid 위치로 [목표|작성일][할일|태그] 배치 */}
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-1">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">

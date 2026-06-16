@@ -17,7 +17,7 @@ export interface UseNoteSubmitParams {
 
 export interface NoteSubmit {
   /** 제목·본문을 받아 모드에 맞는 mutation을 호출하고, 성공 시 onComplete를 부른다 */
-  submit: (draft: { title: string; content: JSONContent }) => Promise<void>;
+  submit: (draft: { title: string; content: JSONContent }) => void;
   /** 생성·수정 중 하나라도 진행 중인지 */
   isSubmitting: boolean;
 }
@@ -26,21 +26,38 @@ export interface NoteSubmit {
 // edit이면 PATCH(기존 링크 보존), 그 외엔 신규 생성. mutation 선택만 모드 의존적이고
 // 나머지(셸·초안)는 NoteWorkspace/useNoteDraft가 따로 책임진다.
 export function useNoteSubmit({ todoId, note, mode, onComplete }: UseNoteSubmitParams): NoteSubmit {
-  const { mutateAsync: createNote, isPending: isCreating } = useCreateNote();
-  const { mutateAsync: updateNote, isPending: isUpdating } = useUpdateNote();
+  const { mutate: createNote, isPending: isCreating } = useCreateNote();
+  const { mutate: updateNote, isPending: isUpdating } = useUpdateNote();
   const { showToast } = useToast();
 
-  const submit = async ({ title, content }: { title: string; content: JSONContent }) => {
-    try {
-      if (mode === 'edit' && note) {
-        // linkUrl은 이 폼에서 다루지 않는다. PATCH는 생략 시 기존 값을 유지하므로 기존 링크는 보존된다.
-        await updateNote({ noteId: note.id, body: { title, content } });
-      } else {
-        await createNote({ todoId, title, content });
-      }
-      onComplete();
-    } catch {
-      showToast(mode === 'create' ? '노트 등록에 실패했어요.' : '노트 수정에 실패했어요.', 'error');
+  const submit = ({ title, content }: { title: string; content: JSONContent }) => {
+    if (mode === 'edit' && note) {
+      // linkUrl은 이 폼에서 다루지 않는다. PATCH는 생략 시 기존 값을 유지하므로 기존 링크는 보존된다.
+      updateNote(
+        { noteId: note.id, body: { title, content } },
+        {
+          onSuccess: () => {
+            showToast('노트가 수정되었어요.', 'success');
+            onComplete();
+          },
+          onError: () => {
+            showToast('노트 수정에 실패했어요.', 'error');
+          },
+        },
+      );
+    } else {
+      createNote(
+        { todoId, title, content },
+        {
+          onSuccess: () => {
+            showToast('노트가 등록되었어요.', 'success');
+            onComplete();
+          },
+          onError: () => {
+            showToast('노트 등록에 실패했어요.', 'error');
+          },
+        },
+      );
     }
   };
 

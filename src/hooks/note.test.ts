@@ -11,6 +11,7 @@ import { waitFor } from '@testing-library/react';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
 import {
   useNoteList,
+  useNoteListSuspense,
   useInfiniteNoteList,
   useNote,
   useCreateNote,
@@ -38,6 +39,17 @@ it('useNoteList는 params와 함께 getNotes를 호출한다', async () => {
 it('useNoteList는 enabled가 false면 getNotes를 호출하지 않는다', () => {
   renderHookWithClient(() => useNoteList({ todoId: 3 }, { enabled: false }));
   expect(mocked.getNotes).not.toHaveBeenCalled();
+});
+
+it('useNoteListSuspense는 params와 함께 getNotes를 호출한다', async () => {
+  mocked.getNotes.mockResolvedValue({
+    notes: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never);
+  const { result } = renderHookWithClient(() => useNoteListSuspense({ todoId: 3 }));
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(mocked.getNotes).toHaveBeenCalledWith({ todoId: 3 });
 });
 
 it('useNote는 id가 주어지면 getNote를 호출한다', async () => {

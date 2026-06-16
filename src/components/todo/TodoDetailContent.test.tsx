@@ -1,9 +1,16 @@
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(),
+  usePathname: jest.fn(),
+  useSearchParams: jest.fn(),
+}));
+
 jest.mock('@/src/api/note', () => ({
   ...jest.requireActual('@/src/api/note'),
   getNotes: jest.fn(),
 }));
 
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import * as noteApi from '@/src/api/note';
 import TodoDetailContent from '@/src/components/todo/TodoDetailContent';
@@ -14,6 +21,9 @@ const mocked = noteApi as jest.Mocked<typeof noteApi>;
 
 beforeEach(() => {
   jest.resetAllMocks();
+  (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
+  (usePathname as jest.Mock).mockReturnValue('/todos');
+  (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
 });
 
 const baseTodo: Todo = {
@@ -107,6 +117,28 @@ it('noteIds가 비어 있으면 노트를 요청하지 않고 작성된 노트 �
   expect(mocked.getNotes).not.toHaveBeenCalled();
 });
 
+it('노트가 있는 할일은 조회 중에 노트 추가하기 버튼을 보여주지 않는다', () => {
+  mocked.getNotes.mockReturnValue(new Promise(() => {})); // 영원히 대기
+  renderContent({ todo: { ...baseTodo, id: 3, noteIds: [7] } });
+  expect(screen.queryByRole('button', { name: /노트 추가하기/ })).not.toBeInTheDocument();
+});
+
+it('노트가 없으면 노트 추가하기 버튼을 표시한다', () => {
+  renderContent({ todo: { ...baseTodo, noteIds: [] } });
+  expect(screen.getByRole('button', { name: /노트 추가하기/ })).toBeInTheDocument();
+});
+
+it('노트 추가하기 버튼을 누르면 write 모드로 노트 드로어를 연다', () => {
+  const push = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ push });
+  renderContent({ todo: { ...baseTodo, id: 5, noteIds: [] } });
+
+  screen.getByRole('button', { name: /노트 추가하기/ }).click();
+
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=5'));
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=write'));
+});
+
 it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한다', async () => {
   mocked.getNotes.mockResolvedValue({
     notes: [{ id: 7, title: '프로그래밍과 데이터 in JavaScript' }],
@@ -116,6 +148,22 @@ it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한�
   renderContent({ todo: { ...baseTodo, id: 3, noteIds: [7] } });
   await waitFor(() => expect(screen.getByText('프로그래밍과 데이터 in JavaScript')).toBeInTheDocument());
   expect(mocked.getNotes).toHaveBeenCalledWith({ todoId: 3 });
+});
+
+it('작성된 노트를 클릭하면 해당 todoId와 mode=detail로 노트 드로어를 연다', async () => {
+  const push = jest.fn();
+  (useRouter as jest.Mock).mockReturnValue({ push });
+  mocked.getNotes.mockResolvedValue({
+    notes: [{ id: 7, title: '프로그래밍과 데이터 in JavaScript' }],
+    nextCursor: null,
+    totalCount: 1,
+  } as never);
+  renderContent({ todo: { ...baseTodo, id: 3, noteIds: [7] } });
+
+  fireEvent.click(await screen.findByRole('button', { name: '프로그래밍과 데이터 in JavaScript' }));
+
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=3'));
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=detail'));
 });
 
 it('닫기 버튼을 누르면 onClose를 호출한다', () => {

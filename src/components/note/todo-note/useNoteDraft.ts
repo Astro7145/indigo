@@ -39,6 +39,7 @@ export function useNoteDraft(note: Note | undefined, editing: boolean): NoteDraf
   const [draftContent, setDraftContent] = useState<JSONContent>(baseContent);
 
   const wasEditing = useRef(editing);
+
   useEffect(() => {
     if (editing && !wasEditing.current) {
       setDraftTitle(baseTitle);

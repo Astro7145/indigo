@@ -1,3 +1,6 @@
+import { Suspense } from 'react';
+
+import NoteDrawer from '@/src/components/note/todo-note/NoteDrawer';
 import Sidebar from '@/src/components/common/sidebar/Sidebar';
 import Topbar from '@/src/components/common/sidebar/Topbar';
 import Settings from '@/src/components/common/settings/Settings';
@@ -12,6 +15,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
         <div id="toast-portal" />
       </div>
+      {/* 쿼리파라미터(todoId) 구독으로 열리는 전역 노트 드로어. useSearchParams의 CSR bailout을 Suspense로 감싼다. */}
+      <Suspense fallback={null}>
+        <NoteDrawer />
+      </Suspense>
     </div>
   );
 }

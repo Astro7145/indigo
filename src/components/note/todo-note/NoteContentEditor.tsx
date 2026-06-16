@@ -103,7 +103,7 @@ export default function NoteContentEditor({
         initial={false}
         animate={{ height: editable ? 'auto' : 0, opacity: editable ? 1 : 0 }}
         transition={reduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' }}
-        className={editable ? 'overflow-hidden' : 'pointer-events-none overflow-hidden'}
+        className={editable ? 'overflow-hidden pb-[29px]' : 'pointer-events-none overflow-hidden'}
       >
         <EditorToolbar
           state={state ?? {}}
