@@ -12,9 +12,9 @@ export default function SettingsModal() {
   const close = useSettingsModalStore((s) => s.close);
 
   return (
-    <Modal open={isOpen} onClose={close} showCloseButton>
+    <Modal open={isOpen} onClose={close} showCloseButton className="dark:bg-indigo-dark-300">
       <div className="flex flex-col gap-8">
-        <Modal.Title>설정</Modal.Title>
+        <Modal.Title className="dark:text-white">설정</Modal.Title>
 
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-4">
@@ -27,8 +27,9 @@ export default function SettingsModal() {
           </div>
 
           <Modal.Actions>
-            <Modal.Cancel>취소</Modal.Cancel>
-            <Modal.Confirm onClick={close}>확인</Modal.Confirm>
+            <Modal.Cancel className="dark:border-white/20 dark:text-white/70 dark:hover:border-white/40 dark:hover:text-white">
+              닫기
+            </Modal.Cancel>
           </Modal.Actions>
         </div>
       </div>
