@@ -36,12 +36,12 @@ export default function SignupForm() {
       password: '',
       passwordConfirm: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const { mutate } = useSignup();
 
-  const { name } = useWatch({ control });
+  const name = useWatch({ control, name: 'name' });
   const debouncedName = useDebounce(name ?? '');
   const { data: nicknameCheck } = useCheckNickname(debouncedName);
 
