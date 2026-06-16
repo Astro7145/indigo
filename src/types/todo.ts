@@ -33,6 +33,12 @@ export interface TodoListParams extends CursorParams {
   sort?: 'latest' | 'dueSoon';
   done?: 'true' | 'false';
   keyword?: string;
+  /** 특정 날짜(KST)의 마감 할 일만 — from/to보다 우선 (YYYY-MM-DD) */
+  date?: string;
+  /** 마감일 범위 시작 (KST, 해당일 포함, YYYY-MM-DD) */
+  from?: string;
+  /** 마감일 범위 끝 (KST, 해당일 포함, YYYY-MM-DD) */
+  to?: string;
 }
 
 export interface TodoListResponse {

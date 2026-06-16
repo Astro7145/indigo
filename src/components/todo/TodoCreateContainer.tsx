@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useCreateTodo } from '@/src/hooks/todo';
 import { useCreateImageUploadUrl } from '@/src/hooks/upload';
@@ -10,15 +12,28 @@ interface TodoCreateContainerProps {
   onClose: () => void;
   /** 취소 버튼 클릭 시 호출 — 확인 절차가 필요하면 호출자가 처리 */
   onCancel: () => void;
+  /** 제출 진행(업로드~뮤테이션) 여부 보고 — 진행 중에는 호출자가 이탈 확인을 막는다 */
+  onPendingChange?: (pending: boolean) => void;
   defaultGoalId?: number;
+  /** 캘린더 등에서 마감일 프리필 (ISO) */
+  defaultDueDate?: string;
 }
 
-export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }: TodoCreateContainerProps) {
+export default function TodoCreateContainer({
+  onClose,
+  onCancel,
+  onPendingChange,
+  defaultGoalId,
+  defaultDueDate,
+}: TodoCreateContainerProps) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const { mutate: createTodo, isPending } = useCreateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
   const { showToast } = useToast();
 
   const handleSubmit = async (values: TodoFormValues) => {
+    onPendingChange?.(true);
     let fileUrl: string | undefined;
 
     if (values.imageFile) {
@@ -28,7 +43,8 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
         if (!res.ok) throw new Error(`upload failed: ${res.status}`);
         fileUrl = url;
       } catch {
-        showToast('이미지 업로드에 실패했습니다.');
+        showToast(tTodos('imageUploadError'));
+        onPendingChange?.(false);
         return;
       }
     }
@@ -44,11 +60,12 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
       },
       {
         onSuccess: () => {
-          showToast('할 일이 추가되었습니다.');
+          showToast(tTodos('create.success'));
           onClose();
         },
         onError: () => {
-          showToast('할 일 생성에 실패했습니다.');
+          showToast(tTodos('create.error'));
+          onPendingChange?.(false);
         },
       },
     );
@@ -58,9 +75,9 @@ export default function TodoCreateContainer({ onClose, onCancel, defaultGoalId }
     <TodoFormUI
       onSubmit={handleSubmit}
       onClose={onCancel}
-      title="할 일 생성"
-      submitLabel="확인"
-      initialValues={{ goalId: defaultGoalId }}
+      title={tTodos('create.title')}
+      submitLabel={tCommon('actions.confirm')}
+      initialValues={{ goalId: defaultGoalId, dueDate: defaultDueDate }}
       disableSubmitUntilValid
       isPending={isPending}
     />

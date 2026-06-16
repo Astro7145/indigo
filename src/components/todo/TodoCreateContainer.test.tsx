@@ -121,7 +121,7 @@ describe('TodoCreateContainer', () => {
     await act(async () => {
       await capturedOnSubmit!(baseValues);
     });
-    expect(mockShowToast).toHaveBeenCalledWith('할 일이 추가되었습니다.');
+    expect(mockShowToast).toHaveBeenCalledWith('할일이 추가되었습니다.');
     expect(onClose).toHaveBeenCalled();
   });
 
@@ -134,7 +134,7 @@ describe('TodoCreateContainer', () => {
     await act(async () => {
       await capturedOnSubmit!(baseValues);
     });
-    expect(mockShowToast).toHaveBeenCalledWith('할 일 생성에 실패했습니다.');
+    expect(mockShowToast).toHaveBeenCalledWith('할일 생성에 실패했습니다.');
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -150,5 +150,15 @@ describe('TodoCreateContainer', () => {
       });
     });
     expect(mockMutate).toHaveBeenCalledWith(expect.objectContaining({ tags: ['취미', '운동'] }), expect.any(Object));
+  });
+
+  it('defaultDueDate를 TodoFormUI initialValues.dueDate로 전달한다', () => {
+    let capturedInitialValues: Partial<TodoFormValues> | undefined;
+    mockedTodoFormUI.mockImplementation(({ initialValues }: { initialValues?: Partial<TodoFormValues> }) => {
+      capturedInitialValues = initialValues;
+      return null;
+    });
+    render(<TodoCreateContainer onClose={jest.fn()} onCancel={jest.fn()} defaultDueDate="2025-01-10T00:00:00.000Z" />);
+    expect(capturedInitialValues).toMatchObject({ dueDate: '2025-01-10T00:00:00.000Z' });
   });
 });

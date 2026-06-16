@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useLogout } from '@/src/hooks/auth';
 import SidebarRow from './SidebarRow';
@@ -12,6 +13,7 @@ import SidebarRow from './SidebarRow';
  * 쿠키는 /api/auth/logout 응답에서 삭제되므로 이후 proxy도 /login을 통과시킨다.
  */
 export default function LogoutButton({ collapsed }: { collapsed?: boolean }) {
+  const t = useTranslations('sidebar');
   const { mutate } = useLogout();
   const router = useRouter();
 
@@ -19,5 +21,5 @@ export default function LogoutButton({ collapsed }: { collapsed?: boolean }) {
     mutate(undefined, { onSettled: () => router.replace('/login') });
   };
 
-  return <SidebarRow type="logout" text="로그아웃" collapsed={collapsed} onClick={handleLogout} />;
+  return <SidebarRow type="logout" text={t('nav.logout')} collapsed={collapsed} onClick={handleLogout} />;
 }

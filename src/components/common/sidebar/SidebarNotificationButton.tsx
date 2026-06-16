@@ -1,10 +1,12 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { ComponentPropsWithRef } from 'react';
 import { IcBell } from '../icons';
 import { useInfiniteNotificationList } from '@/src/hooks/notification';
 
 export default function SidebarNotificationButton({ ...props }: ComponentPropsWithRef<'button'>) {
+  const t = useTranslations('sidebar.notification');
   const { data } = useInfiniteNotificationList({ limit: 100 });
 
   const notifications = data?.pages.flatMap((page) => page.notifications) ?? [];
@@ -13,7 +15,7 @@ export default function SidebarNotificationButton({ ...props }: ComponentPropsWi
   return (
     <button
       type="button"
-      aria-label="알림"
+      aria-label={t('title')}
       {...props}
       className="flex aspect-square size-16 cursor-pointer items-center justify-center rounded-sm border border-indigo-600 bg-indigo-800/20 transition-shadow hover:shadow-[inset_0_0_8px_0_rgba(255,255,255,0.4)]"
     >

@@ -27,8 +27,7 @@ export default function SettingsModal() {
           </div>
 
           <Modal.Actions>
-            <Modal.Cancel>취소</Modal.Cancel>
-            <Modal.Confirm onClick={close}>확인</Modal.Confirm>
+            <Modal.Cancel>닫기</Modal.Cancel>
           </Modal.Actions>
         </div>
       </div>

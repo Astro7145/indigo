@@ -20,6 +20,7 @@ import {
   useLikeComment,
   useUnlikeComment,
 } from '@/src/hooks/comment';
+import type { Comment, CommentListResponse } from '@/src/types/comment';
 
 const mocked = commentApi as jest.Mocked<typeof commentApi>;
 
@@ -93,23 +94,41 @@ it('useDeleteComment(postId)는 게시글 상세(댓글 포함)와 목록을 무
   expect(inv).toHaveBeenCalledWith({ queryKey: postKeys.lists() });
 });
 
-it('useLikeComment(postId)는 likeComment를 호출하고 comments prefix를 무효화한다', async () => {
+it('useLikeComment(postId)는 likeComment를 호출하고 캐시의 isLiked/likeCount를 토글한다', async () => {
   mocked.likeComment.mockResolvedValue({ isLiked: true, likeCount: 1 } as never);
   const { result, client } = renderHookWithClient(() => useLikeComment(5));
-  const inv = jest.spyOn(client, 'invalidateQueries');
+
+  // 낙관적 업데이트 대상 캐시를 미리 채워둠
+  const queryKey = commentApi.commentKeys.list(5, {});
+  client.setQueryData<CommentListResponse>(queryKey, {
+    comments: [{ id: 9, isLiked: false, likeCount: 0 } as Comment],
+    nextCursor: null,
+    totalCount: 1,
+  });
+
   await result.current.mutateAsync(9);
+
   expect(mocked.likeComment).toHaveBeenCalledWith(5, 9);
-  expect(inv).toHaveBeenCalledWith({ queryKey: commentApi.commentKeys.lists(5) });
+  const updated = client.getQueryData<CommentListResponse>(queryKey);
+  expect(updated?.comments[0].isLiked).toBe(true);
+  expect(updated?.comments[0].likeCount).toBe(1);
 });
 
-it('useUnlikeComment(postId)는 unlikeComment를 호출하고 comments prefix를 무효화한다', async () => {
-  mocked.unlikeComment.mockResolvedValue({
-    isLiked: false,
-    likeCount: 0,
-  } as never);
+it('useUnlikeComment(postId)는 unlikeComment를 호출하고 캐시의 isLiked/likeCount를 토글한다', async () => {
+  mocked.unlikeComment.mockResolvedValue({ isLiked: false, likeCount: 0 } as never);
   const { result, client } = renderHookWithClient(() => useUnlikeComment(5));
-  const inv = jest.spyOn(client, 'invalidateQueries');
+
+  const queryKey = commentApi.commentKeys.list(5, {});
+  client.setQueryData<CommentListResponse>(queryKey, {
+    comments: [{ id: 9, isLiked: true, likeCount: 1 } as Comment],
+    nextCursor: null,
+    totalCount: 1,
+  });
+
   await result.current.mutateAsync(9);
+
   expect(mocked.unlikeComment).toHaveBeenCalledWith(5, 9);
-  expect(inv).toHaveBeenCalledWith({ queryKey: commentApi.commentKeys.lists(5) });
+  const updated = client.getQueryData<CommentListResponse>(queryKey);
+  expect(updated?.comments[0].isLiked).toBe(false);
+  expect(updated?.comments[0].likeCount).toBe(0);
 });

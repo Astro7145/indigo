@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -7,38 +8,41 @@ import GoalTodoBoard from '@/src/components/goal/GoalTodoBoard';
 import Card from '@/src/components/common/cards/Card';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import { useInfiniteGoalListSuspense } from '@/src/hooks/goal';
-import type { Todo } from '@/src/types/todo';
 import { cn } from '@/src/utils/cn';
 
 export interface GoalTodoSectionProps {
   className?: string;
-  onEditTodo: (todo: Todo) => void;
-  onAddTodo: (goalId: number) => void;
-  onSelectTodo: (todo: Todo) => void;
 }
 
 /**
  * "목표 별 할일" 섹션. 목표를 2개씩 무한 스크롤로 불러와 GoalTodoBoard로 렌더한다.
  * 목표가 0개면 섹션 헤더와 함께 "등록한 목표가 없어요" 안내를 표시한다(일러스트 없음).
  */
-export default function GoalTodoSection({ className, onEditTodo, onAddTodo, onSelectTodo }: GoalTodoSectionProps) {
+export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
+  const tCommon = useTranslations('common');
+  const tDashboard = useTranslations('dashboard');
+
   return (
-    <section aria-label="목표 별 할일" className={cn('flex flex-col gap-2.5', className)}>
+    <section aria-label={tDashboard('goalTodos.title')} className={cn('flex flex-col gap-2.5', className)}>
       <div className="flex items-center gap-3 px-2">
         <IcGoal aria-hidden className="size-8 shrink-0 xl:size-10" />
-        <h2 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">목표 별 할일</h2>
+        <h2 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
+          {tDashboard('goalTodos.title')}
+        </h2>
       </div>
       <AsyncBoundary
-        fallback={<p className="py-10 text-center text-sm text-slate-400">불러오는 중…</p>}
-        errorFallback={<p className="py-10 text-center text-sm text-slate-400">불러오지 못했어요</p>}
+        fallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+        errorFallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
       >
-        <GoalTodoSectionContent onEditTodo={onEditTodo} onAddTodo={onAddTodo} onSelectTodo={onSelectTodo} />
+        <GoalTodoSectionContent />
       </AsyncBoundary>
     </section>
   );
 }
 
-function GoalTodoSectionContent({ onEditTodo, onAddTodo, onSelectTodo }: Omit<GoalTodoSectionProps, 'className'>) {
+function GoalTodoSectionContent() {
+  const tCommon = useTranslations('common');
+  const tDashboard = useTranslations('dashboard');
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteGoalListSuspense({
     limit: 2,
   });
@@ -64,7 +68,7 @@ function GoalTodoSectionContent({ onEditTodo, onAddTodo, onSelectTodo }: Omit<Go
     // figma 21209:52456 — 카드 chrome 그대로(일러스트 제외). 텍스트 가운데 정렬용 min-h 확보.
     return (
       <Card className="flex min-h-[200px] items-center justify-center border border-slate-200 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
-        <p className="text-md m-auto text-center text-slate-500">등록한 목표가 없어요</p>
+        <p className="text-md m-auto text-center text-slate-500">{tDashboard('goalTodos.empty')}</p>
       </Card>
     );
   }
@@ -73,17 +77,11 @@ function GoalTodoSectionContent({ onEditTodo, onAddTodo, onSelectTodo }: Omit<Go
     <>
       <div className="flex flex-col gap-6 xl:gap-8">
         {goals.map((goal) => (
-          <GoalTodoBoard
-            key={goal.id}
-            goal={goal}
-            onEditTodo={onEditTodo}
-            onAddTodo={onAddTodo}
-            onSelectTodo={onSelectTodo}
-          />
+          <GoalTodoBoard key={goal.id} goal={goal} />
         ))}
       </div>
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">불러오는 중…</p>}
+      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
     </>
   );
 }

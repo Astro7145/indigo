@@ -1,16 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import ProgressCard from '@/src/components/goal/ProgressCard';
 import GoalDetailHeader from '@/src/components/goal/GoalDetailHeader';
 import GoalNotesCard from '@/src/components/goal/GoalNotesCard';
 import GoalTodoColumn from '@/src/components/goal/GoalTodoColumn';
-import TodoDetailSheet from '@/src/components/todo/TodoDetailSheet';
-import TodoFormSheet from '@/src/components/todo/TodoFormSheet';
 import { useMe } from '@/src/hooks/user';
-import type { Todo } from '@/src/types/todo';
 
 export interface GoalDetailProps {
   goalId: number;
@@ -24,24 +21,22 @@ export interface GoalDetailProps {
  * - 반응형: 모바일 세로 스택 → 태블릿(sm) 진행도·노트 2열 → 데스크톱(xl) 전체 가로 배치
  */
 export default function GoalDetail({ goalId }: GoalDetailProps) {
+  const tGoals = useTranslations('goals');
   const { data: me } = useMe();
-
-  // 두 컬럼(To do/Done)이 공유하는 단일 시트 상태. goalId가 고정이라 생성은 boolean으로 충분.
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [creating, setCreating] = useState(false);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   return (
     <div className="mx-auto flex w-full max-w-328 flex-col gap-8">
       {/* 모바일(<sm)은 GNB가 타이틀을 담당 → sm+에서 노출. 로드 전후 레이아웃 시프트 방지로 h-8 예약 */}
       <div className="hidden h-8 sm:block">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{`${me?.name ?? ''}님의 목표`}</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">
+          {tGoals('title', { name: me?.name ?? '' })}
+        </h1>
       </div>
 
       <AsyncBoundary
         fallback={<section className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-8" aria-hidden />}
         errorFallback={
-          <div className="mx-auto w-full max-w-328 py-20 text-center text-slate-500">목표 정보를 불러오지 못했어요</div>
+          <div className="mx-auto w-full max-w-328 py-20 text-center text-slate-500">{tGoals('loadError')}</div>
         }
       >
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-8">
@@ -58,30 +53,9 @@ export default function GoalDetail({ goalId }: GoalDetailProps) {
 
       {/* 본문 2컬럼 — To do / Done. grid로 균등 분할(xl) */}
       <div className="grid grid-cols-1 gap-8 xl:grid-cols-2 xl:gap-8">
-        <GoalTodoColumn
-          goalId={goalId}
-          done={false}
-          onEditTodo={setEditingTodo}
-          onAddTodo={() => setCreating(true)}
-          onSelectTodo={setSelectedTodo}
-        />
-        <GoalTodoColumn
-          goalId={goalId}
-          done
-          onEditTodo={setEditingTodo}
-          onAddTodo={() => setCreating(true)}
-          onSelectTodo={setSelectedTodo}
-        />
+        <GoalTodoColumn goalId={goalId} done={false} />
+        <GoalTodoColumn goalId={goalId} done />
       </div>
-
-      <TodoFormSheet
-        mode="update"
-        isOpen={editingTodo !== null}
-        onClose={() => setEditingTodo(null)}
-        todo={editingTodo}
-      />
-      <TodoFormSheet mode="create" isOpen={creating} onClose={() => setCreating(false)} defaultGoalId={goalId} />
-      <TodoDetailSheet isOpen={selectedTodo !== null} onClose={() => setSelectedTodo(null)} todo={selectedTodo} />
     </div>
   );
 }

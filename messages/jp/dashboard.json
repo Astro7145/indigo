@@ -1,0 +1,17 @@
+{
+  "title": "さんのダッシュボード",
+  "recentTodos": {
+    "title": "最近登録したTODO",
+    "empty": "最近登録したTODOがありません"
+  },
+  "goalTodos": {
+    "title": "目標別のTODO",
+    "empty": "登録した目標がありません",
+    "boardEmpty": "まだTODOがありません",
+    "progressLabel": "{title} の進捗"
+  },
+  "progress": {
+    "header": "私の進捗状況",
+    "body": "{name}さんの進捗は"
+  }
+}

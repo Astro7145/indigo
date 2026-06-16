@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Button from '@/src/components/common/buttons/Button';
@@ -8,19 +10,13 @@ import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcCalendar } from '@/src/components/common/icons/IcCalendar';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
 import { useInfiniteTodoList } from '@/src/hooks/todo';
-import type { Todo } from '@/src/types/todo';
+import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { cn } from '@/src/utils/cn';
 
 export interface GoalTodoColumnProps {
   goalId: number;
   /** true=완료한 일(Done), false=해야 할 일(To do) */
   done: boolean;
-  /** 케밥 "수정하기" → 할 일 수정 시트 열기 */
-  onEditTodo: (todo: Todo) => void;
-  /** To do 헤더 "할 일 추가" → 할 일 생성 시트 열기 */
-  onAddTodo: (goalId: number) => void;
-  /** 행 클릭 → 할 일 상세 시트 열기 */
-  onSelectTodo: (todo: Todo) => void;
   className?: string;
 }
 
@@ -31,24 +27,22 @@ export interface GoalTodoColumnProps {
  * 행 아이콘(링크/노트 인디케이터·즐겨찾기)은 `/todos` 응답 필드를 쓰므로 useInfiniteTodoList로 조회.
  *
  * 행 클릭·케밥(수정/삭제)·`할 일 추가`는 호출 측(GoalDetail)이 소유한 시트로 연결된다(콜백 props).
- * `캘린더 보기` 버튼은 대상 페이지 연동 전 placeholder다. Figma 21209:54510(To do) / 21209:54528(Done).
+ * `캘린더 보기`는 목표 필터가 프리셋된 `/calendar?goalId=`로 이동한다. Figma 21209:54510(To do) / 21209:54528(Done).
  */
-export default function GoalTodoColumn({
-  goalId,
-  done,
-  onEditTodo,
-  onAddTodo,
-  onSelectTodo,
-  className,
-}: GoalTodoColumnProps) {
-  const label = done ? 'DONE' : 'TO DO';
+export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColumnProps) {
+  const tCommon = useTranslations('common');
+  const tGoals = useTranslations('goals');
+  const tTodos = useTranslations('todos');
+  const label = done ? tCommon('tabs.done') : tCommon('tabs.todo');
+  const router = useRouter();
+  const { openCreate } = useTodoSheet();
 
   return (
     <section aria-label={label} className={cn('flex min-w-0 flex-col gap-2.5', className)}>
       {/* 헤더는 두 컬럼 모두 40px로 통일 — To do의 버튼(40px)과 Done의 라벨 본문 상단이 같은 높이에서 시작하도록 */}
       <div className="flex h-10 items-center justify-between px-2">
         <h3 className="text-lg font-semibold tracking-[-0.03em] text-slate-800">{label}</h3>
-        {/* To do 컬럼에만 노출 — 할 일 추가는 생성 시트로 연결, 캘린더 보기는 placeholder(별도 작업) */}
+        {/* To do 컬럼에만 노출 — 할 일 추가는 생성 시트로, 캘린더 보기는 목표 필터 프리셋 캘린더로 */}
         {!done && (
           <div className="flex items-center gap-2">
             <Button
@@ -56,17 +50,18 @@ export default function GoalTodoColumn({
               size="small"
               startIcon={<IcCalendar className="size-5" />}
               className="h-10 whitespace-nowrap"
+              onClick={() => router.push(`/calendar?goalId=${goalId}`)}
             >
-              캘린더 보기
+              {tGoals('calendarView')}
             </Button>
             <Button
               variant="primary"
               size="small"
               startIcon={<IcPlus className="size-5 text-white" />}
               className="h-10 whitespace-nowrap"
-              onClick={() => onAddTodo(goalId)}
+              onClick={() => openCreate({ goalId })}
             >
-              할 일 추가
+              {tTodos('addButton')}
             </Button>
           </div>
         )}
@@ -82,28 +77,26 @@ export default function GoalTodoColumn({
         <AsyncBoundary
           fallback={
             <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-              불러오는 중…
+              {tCommon('state.loading')}
             </p>
           }
           errorFallback={
             <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
-              불러오지 못했어요
+              {tCommon('state.loadError')}
             </p>
           }
         >
-          <GoalTodoColumnContent goalId={goalId} done={done} onEditTodo={onEditTodo} onSelectTodo={onSelectTodo} />
+          <GoalTodoColumnContent goalId={goalId} done={done} />
         </AsyncBoundary>
       </div>
     </section>
   );
 }
 
-function GoalTodoColumnContent({
-  goalId,
-  done,
-  onEditTodo,
-  onSelectTodo,
-}: Pick<GoalTodoColumnProps, 'goalId' | 'done' | 'onEditTodo' | 'onSelectTodo'>) {
+function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goalId' | 'done'>) {
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
+  const { openEdit, openDetail } = useTodoSheet();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteTodoList({
     goalId,
     done: done ? 'true' : 'false',
@@ -133,7 +126,7 @@ function GoalTodoColumnContent({
   if (todos.length === 0) {
     return (
       <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
-        {done ? '완료한 일이 아직 없어요' : '해야할 일이 아직 없어요'}
+        {done ? tTodos('empty.done') : tTodos('empty.todo')}
       </p>
     );
   }
@@ -144,11 +137,11 @@ function GoalTodoColumnContent({
       className="scrollbar-slate flex max-h-[420px] flex-1 flex-col gap-1 overflow-y-auto xl:max-h-none"
       todos={todos}
       size="large"
-      onEdit={onEditTodo}
-      onSelect={onSelectTodo}
+      onEdit={openEdit}
+      onSelect={openDetail}
     >
       {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
-      {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">불러오는 중…</li>}
+      {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</li>}
     </TodoList>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, useReducedMotion } from 'motion/react';
 
 import TodoItem from '@/src/components/common/todo-list/TodoItem';
@@ -23,6 +24,7 @@ export interface TodoRowProps {
  * 행 클릭은 상세 선택(onSelect), 케밥은 수정(onEdit)/삭제로 연결되며 삭제 확인 모달을 행 로컬로 소유한다.
  */
 export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit, onSelect }: TodoRowProps) {
+  const tCommon = useTranslations('common');
   // 타입상 noteIds는 required지만 백엔드 응답 누락/null 케이스를 방어한다.
   const hasNote = (todo.noteIds?.length ?? 0) > 0;
   // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
@@ -48,7 +50,7 @@ export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit
           {hasNote && <TodoItem.NoteAction onClick={() => {}} />}
           {todo.linkUrl && <TodoItem.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 — 노트 작성 모달(별도 작업) 연동 전 placeholder */}
-          {!hasNote && <TodoItem.EditAction onClick={() => {}} hoverOnly aria-label="노트 작성" />}
+          {!hasNote && <TodoItem.EditAction onClick={() => {}} hoverOnly aria-label={tCommon('actions.writeNote')} />}
           <TodoItem.KebabAction hoverOnly onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
           <TodoItem.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoItem.Actions>

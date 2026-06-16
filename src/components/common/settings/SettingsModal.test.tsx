@@ -1,3 +1,5 @@
+jest.mock('next/navigation', () => ({ useRouter: () => ({ refresh: jest.fn() }) }));
+
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import SettingsModal from './SettingsModal';
@@ -22,11 +24,12 @@ describe('SettingsModal', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('취소 버튼을 누르면 스토어가 닫힌다', () => {
+  it('닫기 버튼을 누르면 스토어가 닫힌다', () => {
     useSettingsModalStore.setState({ isOpen: true });
     render(<SettingsModal />);
 
-    fireEvent.click(screen.getByRole('button', { name: '취소' }));
+    // 푸터 "닫기" 버튼과 우상단 X(aria-label "닫기")가 모두 존재 — 푸터 버튼(첫 번째)을 누른다
+    fireEvent.click(screen.getAllByRole('button', { name: '닫기' })[0]);
 
     expect(useSettingsModalStore.getState().isOpen).toBe(false);
   });

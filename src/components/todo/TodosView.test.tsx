@@ -1,3 +1,14 @@
+const mockSearchParams = new URLSearchParams();
+jest.mock('next/navigation', () => ({
+  useSearchParams: () => mockSearchParams,
+}));
+
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 import type { ComponentProps, ReactNode } from 'react';
 
 jest.mock('@/src/api/todo', () => ({
@@ -23,20 +34,11 @@ jest.mock('motion/react', () => {
 
 // 시트는 스텁으로 대체 — 페이지의 시트 배선(어떤 상호작용이 어떤 시트를 여는가)만 검증한다.
 // 삭제 확인 모달은 GoalTodoColumn 테스트와 동일하게 실제 컴포넌트를 사용한다.
-jest.mock('@/src/components/todo/TodoFormSheet', () => ({
-  __esModule: true,
-  default: ({ mode, isOpen }: { mode: 'create' | 'update'; isOpen: boolean }) =>
-    isOpen ? <div>{`form-sheet:${mode}`}</div> : null,
-}));
-jest.mock('@/src/components/todo/TodoDetailSheet', () => ({
-  __esModule: true,
-  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div>detail-sheet</div> : null),
-}));
 
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 
 import * as todoApi from '@/src/api/todo';
-import TodosPage from '@/app/(main)/todos/page';
+import TodosView from '@/src/components/todo/TodosView';
 import { renderWithClient } from '@/src/hooks/__tests__/test-utils';
 import type { Todo, TodoListParams, TodoListResponse } from '@/src/types/todo';
 
@@ -88,28 +90,29 @@ class MockIO {
 
 beforeEach(() => {
   jest.resetAllMocks();
+  mockSearchParams.delete('tab');
   lastIoCallback = null;
   (globalThis as unknown as { IntersectionObserver: typeof IntersectionObserver }).IntersectionObserver =
     MockIO as unknown as typeof IntersectionObserver;
 });
 
-it('헤더에 "모든 할 일" 제목과 totalCount 배지를 렌더한다', async () => {
+it('헤더에 "모든 할일" 제목과 totalCount 배지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 42));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   expect(await screen.findByText('할일 A')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: '모든 할 일' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '모든 할일' })).toBeInTheDocument();
   expect(screen.getByText('42')).toBeInTheDocument();
 });
 
 it('할일이 없으면 빈 상태 텍스트를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
-  renderWithClient(<TodosPage />);
-  expect(await screen.findByText('아직 등록한 할 일이 없어요')).toBeInTheDocument();
+  renderWithClient(<TodosView />);
+  expect(await screen.findByText('아직 등록한 할일이 없어요')).toBeInTheDocument();
 });
 
 it('초기 호출은 done 미지정·sort=latest·limit=40으로 한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   const calledWith = mocked.getTodos.mock.calls[0]?.[0] as TodoListParams;
   expect(calledWith.sort).toBe('latest');
@@ -119,7 +122,7 @@ it('초기 호출은 done 미지정·sort=latest·limit=40으로 한다', async 
 
 it('TO DO 탭 클릭 시 done=false 파라미터로 다시 조회한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByRole('button', { name: 'TO DO' }));
   await waitFor(() => {
@@ -130,7 +133,7 @@ it('TO DO 탭 클릭 시 done=false 파라미터로 다시 조회한다', async 
 
 it('DONE 탭 클릭 시 done=true 파라미터로 다시 조회한다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByRole('button', { name: 'DONE' }));
   await waitFor(() => {
@@ -139,41 +142,33 @@ it('DONE 탭 클릭 시 done=true 파라미터로 다시 조회한다', async ()
   });
 });
 
-it('초기에는 어떤 시트도 열려 있지 않다', async () => {
-  mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
-  await screen.findByText('할일 A');
-  expect(screen.queryByText(/form-sheet:/)).not.toBeInTheDocument();
-  expect(screen.queryByText('detail-sheet')).not.toBeInTheDocument();
-});
-
-it('할 일 추가 버튼을 누르면 생성 시트가 열린다', async () => {
+it('할일 추가 버튼을 누르면 생성 시트가 열린다', async () => {
   mocked.getTodos.mockResolvedValue(page([], null, 0));
-  renderWithClient(<TodosPage />);
-  await screen.findByText('아직 등록한 할 일이 없어요');
-  fireEvent.click(screen.getByRole('button', { name: '할 일 추가' }));
-  expect(await screen.findByText('form-sheet:create')).toBeInTheDocument();
+  renderWithClient(<TodosView />);
+  await screen.findByText('아직 등록한 할일이 없어요');
+  fireEvent.click(screen.getByRole('button', { name: '할일 추가' }));
+  expect(mockOpenCreate).toHaveBeenCalledTimes(1);
 });
 
 it('할 일을 클릭하면 상세 시트가 열린다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   fireEvent.click(await screen.findByText('할일 A'));
-  expect(await screen.findByText('detail-sheet')).toBeInTheDocument();
+  expect(mockOpenDetail.mock.calls[0][0]).toMatchObject({ id: 1, title: '할일 A' });
 });
 
 it('케밥 메뉴에서 수정하기를 누르면 수정 시트가 열린다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByLabelText('더보기 메뉴'));
   fireEvent.click(screen.getByText('수정하기'));
-  expect(await screen.findByText('form-sheet:update')).toBeInTheDocument();
+  expect(mockOpenEdit.mock.calls[0][0]).toMatchObject({ id: 1, title: '할일 A' });
 });
 
 it('케밥 메뉴에서 삭제하기를 누르면 삭제 확인 모달이 열린다', async () => {
   mocked.getTodos.mockResolvedValue(page([makeTodo(1, '할일 A')], null, 1));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   fireEvent.click(screen.getByLabelText('더보기 메뉴'));
   fireEvent.click(screen.getByText('삭제하기'));
@@ -184,7 +179,7 @@ it('sentinel 교차 시 fetchNextPage가 호출되어 두 번째 페이지를 �
   mocked.getTodos
     .mockResolvedValueOnce(page([makeTodo(1, '할일 A')], 1, 2))
     .mockResolvedValueOnce(page([makeTodo(2, '할일 B')], null, 2));
-  renderWithClient(<TodosPage />);
+  renderWithClient(<TodosView />);
   await screen.findByText('할일 A');
   // IO가 sentinel을 관찰하기까지 effect 사이클 대기.
   await waitFor(() => expect(lastIoCallback).not.toBeNull());
@@ -192,4 +187,22 @@ it('sentinel 교차 시 fetchNextPage가 호출되어 두 번째 페이지를 �
     lastIoCallback?.([{ isIntersecting: true } as IntersectionObserverEntry]);
   });
   expect(await screen.findByText('할일 B')).toBeInTheDocument();
+});
+
+it('?tab=done으로 진입하면 DONE 탭이 활성화되고 done 파라미터로 조회한다', async () => {
+  mockSearchParams.set('tab', 'done');
+  mocked.getTodos.mockResolvedValue(page([], null, 0));
+  renderWithClient(<TodosView />);
+  await screen.findByText('완료한 일이 아직 없어요');
+  expect(mocked.getTodos).toHaveBeenCalledWith(expect.objectContaining({ done: 'true' }));
+});
+
+it('탭을 바꾸면 URL이 셸로우로 동기화된다', async () => {
+  mocked.getTodos.mockResolvedValue(page([], null, 0));
+  renderWithClient(<TodosView />);
+  await screen.findByText('아직 등록한 할일이 없어요');
+  fireEvent.click(screen.getByText('TO DO'));
+  expect(window.location.pathname + window.location.search).toBe('/todos?tab=todo');
+  fireEvent.click(screen.getByText('ALL'));
+  expect(window.location.pathname + window.location.search).toBe('/todos');
 });

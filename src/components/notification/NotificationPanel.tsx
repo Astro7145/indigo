@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { Notification, NotificationListResponse } from '@/src/types/notification';
 import type { CursorParams } from '@/src/types/common';
 import {
@@ -36,6 +37,8 @@ type NotificationPanelProps = {
  * 알림이 없을 때는 빈 상태 메시지를 표시합니다.
  */
 export default function NotificationPanel({ queryFn }: NotificationPanelProps = {}) {
+  const t = useTranslations('sidebar.notification');
+  const tc = useTranslations('common');
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteNotificationList({ limit: 5 }, queryFn);
 
   const { mutate: readAll, isPending: isReadingAll } = useReadAllNotifications();
@@ -66,18 +69,20 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
 
   return (
     <section
-      aria-label="알림"
-      className="w-72 overflow-hidden rounded border border-slate-200 bg-white px-3 py-5 shadow-md"
+      aria-label={t('title')}
+      className="dark:bg-indigo-dark-300 w-72 overflow-hidden rounded border border-slate-200 bg-white px-3 py-5 shadow-md dark:border-white/10"
     >
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between px-2">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700">알림</h2>
+          <h2 className="text-sm leading-5 font-semibold tracking-[-0.03em] text-slate-700 dark:text-white">
+            {t('title')}
+          </h2>
           <button
             type="button"
             onClick={refreshNotifications}
-            aria-label="알림 목록 새로고침"
-            className="cursor-pointer text-slate-300 transition-colors hover:text-slate-500"
+            aria-label={t('refresh')}
+            className="cursor-pointer text-slate-300 transition-colors hover:text-slate-500 dark:text-white/40 dark:hover:text-white/70"
           >
             <IcRefresh className="size-4 text-inherit" />
           </button>
@@ -87,19 +92,19 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
             type="button"
             onClick={handleDeleteAll}
             disabled={!hasNotifications || isDeletingAll}
-            aria-label="모두 삭제"
-            className="text-destructive/80 hover:text-destructive hover:bg-destructive/20 cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold transition-colors disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent"
+            aria-label={t('deleteAll')}
+            className="text-destructive/80 hover:text-destructive hover:bg-destructive/20 cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold transition-colors disabled:cursor-not-allowed disabled:text-slate-300 disabled:hover:bg-transparent dark:disabled:text-white/20"
           >
-            모두 삭제
+            {t('deleteAll')}
           </button>
           <button
             type="button"
             onClick={handleReadAll}
             disabled={!hasUnread || isReadingAll}
-            aria-label="모든 알림을 읽음으로 표시"
-            className="cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold text-indigo-500 transition-colors hover:bg-indigo-500/20 hover:text-indigo-600 disabled:cursor-not-allowed disabled:text-slate-300"
+            aria-label={t('readAllLabel')}
+            className="dark:text-indigo-dark-800 cursor-pointer rounded-lg px-2 py-1 text-xs leading-4 font-semibold text-indigo-500 transition-colors hover:bg-indigo-500/20 hover:text-indigo-600 disabled:cursor-not-allowed disabled:text-slate-300 dark:disabled:text-white/20"
           >
-            모두 읽기
+            {t('readAll')}
           </button>
         </div>
       </div>
@@ -107,7 +112,7 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
       {/* 알림 목록 또는 빈 상태 */}
       {hasNotifications ? (
         <ul
-          aria-label="알림 목록"
+          aria-label={t('listLabel')}
           aria-live="polite"
           className="scrollbar-slate -mr-2 flex max-h-90 flex-col gap-2 overflow-y-auto"
         >
@@ -125,10 +130,10 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
                 type="button"
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
-                aria-label="이전 알림 더 불러오기"
-                className="text-xs text-slate-400 transition-colors hover:text-slate-600 disabled:cursor-not-allowed"
+                aria-label={t('loadMoreLabel')}
+                className="text-xs text-slate-400 transition-colors hover:text-slate-600 disabled:cursor-not-allowed dark:text-white/40 dark:hover:text-white/70"
               >
-                {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
+                {isFetchingNextPage ? tc('state.loading') : t('loadMore')}
               </button>
             </li>
           )}
@@ -137,9 +142,9 @@ export default function NotificationPanel({ queryFn }: NotificationPanelProps = 
         <div
           role="status"
           aria-live="polite"
-          className="pt-12 pb-14 text-center text-sm leading-5 font-medium tracking-[-0.03em] text-slate-500"
+          className="pt-12 pb-14 text-center text-sm leading-5 font-medium tracking-[-0.03em] text-slate-500 dark:text-white/60"
         >
-          아직 알림이 없어요
+          {t('empty')}
         </div>
       )}
     </section>

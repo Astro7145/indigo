@@ -52,7 +52,7 @@ it('확인을 누르면 해당 할 일이 삭제되고 닫힌다', () => {
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
   expect(mockMutate).toHaveBeenCalledWith(7, expect.any(Object));
-  expect(mockShowToast).toHaveBeenCalledWith('할 일이 삭제되었습니다.');
+  expect(mockShowToast).toHaveBeenCalledWith('할일이 삭제되었습니다.');
   expect(onClose).toHaveBeenCalled();
 });
 
@@ -73,7 +73,7 @@ it('삭제에 실패하면 실패 토스트를 띄우고 닫지 않는다', () =
 
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
-  expect(mockShowToast).toHaveBeenCalledWith('할 일 삭제에 실패했습니다.');
+  expect(mockShowToast).toHaveBeenCalledWith('할일 삭제에 실패했습니다.');
   expect(onClose).not.toHaveBeenCalled();
 });
 
@@ -88,5 +88,5 @@ it('경고 문구로 복구 불가를 안내한다', () => {
   render(<TodoDeleteConfirm open todo={makeTodo(7, '운동')} onClose={jest.fn()} />);
 
   expect(screen.getByText('정말 삭제하시겠어요?')).toBeInTheDocument();
-  expect(screen.getByText('삭제된 할 일은 복구할 수 없습니다.')).toBeInTheDocument();
+  expect(screen.getByText('삭제된 할일은 복구할 수 없습니다.')).toBeInTheDocument();
 });

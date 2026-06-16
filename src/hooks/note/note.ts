@@ -38,8 +38,12 @@ export function useInfiniteNoteList(params: Omit<NoteListParams, 'cursor'> = {})
   });
 }
 
+/**
+ * 노트 상세 — 비suspense. 소비처(NoteDetail)는 프로토타입이고 standalone 직접 진입 라우트가
+ * prefetch 범위 밖이라(구조 개편 예정), SSR에서 서버 페칭을 시도하지 않는 useQuery로 둔다.
+ */
 export function useNote(id: number) {
-  return useSuspenseQuery<Note, ApiError>({
+  return useQuery<Note, ApiError>({
     queryKey: noteKeys.detail(id),
     queryFn: () => getNote(id),
   });

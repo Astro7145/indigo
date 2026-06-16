@@ -1,3 +1,9 @@
+const mockOpenCreate = jest.fn();
+const mockOpenEdit = jest.fn();
+const mockOpenDetail = jest.fn();
+jest.mock('@/src/hooks/useTodoSheet', () => ({
+  useTodoSheet: () => ({ openCreate: mockOpenCreate, openEdit: mockOpenEdit, openDetail: mockOpenDetail }),
+}));
 jest.mock('@/src/hooks/useIsMobile', () => ({ useIsMobile: () => false }));
 
 jest.mock('@/src/api/todo', () => ({
@@ -56,9 +62,7 @@ const makeTodo = (id: number, title: string, done = false): Todo => ({
 const listOf = (todos: Todo[]) => ({ todos, nextCursor: null, totalCount: todos.length });
 
 const renderBoard = (overrides?: Partial<ComponentProps<typeof GoalTodoBoard>>) =>
-  renderWithClient(
-    <GoalTodoBoard goal={goal} onEditTodo={() => {}} onAddTodo={() => {}} onSelectTodo={() => {}} {...overrides} />,
-  );
+  renderWithClient(<GoalTodoBoard goal={goal} {...overrides} />);
 
 beforeEach(() => jest.resetAllMocks());
 
@@ -72,8 +76,8 @@ it('목표명과 진행률(1/4 → 25%)을 렌더한다', async () => {
 it('할일을 done 기준으로 To Do/Done 열에 나눠 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일'), makeTodo(2, '완료 할일', true)]));
   renderBoard();
-  const todoCol = await screen.findByRole('group', { name: 'To do' });
-  const doneCol = screen.getByRole('group', { name: 'Done' });
+  const todoCol = await screen.findByRole('group', { name: 'TO DO' });
+  const doneCol = screen.getByRole('group', { name: 'DONE' });
   expect(within(todoCol).getByText('미완료 할일')).toBeInTheDocument();
   expect(within(doneCol).getByText('완료 할일')).toBeInTheDocument();
 });
@@ -89,7 +93,7 @@ it('노트가 없으면 노트 작성(연필) 액션을, 있으면 노트 인디
 it('할일이 없으면 빈 UI 메시지를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
-  expect(await screen.findByText('아직 할 일이 없어요')).toBeInTheDocument();
+  expect(await screen.findByText('아직 할일이 없어요')).toBeInTheDocument();
 });
 
 it('조회 실패 시 에러 메시지를 렌더한다', async () => {
@@ -101,12 +105,12 @@ it('조회 실패 시 에러 메시지를 렌더한다', async () => {
 it('검색어가 있고 결과가 없으면 "검색 결과가 없어요"를 렌더한다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
-  await screen.findByText('아직 할 일이 없어요');
-  const input = screen.getByLabelText('할 일 검색');
+  await screen.findByText('아직 할일이 없어요');
+  const input = screen.getByLabelText('할일 검색');
   fireEvent.change(input, { target: { value: '없는키워드' } });
   fireEvent.keyUp(input, { key: 'Enter' });
   expect(await screen.findByText('검색 결과가 없어요')).toBeInTheDocument();
-  expect(screen.queryByText('아직 할 일이 없어요')).not.toBeInTheDocument();
+  expect(screen.queryByText('아직 할일이 없어요')).not.toBeInTheDocument();
 });
 
 it('체크박스 클릭 시 patchTodo로 done을 토글한다', async () => {
@@ -131,7 +135,7 @@ it('검색어 입력 후 Enter 시 keyword로 getTodos를 호출한다', async (
   mocked.getTodos.mockResolvedValue(listOf([]));
   renderBoard();
   await screen.findByText('디자인 시스템 정복하기');
-  const input = screen.getByLabelText('할 일 검색');
+  const input = screen.getByLabelText('할일 검색');
   fireEvent.change(input, { target: { value: '실습' } });
   fireEvent.keyUp(input, { key: 'Enter' });
   await waitFor(() =>
@@ -151,7 +155,7 @@ it('"할일 추가" 버튼 클릭은 카드 네비게이션을 트리거하지 �
   renderBoard();
   await screen.findByText('디자인 시스템 정복하기');
   // 모바일 +아이콘 버튼과 태블릿+ 텍스트 버튼 둘 다 카드 이동을 막아야 한다
-  screen.getAllByRole('button', { name: '할 일 추가' }).forEach((btn) => fireEvent.click(btn));
+  screen.getAllByRole('button', { name: '할일 추가' }).forEach((btn) => fireEvent.click(btn));
   expect(mockPush).not.toHaveBeenCalled();
 });
 
@@ -163,13 +167,12 @@ it('진행바는 최종 percent를 aria-valuenow로 노출하고 fill 요소를 
   expect(bar.firstElementChild).toBeTruthy();
 });
 
-it('할일 행을 클릭하면 해당 할일로 onSelectTodo를 호출한다', async () => {
+it('할일 행을 클릭하면 해당 할일로 상세 시트를 연다', async () => {
   mocked.getTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일')]));
-  const onSelectTodo = jest.fn();
-  renderBoard({ onSelectTodo });
+  renderBoard();
   fireEvent.click(await screen.findByText('미완료 할일'));
-  expect(onSelectTodo).toHaveBeenCalledTimes(1);
-  expect(onSelectTodo.mock.calls[0][0]).toMatchObject({ id: 1, title: '미완료 할일' });
+  expect(mockOpenDetail).toHaveBeenCalledTimes(1);
+  expect(mockOpenDetail.mock.calls[0][0]).toMatchObject({ id: 1, title: '미완료 할일' });
   expect(mockPush).not.toHaveBeenCalled();
 });
 
