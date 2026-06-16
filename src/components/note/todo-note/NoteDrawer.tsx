@@ -5,8 +5,8 @@ import { useEffect, useRef, type RefObject } from 'react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import NoteWorkspace, { type NoteWorkspaceHandle } from '@/src/components/note/todo-note/NoteWorkspace';
-import { useNoteDrawer } from '@/src/components/note/todo-note/useNoteDrawer';
-import { useNoteListSuspense } from '@/src/hooks/note';
+import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useNoteListSuspense } from '@/src/hooks/note/note';
 import { useTodo } from '@/src/hooks/todo';
 import { useModalStore } from '@/src/stores/modal';
 import { lockScroll, unlockScroll } from '@/src/utils/scrollLock';

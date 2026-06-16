@@ -10,7 +10,7 @@ import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
 import { IcHash } from '@/src/components/common/icons/IcHash';
 import { IcLink } from '@/src/components/common/icons/IcLink';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
-import { useNote } from '@/src/hooks/note';
+import { useNote } from '@/src/hooks/note/note';
 import { cn } from '@/src/utils/cn';
 import { formatDate } from '@/src/utils/date';
 

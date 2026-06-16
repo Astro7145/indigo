@@ -5,7 +5,7 @@ import type { ReactElement } from 'react';
 import { useModalStore } from '@/src/stores/modal';
 import { useToastStore } from '@/src/stores/toast';
 
-import { loadDraft, saveDraft } from './noteDraftStorage';
+import { loadDraft, saveDraft } from '../../components/note/todo-note/noteDraftStorage';
 import { useNoteDraftPersistence } from './useNoteDraftPersistence';
 
 const content: JSONContent = {

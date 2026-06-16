@@ -17,7 +17,7 @@ import {
   useCreateNote,
   useUpdateNote,
   useDeleteNote,
-} from '@/src/hooks/note';
+} from '@/src/hooks/note/note';
 
 const mocked = noteApi as jest.Mocked<typeof noteApi>;
 

@@ -14,8 +14,8 @@ import {
   IcPlus,
   IcSpringNote,
 } from '@/src/components/common/icons';
-import { useNoteDrawer } from '@/src/components/note/todo-note/useNoteDrawer';
-import { useNoteList } from '@/src/hooks/note';
+import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useNoteList } from '@/src/hooks/note/note';
 import type { Todo } from '@/src/types/todo';
 import { formatDotDate } from '@/src/utils/date';
 

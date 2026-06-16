@@ -11,7 +11,7 @@ import NoteEmbedPanel from '@/src/components/note/NoteEmbedPanel';
 import NoteLinkCard from '@/src/components/note/NoteLinkCard';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
-import { useCreateNote, useNoteList, useUpdateNote } from '@/src/hooks/note';
+import { useCreateNote, useNoteList, useUpdateNote } from '@/src/hooks/note/note';
 import { useTodo } from '@/src/hooks/todo';
 
 export type NoteFormProps = { mode: 'create'; todoId: number } | { mode: 'edit'; todoId: number };

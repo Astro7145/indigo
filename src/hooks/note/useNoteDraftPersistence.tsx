@@ -5,7 +5,12 @@ import NoteDraftPrompt from '@/src/components/note/todo-note/NoteDraftPrompt';
 import { useToast } from '@/src/hooks/useToast';
 import { useModalStore } from '@/src/stores/modal';
 
-import { loadDraft, saveDraft, clearDraft, type StoredNoteDraft } from './noteDraftStorage';
+import {
+  loadDraft,
+  saveDraft,
+  clearDraft,
+  type StoredNoteDraft,
+} from '../../components/note/todo-note/noteDraftStorage';
 
 export interface UseNoteDraftPersistenceParams {
   todoId: number;

@@ -10,7 +10,7 @@ import { IcFilter } from '@/src/components/common/icons/IcFilter';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import NoteCard from '@/src/components/note/NoteCard';
 import { useGoal } from '@/src/hooks/goal';
-import { useInfiniteNoteList } from '@/src/hooks/note';
+import { useInfiniteNoteList } from '@/src/hooks/note/note';
 import { cn } from '@/src/utils/cn';
 
 type Sort = 'latest' | 'oldest';

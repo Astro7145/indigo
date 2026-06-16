@@ -1,6 +1,6 @@
 import type { JSONContent } from '@tiptap/core';
 
-import { useCreateNote, useUpdateNote } from '@/src/hooks/note';
+import { useCreateNote, useUpdateNote } from '@/src/hooks/note/note';
 import { useToast } from '@/src/hooks/useToast';
 import type { Note } from '@/src/types/note';
 
