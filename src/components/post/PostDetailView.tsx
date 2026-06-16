@@ -6,6 +6,7 @@ import Image from 'next/image';
 import DOMPurify from 'isomorphic-dompurify';
 import { useTranslations } from 'next-intl';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
@@ -13,7 +14,7 @@ import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
 import Modal from '@/src/components/common/modal/Modal';
 import CommentSection from '@/src/components/post/CommentSection';
 import { useInfiniteComments } from '@/src/hooks/comment';
-import { useDeletePost, usePost } from '@/src/hooks/post';
+import { useDeletePost, usePostSuspense } from '@/src/hooks/post';
 import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
 
@@ -22,11 +23,33 @@ interface PostDetailViewProps {
 }
 
 export default function PostDetailView({ postId }: PostDetailViewProps) {
+  const tCommon = useTranslations('common');
+  const t = useTranslations('posts');
+
+  return (
+    <AsyncBoundary
+      fallback={
+        <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+          <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
+        </div>
+      }
+      errorFallback={
+        <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+          <p className="text-sm text-slate-500">{t('loadError')}</p>
+        </div>
+      }
+    >
+      <PostDetailContent postId={postId} />
+    </AsyncBoundary>
+  );
+}
+
+function PostDetailContent({ postId }: PostDetailViewProps) {
   const router = useRouter();
   const t = useTranslations('posts');
   const tCommon = useTranslations('common');
 
-  const { data: post, isPending: postPending } = usePost(postId);
+  const { data: post } = usePostSuspense(postId);
   // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
   const {
     data: commentsData,
@@ -40,9 +63,7 @@ export default function PostDetailView({ postId }: PostDetailViewProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
-  const comments = (commentsData?.pages.flatMap((p) => p.comments) ?? []).sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt),
-  );
+  const comments = commentsData.pages.flatMap((p) => p.comments).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 
   const handleDelete = () => {
     deletePost(postId, {
@@ -50,14 +71,6 @@ export default function PostDetailView({ postId }: PostDetailViewProps) {
       onError: () => showToast(t('detail.deleteError'), 'error'),
     });
   };
-
-  if (postPending || !post) {
-    return (
-      <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
-        <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
-      </div>
-    );
-  }
 
   return (
     <>
