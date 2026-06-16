@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { useEffect, useRef, type RefObject } from 'react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -16,6 +17,8 @@ const EMPTY_NOTE_LIST = { notes: [], nextCursor: null, totalCount: 0 };
 // 쿼리파라미터(todoId·mode)를 구독해 열리는 전역 노트 드로어. (main) 레이아웃에 상시 마운트된다.
 // todoId가 없으면 닫힘(렌더 안 함). 열림 판단은 오직 todoId 존재 여부다.
 export default function NoteDrawer() {
+  const t = useTranslations('note');
+  const tc = useTranslations('common');
   const { todoId } = useNoteDrawer();
   const reduceMotion = useReducedMotion();
   // NoteWorkspace의 requestClose를 ref로 참조해 ESC 트리거 시 호출한다.
@@ -55,7 +58,7 @@ export default function NoteDrawer() {
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label="노트"
+            aria-label={t('ariaLabel')}
             className="absolute inset-y-0 right-0 flex w-full flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
@@ -63,11 +66,11 @@ export default function NoteDrawer() {
             transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 30, stiffness: 300 }}
           >
             <AsyncBoundary
-              fallback={<p className="flex h-full items-center justify-center text-sm text-slate-400">불러오는 중…</p>}
+              fallback={
+                <p className="flex h-full items-center justify-center text-sm text-slate-400">{tc('state.loading')}</p>
+              }
               errorFallback={
-                <p className="flex h-full items-center justify-center text-sm text-slate-400">
-                  노트를 불러오지 못했어요
-                </p>
+                <p className="flex h-full items-center justify-center text-sm text-slate-400">{t('loadError')}</p>
               }
             >
               <NoteDrawerContent todoId={todoId} workspaceRef={workspaceRef} />

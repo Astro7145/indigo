@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import Modal from '@/src/components/common/modal/Modal';
 
 interface NoteCancelConfirmProps {
@@ -11,10 +13,13 @@ interface NoteCancelConfirmProps {
 
 // 노트 작성/수정 취소 확인 다이얼로그. Modal shell(ModalStack)이 씌워주므로 내용만 담는다.
 export default function NoteCancelConfirm({ isCreate, onStay, onLeave }: NoteCancelConfirmProps) {
+  const t = useTranslations('note');
+  const tc = useTranslations('common');
+
   return (
     <>
       <Modal.Title className="text-center text-base sm:text-xl">
-        {isCreate ? '노트 작성을 취소하시겠어요?' : '노트 수정을 취소하시겠어요?'}
+        {isCreate ? t('cancelConfirm.create') : t('cancelConfirm.edit')}
       </Modal.Title>
       <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
         <span
@@ -23,14 +28,14 @@ export default function NoteCancelConfirm({ isCreate, onStay, onLeave }: NoteCan
         >
           !
         </span>
-        작성하신 모든 내용이 사라집니다.
+        {tc('cancelWarning')}
       </p>
       <Modal.Actions>
         <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={onStay}>
-          취소
+          {tc('actions.cancel')}
         </Modal.Cancel>
         <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={onLeave}>
-          확인
+          {tc('actions.confirm')}
         </Modal.Confirm>
       </Modal.Actions>
     </>

@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import { IcCalendarOutline } from '@/src/components/common/icons/IcCalendarOutline';
 import { IcCheckbox } from '@/src/components/common/icons/IcCheckbox';
 import { IcFlagOutline } from '@/src/components/common/icons/IcFlagOutline';
@@ -18,13 +20,15 @@ export interface NoteMetaInfoProps {
 const TAG_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, createdAt }: NoteMetaInfoProps) {
+  const t = useTranslations('note');
+
   return (
     <dl className="grid grid-cols-1 gap-y-2 text-xs sm:grid-cols-2 sm:gap-x-3 sm:gap-y-3 sm:text-sm">
       {/* 모바일 순서는 JSX 순서로 흐르고, 데스크탑/태블릿(2col)은 명시적 grid 위치로 [목표|작성일][할일|태그] 배치 */}
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-1">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
           <IcFlagOutline size="small" className="size-4" />
-          <span>목표</span>
+          <span>{t('metaInfo.goal')}</span>
         </dt>
         <dd className="truncate text-slate-800">{goalTitle}</dd>
       </div>
@@ -32,7 +36,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-2">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
           <IcCheckbox className="size-4" />
-          <span>할 일</span>
+          <span>{t('metaInfo.todo')}</span>
         </dt>
         <dd className="flex min-w-0 items-center gap-2">
           <span className="truncate text-slate-800">{todoTitle}</span>
@@ -43,7 +47,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
       <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-1">
         <dt className="flex shrink-0 items-center gap-1 text-slate-500">
           <IcCalendarOutline className="size-4" />
-          <span>작성일</span>
+          <span>{t('metaInfo.createdAt')}</span>
         </dt>
         <dd className="text-slate-800">{formatDate(createdAt)}</dd>
       </div>
@@ -52,7 +56,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
         <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-2">
           <dt className="flex shrink-0 items-center gap-1 text-slate-500">
             <IcHash className="size-4" />
-            <span>태그</span>
+            <span>{t('metaInfo.tags')}</span>
           </dt>
           <dd className="flex flex-wrap gap-1">
             {tags.map((tag, idx) => (

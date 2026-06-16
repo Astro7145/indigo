@@ -1,3 +1,5 @@
+import { useTranslations } from 'next-intl';
+
 import Button from '@/src/components/common/buttons/Button';
 import type { NoteWorkspaceMode } from '@/src/components/note/todo-note/NoteWorkspace';
 
@@ -22,10 +24,12 @@ export default function NoteWorkspaceHeader({
   onEdit,
   onClose,
 }: NoteWorkspaceHeaderProps) {
+  const t = useTranslations('note');
+  const tc = useTranslations('common');
   const editing = mode !== 'read';
   const isCreate = mode === 'create';
-  const headingText = isCreate ? '노트 작성' : '노트 수정';
-  const submitText = isCreate ? '등록하기' : '수정하기';
+  const headingText = isCreate ? t('heading.create') : t('heading.edit');
+  const submitText = isCreate ? t('submit') : tc('actions.edit');
 
   return (
     <header className="mb-4 flex h-10 items-center justify-between gap-3 sm:mb-3">
@@ -43,7 +47,7 @@ export default function NoteWorkspaceHeader({
             disabled={isSubmitting}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
-            취소
+            {tc('actions.cancel')}
           </Button>
           <Button
             variant="secondary"
@@ -52,7 +56,7 @@ export default function NoteWorkspaceHeader({
             disabled={isSubmitting}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
-            임시저장
+            {t('saveDraft')}
           </Button>
           <Button
             variant="primary"
@@ -73,7 +77,7 @@ export default function NoteWorkspaceHeader({
               onClick={onClose}
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
-              닫기
+              {tc('actions.close')}
             </Button>
           )}
           <Button
@@ -82,7 +86,7 @@ export default function NoteWorkspaceHeader({
             onClick={onEdit}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
-            수정하기
+            {tc('actions.edit')}
           </Button>
         </div>
       )}

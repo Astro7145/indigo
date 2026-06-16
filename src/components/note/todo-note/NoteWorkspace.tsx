@@ -1,6 +1,7 @@
 'use client';
 
 import type { JSONContent } from '@tiptap/core';
+import { useTranslations } from 'next-intl';
 import { useImperativeHandle, useRef, type Ref } from 'react';
 
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
@@ -63,6 +64,8 @@ export default function NoteWorkspace({
   onClose,
   ref,
 }: NoteWorkspaceProps) {
+  const t = useTranslations('note');
+  const tc = useTranslations('common');
   const editing = mode !== 'read';
   const isCreate = mode === 'create';
 
@@ -151,7 +154,7 @@ export default function NoteWorkspace({
           onChange={setContent}
           editable={editing}
           onLink={editing ? link.openInput : undefined}
-          placeholder={editing ? '이 곳을 통해 노트 작성을 시작해주세요' : undefined}
+          placeholder={editing ? t('contentPlaceholder') : undefined}
           contentClassName="prose max-w-none min-h-[400px] pt-5 text-sm text-slate-800 sm:min-h-[450px] sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
             <div className="flex items-center gap-2 sm:gap-3">
@@ -162,8 +165,8 @@ export default function NoteWorkspace({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={30}
-                  placeholder="노트의 제목을 입력해주세요"
-                  aria-label="제목"
+                  placeholder={t('titlePlaceholder')}
+                  aria-label={t('titleLabel')}
                   className="h-8 min-w-0 flex-1 py-0 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:h-10 sm:text-2xl"
                 />
               ) : (
@@ -199,7 +202,7 @@ export default function NoteWorkspace({
 
         {editing && (
           <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-            공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+            {tc('charCount', { total: contentCharCount, nonSpace: contentNoSpaceCount })}
           </div>
         )}
       </div>

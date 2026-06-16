@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { z } from 'zod';
 
@@ -22,6 +23,8 @@ interface NoteLinkInputProps {
 // 대칭 패딩은 이 컴포넌트와 useNoteLink의 className 오버라이드로 직접 구현한다.
 // Figma: 343×180(모바일) / 456×260(sm+) — useNoteLink가 모달 open 시 className으로 지정한다.
 export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLinkInputProps) {
+  const t = useTranslations('note');
+  const tc = useTranslations('common');
   const [value, setValue] = useState(initialUrl);
 
   // todo 생성 폼과 동일하게 프로토콜이 없으면 https://를 붙여 보정한 뒤 URL 형식만 검증한다
@@ -32,13 +35,13 @@ export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLi
 
   return (
     <>
-      <Modal.Title className="text-left text-base sm:text-xl">링크 업로드</Modal.Title>
+      <Modal.Title className="text-left text-base sm:text-xl">{t('linkInput.title')}</Modal.Title>
       <input
         type="url"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="링크를 입력해주세요"
-        aria-label="링크 URL"
+        placeholder={t('linkInput.placeholder')}
+        aria-label={t('linkInput.label')}
         aria-invalid={showError || undefined}
         aria-describedby={showError ? 'link-input-error' : undefined}
         className={`mt-6 w-full rounded border p-3 text-sm text-slate-700 outline-none placeholder:text-slate-400 sm:mt-8 sm:p-4 sm:text-base ${
@@ -47,16 +50,20 @@ export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLi
       />
       {showError && (
         <p id="link-input-error" className="mt-1 text-xs text-red-500 sm:text-sm">
-          올바른 URL을 입력해주세요.
+          {t('linkInput.error')}
         </p>
       )}
       <Modal.Actions className="mt-4 sm:mt-6">
         <Modal.Confirm className="h-10 sm:h-14" onClick={() => onConfirm(normalized)} disabled={!isValid}>
-          확인
+          {tc('actions.confirm')}
         </Modal.Confirm>
       </Modal.Actions>
       {/* DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
-      <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4 sm:top-8 sm:right-8">
+      <IconButton
+        aria-label={tc('actions.close')}
+        onClick={onClose}
+        className="absolute top-4 right-4 sm:top-8 sm:right-8"
+      >
         <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
       </IconButton>
     </>

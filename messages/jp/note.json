@@ -1,0 +1,35 @@
+{
+  "ariaLabel": "ノート",
+  "loadError": "ノートを読み込めませんでした",
+  "heading": {
+    "create": "ノート作成",
+    "edit": "ノート編集"
+  },
+  "submit": "登録する",
+  "saveDraft": "一時保存",
+  "titlePlaceholder": "ノートのタイトルを入力してください",
+  "titleLabel": "タイトル",
+  "contentPlaceholder": "ここからノートの作成を始めてください",
+  "cancelConfirm": {
+    "create": "ノートの作成をキャンセルしますか？",
+    "edit": "ノートの編集をキャンセルしますか？"
+  },
+  "draftPrompt": {
+    "title": "一時保存されたノートがあります",
+    "description": "続けて作成しますか？",
+    "new": "新しく作成",
+    "load": "読み込む"
+  },
+  "linkInput": {
+    "title": "リンクをアップロード",
+    "placeholder": "リンクを入力してください",
+    "label": "リンクURL",
+    "error": "正しいURLを入力してください。"
+  },
+  "metaInfo": {
+    "goal": "目標",
+    "todo": "To-do",
+    "createdAt": "作成日",
+    "tags": "タグ"
+  }
+}
