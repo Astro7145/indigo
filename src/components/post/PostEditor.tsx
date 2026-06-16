@@ -58,7 +58,10 @@ export default function PostEditor({
   useImperativeHandle(
     ref,
     () => ({
-      focus: () => editor?.chain().focus().run(),
+      // 인자 없이 focus()를 호출하면 기존 selection이 보존돼, 사용자가 텍스트를 선택한 상태에서
+      // 빈 영역을 클릭해 deselect하려 해도 selection이 복원된다. 'end'를 명시해 caret을 문서 끝으로
+      // 이동시키며 selection을 자연스럽게 해제한다. (#185)
+      focus: () => editor?.chain().focus('end').run(),
     }),
     [editor],
   );
