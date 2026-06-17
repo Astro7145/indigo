@@ -22,7 +22,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <div className="flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
+      <div className="dark:bg-indigo-dark-400 flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
         <Topbar />
         <Sidebar />
         <Settings />
