@@ -27,6 +27,8 @@
     "label": "Link URL",
     "error": "Please enter a valid URL."
   },
+  "shareToPost": "Share to Post",
+  "shareToPostTruncated": "The note content was too long and has been trimmed. Please review in the post form.",
   "metaInfo": {
     "goal": "Goal",
     "todo": "To-do",

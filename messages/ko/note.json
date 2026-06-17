@@ -27,6 +27,8 @@
     "label": "링크 URL",
     "error": "올바른 URL을 입력해주세요."
   },
+  "shareToPost": "게시글로 공유",
+  "shareToPostTruncated": "노트 내용이 길어 일부가 잘렸어요. 작성 폼에서 확인해주세요.",
   "metaInfo": {
     "goal": "목표",
     "todo": "할 일",
