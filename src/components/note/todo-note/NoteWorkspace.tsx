@@ -227,9 +227,10 @@ export default function NoteWorkspace({
         )}
       </div>
 
-      <Modal open={truncatedAlert} onClose={() => setTruncatedAlert(false)}>
+      <Modal open={truncatedAlert} onClose={() => setTruncatedAlert(false)} zIndex={70}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>{t('shareToPostTruncated')}</Modal.Title>
+          <Modal.Title>{t('shareToPostTruncatedLine1')}</Modal.Title>
+          <p className="mt-1 text-xs text-slate-500 sm:text-sm">{t('shareToPostTruncatedLine2')}</p>
         </div>
         <Modal.Actions>
           <Modal.Cancel>{tc('actions.cancel')}</Modal.Cancel>
