@@ -140,4 +140,12 @@
       border-radius: 10px;
     }
   }
+
+  /* 스크롤바는 숨기되 스크롤 기능은 유지 — 중첩 스크롤(목표 목록 등)에서 스크롤바 시각적 중복 방지 */
+  .scrollbar-none {
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      display: none; /* Chrome / Safari / Edge */
+    }
+  }
 }

@@ -172,7 +172,7 @@ export default function SidebarGoalRow({
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <ul ref={listRef} className="scrollbar-slate flex max-h-45 flex-col overflow-y-auto">
+            <ul ref={listRef} className="flex max-h-45 scrollbar-none flex-col overflow-y-auto">
               {isLoading ? (
                 <li className="list-none px-6 py-2 text-sm text-slate-400">{tc('state.loading')}</li>
               ) : isError ? (
