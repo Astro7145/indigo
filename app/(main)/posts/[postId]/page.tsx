@@ -6,6 +6,15 @@ import Image from 'next/image';
 import DOMPurify from 'dompurify';
 import { useTranslations } from 'next-intl';
 
+// DOMPurify가 anchor의 target을 떨어트리므로 sanitize 후 강제 주입한다 (rel은 보존돼서 그대로 둠).
+if (typeof window !== 'undefined') {
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A') {
+      node.setAttribute('target', '_blank');
+    }
+  });
+}
+
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
