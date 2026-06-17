@@ -89,15 +89,16 @@ export default function Sidebar() {
       </AnimatePresence>
       {isTablet && <span className="w-18 shrink-0" />}
       <aside
-        className={cn('scrollbar-slate top-0 left-0 z-50 h-screen w-fit bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
+        className={cn('top-0 left-0 z-50 h-screen w-fit overflow-hidden bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
       >
         <div
           className={cn(
-            'flex h-full flex-col justify-between',
+            'flex h-full flex-col',
             collapsed ? (isTablet ? 'px-2.5 py-8' : 'px-3 py-8') : 'px-8 pt-8 pb-16',
           )}
         >
-          <div className="flex flex-col gap-y-8">
+          {/* 스크롤 영역: 로고~로그아웃. 새할일/프로필 푸터는 아래에 고정된다 */}
+          <div className="scrollbar-slate flex min-h-0 flex-1 flex-col gap-y-8 overflow-y-auto">
             <div className="flex items-center justify-between">
               {collapsed ? null : <LogoFull type="white" />}
               <button
@@ -152,7 +153,8 @@ export default function Sidebar() {
             </ul>
           </div>
           {!collapsed && (
-            <div className="flex flex-col gap-y-8">
+            // 고정 푸터: 새할일 + 프로필. pt-8로 스크롤 영역과 간격 확보
+            <div className="flex shrink-0 flex-col gap-y-8 pt-8">
               <TodoAddButton
                 onClick={() => {
                   openCreate();
