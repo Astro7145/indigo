@@ -76,7 +76,9 @@ export default function Topbar() {
         <motion.div
           initial={false}
           animate={{ opacity: collapsed ? 1 : 0 }}
-          aria-hidden={!collapsed}
+          // inert: 펼침 상태에선 접힘 바를 비활성화(포커스·AT·포인터 제거). aria-hidden은 내부 버튼이
+          // 포커스를 쥔 채 막혀 경고가 나므로 inert를 쓴다(포커스도 함께 빠져나간다).
+          inert={!collapsed}
           className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between px-5 pt-4"
         >
           <div className="flex items-center gap-x-2">
@@ -90,21 +92,30 @@ export default function Topbar() {
             </button>
             <span className="text-base font-semibold text-slate-50">{title}</span>
           </div>
-          {rightSlot ? (
+          {isFormRoute ? (
+            // 폼 페이지: 등록된 액션 버튼(슬롯)이 알림 종을 대체. 슬롯 등록 전 한 프레임은
+            // 빈 자리를 둬서 fallback(종) → 액션 갈아끼는 깜빡임을 막는다.
             // 슬롯 내부 버튼은 접힘 바 위에서 클릭 가능해야 함 (부모의 pointer-events-none 해제)
-            <div className="pointer-events-auto relative z-10">{rightSlot}</div>
-          ) : isFormRoute ? (
-            // 폼 페이지는 곧 슬롯이 등록될 거라 빈 자리를 둬서 fallback(종) 깜빡임 방지
-            <span aria-hidden />
+            rightSlot ? (
+              <div className="pointer-events-auto relative z-10">{rightSlot}</div>
+            ) : (
+              <span aria-hidden />
+            )
           ) : (
-            <TopbarNotification active={collapsed} />
+            // 그 외(대시보드 등): 알림 종을 유지하고, 페이지 슬롯(예: 그래프 토글)을 종 좌측에 둔다
+            <div className="pointer-events-auto relative z-10 flex items-center gap-x-4">
+              {rightSlot}
+              <TopbarNotification active={collapsed} />
+            </div>
           )}
         </motion.div>
         {/* 펼침 상태: 사이드바와 동일한 메뉴 */}
         <motion.div
           initial={false}
           animate={{ opacity: collapsed ? 0 : 1 }}
-          aria-hidden={collapsed}
+          // 접힘 상태에선 펼침 메뉴를 inert 처리. 메뉴 접기 버튼이 포커스를 쥔 채 aria-hidden이
+          // 막히던 경고를 해소한다(inert가 포커스를 빼낸다).
+          inert={collapsed}
           className={`flex h-full min-h-0 flex-col justify-between overflow-y-auto px-5 pt-4 pb-12 ${
             !collapsed ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
