@@ -73,7 +73,7 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
     return (
       <td
         {...cellProps}
-        className="dark:bg-indigo-dark-400 border-r border-b border-slate-200 bg-slate-50 p-0 align-top last:border-r-0 dark:border-white/10"
+        className="border-r border-b border-slate-200 bg-slate-50 p-0 align-top last:border-r-0 dark:border-white/10 dark:bg-black/20"
       >
         <div className="flex h-[100px] flex-col items-start gap-1 p-2 opacity-60 xl:h-[158px]">{content}</div>
       </td>
