@@ -3,6 +3,10 @@ jest.mock('@/src/api/todo', () => ({
   patchTodo: jest.fn(),
 }));
 
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
 jest.mock('@/src/api/favorite', () => ({
   ...jest.requireActual('@/src/api/favorite'),
   addTodoFavorite: jest.fn(),

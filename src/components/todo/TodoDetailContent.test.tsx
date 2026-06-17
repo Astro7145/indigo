@@ -135,8 +135,8 @@ it('노트 추가하기 버튼을 누르면 write 모드로 노트 드로어를 
 
   screen.getByRole('button', { name: /노트 추가하기/ }).click();
 
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=5'));
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=write'));
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=5'), { scroll: false });
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=write'), { scroll: false });
 });
 
 it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한다', async () => {
@@ -162,8 +162,8 @@ it('작성된 노트를 클릭하면 해당 todoId와 mode=detail로 노트 드�
 
   fireEvent.click(await screen.findByRole('button', { name: '프로그래밍과 데이터 in JavaScript' }));
 
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=3'));
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=detail'));
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=3'), { scroll: false });
+  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=detail'), { scroll: false });
 });
 
 it('닫기 버튼을 누르면 onClose를 호출한다', () => {

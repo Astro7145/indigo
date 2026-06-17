@@ -152,7 +152,7 @@ it('상세 모드에서 닫기를 누르면 todoId·mode 파라미터를 제거�
 
   fireEvent.click(screen.getByRole('button', { name: '닫기' }));
 
-  expect(push).toHaveBeenCalledWith('/todos');
+  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
 });
 
 // --- ESC 닫기 ---
@@ -171,7 +171,7 @@ it('상세: Escape를 누르면 이벤트 전파를 막고 드로어를 닫는�
   document.dispatchEvent(event);
 
   expect(stopProp).toHaveBeenCalled();
-  expect(push).toHaveBeenCalledWith('/todos');
+  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
 });
 
 it('작성: Escape를 누르면 드로어를 닫는다', async () => {
@@ -184,7 +184,7 @@ it('작성: Escape를 누르면 드로어를 닫는다', async () => {
 
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
 
-  expect(push).toHaveBeenCalledWith('/todos');
+  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
 });
 
 it('모달 스택이 열려 있으면 Escape를 눌러도 드로어는 반응하지 않는다', async () => {
