@@ -78,12 +78,12 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
       >
         <AsyncBoundary
           fallback={
-            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/40">
+            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/60">
               {tCommon('state.loading')}
             </p>
           }
           errorFallback={
-            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/40">
+            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/60">
               {tCommon('state.loadError')}
             </p>
           }
@@ -144,7 +144,7 @@ function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goal
     >
       {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
       {isFetchingNextPage && (
-        <li className="py-3 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</li>
+        <li className="py-3 text-center text-sm text-slate-400 dark:text-white/60">{tCommon('state.loading')}</li>
       )}
     </TodoList>
   );
