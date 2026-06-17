@@ -40,8 +40,8 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
           isSelected && !isOutsideVisibleRange
             ? 'bg-indigo-500 text-white'
             : today
-              ? 'bg-slate-100 text-slate-600'
-              : 'text-slate-600',
+              ? 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-white'
+              : 'text-slate-600 dark:text-white',
         )}
       >
         {date.day}
@@ -58,18 +58,23 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
           <span
             key={t.id}
             aria-hidden
-            className={cn('size-1.5 rounded-full', t.done ? 'bg-slate-400' : 'bg-indigo-500')}
+            className={cn('size-1.5 rounded-full', t.done ? 'bg-slate-400 dark:bg-white/40' : 'bg-indigo-500')}
           />
         ))}
       </span>
-      {overflow > 0 && <span className="px-1 text-xs font-semibold text-slate-400 xl:px-2">+{overflow}</span>}
+      {overflow > 0 && (
+        <span className="px-1 text-xs font-semibold text-slate-400 xl:px-2 dark:text-white/40">+{overflow}</span>
+      )}
     </>
   );
 
   // 이전·다음 달 날짜: 날짜 선택은 불가(셀 버튼 없음) — 칩은 그대로 클릭 가능
   if (isOutsideVisibleRange) {
     return (
-      <td {...cellProps} className="border-r border-b border-slate-200 bg-slate-50 p-0 align-top last:border-r-0">
+      <td
+        {...cellProps}
+        className="dark:bg-indigo-dark-400 border-r border-b border-slate-200 bg-slate-50 p-0 align-top last:border-r-0 dark:border-white/10"
+      >
         <div className="flex h-[100px] flex-col items-start gap-1 p-2 opacity-60 xl:h-[158px]">{content}</div>
       </td>
     );
@@ -78,7 +83,10 @@ export default function MonthCalendarCell({ state, date, todos, onSelectTodo }: 
   // 셀 선택(날짜 클릭)은 절대 위치 오버레이 버튼이 담당하고, 콘텐츠는 pointer-events-none 레이어로 분리한다 —
   // role="button" 안에 칩 <button>이 중첩되는 접근성 위반(대화형 요소 중첩)을 피하면서 셀 전체 클릭 UX를 유지.
   return (
-    <td {...cellProps} className="relative border-r border-b border-slate-200 p-0 align-top last:border-r-0">
+    <td
+      {...cellProps}
+      className="relative border-r border-b border-slate-200 p-0 align-top last:border-r-0 dark:border-white/10"
+    >
       <button
         {...buttonProps}
         ref={ref}
