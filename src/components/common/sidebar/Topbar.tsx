@@ -70,7 +70,7 @@ export default function Topbar() {
         initial={false}
         animate={{ height: collapsed ? COLLAPSED_HEIGHT : expandedHeight }}
         transition={SPRING}
-        className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
+        className="bg-indigo-dark-200 fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden sm:hidden"
       >
         {/* 접힘 상태: 인사말 + 우측 슬롯(기본 알림, 페이지가 등록 시 액션) */}
         <motion.div

@@ -89,7 +89,10 @@ export default function Sidebar() {
       </AnimatePresence>
       {isTablet && <span className="w-18 shrink-0" />}
       <aside
-        className={cn('top-0 left-0 z-50 h-screen w-fit overflow-hidden bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
+        className={cn(
+          'bg-indigo-dark-200 top-0 left-0 z-50 h-screen w-fit overflow-hidden',
+          isTablet ? 'fixed' : 'sticky',
+        )}
       >
         <div
           className={cn(
