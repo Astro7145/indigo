@@ -76,7 +76,7 @@ function RecentTodosContent() {
 
   return (
     <TodoList
-      className="scrollbar-slate flex flex-1 scrollbar-gutter-stable flex-col gap-1.5 sm:overflow-y-auto"
+      className="scrollbar-slate flex flex-1 sm:scrollbar-gutter-stable flex-col gap-1.5 sm:overflow-y-auto"
       todos={todos}
       size="large"
       onEdit={openEdit}
