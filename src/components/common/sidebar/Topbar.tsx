@@ -132,8 +132,8 @@ export default function Topbar() {
               <IcHamburger className="size-8 text-current" />
             </button>
           </div>
-          {/* 스크롤 영역: 내비~로그아웃 (헤더·푸터는 고정) */}
-          <div className="scrollbar-slate flex min-h-0 flex-1 flex-col gap-y-8 overflow-y-auto">
+          {/* 스크롤 영역: 내비~로그아웃 (헤더·푸터는 고정). gutter 예약으로 스크롤바 등장 시 가로 흔들림 방지 */}
+          <div className="scrollbar-slate flex min-h-0 flex-1 scrollbar-gutter-stable flex-col gap-y-8 overflow-y-auto">
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text={t('nav.dashboard')} />
