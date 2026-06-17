@@ -93,23 +93,24 @@ export default function Sidebar() {
       >
         <div
           className={cn(
-            'flex h-full flex-col',
+            'flex h-full flex-col gap-y-8',
             collapsed ? (isTablet ? 'px-2.5 py-8' : 'px-3 py-8') : 'px-8 pt-8 pb-16',
           )}
         >
-          {/* 스크롤 영역: 로고~로그아웃. 새할일/프로필 푸터는 아래에 고정된다 */}
+          {/* 고정 헤더: 로고 + 접기 토글 (스크롤 영향 없음) */}
+          <div className="flex shrink-0 items-center justify-between">
+            {collapsed ? null : <LogoFull type="white" />}
+            <button
+              type="button"
+              onClick={() => setCollapsed((prev) => !prev)}
+              aria-label={collapsed ? t('expand') : t('collapse')}
+              className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+            >
+              <IcDoubleArrow state={collapsed ? 'expand' : 'fold'} />
+            </button>
+          </div>
+          {/* 스크롤 영역: 내비~로그아웃 (헤더·푸터는 고정) */}
           <div className="scrollbar-slate flex min-h-0 flex-1 flex-col gap-y-8 overflow-y-auto">
-            <div className="flex items-center justify-between">
-              {collapsed ? null : <LogoFull type="white" />}
-              <button
-                type="button"
-                onClick={() => setCollapsed((prev) => !prev)}
-                aria-label={collapsed ? t('expand') : t('collapse')}
-                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
-              >
-                <IcDoubleArrow state={collapsed ? 'expand' : 'fold'} />
-              </button>
-            </div>
             <ul className="flex flex-col gap-y-3">
               <SidebarRow
                 type="dashboard"
@@ -153,8 +154,8 @@ export default function Sidebar() {
             </ul>
           </div>
           {!collapsed && (
-            // 고정 푸터: 새할일 + 프로필. pt-8로 스크롤 영역과 간격 확보
-            <div className="flex shrink-0 flex-col gap-y-8 pt-8">
+            // 고정 푸터: 새할일 + 프로필 (outer gap-y-8로 스크롤 영역과 간격)
+            <div className="flex shrink-0 flex-col gap-y-8">
               <TodoAddButton
                 onClick={() => {
                   openCreate();
