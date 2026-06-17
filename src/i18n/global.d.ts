@@ -9,6 +9,7 @@ import type favorites from '@/messages/ko/favorites.json';
 import type goals from '@/messages/ko/goals.json';
 import type login from '@/messages/ko/login.json';
 import type me from '@/messages/ko/me.json';
+import type note from '@/messages/ko/note.json';
 import type posts from '@/messages/ko/posts.json';
 import type settings from '@/messages/ko/settings.json';
 import type sidebar from '@/messages/ko/sidebar.json';
@@ -27,6 +28,7 @@ declare module 'next-intl' {
       goals: typeof goals;
       login: typeof login;
       me: typeof me;
+      note: typeof note;
       posts: typeof posts;
       settings: typeof settings;
       sidebar: typeof sidebar;

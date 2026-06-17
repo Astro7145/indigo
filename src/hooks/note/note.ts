@@ -1,4 +1,11 @@
-import { useQuery, useSuspenseInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useQuery,
+  useSuspenseQuery,
+  useSuspenseInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  type UseSuspenseQueryOptions,
+} from '@tanstack/react-query';
 import { noteKeys, getNotes, getNote, createNote, patchNote, deleteNote } from '@/src/api/note';
 import type { Note, NoteListParams, NoteListResponse, CreateNoteBody, UpdateNoteBody } from '@/src/types/note';
 import type { ApiError } from '@/src/types/common';
@@ -8,6 +15,17 @@ export function useNoteList(params: NoteListParams = {}, options?: { enabled?: b
     queryKey: noteKeys.list(params),
     queryFn: () => getNotes(params),
     enabled: options?.enabled,
+  });
+}
+
+export function useNoteListSuspense(
+  params: NoteListParams = {},
+  options?: Pick<UseSuspenseQueryOptions<NoteListResponse, ApiError>, 'initialData' | 'staleTime'>,
+) {
+  return useSuspenseQuery<NoteListResponse, ApiError>({
+    queryKey: noteKeys.list(params),
+    queryFn: () => getNotes(params),
+    ...options,
   });
 }
 
