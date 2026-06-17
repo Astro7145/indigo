@@ -2,7 +2,7 @@
   "title": "マイページ",
   "formLabel": "マイページフォーム",
   "meta": {
-    "title": "マイページ | INdigo",
+    "title": "マイページ",
     "description": "プロフィールアイコン、名前、パスワードを変更できます。"
   },
   "password": {
