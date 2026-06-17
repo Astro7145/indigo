@@ -17,6 +17,7 @@ import {
 } from '@/src/components/common/icons';
 import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
 import { useNoteList } from '@/src/hooks/note/note';
+import { useImageLightbox } from '@/src/hooks/useImageLightbox';
 import type { Todo } from '@/src/types/todo';
 import { formatDotDate } from '@/src/utils/date';
 
@@ -42,6 +43,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
   const tTodos = useTranslations('todos');
   const dueDate = formatDotDate(todo.dueDate);
   const hasAttachment = Boolean(todo.linkUrl || todo.fileUrl);
+  const openImageLightbox = useImageLightbox();
 
   // 타입상 noteIds는 number[]지만 백엔드 누락/null 방어. 노트가 없으면 요청도 생략.
   const hasNotes = (todo.noteIds?.length ?? 0) > 0;
@@ -119,9 +121,14 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
               </a>
             )}
             {todo.fileUrl && (
-              <div className="relative aspect-[408/223] w-full overflow-hidden rounded-[4px] border border-slate-200">
+              <button
+                type="button"
+                onClick={() => openImageLightbox(todo.fileUrl!, todo.title)}
+                aria-label={tCommon('image.attachmentAlt')}
+                className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200"
+              >
                 <Image src={todo.fileUrl} alt={tCommon('image.attachmentAlt')} fill className="object-cover" />
-              </div>
+              </button>
             )}
           </div>
         </section>

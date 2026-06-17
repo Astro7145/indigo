@@ -44,15 +44,17 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
       onKeyDown={(e) => e.stopPropagation()}
       className={cn(
         // viewport 기준: <sm stacked, sm 옆나란히 compact(p-4·gap-2·auto 높이), lg+ spacious(p-6·gap-4·고정 324)
-        'flex min-w-0 cursor-auto flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 sm:flex-1 xl:h-[324px] xl:gap-4 xl:p-6',
+        'flex min-w-0 cursor-auto flex-col gap-2 overflow-hidden rounded border border-slate-200 p-4 sm:flex-1 xl:h-[324px] xl:gap-4 xl:p-6 dark:border-white/10',
         // figma: To Do = slate-50 배경(그림자 없음), Done = 흰 배경 + 옅은 그림자
-        isTodo ? 'bg-slate-50' : 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
+        isTodo
+          ? 'dark:bg-indigo-dark-400 bg-slate-50'
+          : 'dark:bg-indigo-dark-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]',
       )}
     >
       <span
         className={cn(
           'px-1 text-sm font-semibold tracking-[-0.03em] xl:px-2 xl:text-base xl:font-bold',
-          isTodo ? 'text-indigo-700' : 'text-slate-400',
+          isTodo ? 'dark:text-indigo-dark-800 text-indigo-700' : 'text-slate-400 dark:text-white/40',
         )}
       >
         {labelText}
@@ -85,7 +87,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
     <Card
       onClick={() => router.push(`/goals/${goal.id}`)}
       className={cn(
-        'flex cursor-pointer flex-col gap-4 border border-slate-200 px-8 py-6 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg',
+        'flex cursor-pointer flex-col gap-4 border border-slate-200 px-8 py-6 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg dark:border-white/10',
         className,
       )}
     >
@@ -102,7 +104,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         <div className="flex items-center gap-4 sm:contents">
           <div className="flex min-w-0 flex-1 flex-col gap-1 xl:max-w-[550px] xl:flex-row xl:items-center xl:gap-4">
             {/* 제목 — 데스크톱은 진행바와 226:358 비율(grow 가중치)로 함께 축소. 600폭에서 226 */}
-            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 xl:flex-[200]">
+            <h3 className="min-w-0 truncate text-base font-semibold tracking-[-0.03em] text-slate-700 xl:flex-[200] dark:text-white">
               {goal.title}
             </h3>
             {/* 진행바 + % — 모바일 202px 고정(시안), tablet은 컬럼 채움. desktop은 제목과 비율 축소(grow 358 → 600폭에서 바 310) */}
@@ -113,7 +115,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
                 aria-valuenow={percent}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                className="h-2 w-full shrink overflow-hidden rounded-full bg-[#e9e9e9] sm:w-full sm:max-w-[310px] xl:w-auto xl:flex-1"
+                className="h-2 w-full shrink overflow-hidden rounded-full bg-[#e9e9e9] sm:w-full sm:max-w-[310px] xl:w-auto xl:flex-1 dark:bg-white/10"
               >
                 <motion.div
                   className="h-full rounded-full bg-indigo-500"
@@ -122,7 +124,7 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
                   transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
                 />
               </div>
-              <span className="shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 xl:w-10 xl:text-right xl:text-base">
+              <span className="dark:text-indigo-dark-800 shrink-0 text-sm font-bold tracking-[-0.03em] text-indigo-600 xl:w-10 xl:text-right xl:text-base">
                 {percent}%
               </span>
             </div>
@@ -172,8 +174,12 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
         <AsyncBoundary
-          fallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
-          errorFallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
+          fallback={
+            <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+          }
+          errorFallback={
+            <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loadError')}</p>
+          }
           resetKeys={[keyword]}
         >
           <GoalTodoBoardContent goalId={goal.id} keyword={keyword} />
@@ -194,9 +200,11 @@ function GoalTodoBoardContent({ goalId, keyword }: { goalId: number; keyword: st
 
   if (todos.length === 0) {
     return keyword ? (
-      <p className="py-10 text-center text-sm text-slate-500">{tCommon('state.noSearchResults')}</p>
+      <p className="py-10 text-center text-sm text-slate-500 dark:text-white/60">{tCommon('state.noSearchResults')}</p>
     ) : (
-      <p className="py-10 text-center text-sm text-slate-500">{tDashboard('goalTodos.boardEmpty')}</p>
+      <p className="py-10 text-center text-sm text-slate-500 dark:text-white/60">
+        {tDashboard('goalTodos.boardEmpty')}
+      </p>
     );
   }
 

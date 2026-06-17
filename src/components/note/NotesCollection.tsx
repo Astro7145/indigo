@@ -112,7 +112,7 @@ function NotesCollectionContent({ goalId, search, sort }: { goalId: number; sear
   const moreMenu = (
     <Dropdown.Menu size="small" placement="bottom-end">
       <Dropdown.Item onClick={() => {}}>수정하기</Dropdown.Item>
-      <Dropdown.Item onClick={() => {}} className="text-destructive">
+      <Dropdown.Item onClick={() => {}} className="text-destructive dark:text-destructive">
         삭제하기
       </Dropdown.Item>
     </Dropdown.Menu>
