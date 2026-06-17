@@ -32,7 +32,8 @@ it('새 할일 버튼을 누르면 생성 시트를 연다', () => {
 
 it('햄버거를 누르면 메뉴가 펼쳐진다', () => {
   render(<Topbar />);
-  const menu = screen.getByLabelText('메뉴 접기').closest('.overflow-y-auto');
+  // inert는 펼침 메뉴 컨테이너(pb-12)에 걸린다. 스크롤 영역이 분리되며 overflow-y-auto가 내부로 옮겨가서 pb-12로 찾는다
+  const menu = screen.getByLabelText('메뉴 접기').closest('.pb-12');
   // 접힘 상태: 펼침 메뉴는 inert(비활성). 펼치면 inert가 제거된다
   expect(menu).toHaveAttribute('inert');
   fireEvent.click(screen.getByLabelText('메뉴 열기'));

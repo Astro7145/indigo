@@ -34,3 +34,9 @@ it('X 버튼 클릭 시 onDelete가 호출된다', () => {
   fireEvent.click(screen.getByRole('button', { name: '링크 삭제' }));
   expect(onDelete).toHaveBeenCalledTimes(1);
 });
+
+it('onDelete가 없으면 삭제 버튼이 보이지 않는다', () => {
+  render(<NoteLinkCard url="https://x" onClick={() => {}} />);
+
+  expect(screen.queryByRole('button', { name: '링크 삭제' })).not.toBeInTheDocument();
+});
