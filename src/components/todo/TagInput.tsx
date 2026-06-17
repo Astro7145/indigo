@@ -51,7 +51,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-1.5 rounded-sm border border-slate-300 p-3 focus-within:border-indigo-500 sm:p-4">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-sm border border-slate-300 p-3 focus-within:border-indigo-500 sm:p-4 dark:border-white/20">
         {value.map((tag) => (
           <Badge key={tag.text} color={tag.color} onDelete={() => onChange(value.filter((t) => t.text !== tag.text))}>
             {tag.text}
@@ -67,7 +67,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
           onKeyDown={handleKeyDown}
           maxLength={50}
           placeholder={tTodos('form.tagPlaceholder')}
-          className="min-w-0 flex-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base"
+          className="min-w-0 flex-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base dark:text-white dark:placeholder:text-white/40"
         />
         <button
           type="button"
@@ -75,7 +75,7 @@ export default function TagInput({ value, onChange }: TagInputProps) {
           disabled={!trimmed}
           onMouseDown={(e) => e.preventDefault()}
           onClick={addTag}
-          className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 disabled:bg-slate-300"
+          className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-white/10"
         >
           <IcPlus className="size-4 text-white" />
         </button>

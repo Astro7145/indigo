@@ -10,6 +10,16 @@ import { create } from 'zustand';
 
 export type ModalVariant = 'bottom-sheet' | 'modal' | 'auto';
 
+// crypto.randomUUID는 secure context(HTTPS/localhost)에서만 동작 — 모바일 디바이스가 dev server에
+// LAN IP(HTTP)로 접속하면 undefined가 되어 모달 열기 자체가 throw한다. unique한 React key만 필요하므로
+// 그 환경에서는 timestamp + random base36 조합으로 대체한다.
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
 export interface ModalControls {
   close: () => void;
   /** 자기 자신과 바로 아래 부모 엔트리를 함께 닫는다(위 2개). */
@@ -47,7 +57,7 @@ export const useModalStore = create<ModalState>((set) => ({
   modals: [],
   open: (render, options) => {
     const entry: ModalEntry = {
-      id: crypto.randomUUID(),
+      id: generateId(),
       render,
       variant: options?.variant ?? 'auto',
       onClose: options?.onClose,

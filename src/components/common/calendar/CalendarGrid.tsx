@@ -16,7 +16,10 @@ export default function CalendarGrid({ state, ...props }: CalendarGridProps) {
       <thead {...headerProps}>
         <tr>
           {weekDays.map((day, index) => (
-            <th key={index} className="h-10 text-center text-sm font-medium tracking-[-0.42px] text-slate-700">
+            <th
+              key={index}
+              className="h-10 text-center text-sm font-medium tracking-[-0.42px] text-slate-700 dark:text-white"
+            >
               {day}
             </th>
           ))}

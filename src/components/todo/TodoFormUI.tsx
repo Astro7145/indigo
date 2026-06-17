@@ -110,9 +110,9 @@ export default function TodoFormUI({
   return (
     <>
       <div className="flex shrink-0 items-center justify-between">
-        <h2 className="text-xl font-semibold text-slate-800">{title}</h2>
+        <h2 className="text-xl font-semibold text-slate-800 dark:text-white">{title}</h2>
         <button type="button" onClick={onClose} aria-label={tCommon('actions.close')}>
-          <IcDelete className="size-6 text-slate-400" />
+          <IcDelete className="size-6 text-slate-400 dark:text-white/40" />
         </button>
       </div>
       <form
@@ -134,7 +134,7 @@ export default function TodoFormUI({
 
         {/* 제목 */}
         <div className="flex flex-col gap-2">
-          <label className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
+          <label className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white">
             {tTodos('fields.title')} <span className="text-destructive">*</span>
           </label>
           <Input
@@ -149,19 +149,21 @@ export default function TodoFormUI({
 
         {/* 목표 */}
         <div className="flex flex-col gap-2 pb-8">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.goal')}</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white">
+            {tTodos('fields.goal')}
+          </span>
           <Dropdown>
             <Dropdown.Trigger asChild>
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-sm border border-slate-300 p-3 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base"
+                className="flex w-full items-center justify-between rounded-sm border border-slate-300 p-3 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base dark:border-white/20 dark:text-white"
               >
                 {selectedGoal?.title ?? tTodos('form.goalPlaceholder')}
-                <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6" />
+                <IcChevron direction="down" className="size-5 shrink-0 text-slate-400 sm:size-6 dark:text-white/40" />
               </button>
             </Dropdown.Trigger>
             {/* 폼은 모달 스택(z-100+) 안에서 열리므로 메뉴를 그 위로 — 기본 z-50은 페이지 맥락용으로 유지 */}
-            <Dropdown.Menu size="full" className="z-[120]">
+            <Dropdown.Menu size="full" className="z-120">
               <Dropdown.Item onClick={() => setValue('goalId', undefined)}>{tTodos('form.goalNone')}</Dropdown.Item>
               {goalData?.goals.map((goal) => (
                 <Dropdown.Item key={goal.id} onClick={() => setValue('goalId', goal.id)}>
@@ -174,7 +176,7 @@ export default function TodoFormUI({
 
         {/* 마감기한 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white">
             {tTodos('fields.dueDate')} <span className="text-destructive">*</span>
           </span>
           <DatePicker
@@ -192,13 +194,18 @@ export default function TodoFormUI({
 
         {/* 태그 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.tag')}</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white">
+            {tTodos('fields.tag')}
+          </span>
           <TagInput value={tags} onChange={setTags} />
         </div>
 
         {/* 링크 */}
         <div className="flex flex-col gap-2">
-          <label htmlFor="link-input" className="px-1 text-sm font-semibold text-slate-700 sm:text-base">
+          <label
+            htmlFor="link-input"
+            className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white"
+          >
             {tTodos('fields.link')}
           </label>
           <LinkInput
@@ -214,19 +221,21 @@ export default function TodoFormUI({
 
         {/* 이미지 */}
         <div className="flex flex-col gap-2">
-          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base">{tTodos('fields.image')}</span>
+          <span className="px-1 text-sm font-semibold text-slate-700 sm:text-base dark:text-white">
+            {tTodos('fields.image')}
+          </span>
           <ImageInput onFileChange={setImageFile} initialUrl={fileUrl} onInitialUrlRemove={() => setFileUrl(null)} />
-          <p className="text-sm font-medium text-slate-400">{tTodos('form.imageHint')}</p>
+          <p className="text-sm font-medium text-slate-400 dark:text-white/40">{tTodos('form.imageHint')}</p>
         </div>
       </form>
-      <div className="mt-10 flex w-full shrink-0 items-center gap-2 sm:gap-3 [&>*]:flex-1">
-        <Button variant="tertiary" size="small" className="py-3 text-base sm:py-[14px] sm:text-lg" onClick={onClose}>
+      <div className="mt-10 flex w-full shrink-0 items-center gap-2 *:flex-1 sm:gap-3">
+        <Button variant="tertiary" size="small" className="py-3 text-base sm:py-3.5 sm:text-lg" onClick={onClose}>
           {tCommon('actions.cancel')}
         </Button>
         <Button
           variant="primary"
           size="small"
-          className="py-3 text-base sm:py-[14px] sm:text-lg"
+          className="py-3 text-base sm:py-3.5 sm:text-lg"
           onClick={handleSubmit_}
           disabled={(disableSubmitUntilValid && !canSubmit) || submitting}
         >
