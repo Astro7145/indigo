@@ -71,7 +71,9 @@ export default function FavoritesView() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:61509) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{tFavorites('title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800 dark:text-white">
+          {tFavorites('title')}
+        </h1>
         {/* 카운트는 현재 보이는(필터된) 찜 개수 — 탭·목표 필터에 따라 갱신. aria-label 미부착으로 h1+숫자를 이어 읽힘 */}
         <AsyncBoundary
           fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
@@ -89,17 +91,17 @@ export default function FavoritesView() {
           <CategoryTab label="DONE" isActive={tab === 'done'} onClick={() => changeTab('done')} />
         </div>
 
-        <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
+        <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8 dark:border-white/10">
           {/* 목표 필터 드롭다운 (Figma 21209:61520) — `/todos`엔 없는 신규 요소 */}
           <Dropdown className="mb-5">
             <Dropdown.Trigger asChild>
               <button
                 type="button"
-                className="flex w-full items-center justify-between rounded-sm border border-slate-100 bg-slate-50 px-4 py-3"
+                className="dark:bg-indigo-dark-400 flex w-full items-center justify-between rounded-sm border border-slate-100 bg-slate-50 px-4 py-3 dark:border-white/10"
               >
                 <span className="flex items-center gap-3">
                   <IcGoal className="size-8" />
-                  <span className="text-base font-semibold tracking-[-0.03em] text-slate-800">
+                  <span className="text-base font-semibold tracking-[-0.03em] text-slate-800 dark:text-white">
                     {selectedGoal ? selectedGoal.title : tFavorites('goalFilter.all')}
                   </span>
                 </span>
@@ -117,8 +119,14 @@ export default function FavoritesView() {
           </Dropdown>
 
           <AsyncBoundary
-            fallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
-            errorFallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
+            fallback={
+              <p className="py-12 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+            }
+            errorFallback={
+              <p className="py-12 text-center text-sm text-slate-400 dark:text-white/40">
+                {tCommon('state.loadError')}
+              </p>
+            }
             resetKeys={[tab, goalId]}
           >
             <FavoritesList tab={tab} goalId={goalId} />
@@ -143,7 +151,7 @@ function FavoritesList({ tab, goalId }: { tab: Tab; goalId: number | null }) {
   const visible = filterFavorites(data.favorites, tab, goalId);
 
   if (visible.length === 0) {
-    return <p className="py-20 text-center text-sm text-slate-500">{tFavorites('empty')}</p>;
+    return <p className="py-20 text-center text-sm text-slate-500 dark:text-white/60">{tFavorites('empty')}</p>;
   }
 
   // 즐겨찾기 응답의 todo는 isFavorite=true인 완전한 Todo — 별 클릭은 TodoList의 일반 토글로 해제가 된다.
