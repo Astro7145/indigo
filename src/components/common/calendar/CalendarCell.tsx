@@ -22,10 +22,10 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
   const variant = isOutsideVisibleRange || isDisabled ? 'outside' : isSelected ? 'selected' : 'default';
 
   const { buttonClass, circleClass } = {
-    outside: { buttonClass: 'cursor-default font-normal text-slate-400', circleClass: '' },
+    outside: { buttonClass: 'cursor-default font-normal text-slate-400 dark:text-white/40', circleClass: '' },
     selected: { buttonClass: 'font-medium text-white', circleClass: 'bg-indigo-600 group-hover:bg-indigo-700' },
     default: {
-      buttonClass: 'font-normal text-slate-700 hover:font-medium hover:text-white',
+      buttonClass: 'font-normal text-slate-700 hover:font-medium hover:text-white dark:text-white',
       circleClass: 'group-hover:bg-indigo-700',
     },
   }[variant];
