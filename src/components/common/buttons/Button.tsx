@@ -29,22 +29,25 @@ const sizeClasses: Record<ButtonSize, string> = {
 
 /** variant별 기본(default) 클래스. primary는 secondary·tertiary와 높이 맞춤을 위해 투명 border 포함 */
 const variantBaseClasses: Record<ButtonVariant, string> = {
-  primary: 'border border-transparent bg-indigo-600 text-white',
-  secondary: 'border border-indigo-500 bg-transparent text-indigo-600',
-  tertiary: 'border border-slate-300 bg-transparent text-slate-500',
+  primary: 'border border-transparent bg-indigo-600 text-white dark:bg-indigo-dark-700',
+  secondary:
+    'border border-indigo-500 bg-transparent text-indigo-600 dark:border-indigo-dark-800 dark:text-indigo-dark-900',
+  tertiary: 'border border-slate-300 bg-transparent text-slate-500 dark:border-white/20 dark:text-white/70',
 };
 
 /** variant별 hover 클래스. hover={true}일 때만 적용 */
 const variantHoverClasses: Record<ButtonVariant, string> = {
-  primary: 'hover:bg-indigo-700',
-  secondary: 'hover:border-indigo-600',
-  tertiary: 'hover:border-slate-400 hover:text-slate-600',
+  primary: 'hover:bg-indigo-700 dark:hover:bg-indigo-dark-600',
+  secondary: 'hover:border-indigo-600 dark:hover:border-indigo-dark-900',
+  tertiary: 'hover:border-slate-400 hover:text-slate-600 dark:hover:border-white/40 dark:hover:text-white',
 };
 
 const variantDisabledClasses: Record<ButtonVariant, string> = {
-  primary: 'disabled:cursor-not-allowed disabled:bg-slate-400',
-  secondary: 'disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400',
-  tertiary: 'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400',
+  primary: 'disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-white/10',
+  secondary:
+    'disabled:cursor-not-allowed disabled:border-slate-400 disabled:text-slate-400 dark:disabled:border-white/10 dark:disabled:text-white/30',
+  tertiary:
+    'disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400 dark:disabled:border-white/10 dark:disabled:text-white/30',
 };
 
 /**

@@ -95,9 +95,9 @@ export default function ImageInput({ onFileChange, initialUrl, onInitialUrlRemov
           </span>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center gap-y-0.5 rounded-sm border border-dashed border-slate-300 bg-slate-50 p-3 focus-within:border-indigo-500">
+        <label className="dark:bg-indigo-dark-300 flex flex-col items-center justify-center gap-y-0.5 rounded-sm border border-dashed border-slate-300 bg-slate-50 p-3 focus-within:border-indigo-500 dark:border-white/20">
           <IcUpload />
-          <span className="text-base font-medium text-slate-500">{tCommon('image.attach')}</span>
+          <span className="text-base font-medium text-slate-500 dark:text-white/70">{tCommon('image.attach')}</span>
           <input
             ref={inputRef}
             type="file"

@@ -19,7 +19,7 @@ interface DatePickerProps {
 }
 
 const pickerCardClass =
-  'rounded-2xl border border-black/8 bg-white shadow-[0px_20px_24px_-4px_rgba(10,13,18,0.08),0px_8px_8px_-4px_rgba(10,13,18,0.03),0px_3px_3px_-1.5px_rgba(10,13,18,0.04)]';
+  'rounded-2xl border border-black/8 bg-white shadow-[0px_20px_24px_-4px_rgba(10,13,18,0.08),0px_8px_8px_-4px_rgba(10,13,18,0.03),0px_3px_3px_-1.5px_rgba(10,13,18,0.04)] dark:border-white/10 dark:bg-indigo-dark-300';
 
 function formatDate(date: CalendarDate): string {
   return `${date.year}. ${String(date.month).padStart(2, '0')}. ${String(date.day).padStart(2, '0')}`;
@@ -52,9 +52,11 @@ export default function DatePicker(props: DatePickerProps) {
         ref={triggerRef}
         {...buttonProps}
         className={cn(
-          'flex w-full items-center gap-2 rounded-sm bg-white p-3 text-sm font-normal tracking-[-0.02em] transition-colors focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base',
-          props.value ? 'text-slate-700' : 'text-slate-500',
-          isOpen ? 'border border-indigo-500' : 'border border-slate-300 hover:border-slate-400',
+          'dark:bg-indigo-dark-300 flex w-full items-center gap-2 rounded-sm bg-white p-3 text-sm font-normal tracking-[-0.02em] transition-colors focus:border-indigo-500 focus:outline-none sm:p-4 sm:text-base',
+          props.value ? 'text-slate-700 dark:text-white' : 'text-slate-500 dark:text-white/70',
+          isOpen
+            ? 'border border-indigo-500'
+            : 'border border-slate-300 hover:border-slate-400 dark:border-white/20 dark:hover:border-white/30',
         )}
       >
         <IcCalendarOutline className="size-5 shrink-0 sm:size-6" />

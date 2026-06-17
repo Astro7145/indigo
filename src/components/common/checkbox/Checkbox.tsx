@@ -52,7 +52,7 @@ export default function Checkbox({
     <label
       style={style}
       className={cn(
-        'relative inline-flex items-center gap-2 text-sm text-slate-700 select-none',
+        'relative inline-flex items-center gap-2 text-sm text-slate-700 select-none dark:text-white',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer',
         className,
       )}
@@ -60,7 +60,7 @@ export default function Checkbox({
       <input ref={ref} disabled={disabled} className="peer sr-only" {...rest} type="checkbox" />
       <Icon aria-hidden="true" state="default" className={cn(ICON_BASE, 'peer-checked:hidden')} />
       <Icon aria-hidden="true" state="active" className={cn(ICON_BASE, 'hidden peer-checked:block')} />
-      {children && <span className="peer-disabled:text-slate-400">{children}</span>}
+      {children && <span className="peer-disabled:text-slate-400 dark:peer-disabled:text-white/40">{children}</span>}
     </label>
   );
 }

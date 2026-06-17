@@ -10,6 +10,7 @@
   "expand": "Expand sidebar",
   "collapse": "Collapse sidebar",
   "menuCollapse": "Collapse menu",
+  "menuExpand": "Open menu",
   "newTodo": "Add TODO",
   "goal": {
     "title": "Goals",

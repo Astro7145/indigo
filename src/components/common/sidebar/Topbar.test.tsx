@@ -30,6 +30,14 @@ it('새 할일 버튼을 누르면 생성 시트를 연다', () => {
   expect(mockOpenCreate).toHaveBeenCalledTimes(1);
 });
 
+it('햄버거를 누르면 메뉴가 펼쳐진다', () => {
+  render(<Topbar />);
+  const menu = screen.getByLabelText('메뉴 접기').closest('[aria-hidden]');
+  expect(menu).toHaveAttribute('aria-hidden', 'true');
+  fireEvent.click(screen.getByLabelText('메뉴 열기'));
+  expect(menu).toHaveAttribute('aria-hidden', 'false');
+});
+
 it('store에 등록된 rightSlot이 우측 영역에 노출된다', () => {
   useTopbarSlotStore.setState({ rightSlot: <span>action-slot</span> });
   render(<Topbar />);
