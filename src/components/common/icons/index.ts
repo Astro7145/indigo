@@ -18,6 +18,7 @@ export { IcFilter } from './IcFilter';
 export { IcFlagFill } from './IcFlagFill';
 export { IcFlagOutline } from './IcFlagOutline';
 export { IcGoal } from './IcGoal';
+export { IcGraph } from './IcGraph';
 export { IcGoogle } from './IcGoogle';
 export { IcHamburger } from './IcHamburger';
 export { IcHash } from './IcHash';
