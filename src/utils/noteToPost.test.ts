@@ -10,7 +10,9 @@ it('linkUrl이 있으면 HTML 앞에 a 태그로 추가한다', () => {
   const json = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: '본문' }] }] };
   const html = noteContentToPostHtml(json, 'https://example.com');
   expect(html).toContain('<p>본문</p>');
-  expect(html).toContain('관련 링크: <a href="https://example.com">https://example.com</a>');
+  expect(html).toContain(
+    '관련 링크: <a href="https://example.com" target="_blank" rel="noopener noreferrer">https://example.com</a>',
+  );
   expect(html.indexOf('관련 링크')).toBeLessThan(html.indexOf('<p>본문</p>'));
 });
 
