@@ -12,7 +12,7 @@ export function noteContentToPostHtml(content: unknown, linkUrl?: string | null)
   if (content == null) return '';
   const html = generateHTML(content as JSONContent, EXTENSIONS);
   if (!linkUrl) return html;
-  return html + `<p>관련 링크: <a href="${linkUrl}">${linkUrl}</a></p>`;
+  return `<p>관련 링크: <a href="${linkUrl}">${linkUrl}</a></p>` + html;
 }
 
 /** 단락 경계에서 limit 이내로 잘라낸다. */
