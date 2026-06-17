@@ -50,8 +50,8 @@ export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit
           {hasNote && <TodoItem.NoteAction onClick={() => {}} />}
           {todo.linkUrl && <TodoItem.LinkAction onClick={() => {}} />}
           {/* 노트 없으면 hover 시 노트 작성(연필) 노출 — 노트 작성 모달(별도 작업) 연동 전 placeholder */}
-          {!hasNote && <TodoItem.EditAction onClick={() => {}} hoverOnly aria-label={tCommon('actions.writeNote')} />}
-          <TodoItem.KebabAction hoverOnly onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
+          {!hasNote && <TodoItem.EditAction onClick={() => {}} aria-label={tCommon('actions.writeNote')} />}
+          <TodoItem.KebabAction onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
           <TodoItem.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoItem.Actions>
       </TodoItem>
