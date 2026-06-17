@@ -7,6 +7,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import TodoItem from '@/src/components/common/todo-list/TodoItem';
 import type { TodoItemSize } from '@/src/components/common/todo-list/TodoItem';
 import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
+import { useOpenNote } from '@/src/hooks/note/useNoteDrawer';
 import type { Todo } from '@/src/types/todo';
 
 export interface TodoRowProps {
@@ -25,6 +26,7 @@ export interface TodoRowProps {
  */
 export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit, onSelect }: TodoRowProps) {
   const tCommon = useTranslations('common');
+  const { openNote } = useOpenNote();
   // 타입상 noteIds는 required지만 백엔드 응답 누락/null 케이스를 방어한다.
   const hasNote = (todo.noteIds?.length ?? 0) > 0;
   // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
@@ -47,10 +49,13 @@ export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit
       >
         <TodoItem.Actions>
           {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필) · 케밥 · 별 */}
-          {hasNote && <TodoItem.NoteAction onClick={() => {}} />}
+          {hasNote && <TodoItem.NoteAction onClick={() => openNote(todo.id, 'detail')} />}
           {todo.linkUrl && <TodoItem.LinkAction onClick={() => {}} />}
-          {/* 노트 없으면 hover 시 노트 작성(연필) 노출 — 노트 작성 모달(별도 작업) 연동 전 placeholder */}
-          {!hasNote && <TodoItem.EditAction onClick={() => {}} aria-label={tCommon('actions.writeNote')} />}
+
+          {/* 노트 없으면 노트 작성(연필) 노출 */}
+          {!hasNote && (
+            <TodoItem.EditAction onClick={() => openNote(todo.id, 'write')} aria-label={tCommon('actions.writeNote')} />
+          )}
           <TodoItem.KebabAction onEdit={() => onEdit(todo)} onDelete={() => setConfirmOpen(true)} />
           <TodoItem.StarAction active={todo.isFavorite} onClick={() => onToggleFavorite(todo.id, todo.isFavorite)} />
         </TodoItem.Actions>

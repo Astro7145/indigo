@@ -9,6 +9,7 @@ import favorites from '@/messages/ko/favorites.json';
 import goals from '@/messages/ko/goals.json';
 import login from '@/messages/ko/login.json';
 import me from '@/messages/ko/me.json';
+import note from '@/messages/ko/note.json';
 import posts from '@/messages/ko/posts.json';
 import settings from '@/messages/ko/settings.json';
 import sidebar from '@/messages/ko/sidebar.json';
@@ -24,6 +25,7 @@ const messages: Record<string, unknown> = {
   goals,
   login,
   me,
+  note,
   posts,
   settings,
   sidebar,

@@ -47,3 +47,8 @@ export interface UpdateNoteBody {
   content?: unknown;
   linkUrl?: string | null;
 }
+
+export interface LinkPreview {
+  title: string | null;
+  faviconUrl: string | null;
+}
