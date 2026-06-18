@@ -41,7 +41,7 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
     <section aria-label={label} className={cn('flex min-w-0 flex-col gap-2.5', className)}>
       {/* 헤더는 두 컬럼 모두 40px로 통일 — To do의 버튼(40px)과 Done의 라벨 본문 상단이 같은 높이에서 시작하도록 */}
       <div className="flex h-10 items-center justify-between px-2">
-        <h3 className="text-lg font-semibold tracking-[-0.03em] text-slate-800">{label}</h3>
+        <h3 className="text-lg font-semibold tracking-[-0.03em] text-slate-800 dark:text-white">{label}</h3>
         {/* To do 컬럼에만 노출 — 할 일 추가는 생성 시트로, 캘린더 보기는 목표 필터 프리셋 캘린더로 */}
         {!done && (
           <div className="flex items-center gap-2">
@@ -71,17 +71,19 @@ export default function GoalTodoColumn({ goalId, done, className }: GoalTodoColu
       <div
         className={cn(
           'flex flex-col rounded px-7 py-8 xl:h-[576px]',
-          done ? 'bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]' : 'bg-indigo-100',
+          done
+            ? 'dark:bg-indigo-dark-200 bg-white shadow-[0_2px_8px_0_rgba(0,0,0,0.04)]'
+            : 'dark:bg-indigo-dark-300 bg-indigo-100',
         )}
       >
         <AsyncBoundary
           fallback={
-            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
+            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/60">
               {tCommon('state.loading')}
             </p>
           }
           errorFallback={
-            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400">
+            <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-400 dark:text-white/60">
               {tCommon('state.loadError')}
             </p>
           }
@@ -125,7 +127,7 @@ function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goal
 
   if (todos.length === 0) {
     return (
-      <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500">
+      <p className="flex flex-1 items-center justify-center py-16 text-center text-sm text-slate-500 dark:text-white/60">
         {done ? tTodos('empty.done') : tTodos('empty.todo')}
       </p>
     );
@@ -141,7 +143,9 @@ function GoalTodoColumnContent({ goalId, done }: Pick<GoalTodoColumnProps, 'goal
       onSelect={openDetail}
     >
       {hasNextPage && <li ref={sentinelRef} aria-hidden className="h-1 shrink-0" />}
-      {isFetchingNextPage && <li className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</li>}
+      {isFetchingNextPage && (
+        <li className="py-3 text-center text-sm text-slate-400 dark:text-white/60">{tCommon('state.loading')}</li>
+      )}
     </TodoList>
   );
 }
