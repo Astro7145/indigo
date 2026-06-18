@@ -24,6 +24,11 @@ beforeEach(() => {
   (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
   (usePathname as jest.Mock).mockReturnValue('/todos');
   (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
+  window.history.pushState({}, '', '/todos');
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 const baseTodo: Todo = {
@@ -129,14 +134,13 @@ it('노트가 없으면 노트 추가하기 버튼을 표시한다', () => {
 });
 
 it('노트 추가하기 버튼을 누르면 write 모드로 노트 드로어를 연다', () => {
-  const push = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push });
+  const pushState = jest.spyOn(window.history, 'pushState');
   renderContent({ todo: { ...baseTodo, id: 5, noteIds: [] } });
 
   screen.getByRole('button', { name: /노트 추가하기/ }).click();
 
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=5'), { scroll: false });
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=write'), { scroll: false });
+  expect(pushState).toHaveBeenCalledWith(null, '', expect.stringContaining('todoId=5'));
+  expect(pushState).toHaveBeenCalledWith(null, '', expect.stringContaining('mode=write'));
 });
 
 it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한다', async () => {
@@ -151,8 +155,7 @@ it('noteIds가 있으면 해당 todoId로 노트를 받아 제목을 표시한�
 });
 
 it('작성된 노트를 클릭하면 해당 todoId와 mode=detail로 노트 드로어를 연다', async () => {
-  const push = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push });
+  const pushState = jest.spyOn(window.history, 'pushState');
   mocked.getNotes.mockResolvedValue({
     notes: [{ id: 7, title: '프로그래밍과 데이터 in JavaScript' }],
     nextCursor: null,
@@ -162,8 +165,8 @@ it('작성된 노트를 클릭하면 해당 todoId와 mode=detail로 노트 드�
 
   fireEvent.click(await screen.findByRole('button', { name: '프로그래밍과 데이터 in JavaScript' }));
 
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('todoId=3'), { scroll: false });
-  expect(push).toHaveBeenCalledWith(expect.stringContaining('mode=detail'), { scroll: false });
+  expect(pushState).toHaveBeenCalledWith(null, '', expect.stringContaining('todoId=3'));
+  expect(pushState).toHaveBeenCalledWith(null, '', expect.stringContaining('mode=detail'));
 });
 
 it('닫기 버튼을 누르면 onClose를 호출한다', () => {
