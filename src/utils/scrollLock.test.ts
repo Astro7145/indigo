@@ -7,9 +7,7 @@ describe('scrollLock', () => {
     document.documentElement.style.scrollbarGutter = '';
     // 이전 테스트의 실패/예외로 전역 카운트가 남는 오염을 막는다
     _resetScrollLock();
-    // 기본: 스크롤바 폭 0 (innerWidth === clientWidth) → padding 보정 없음(기존 동작 테스트에 영향 없도록)
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1000 });
-    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, get: () => 1000 });
+    jest.restoreAllMocks();
   });
 
   it('잠그면 body 스크롤이 막히고 해제하면 원래대로 돌아온다', () => {
@@ -43,9 +41,10 @@ describe('scrollLock', () => {
     expect(document.documentElement.style.scrollbarGutter).toBe('');
   });
 
-  it('잠그면 회수된 스크롤바 폭만큼 padding-right로 보정하고 해제 시 되돌린다', () => {
-    // innerWidth 1000 - clientWidth 985 = 15
-    Object.defineProperty(document.documentElement, 'clientWidth', { configurable: true, get: () => 985 });
+  it('잠그면 스크롤바(거터) 폭만큼 padding-right로 보정하고 해제 시 되돌린다', () => {
+    // probe div의 offsetWidth(50) - clientWidth(35) = 15px 스크롤바 폭을 모사
+    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(50);
+    jest.spyOn(Element.prototype, 'clientWidth', 'get').mockReturnValue(35);
     lockScroll();
     expect(document.body.style.paddingRight).toBe('15px');
     unlockScroll();
@@ -53,7 +52,8 @@ describe('scrollLock', () => {
   });
 
   it('스크롤바 폭이 0이면(오버레이) padding-right를 건드리지 않는다', () => {
-    // beforeEach 기본 clientWidth 1000 === innerWidth 1000 → 폭 0
+    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(50);
+    jest.spyOn(Element.prototype, 'clientWidth', 'get').mockReturnValue(50);
     lockScroll();
     expect(document.body.style.paddingRight).toBe('');
     unlockScroll();
