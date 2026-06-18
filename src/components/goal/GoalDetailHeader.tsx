@@ -39,13 +39,13 @@ export default function GoalDetailHeader({ goalId, className }: GoalDetailHeader
   return (
     <Card
       className={cn(
-        'flex h-16 items-center justify-between gap-2 border border-slate-200 px-4 py-0 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg sm:h-20 sm:px-6 xl:h-40 xl:px-10',
+        'flex h-16 items-center justify-between gap-2 border border-slate-200 px-4 py-0 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] transition-shadow hover:shadow-lg sm:h-20 sm:px-6 xl:h-40 xl:px-10 dark:border-white/10',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3 xl:gap-4">
         <IcGoal aria-hidden className="size-8 shrink-0 xl:size-10" />
-        <h2 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-700 xl:text-2xl">
+        <h2 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-700 xl:text-2xl dark:text-white">
           {goal.title}
         </h2>
       </div>

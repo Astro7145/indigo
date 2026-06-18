@@ -95,7 +95,7 @@ export default function ProfileForm() {
         {/* 기본 정보: 이메일 · 이름 */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <label htmlFor="email" className="pl-1 text-base font-semibold text-slate-700">
+            <label htmlFor="email" className="pl-1 text-base font-semibold text-slate-700 dark:text-white">
               {tCommon('fields.email')}
             </label>
             <Input
@@ -105,11 +105,11 @@ export default function ProfileForm() {
               value={isLoading ? '' : (me?.email ?? '')}
               placeholder={isLoading ? tCommon('state.loading') : undefined}
               disabled
-              className="cursor-not-allowed bg-slate-50"
+              className="dark:bg-indigo-dark-200 cursor-not-allowed bg-slate-50"
             />
           </div>
           <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="pl-1 text-base font-semibold text-slate-700">
+            <label htmlFor="name" className="pl-1 text-base font-semibold text-slate-700 dark:text-white">
               {tCommon('fields.name')}
             </label>
             <Input
@@ -131,7 +131,9 @@ export default function ProfileForm() {
 
         {/* 비밀번호 변경 */}
         <fieldset>
-          <legend className="mb-2 pl-1 text-base font-semibold text-slate-700">{tMe('password.section')}</legend>
+          <legend className="mb-2 pl-1 text-base font-semibold text-slate-700 dark:text-white">
+            {tMe('password.section')}
+          </legend>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
               <PasswordInput

@@ -17,7 +17,7 @@ export function IcChevron({ direction = 'left', className, ...rest }: IcChevronP
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      className={cn('size-6 text-slate-400', rotate[direction], className)}
+      className={cn('size-6 text-slate-400 dark:text-white/40', rotate[direction], className)}
       {...rest}
     >
       <path

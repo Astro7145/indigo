@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "설정",
+    "description": "언어와 테마 등 환경을 설정하세요."
+  },
   "title": "설정",
   "language": "언어",
   "darkMode": "다크모드",

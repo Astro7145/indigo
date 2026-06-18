@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "대시보드",
+    "description": "오늘의 할일과 목표 진행 상황을 한눈에 확인하세요."
+  },
   "title": "님의 대시보드",
   "recentTodos": {
     "title": "최근 등록한 할일",

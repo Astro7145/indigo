@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "즐겨찾기",
+    "description": "찜한 할일을 모아 한곳에서 확인하세요."
+  },
   "title": "찜한 할일",
   "empty": "아직 찜한 할일이 없어요",
   "goalFilter": {

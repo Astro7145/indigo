@@ -6,6 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import { noteKeys } from '@/src/api/note';
+import { notificationKeys } from '@/src/api/notification';
 import {
   prefetchAllGoals,
   prefetchCalendarMonth,
@@ -16,6 +17,8 @@ import {
   prefetchInfiniteTodos,
   prefetchMe,
   prefetchRecentTodos,
+  prefetchSidebarGoals,
+  prefetchSidebarNotifications,
 } from '@/src/api/server/prefetch';
 import { serverGet } from '@/src/api/server/server-get';
 import { todoKeys } from '@/src/api/todo';
@@ -106,4 +109,18 @@ it('prefetchInfiniteGoals는 캐시에 넣고 첫 페이지 목표를 반환한�
 it('prefetchInfiniteGoals는 실패 시 던지지 않고 빈 배열을 반환한다', async () => {
   mocked.mockRejectedValue(new Error('backend down'));
   await expect(prefetchInfiniteGoals(qc, 2)).resolves.toEqual([]);
+});
+
+it('prefetchSidebarGoals는 useInfiniteGoalList() 무파라미터 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ goals: [{ id: 1 }], nextCursor: null, totalCount: 1 });
+  await prefetchSidebarGoals(qc);
+  expect(mocked).toHaveBeenCalledWith('goals', {});
+  expect(qc.getQueryData([...goalKeys.list({}), 'infinite'])).toBeDefined();
+});
+
+it('prefetchSidebarNotifications는 useInfiniteNotificationList({limit:100}) 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ notifications: [], nextCursor: null, totalCount: 0 });
+  await prefetchSidebarNotifications(qc);
+  expect(mocked).toHaveBeenCalledWith('notifications', { limit: 100 });
+  expect(qc.getQueryData([...notificationKeys.list({ limit: 100 }), 'infinite'])).toBeDefined();
 });

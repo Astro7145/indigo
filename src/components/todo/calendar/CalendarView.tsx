@@ -21,7 +21,7 @@ import { useMe } from '@/src/hooks/user';
 import type { Todo } from '@/src/types/todo';
 import { calendarDateToIso, calendarGridRange, isoToCalendarDate } from '@/src/utils/date';
 
-const statusMessageClass = 'py-16 text-center text-sm text-slate-400';
+const statusMessageClass = 'py-16 text-center text-sm text-slate-400 dark:text-white/40';
 
 /** `?goalId=` 파싱 — 잘못된 값(비정수·0 이하)은 전체 목표 */
 function parseGoalId(raw: string | null): number | null {
@@ -78,7 +78,7 @@ export default function CalendarView() {
     <section className="mx-auto flex w-full max-w-320 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+에서만 헤더 노출 (/todos와 동일 패턴) */}
       <div className="hidden items-center justify-between px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800 dark:text-white">
           {me ? tCalendar('title', { name: me.name }) : tCalendar('titleFallback')}
         </h1>
         <Button
@@ -95,7 +95,7 @@ export default function CalendarView() {
       </div>
 
       {/* 모바일은 풀블리드(시안), sm+는 카드 */}
-      <Card className="-mx-4 overflow-hidden rounded-none border-y border-slate-200 p-0 shadow-[0_0_60px_0_rgba(0,0,0,0.05)] sm:mx-0 sm:rounded-[4px] sm:border">
+      <Card className="-mx-4 overflow-hidden rounded-none border-y border-slate-200 p-0 shadow-[0_0_60px_0_rgba(0,0,0,0.05)] sm:mx-0 sm:rounded-[4px] sm:border dark:border-white/10">
         <AsyncBoundary
           fallback={<p className={statusMessageClass}>{tCommon('state.loading')}</p>}
           errorFallback={<p className={statusMessageClass}>{tCommon('state.loadError')}</p>}
@@ -186,15 +186,15 @@ function CalendarContent({
           <Dropdown.Trigger asChild>
             <button
               type="button"
-              className="flex w-full items-center justify-between rounded-sm border border-slate-100 bg-slate-50 px-3 py-2"
+              className="dark:bg-indigo-dark-400 flex w-full items-center justify-between rounded-sm border border-slate-100 bg-slate-50 px-3 py-2 dark:border-white/10"
             >
               <span className="flex items-center gap-2">
                 <IcGoal className="size-8" />
-                <span className="text-sm font-semibold tracking-[-0.03em] text-slate-700">
+                <span className="text-sm font-semibold tracking-[-0.03em] text-slate-700 dark:text-white">
                   {selectedGoal ? selectedGoal.title : tCalendar('allGoals')}
                 </span>
               </span>
-              <IcChevron direction="down" />
+              <IcChevron direction="down" className="dark:text-white/60" />
             </button>
           </Dropdown.Trigger>
           <Dropdown.Menu size="full">

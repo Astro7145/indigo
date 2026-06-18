@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "All TODOs",
+    "description": "Manage and complete all the todos you've registered.",
+    "noteWrite": {
+      "title": "Write Note",
+      "description": "Write a note related to your todo."
+    },
+    "noteEdit": {
+      "title": "Edit Note",
+      "description": "Edit the note you wrote."
+    }
+  },
   "title": "All TODOs",
   "addButton": "Add TODO",
   "empty": {
