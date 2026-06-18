@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Dashboard",
+    "description": "See today's todos and your goal progress at a glance."
+  },
   "title": "'s Dashboard",
   "recentTodos": {
     "title": "Recent TODOs",

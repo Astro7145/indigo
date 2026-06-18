@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "캘린더",
+    "description": "할일과 목표를 달력에서 한눈에 확인하세요."
+  },
   "title": "{name}님의 캘린더",
   "titleFallback": "캘린더",
   "monthYear": "{year}년 {month}월",

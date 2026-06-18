@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "カレンダー",
+    "description": "TODOと目標をカレンダーでひと目で確認できます。"
+  },
   "title": "{name}さんのカレンダー",
   "titleFallback": "カレンダー",
   "monthYear": "{year}年{month}月",
