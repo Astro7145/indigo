@@ -3,17 +3,8 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import DOMPurify from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { useTranslations } from 'next-intl';
-
-// DOMPurify가 anchor의 target을 떨어트리므로 sanitize 후 강제 주입한다 (rel은 보존돼서 그대로 둠).
-if (typeof window !== 'undefined') {
-  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    if (node.tagName === 'A') {
-      node.setAttribute('target', '_blank');
-    }
-  });
-}
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
@@ -26,6 +17,32 @@ import { useImageLightbox } from '@/src/hooks/useImageLightbox';
 import { useDeletePost, usePost } from '@/src/hooks/post';
 import { useToast } from '@/src/hooks/useToast';
 import { useMe } from '@/src/hooks/user';
+
+// 게시물 본문 허용 정책 — 에디터가 만들어내는 태그·속성·인라인 스타일을 통과시키고 나머지는 제거.
+// sanitize-html 디폴트(블록/인라인 텍스트 + 링크)에 img와 h1·h2를 더해 확장하고, anchor는 항상
+// 새 탭으로 열도록 transformTags로 target을 강제 주입(rel은 보존). 인라인 스타일은 정렬 정도만 허용,
+// javascript: 등 위험 스킴은 allowedSchemes로 차단.
+const POST_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img', 'h1', 'h2'],
+  allowedAttributes: {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    a: ['href', 'name', 'target', 'rel', 'class'],
+    img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading', 'class'],
+    '*': ['class', 'style'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto', 'data'],
+  allowedStyles: {
+    '*': {
+      'text-align': [/^(left|right|center|justify)$/],
+    },
+  },
+  transformTags: {
+    a: (tagName, attribs) => ({
+      tagName,
+      attribs: { ...attribs, target: '_blank' },
+    }),
+  },
+};
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -109,12 +126,10 @@ export default function PostDetailPage() {
           <span className="text-sm text-slate-700">{post.writer.name}</span>
         </div>
 
-        {/* 본문 — 에디터 HTML을 그대로 렌더. SSR/빌드 시점엔 window가 없으므로 빈 문자열 */}
+        {/* 본문 — sanitize-html로 서버·클라이언트 모두 sanitize */}
         <div
           className="mb-6 text-sm text-slate-800 sm:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
-          dangerouslySetInnerHTML={{
-            __html: typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : '',
-          }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content, POST_SANITIZE_OPTIONS) }}
         />
 
         {/* 이미지 — 클릭 시 라이트박스로 확대 */}
