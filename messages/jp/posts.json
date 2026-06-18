@@ -1,5 +1,21 @@
 {
-  "title": "コミュニティ掲示板",
+  "meta": {
+    "title": "コミュニティ",
+    "description": "チームと自由にコミュニケーションし、意見を共有しましょう。",
+    "write": {
+      "title": "投稿の作成",
+      "description": "新しい投稿を作成してチームと共有しましょう。"
+    },
+    "detail": {
+      "title": "投稿",
+      "description": "投稿を確認し、コメントでやり取りできます。"
+    },
+    "edit": {
+      "title": "投稿の編集",
+      "description": "作成した投稿を編集できます。"
+    }
+  },
+  "title": "コミュニティ",
   "viewCount": "閲覧 {count}",
   "commentCount": "コメント {count}件",
   "empty": "まだ投稿がありません。",
@@ -55,6 +71,7 @@
     "replyPlaceholder": "返信を入力してください。",
     "replyInputLabel": "返信入力",
     "replyLoading": "返信を読み込んでいます…",
-    "replyCreateError": "返信の登録に失敗しました。"
+    "replyCreateError": "返信の登録に失敗しました。",
+    "loadError": "コメントを読み込めませんでした。"
   }
 }

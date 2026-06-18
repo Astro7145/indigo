@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
+import { useQuery, useSuspenseInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
 import type { QueryKey } from '@tanstack/react-query';
 import { postKeys } from '@/src/api/post';
 import {
@@ -33,20 +33,14 @@ export function useComments(postId: number | undefined, params: CommentListParam
   });
 }
 
-export function useInfiniteComments(postId: number | undefined, params: Omit<CommentListParams, 'cursor'> = {}) {
-  return useInfiniteQuery<CommentListResponse, ApiError>({
-    queryKey:
-      postId == null
-        ? [...postKeys.details(), 'pending', 'comments', 'infinite']
-        : [...commentKeys.list(postId, params), 'infinite'],
-    queryFn:
-      postId == null
-        ? skipToken
-        : ({ pageParam }) =>
-            getComments(postId, {
-              ...params,
-              cursor: pageParam as string | undefined,
-            }),
+export function useInfiniteComments(postId: number, params: Omit<CommentListParams, 'cursor'> = {}) {
+  return useSuspenseInfiniteQuery<CommentListResponse, ApiError>({
+    queryKey: [...commentKeys.list(postId, params), 'infinite'],
+    queryFn: ({ pageParam }) =>
+      getComments(postId, {
+        ...params,
+        cursor: pageParam as string | undefined,
+      }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });

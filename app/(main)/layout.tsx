@@ -4,15 +4,16 @@ import NoteDrawer from '@/src/components/note/todo-note/NoteDrawer';
 import { cookies } from 'next/headers';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-import { prefetchMe } from '@/src/api/server/prefetch';
+import { prefetchMe, prefetchSidebarGoals, prefetchSidebarNotifications } from '@/src/api/server/prefetch';
 import { getQueryClient } from '@/src/api/server/query-client';
+import NotificationTitleBadge from '@/src/components/common/sidebar/NotificationTitleBadge';
 import Sidebar from '@/src/components/common/sidebar/Sidebar';
 import Topbar from '@/src/components/common/sidebar/Topbar';
 import Settings from '@/src/components/common/settings/Settings';
 
 /**
- * (main) 그룹 레이아웃. 전 페이지가 쓰는 useMe(타이틀·사이드바 프로필)를 서버에서 prefetch한다.
- * cookies()를 읽으므로 (main) 전 라우트는 동적(ƒ) — 전 쿼리 prefetch 커버의 의도된 비용.
+ * (main) 그룹 레이아웃. 전 페이지의 사이드바/탑바가 쓰는 공용 데이터(useMe 프로필·목표 목록·알림)를
+ * 서버에서 prefetch한다. cookies()를 읽으므로 (main) 전 라우트는 동적(ƒ) — 전 쿼리 prefetch 커버의 의도된 비용.
  */
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   // 빌드 프리렌더 차단 신호를 prefetch보다 먼저 — queryFn 안의 cookies()가 던지는 dynamic bail-out은
@@ -21,11 +22,13 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   await cookies();
 
   const qc = getQueryClient();
-  await prefetchMe(qc);
+  // 사이드바/탑바 공용 데이터(프로필·목표·알림)를 병렬 prefetch — TTFB 추가 지연 최소화.
+  await Promise.all([prefetchMe(qc), prefetchSidebarGoals(qc), prefetchSidebarNotifications(qc)]);
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
       <div className="dark:bg-indigo-dark-400 flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
+        <NotificationTitleBadge />
         <Topbar />
         <Sidebar />
         <Settings />

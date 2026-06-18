@@ -4,13 +4,17 @@
 import type { QueryClient } from '@tanstack/react-query';
 import type { CalendarDate } from '@internationalized/date';
 
+import { commentKeys } from '@/src/api/comment';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import { noteKeys } from '@/src/api/note';
+import { notificationKeys } from '@/src/api/notification';
+import { postKeys } from '@/src/api/post';
 import { serverGet } from '@/src/api/server/server-get';
 import { todoKeys } from '@/src/api/todo';
 import { userKeys } from '@/src/api/user';
 import type { GoalListResponse } from '@/src/types/goal';
+import type { PostListParams } from '@/src/types/post';
 import type { Todo, TodoListResponse } from '@/src/types/todo';
 import { calendarGridRange } from '@/src/utils/date';
 
@@ -25,6 +29,13 @@ function prefetchInfinite(qc: QueryClient, key: readonly unknown[], path: string
 
 export const prefetchMe = (qc: QueryClient) =>
   qc.prefetchQuery({ queryKey: userKeys.me(), queryFn: () => serverGet('users/me') });
+
+/** 사이드바 목표 목록 — useInfiniteGoalList()와 동일 키(무파라미터). */
+export const prefetchSidebarGoals = (qc: QueryClient) => prefetchInfinite(qc, goalKeys.list({}), 'goals', {});
+
+/** 사이드바/탑바 알림 — useInfiniteNotificationList({ limit: 100 })와 동일 키. */
+export const prefetchSidebarNotifications = (qc: QueryClient) =>
+  prefetchInfinite(qc, notificationKeys.list({ limit: 100 }), 'notifications', { limit: 100 });
 
 /** 대시보드 RecentTodos — useTodoList({sort:'latest',limit:4})와 동일 키. */
 export const prefetchRecentTodos = (qc: QueryClient) =>
@@ -92,6 +103,35 @@ export const prefetchGoalDetail = (qc: QueryClient, goalId: number) =>
 /** 노트 모아보기 — useInfiniteNoteList({goalId, search: undefined, sort:'latest'}) 초기 키. */
 export const prefetchInfiniteNotes = (qc: QueryClient, goalId: number) =>
   prefetchInfinite(qc, noteKeys.list({ goalId, sort: 'latest' }), 'notes', { goalId, sort: 'latest' });
+
+/** /posts 목록 — useInfinitePostList(params) 첫 페이지 + usePostList({type:'best',limit:3}) 인기글. */
+export const prefetchPosts = (qc: QueryClient, params: Omit<PostListParams, 'cursor'> = {}) =>
+  Promise.all([
+    prefetchInfinite(qc, postKeys.list(params), 'posts', params),
+    qc.prefetchQuery({
+      queryKey: postKeys.list({ type: 'best', limit: 3 }),
+      queryFn: () => serverGet('posts', { type: 'best', limit: 3 }),
+    }),
+  ]);
+
+/** /posts/[postId] 상세 — usePost(postId) 단건 + useInfiniteComments(postId,{parentId:'null'}) 첫 페이지. */
+export const prefetchPostDetail = (qc: QueryClient, postId: number) =>
+  Promise.all([
+    qc.prefetchQuery({
+      queryKey: postKeys.detail(postId),
+      queryFn: () => serverGet(`posts/${postId}`),
+    }),
+    prefetchInfinite(qc, commentKeys.list(postId, { parentId: 'null' }), `posts/${postId}/comments`, {
+      parentId: 'null',
+    }),
+  ]);
+
+/** /posts/[postId]/edit — usePost(postId) 단건 (편집 초기값). */
+export const prefetchPostEdit = (qc: QueryClient, postId: number) =>
+  qc.prefetchQuery({
+    queryKey: postKeys.detail(postId),
+    queryFn: () => serverGet(`posts/${postId}`),
+  });
 
 /** /calendar — useTodosInRange(calendarGridRange(month))와 동일 키·범위. 커서를 끝까지 합친다. */
 export const prefetchCalendarMonth = (qc: QueryClient, month: CalendarDate) => {

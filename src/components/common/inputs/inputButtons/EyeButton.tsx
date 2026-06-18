@@ -14,6 +14,7 @@ export default function EyeButton({ hide, onClick }: EyeButtonProps) {
 
   return (
     <button
+      type="button"
       aria-label={hide ? tCommon('passwordToggle.show') : tCommon('passwordToggle.hide')}
       aria-pressed={!hide}
       onClick={onClick}

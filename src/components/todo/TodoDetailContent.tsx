@@ -31,11 +31,11 @@ export interface TodoDetailContentProps {
 const TAG_BADGE_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 /** 메타 행 라벨(아이콘 + 텍스트)의 공통 회색 텍스트 스타일 */
-const metaLabelClass = 'text-sm font-medium whitespace-nowrap text-slate-400';
+const metaLabelClass = 'text-sm font-medium whitespace-nowrap text-slate-400 dark:text-white/40';
 /** 메타 행 값 텍스트 스타일 */
-const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700';
+const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700 dark:text-white';
 /** 섹션 제목 스타일 (모바일 sm → 데스크탑 base) */
-const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base';
+const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base dark:text-white';
 
 export default function TodoDetailContent({ todo, onClose }: TodoDetailContentProps) {
   const { openNote } = useNoteDrawer();
@@ -55,13 +55,13 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
       {/* 헤더: 제목 + 상태 칩 + 닫기 */}
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <h2 className="text-base font-semibold tracking-[-0.48px] text-slate-800 sm:text-xl sm:leading-[30px] sm:tracking-[-0.6px]">
+          <h2 className="text-base font-semibold tracking-[-0.48px] text-slate-800 sm:text-xl sm:leading-[30px] sm:tracking-[-0.6px] dark:text-white">
             {todo.title}
           </h2>
           <Chip type={todo.done ? 'done' : 'todo'} className="shrink-0" />
         </div>
         <IconButton aria-label={tCommon('actions.close')} onClick={onClose} className="shrink-0">
-          <IcDelete aria-hidden className="size-6 text-slate-400" />
+          <IcDelete aria-hidden className="size-6 text-slate-400 dark:text-white/40" />
         </IconButton>
       </div>
 
@@ -70,7 +70,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         {todo.goal && (
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
-              <IcFlagOutline aria-hidden size="small" className="size-[18px] text-slate-400" />
+              <IcFlagOutline aria-hidden size="small" className="size-[18px] text-slate-400 dark:text-white/40" />
               <span className={metaLabelClass}>{tTodos('fields.goal')}</span>
             </div>
             <p className={metaValueClass}>{todo.goal.title}</p>
@@ -80,7 +80,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         {dueDate && (
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
-              <IcCalendarOutline aria-hidden className="size-[18px] text-slate-400" />
+              <IcCalendarOutline aria-hidden className="size-[18px] text-slate-400 dark:text-white/40" />
               <span className={metaLabelClass}>{tTodos('fields.dueDate')}</span>
             </div>
             <p className={metaValueClass}>{dueDate}</p>
@@ -89,7 +89,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
 
         {todo.tags.length > 0 && (
           <div className="flex w-full items-start gap-2">
-            <div className="flex shrink-0 items-center gap-1 text-slate-400">
+            <div className="flex shrink-0 items-center gap-1 text-slate-400 dark:text-white/40">
               <span className="w-[17px] text-center text-base font-semibold">#</span>
               <span className="text-sm font-medium whitespace-nowrap">{tTodos('fields.tag')}</span>
             </div>
@@ -116,8 +116,10 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 rel="noopener noreferrer"
                 className="flex w-full items-start gap-1 hover:underline"
               >
-                <IcLink aria-hidden className="size-6 shrink-0 text-slate-500" />
-                <span className="min-w-0 flex-1 text-base break-all text-slate-700">{todo.linkUrl}</span>
+                <IcLink aria-hidden className="size-6 shrink-0 text-slate-500 dark:text-white/60" />
+                <span className="min-w-0 flex-1 text-base break-all text-slate-700 dark:text-white">
+                  {todo.linkUrl}
+                </span>
               </a>
             )}
             {todo.fileUrl && (
@@ -125,7 +127,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 type="button"
                 onClick={() => openImageLightbox(todo.fileUrl!, todo.title)}
                 aria-label={tCommon('image.attachmentAlt')}
-                className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200"
+                className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200 dark:border-white/10"
               >
                 <Image src={todo.fileUrl} alt={tCommon('image.attachmentAlt')} fill className="object-cover" />
               </button>
@@ -159,10 +161,12 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                       onClose();
                       openNote(todo.id, 'detail');
                     }}
-                    className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
+                    className="dark:bg-indigo-dark-400 dark:hover:bg-indigo-dark-500 flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50 dark:border-white/10"
                   >
                     <IcSpringNote aria-hidden className="size-8 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700">{note.title}</span>
+                    <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700 dark:text-white">
+                      {note.title}
+                    </span>
                   </button>
                 </li>
               ))}

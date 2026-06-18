@@ -38,7 +38,6 @@ export function useInfiniteNotificationList(
       }),
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
-    refetchOnMount: 'always',
   });
 }
 

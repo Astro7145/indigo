@@ -12,7 +12,6 @@ import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 import { IcHamburger, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
-import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
@@ -165,10 +164,7 @@ export default function Topbar() {
                 openCreate();
               }}
             />
-            <div className="flex gap-x-2">
-              <SidebarProfileButton />
-              <SidebarNotificationButton />
-            </div>
+            <SidebarProfileButton />
           </div>
         </motion.div>
       </motion.div>
