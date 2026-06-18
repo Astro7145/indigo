@@ -47,14 +47,14 @@ export default function PostList() {
         fallback={
           <section className="mx-auto max-w-[1200px]">
             <div className="flex min-h-[40vh] items-center justify-center">
-              <p className="text-sm text-slate-400">{t('loadMoreError')}</p>
+              <p className="text-sm text-slate-400 dark:text-white/40">{t('loadMoreError')}</p>
             </div>
           </section>
         }
         errorFallback={
           <section className="mx-auto max-w-[1200px]">
             <div className="flex min-h-[40vh] items-center justify-center">
-              <p className="text-sm text-slate-500">{t('loadError')}</p>
+              <p className="text-sm text-slate-500 dark:text-white/60">{t('loadError')}</p>
             </div>
           </section>
         }
@@ -147,8 +147,12 @@ function PostsList({ search, type }: { search?: string; type: 'all' | 'best' }) 
         ))}
       </ul>
       <div ref={sentinelRef} aria-hidden className="h-4 w-full" />
-      {isFetchingNextPage && <p className="py-4 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
-      {isFetchNextPageError && <p className="py-4 text-center text-sm text-slate-500">{t('loadMoreError')}</p>}
+      {isFetchingNextPage && (
+        <p className="py-4 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+      )}
+      {isFetchNextPageError && (
+        <p className="py-4 text-center text-sm text-slate-500 dark:text-white/60">{t('loadMoreError')}</p>
+      )}
     </section>
   );
 }

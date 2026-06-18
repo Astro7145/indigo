@@ -1,4 +1,20 @@
 {
+  "meta": {
+    "title": "소통 게시판",
+    "description": "팀과 자유롭게 소통하고 의견을 나눠보세요.",
+    "write": {
+      "title": "게시물 작성",
+      "description": "새로운 게시물을 작성해 팀과 공유하세요."
+    },
+    "detail": {
+      "title": "게시물",
+      "description": "게시물을 확인하고 댓글로 소통하세요."
+    },
+    "edit": {
+      "title": "게시물 수정",
+      "description": "작성한 게시물을 수정하세요."
+    }
+  },
   "title": "소통 게시판",
   "viewCount": "조회 {count}",
   "commentCount": "댓글 {count}개",

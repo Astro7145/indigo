@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Sign Up",
+    "description": "Create your INdigo account and start your productivity journey."
+  },
   "submit": "Sign Up",
   "submitting": "Processing...",
   "loginPrompt": "Already a member?",

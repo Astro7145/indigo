@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getTranslations } from 'next-intl/server';
@@ -5,6 +6,13 @@ import { getTranslations } from 'next-intl/server';
 import { prefetchPosts } from '@/src/api/server/prefetch';
 import { getQueryClient } from '@/src/api/server/query-client';
 import PostList from '@/src/components/post/PostList';
+
+// 메타데이터는 layout이 아닌 page에 둔다 — 컨테이너 layout이 문자열 title을 가지면
+// 루트 title.template이 하위 화면(write·detail·edit)까지 전파되지 못하고 끊긴다.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('posts');
+  return { title: t('meta.title'), description: t('meta.description') };
+}
 
 /**
  * 소통 게시판 라우트(`/posts`). 서버 셸 — searchParams를 파싱해 목록·인기글 첫 페이지를
@@ -28,7 +36,7 @@ export default async function PostsPage({
     <div>
       {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
       <header className="mx-auto mb-6 hidden max-w-[1200px] sm:block">
-        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">{t('title')}</h1>
+        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl dark:text-white">{t('title')}</h1>
       </header>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense fallback={<div />}>

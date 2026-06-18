@@ -124,7 +124,7 @@ export default function CommentItem({
             ) : (
               <IcProfileYellow className="size-5 sm:size-6" />
             )}
-            <span className="text-sm text-slate-700 sm:text-base">{comment.writer.name}</span>
+            <span className="text-sm text-slate-700 sm:text-base dark:text-white">{comment.writer.name}</span>
             {isMine && (
               <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
                 {t('comment.mine')}
@@ -135,7 +135,7 @@ export default function CommentItem({
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
                 <IconButton aria-label={tCommon('actions.more')}>
-                  <IcMeetballs className="size-5 text-slate-400" />
+                  <IcMeetballs className="size-5 text-slate-400 dark:text-white/60" />
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
@@ -157,11 +157,11 @@ export default function CommentItem({
               onKeyDown={handleEditKeyDown}
               aria-label={t('comment.editLabel')}
               disabled={isUpdating}
-              className="field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:px-4 sm:py-2.5"
+              className="dark:focus:border-indigo-dark-800 field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:px-4 sm:py-2.5 dark:border-white/20 dark:text-white"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-400">{formattedDate}</span>
+              <span className="text-xs text-slate-400 dark:text-white/40">{formattedDate}</span>
               <div className="flex gap-2">
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
                   {tCommon('actions.cancel')}
@@ -174,8 +174,10 @@ export default function CommentItem({
           </form>
         ) : (
           <>
-            <p className="text-sm whitespace-pre-wrap text-slate-700 sm:text-base">{comment.content}</p>
-            <div className="flex items-center gap-3 text-xs text-slate-400">
+            <p className="text-sm whitespace-pre-wrap text-slate-700 sm:text-base dark:text-white/80">
+              {comment.content}
+            </p>
+            <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-white/40">
               <span>{formattedDate}</span>
               <button
                 type="button"
@@ -186,7 +188,10 @@ export default function CommentItem({
               >
                 <IcThumbUp
                   filled={comment.isLiked}
-                  className={cn('size-4', comment.isLiked ? 'text-indigo-500' : 'text-slate-400')}
+                  className={cn(
+                    'size-4',
+                    comment.isLiked ? 'dark:text-indigo-dark-800 text-indigo-500' : 'text-slate-400 dark:text-white/40',
+                  )}
                 />
                 <span>{comment.likeCount}</span>
               </button>
@@ -197,8 +202,8 @@ export default function CommentItem({
                     type="button"
                     onClick={() => onReplyClick?.(comment.id)}
                     className={cn(
-                      'cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
-                      activeReplyTargetId === comment.id && 'font-semibold text-indigo-500',
+                      'dark:active:text-indigo-dark-800 cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
+                      activeReplyTargetId === comment.id && 'dark:text-indigo-dark-800 font-semibold text-indigo-500',
                     )}
                   >
                     {t('comment.reply')}
@@ -208,8 +213,8 @@ export default function CommentItem({
                       type="button"
                       onClick={() => onRepliesOpenChange?.(!repliesOpen)}
                       className={cn(
-                        'cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
-                        repliesOpen && 'font-semibold text-indigo-500',
+                        'dark:active:text-indigo-dark-800 cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
+                        repliesOpen && 'dark:text-indigo-dark-800 font-semibold text-indigo-500',
                       )}
                     >
                       {repliesOpen ? t('comment.hideReplies') : t('comment.showReplies', { count: comment.replyCount })}
@@ -234,9 +239,9 @@ export default function CommentItem({
         )}
 
         {!isReply && repliesOpen && (
-          <div className="mt-3 border-l-2 border-slate-200 pl-4">
+          <div className="mt-3 border-l-2 border-slate-200 pl-4 dark:border-white/10">
             {!replies ? (
-              <p className="text-xs text-slate-400">{t('comment.replyLoading')}</p>
+              <p className="text-xs text-slate-400 dark:text-white/40">{t('comment.replyLoading')}</p>
             ) : (
               <ul className="space-y-3">
                 {replies.comments.map((reply) => (
