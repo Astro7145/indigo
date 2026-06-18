@@ -28,7 +28,8 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       email: '',
       password: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
+    delayError: 300,
   });
   const { mutate } = useLogin();
 
