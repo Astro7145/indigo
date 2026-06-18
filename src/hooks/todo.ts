@@ -23,6 +23,17 @@ export function useTodoList(params: TodoListParams = {}) {
   });
 }
 
+/**
+ * 전체 할일을 커서 끝까지 1스윕으로 불러온다(그래프 등 전수 조회용).
+ * 키는 useGoalList의 'all'과 같은 결로 lists() 아래 'all'에 고정한다.
+ */
+export function useAllTodos() {
+  return useQuery<TodoListResponse, ApiError>({
+    queryKey: [...todoKeys.lists(), 'all'],
+    queryFn: () => getAllTodos({}),
+  });
+}
+
 /** 마감일 범위(KST, YYYY-MM-DD) 쿼리 옵션 — suspense 훅과 프리페치가 키·fetcher를 공유한다. */
 function todosInRangeOptions(from: string, to: string) {
   return queryOptions<TodoListResponse, ApiError>({

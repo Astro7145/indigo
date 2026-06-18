@@ -106,8 +106,8 @@ function TodoItem({
     variant === 'onDark'
       ? 'font-semibold text-white'
       : cn(
-          'font-medium group-hover:font-semibold group-hover:text-indigo-700',
-          checked ? 'text-slate-500' : 'text-slate-800',
+          'font-medium group-hover:font-semibold group-hover:text-indigo-700 dark:group-hover:text-indigo-dark-800',
+          checked ? 'text-slate-500 dark:text-white/50' : 'text-slate-800 dark:text-white',
         ),
   );
 
@@ -253,9 +253,9 @@ function EditAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       label={rest['aria-label'] ?? tCommon('actions.update')}
       onClick={onClick}
       hoverOnly={hoverOnly}
-      className={cn('bg-white', className)}
+      className={cn('dark:bg-indigo-dark-600 bg-white', className)}
     >
-      <IcPencil className="size-[14px] text-indigo-600" />
+      <IcPencil className="dark:text-indigo-dark-800 size-3.5 text-indigo-600" />
     </ActionButton>
   );
 }
@@ -286,13 +286,16 @@ function KebabAction({ hoverOnly, className, onEdit, onDelete, 'aria-label': ari
       className={cn('inline-flex', hoverOnly && !open && 'hidden group-hover:inline-flex')}
     >
       <Dropdown.Trigger asChild>
-        <ActionButton label={ariaLabel ?? tCommon('moreMenu')} className={cn('bg-white', className)}>
-          <IcKebab className="size-[14px] text-indigo-600" />
+        <ActionButton
+          label={ariaLabel ?? tCommon('moreMenu')}
+          className={cn('dark:bg-indigo-dark-600 bg-white', className)}
+        >
+          <IcKebab className="dark:text-indigo-dark-800 size-3.5 text-indigo-600" />
         </ActionButton>
       </Dropdown.Trigger>
       <Dropdown.Menu size="small" placement="bottom-end">
         <Dropdown.Item onClick={onEdit}>{tCommon('actions.edit')}</Dropdown.Item>
-        <Dropdown.Item onClick={onDelete} className="text-destructive">
+        <Dropdown.Item onClick={onDelete} className="text-destructive dark:text-destructive">
           {tCommon('actions.delete')}
         </Dropdown.Item>
       </Dropdown.Menu>

@@ -4,11 +4,11 @@ import { cn } from '@/src/utils/cn';
 import { cva } from 'class-variance-authority';
 
 const inputContainerVariants = cva(
-  'flex items-center gap-x-2 rounded-sm border bg-white focus-within:border-indigo-500 cursor-text p-3 sm:p-4',
+  'flex items-center gap-x-2 rounded-sm border bg-white dark:bg-indigo-dark-300 focus-within:border-indigo-500 cursor-text p-3 sm:p-4',
   {
     variants: {
       variant: {
-        default: 'border-slate-300',
+        default: 'border-slate-300 dark:border-white/20',
         error: 'border-destructive',
         typing: 'border-indigo-500',
       },
@@ -31,7 +31,7 @@ export default function Input({ className, variant, iconRight, ...props }: Input
       <input
         type="text"
         aria-invalid={variant === 'error' ? true : undefined}
-        className="flex-1 text-sm font-normal text-slate-700 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-slate-500 sm:text-base sm:placeholder:text-base"
+        className="min-w-0 flex-1 text-sm font-normal text-slate-700 outline-none placeholder:text-sm placeholder:font-normal placeholder:text-slate-500 sm:text-base sm:placeholder:text-base dark:text-white dark:placeholder:text-white/40"
         {...props}
       />
       {iconRight}

@@ -58,7 +58,7 @@ export default function GoalDetailHeader({ goalId, className }: GoalDetailHeader
         </Dropdown.Trigger>
         <Dropdown.Menu size="small" placement="bottom-end">
           <Dropdown.Item onClick={() => setEditOpen(true)}>{tCommon('actions.edit')}</Dropdown.Item>
-          <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
+          <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive dark:text-destructive">
             {tCommon('actions.delete')}
           </Dropdown.Item>
         </Dropdown.Menu>

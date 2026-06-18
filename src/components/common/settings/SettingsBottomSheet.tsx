@@ -15,7 +15,7 @@ export default function SettingsBottomSheet() {
   return (
     <BottomSheet isOpen={isOpen} onClose={close}>
       <div role="dialog" aria-label="설정" className="flex flex-col gap-8">
-        <h2 className="text-lg font-semibold text-slate-800">설정</h2>
+        <h2 className="text-lg font-semibold text-slate-800 dark:text-white">설정</h2>
 
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-4">
@@ -28,11 +28,13 @@ export default function SettingsBottomSheet() {
           </div>
 
           <div className="flex w-full items-center gap-2 *:flex-1">
-            <Button variant="tertiary" size="large" onClick={close}>
-              취소
-            </Button>
-            <Button variant="primary" size="large" onClick={close}>
-              확인
+            <Button
+              variant="tertiary"
+              size="large"
+              onClick={close}
+              className="dark:border-white/20 dark:text-white/70 dark:hover:border-white/40 dark:hover:text-white"
+            >
+              닫기
             </Button>
           </div>
         </div>
