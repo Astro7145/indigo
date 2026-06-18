@@ -1,17 +1,24 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, skipToken } from '@tanstack/react-query';
+import {
+  useQuery,
+  useSuspenseQuery,
+  useSuspenseInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  skipToken,
+} from '@tanstack/react-query';
 import { postKeys, getPosts, getPost, createPost, patchPost, deletePost } from '@/src/api/post';
 import type { Post, PostListParams, PostListResponse, CreatePostBody, UpdatePostBody } from '@/src/types/post';
 import type { ApiError } from '@/src/types/common';
 
 export function usePostList(params: PostListParams = {}) {
-  return useQuery<PostListResponse, ApiError>({
+  return useSuspenseQuery<PostListResponse, ApiError>({
     queryKey: postKeys.list(params),
     queryFn: () => getPosts(params),
   });
 }
 
 export function useInfinitePostList(params: Omit<PostListParams, 'cursor'> = {}) {
-  return useInfiniteQuery<PostListResponse, ApiError>({
+  return useSuspenseInfiniteQuery<PostListResponse, ApiError>({
     queryKey: [...postKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => getPosts({ ...params, cursor: pageParam as string | undefined }),
     initialPageParam: undefined as string | undefined,
@@ -23,6 +30,13 @@ export function usePost(id: number | undefined) {
   return useQuery<Post, ApiError>({
     queryKey: id == null ? [...postKeys.details(), 'pending'] : postKeys.detail(id),
     queryFn: id == null ? skipToken : () => getPost(id),
+  });
+}
+
+export function usePostSuspense(id: number) {
+  return useSuspenseQuery<Post, ApiError>({
+    queryKey: postKeys.detail(id),
+    queryFn: () => getPost(id),
   });
 }
 

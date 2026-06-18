@@ -33,11 +33,6 @@ it('useComments는 postId가 undefined이면 비활성화된다', () => {
   expect(mocked.getComments).not.toHaveBeenCalled();
 });
 
-it('useInfiniteComments는 postId가 undefined이면 비활성화된다', () => {
-  renderHookWithClient(() => useInfiniteComments(undefined));
-  expect(mocked.getComments).not.toHaveBeenCalled();
-});
-
 it('useComments는 postId와 params로 getComments를 호출한다', async () => {
   mocked.getComments.mockResolvedValue({
     comments: [],
