@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
+import { useScrollLock } from '@/src/hooks/useScrollLock';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
@@ -48,15 +49,8 @@ export default function Topbar() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
-  useEffect(() => {
-    if (collapsed) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [collapsed]);
+  // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다 (공용 참조카운트 락)
+  useScrollLock(!collapsed);
 
   // 메뉴를 여는 버튼은 후속 작업에서 추가한다 (#171). 닫기는 메뉴 내부 항목에서 호출한다.
   const collapse = () => setCollapsed(true);
