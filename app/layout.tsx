@@ -33,6 +33,7 @@ export default async function RootLayout({
             <Toast />
             <ModalStack />
             {children}
+            <div id="toast-portal" />
           </Providers>
         </NextIntlClientProvider>
       </body>

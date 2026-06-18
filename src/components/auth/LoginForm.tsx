@@ -1,6 +1,7 @@
 'use client';
 
 import { useLogin } from '@/src/hooks/auth';
+import { useToast } from '@/src/hooks/useToast';
 import { createLoginSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
@@ -32,16 +33,28 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       email: '',
       password: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
+    delayError: 300,
   });
   const { mutate } = useLogin();
+  const { showToast } = useToast();
 
   const handleLoginBehavior = (data: LoginFields) => {
     const { email, password } = data;
 
     // 오픈 리다이렉트 방지: 내부 경로(/...)만 허용. //로 시작하는 프로토콜-상대 URL·절대 URL은 차단.
     const target = callbackUrl && callbackUrl.startsWith('/') && !callbackUrl.startsWith('//') ? callbackUrl : '/';
-    mutate({ email, password }, { onSuccess: () => router.push(target) });
+    mutate(
+      { email, password },
+      {
+        onSuccess: () => router.push(target),
+        onError: (error) => {
+          if (error.code === 'INVALID_CREDENTIALS') {
+            showToast('이메일 또는 비밀번호가 잘못되었습니다.', 'error');
+          }
+        },
+      },
+    );
   };
 
   return (
