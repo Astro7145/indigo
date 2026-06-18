@@ -31,7 +31,6 @@ export default async function MainLayout({ children }: { children: React.ReactNo
         <Settings />
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
-          <div id="toast-portal" />
         </div>
         {/* 쿼리파라미터(todoId) 구독으로 열리는 전역 노트 드로어. useSearchParams의 CSR bailout을 Suspense로 감싼다. */}
         <Suspense fallback={null}>
