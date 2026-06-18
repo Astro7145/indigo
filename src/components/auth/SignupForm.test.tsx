@@ -110,9 +110,10 @@ describe('SignupForm', () => {
   });
 
   describe('이름 필드', () => {
-    it('빈 값으로 blur 시 에러 메시지가 표시된다', async () => {
+    it('값을 입력했다 비우면 에러 메시지가 표시된다', async () => {
       renderWithClient(<SignupForm />);
-      fireEvent.blur(screen.getByLabelText('이름'));
+      fireEvent.change(screen.getByLabelText('이름'), { target: { value: '홍길동' } });
+      fireEvent.change(screen.getByLabelText('이름'), { target: { value: '' } });
       expect(await screen.findByText('이름을 입력해주세요.')).toBeInTheDocument();
     });
 
@@ -148,7 +149,7 @@ describe('SignupForm', () => {
       expect(await screen.findByText('이미 사용 중인 닉네임입니다.')).toBeInTheDocument();
 
       fireEvent.blur(screen.getByLabelText('이름'));
-      // mode:'onBlur' 재검증(zodResolver)이 끝나도 schema 밖 검증이므로 메시지가 유지되어야 한다
+      // mode:'onChange' 재검증(zodResolver)이 끝나도 schema 밖 검증이므로 메시지가 유지되어야 한다
       await act(async () => {
         await Promise.resolve();
         await Promise.resolve();

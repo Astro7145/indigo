@@ -58,7 +58,12 @@ export default function EditorToolbar({
 }: EditorToolbarProps) {
   const t = useTranslations('common.editor');
   return (
-    <div className={cn('flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5', className)}>
+    <div
+      className={cn(
+        'dark:bg-indigo-dark-500 flex h-11 w-full items-center gap-0.5 rounded bg-slate-50 px-4 py-1.5',
+        className,
+      )}
+    >
       <IconButton aria-label={t('bold')} title={t('bold')} hover={!state.isBold} onClick={onBold}>
         <IcTextBold state={state.isBold ? 'active' : 'default'} />
       </IconButton>
@@ -69,7 +74,7 @@ export default function EditorToolbar({
         <IcTextUnderline state={state.isUnderline ? 'active' : 'default'} />
       </IconButton>
 
-      <div className="mx-1 h-5 w-px bg-slate-200" />
+      <div className="mx-1 h-5 w-px bg-slate-200 dark:bg-white/10" />
 
       <IconButton aria-label={t('alignLeft')} title={t('alignLeft')} hover={!state.isAlignLeft} onClick={onAlignLeft}>
         <IcTextAlignLeft state={state.isAlignLeft ? 'active' : 'default'} />

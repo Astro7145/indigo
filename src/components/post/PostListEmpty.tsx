@@ -15,7 +15,7 @@ export default function PostListEmpty({ className }: PostListEmptyProps) {
     <div className={cn('flex flex-col items-center justify-center gap-6 py-24', className)}>
       {/* empty image 확인할 것 */}
       <Logo size="lg" />
-      <p className="text-sm text-slate-500">{t('empty')}</p>
+      <p className="text-sm text-slate-500 dark:text-white/60">{t('empty')}</p>
     </div>
   );
 }
