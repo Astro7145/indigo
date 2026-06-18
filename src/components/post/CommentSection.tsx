@@ -79,8 +79,8 @@ export default function CommentSection({
 
   return (
     <section className="mt-6">
-      <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg">
-        {t('comment.title')} <span className="text-indigo-500">{totalCount}</span>
+      <h2 className="mb-4 text-base font-semibold text-slate-800 sm:text-lg dark:text-white">
+        {t('comment.title')} <span className="dark:text-indigo-dark-800 text-indigo-500">{totalCount}</span>
       </h2>
       <CommentInput onSubmit={handleTopLevelSubmit} disabled={isCreating} />
       {/* 작성순(오래된 것이 위) 정렬이라 다음 페이지가 위에 누적된다. 시선·데이터 추가 위치를 맞추려고 버튼을 목록 위에 둠 */}
@@ -89,17 +89,17 @@ export default function CommentSection({
           type="button"
           onClick={() => fetchNextPage?.()}
           disabled={isFetchingNextPage}
-          className="mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
+          className="dark:bg-indigo-dark-500 dark:hover:bg-indigo-dark-400 mt-6 flex w-full cursor-pointer items-center justify-between rounded border border-slate-300 bg-indigo-100 px-4 py-2.5 text-xs text-slate-600 transition-colors hover:bg-indigo-200 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm dark:border-white/10 dark:text-white"
         >
           <span>
             {isFetchingNextPage ? tCommon('state.loading') : t('comment.loadMore', { count: COMMENT_PAGE_SIZE })}
           </span>
-          <IcPlus className="size-4 text-slate-600 sm:size-6" />
+          <IcPlus className="size-4 text-slate-600 sm:size-6 dark:text-white" />
         </button>
       )}
       {comments.length === 0 ? (
         <div className="mt-6 flex h-20 items-center justify-center">
-          <p className="text-sm text-slate-400">{t('comment.empty')}</p>
+          <p className="text-sm text-slate-400 dark:text-white/40">{t('comment.empty')}</p>
         </div>
       ) : (
         <ul className="mt-6 space-y-4">
