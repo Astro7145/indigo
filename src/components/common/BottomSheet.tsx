@@ -61,7 +61,7 @@ export default function BottomSheet({
       {show && (
         <motion.div
           key="sheet"
-          className="fixed bottom-0 left-0 z-50 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
+          className="dark:bg-indigo-dark-300 fixed bottom-0 left-0 z-50 flex max-h-[90dvh] w-full flex-col overflow-hidden rounded-t-[20px] bg-white shadow-[0px_-8px_24px_0px_rgba(0,0,0,0.12)]"
           style={zStyle}
           onKeyDown={(e) => closeOnEsc && e.key === 'Escape' && onClose()}
           initial={{ y: '100%' }}
@@ -82,7 +82,7 @@ export default function BottomSheet({
             style={{ touchAction: 'none' }}
             className="flex shrink-0 cursor-grab justify-center pt-[10px] pb-2 active:cursor-grabbing"
           >
-            <div className="h-1 w-9 rounded-[2px] bg-slate-300" />
+            <div className="h-1 w-9 rounded-[2px] bg-slate-300 dark:bg-white/20" />
           </div>
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-8 pt-4 pb-8">{children}</div>
         </motion.div>

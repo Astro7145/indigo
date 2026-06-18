@@ -10,7 +10,7 @@ import { IcFilter } from '@/src/components/common/icons/IcFilter';
 import { IcGoal } from '@/src/components/common/icons/IcGoal';
 import NoteCard from '@/src/components/note/NoteCard';
 import { useGoal } from '@/src/hooks/goal';
-import { useInfiniteNoteList } from '@/src/hooks/note';
+import { useInfiniteNoteList } from '@/src/hooks/note/note';
 import { cn } from '@/src/utils/cn';
 
 type Sort = 'latest' | 'oldest';
@@ -112,7 +112,7 @@ function NotesCollectionContent({ goalId, search, sort }: { goalId: number; sear
   const moreMenu = (
     <Dropdown.Menu size="small" placement="bottom-end">
       <Dropdown.Item onClick={() => {}}>수정하기</Dropdown.Item>
-      <Dropdown.Item onClick={() => {}} className="text-destructive">
+      <Dropdown.Item onClick={() => {}} className="text-destructive dark:text-destructive">
         삭제하기
       </Dropdown.Item>
     </Dropdown.Menu>

@@ -6,7 +6,8 @@ export default function Page() {
   return (
     <div className="flex w-full max-w-100 flex-col gap-10">
       {/* 로고 */}
-      <LogoFull type="indigo" />
+      <LogoFull type="indigo" className="dark:hidden" />
+      <LogoFull type="white" className="hidden dark:block" />
 
       {/* 폼 영역 */}
       <SignupForm />

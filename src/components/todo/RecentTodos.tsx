@@ -21,7 +21,7 @@ export interface RecentTodosProps {
 // 카드 높이·패딩은 `@container` + cqw로 카드(그리드 칸) 폭에 비례 — 옆 ProgressCard와 높이가 항상 일치.
 const rootClass = '@container flex w-full flex-col gap-2.5';
 // 로딩·에러·빈 상태 안내 문구 공통 스타일 — 카드 정중앙 배치.
-const statusMessageClass = 'text-md m-auto text-center text-slate-500';
+const statusMessageClass = 'text-md m-auto text-center text-slate-500 dark:text-white/60';
 
 /**
  * 최근 등록한 할일 카드 — Figma 21673:53974 (Large).
@@ -39,19 +39,19 @@ export default function RecentTodos({ className }: RecentTodosProps) {
       <div className="flex items-center justify-between gap-2 px-2">
         <div className="flex min-w-0 items-center gap-3">
           <IcTask aria-hidden className="size-8 shrink-0 xl:size-10" />
-          <h3 className="truncate text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
+          <h3 className="truncate text-base leading-6 font-medium text-black xl:text-lg xl:leading-7 dark:text-white">
             {tDashboard('recentTodos.title')}
           </h3>
         </div>
         <Link
           href="/todos"
-          className="flex shrink-0 items-center text-base font-semibold whitespace-nowrap text-indigo-600"
+          className="dark:text-indigo-dark-800 flex shrink-0 items-center text-base font-semibold whitespace-nowrap text-indigo-600"
         >
           {tCommon('actions.viewAll')}
-          <IcChevron direction="right" className="size-5 text-indigo-600" />
+          <IcChevron direction="right" className="dark:text-indigo-dark-800 size-5 text-indigo-600" />
         </Link>
       </div>
-      <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)]">
+      <Card className="flex flex-col border border-slate-200 py-5 pr-2 pl-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:py-[max(20px,4.6875cqw)] xl:pr-[calc(max(16px,5cqw)_-_8px)] xl:pl-[max(16px,5cqw)] dark:border-white/10">
         <AsyncBoundary
           fallback={<p className={statusMessageClass}>{tCommon('state.loading')}</p>}
           errorFallback={<p className={statusMessageClass}>{tCommon('state.loadError')}</p>}
@@ -76,7 +76,7 @@ function RecentTodosContent() {
 
   return (
     <TodoList
-      className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto"
+      className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:scrollbar-gutter-stable sm:overflow-y-auto"
       todos={todos}
       size="large"
       onEdit={openEdit}

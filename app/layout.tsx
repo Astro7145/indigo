@@ -26,8 +26,8 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale} className={`${pretendard.className} h-full antialiased`}>
-      <body className="flex min-h-full bg-slate-100">
+    <html lang={locale} className={`${pretendard.className} h-full antialiased`} suppressHydrationWarning>
+      <body className="dark:bg-indigo-dark-400 flex min-h-full bg-slate-100">
         <NextIntlClientProvider>
           <Providers>
             <Toast />

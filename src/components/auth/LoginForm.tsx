@@ -2,8 +2,9 @@
 
 import { useLogin } from '@/src/hooks/auth';
 import { useToast } from '@/src/hooks/useToast';
-import { loginSchema } from '@/src/utils/schema';
+import { createLoginSchema } from '@/src/utils/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import Button from '../common/buttons/Button';
@@ -18,18 +19,22 @@ type LoginFields = {
 
 export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
   const router = useRouter();
+  const t = useTranslations('login');
+  const tc = useTranslations('common');
+  const tv = useTranslations('validation');
 
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, isSubmitted, errors, isValid },
   } = useForm<LoginFields>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(tv)),
     defaultValues: {
       email: '',
       password: '',
     },
-    mode: 'onBlur',
+    mode: 'onChange',
+    delayError: 300,
   });
   const { mutate } = useLogin();
   const { showToast } = useToast();
@@ -59,7 +64,7 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         <span className="flex flex-col gap-y-1">
           <Input
             type="text"
-            placeholder="이메일을 입력해주세요"
+            placeholder={tc('placeholders.email')}
             className="w-full"
             variant={errors.email ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (errors.email ? 'true' : 'false') : undefined}
@@ -73,7 +78,7 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         </span>
         <span className="flex flex-col gap-y-1">
           <PasswordInput
-            placeholder="비밀번호를 입력해주세요"
+            placeholder={tc('placeholders.password')}
             className="w-full"
             variant={errors.password ? 'error' : 'default'}
             aria-invalid={isSubmitted ? (errors.password ? 'true' : 'false') : undefined}
@@ -90,12 +95,12 @@ export default function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       {/* 로그인 버튼 & 회원가입 링크 */}
       <div className="flex flex-col gap-6">
         <Button type="submit" className="w-full" disabled={isSubmitting || !isValid}>
-          {isSubmitting ? '로그인중...' : '로그인하기'}
+          {isSubmitting ? t('submitting') : t('submit')}
         </Button>
         <div className="flex items-center justify-center gap-2 text-base tracking-[-0.03em]">
-          <span className="font-medium text-slate-700">INdigo가 처음이신가요?</span>
-          <Link href="/signup" className="font-semibold text-indigo-600">
-            회원가입
+          <span className="font-medium text-slate-700 dark:text-white/70">{t('signupPrompt')}</span>
+          <Link href="/signup" className="dark:text-indigo-dark-900 font-semibold text-indigo-600">
+            {t('signupLink')}
           </Link>
         </div>
       </div>

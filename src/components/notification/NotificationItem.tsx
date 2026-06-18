@@ -62,7 +62,8 @@ export default function NotificationItem({ notification, subtext, onClick }: Not
       onKeyDown={isInteractive ? handleKeyDown : undefined}
       className={cn(
         'flex items-start gap-2 rounded px-2 py-3 transition-colors',
-        isInteractive && 'cursor-pointer hover:bg-slate-50 focus-visible:ring-2 focus-visible:outline-none',
+        isInteractive &&
+          'dark:hover:bg-indigo-dark-400 cursor-pointer hover:bg-slate-50 focus-visible:ring-2 focus-visible:outline-none',
       )}
     >
       {/* 읽지 않은 알림 인디케이터 */}
@@ -78,22 +79,24 @@ export default function NotificationItem({ notification, subtext, onClick }: Not
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-col gap-0.5 text-sm leading-5 tracking-[-0.03em]">
-            <p className={cn('font-medium wrap-break-word text-slate-700', !subtext && 'line-clamp-2')}>{message}</p>
-            {subtext && <p className="truncate font-normal text-slate-500">{subtext}</p>}
+            <p className={cn('font-medium wrap-break-word text-slate-700 dark:text-white', !subtext && 'line-clamp-2')}>
+              {message}
+            </p>
+            {subtext && <p className="truncate font-normal text-slate-500 dark:text-white/70">{subtext}</p>}
           </div>
-          <p className="text-xs leading-4 text-slate-400">{relativeTime}</p>
+          <p className="text-xs leading-4 text-slate-400 dark:text-white/40">{relativeTime}</p>
         </div>
 
         {/* 아바타 (장식 이미지) */}
         <div
           aria-hidden="true"
-          className="relative size-10 shrink-0 overflow-hidden rounded-full border border-slate-200"
+          className="relative size-10 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-white/10"
         >
           {data?.userImage ? (
             // 아바타 외부 도메인은 가변적 — next.config images.remotePatterns에서 https 전체 허용
             <Image src={data.userImage} alt={t('avatarAlt')} fill sizes="40px" className="object-cover" />
           ) : (
-            <div className="size-full bg-slate-100" />
+            <div className="size-full bg-slate-100 dark:bg-white/10" />
           )}
         </div>
       </div>
