@@ -3,5 +3,6 @@
   "language": "言語",
   "darkMode": "ダークモード",
   "themeLight": "ライトモード",
-  "themeDark": "ダークモード"
+  "themeDark": "ダークモード",
+  "themeSystem": "システム設定"
 }
