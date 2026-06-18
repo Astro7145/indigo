@@ -51,21 +51,11 @@ function PostDetailContent({ postId }: PostDetailViewProps) {
   const tCommon = useTranslations('common');
 
   const { data: post } = usePostSuspense(postId);
-  // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
-  const {
-    data: commentsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteComments(postId, { parentId: 'null' });
   const { data: me } = useMe();
   const { mutate: deletePost } = useDeletePost();
   const { showToast } = useToast();
   const openImageLightbox = useImageLightbox();
   const [deleteOpen, setDeleteOpen] = useState(false);
-
-  // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
-  const comments = commentsData.pages.flatMap((p) => p.comments).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 
   const handleDelete = () => {
     deletePost(postId, {
@@ -137,15 +127,23 @@ function PostDetailContent({ postId }: PostDetailViewProps) {
           {post.createdAt.slice(0, 10).replace(/-/g, '.')} · {t('viewCount', { count: post.viewCount })}
         </div>
 
-        <CommentSection
-          postId={postId}
-          comments={comments}
-          totalCount={post.commentCount}
-          currentUserId={me?.id}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-        />
+        {/* 댓글은 본문과 별개의 Suspense 경계 — 두 Suspense 쿼리가 같은 경계 안에서 동시에 throw하면
+            ErrorBoundary 전파가 어긋나(updateSuspenseComponent 에러) 페이지 전체가 깨질 수 있어 분리한다.
+            덤으로 부분 실패 시 본문은 그대로 두고 댓글 영역에서만 오류를 보여준다. */}
+        <AsyncBoundary
+          fallback={
+            <div className="mt-6 flex h-20 items-center justify-center">
+              <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
+            </div>
+          }
+          errorFallback={
+            <div className="mt-6 flex h-20 items-center justify-center">
+              <p className="text-sm text-slate-500">{t('comment.loadError')}</p>
+            </div>
+          }
+        >
+          <PostComments postId={postId} totalCount={post.commentCount} currentUserId={me?.id} />
+        </AsyncBoundary>
       </article>
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
@@ -158,5 +156,39 @@ function PostDetailContent({ postId }: PostDetailViewProps) {
         </Modal.Actions>
       </Modal>
     </>
+  );
+}
+
+function PostComments({
+  postId,
+  totalCount,
+  currentUserId,
+}: {
+  postId: number;
+  // post.commentCount(부모+답글 전체) — CommentSection 헤더 카운트로 그대로 흘려보낸다
+  totalCount: number;
+  currentUserId: number | undefined;
+}) {
+  // parentId='null'(문자열)을 명시해 최상위 댓글만 받는다. 자식 댓글은 각 CommentItem이 lazy로 별도 페치
+  const {
+    data: commentsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteComments(postId, { parentId: 'null' });
+
+  // 받아둔 모든 페이지의 댓글을 합쳐 작성순(asc)으로 정렬. 페이지 안에서만 정렬하면 경계 어긋남
+  const comments = commentsData.pages.flatMap((p) => p.comments).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  return (
+    <CommentSection
+      postId={postId}
+      comments={comments}
+      totalCount={totalCount}
+      currentUserId={currentUserId}
+      hasNextPage={hasNextPage}
+      fetchNextPage={fetchNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+    />
   );
 }

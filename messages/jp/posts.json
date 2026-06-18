@@ -55,6 +55,7 @@
     "replyPlaceholder": "返信を入力してください。",
     "replyInputLabel": "返信入力",
     "replyLoading": "返信を読み込んでいます…",
-    "replyCreateError": "返信の登録に失敗しました。"
+    "replyCreateError": "返信の登録に失敗しました。",
+    "loadError": "コメントを読み込めませんでした。"
   }
 }
