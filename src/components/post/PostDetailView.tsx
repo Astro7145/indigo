@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 import { useTranslations } from 'next-intl';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
@@ -22,6 +22,26 @@ import { useMe } from '@/src/hooks/user';
 interface PostDetailViewProps {
   postId: number;
 }
+
+// 게시물 본문 허용 정책 — 에디터가 만들어내는 태그·속성·인라인 스타일을 통과시키고 나머지는 제거.
+// sanitize-html 디폴트(블록/인라인 텍스트 + 링크)에 img와 폼·아이콘 외 인라인 마크업을 더해 확장하고,
+// 링크엔 rel/target까지 보존(에디터가 외부 링크에 noopener·noreferrer를 넣어 보냄), 인라인 스타일은
+// text-align 같은 정렬 정도만 허용. javascript: 등 위험 스킴은 allowedSchemes로 차단.
+const POST_SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+  allowedTags: [...sanitizeHtml.defaults.allowedTags, 'img', 'h1', 'h2'],
+  allowedAttributes: {
+    ...sanitizeHtml.defaults.allowedAttributes,
+    a: ['href', 'name', 'target', 'rel', 'class'],
+    img: ['src', 'srcset', 'alt', 'title', 'width', 'height', 'loading', 'class'],
+    '*': ['class', 'style'],
+  },
+  allowedSchemes: ['http', 'https', 'mailto', 'data'],
+  allowedStyles: {
+    '*': {
+      'text-align': [/^(left|right|center|justify)$/],
+    },
+  },
+};
 
 export default function PostDetailView({ postId }: PostDetailViewProps) {
   const tCommon = useTranslations('common');
@@ -104,10 +124,11 @@ function PostDetailContent({ postId }: PostDetailViewProps) {
           <span className="text-sm text-slate-700">{post.writer.name}</span>
         </div>
 
-        {/* 본문 — isomorphic-dompurify로 서버·클라이언트 모두 sanitize */}
+        {/* 본문 — sanitize-html로 서버·클라이언트 모두 sanitize.
+            isomorphic-dompurify는 Vercel production에서 jsdom 번들링이 깨져 SSR 500을 유발해 교체. */}
         <div
           className="mb-6 text-sm text-slate-800 sm:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content, POST_SANITIZE_OPTIONS) }}
         />
 
         {/* 이미지 — 클릭 시 라이트박스로 확대 */}
