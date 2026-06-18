@@ -10,6 +10,7 @@ const isTypingTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false;
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 };
+import { useScrollLock } from '@/src/hooks/useScrollLock';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useModalStore } from '@/src/stores/modal';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
@@ -62,15 +63,8 @@ export default function Sidebar() {
     return () => mql.removeEventListener('change', handleChange);
   }, []);
 
-  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
-  useEffect(() => {
-    if (!isTablet || collapsed) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isTablet, collapsed]);
+  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다 (공용 참조카운트 락)
+  useScrollLock(isTablet && !collapsed);
 
   return (
     <div className="hidden sm:contents">
@@ -88,27 +82,27 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
       {isTablet && <span className="w-18 shrink-0" />}
-      <aside
-        className={cn('scrollbar-slate top-0 left-0 z-50 h-screen w-fit bg-[#1A1B2E]', isTablet ? 'fixed' : 'sticky')}
-      >
+      <aside className={cn('bg-indigo-dark-200 top-0 left-0 z-50 h-screen w-fit', isTablet ? 'fixed' : 'sticky')}>
         <div
           className={cn(
-            'flex h-full flex-col justify-between',
+            'flex h-full flex-col gap-y-8',
             collapsed ? (isTablet ? 'px-2.5 py-8' : 'px-3 py-8') : 'px-8 pt-8 pb-16',
           )}
         >
-          <div className="flex flex-col gap-y-8">
-            <div className="flex items-center justify-between">
-              {collapsed ? null : <LogoFull type="white" />}
-              <button
-                type="button"
-                onClick={() => setCollapsed((prev) => !prev)}
-                aria-label={collapsed ? t('expand') : t('collapse')}
-                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
-              >
-                <IcDoubleArrow state={collapsed ? 'expand' : 'fold'} />
-              </button>
-            </div>
+          {/* 고정 헤더: 로고 + 접기 토글 (스크롤 영향 없음) */}
+          <div className="flex shrink-0 items-center justify-between">
+            {collapsed ? null : <LogoFull type="white" />}
+            <button
+              type="button"
+              onClick={() => setCollapsed((prev) => !prev)}
+              aria-label={collapsed ? t('expand') : t('collapse')}
+              className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+            >
+              <IcDoubleArrow state={collapsed ? 'expand' : 'fold'} />
+            </button>
+          </div>
+          {/* 스크롤 영역: 내비~로그아웃 (헤더·푸터는 고정). gutter 예약으로 스크롤바 등장 시 가로 흔들림 방지 */}
+          <div className="scrollbar-slate flex min-h-0 flex-1 scrollbar-gutter-stable flex-col gap-y-8 overflow-y-auto">
             <ul className="flex flex-col gap-y-3">
               <SidebarRow
                 type="dashboard"
@@ -152,7 +146,8 @@ export default function Sidebar() {
             </ul>
           </div>
           {!collapsed && (
-            <div className="flex flex-col gap-y-8">
+            // 고정 푸터: 새할일 + 프로필 (outer gap-y-8로 스크롤 영역과 간격)
+            <div className="flex shrink-0 flex-col gap-y-8">
               <TodoAddButton
                 onClick={() => {
                   openCreate();

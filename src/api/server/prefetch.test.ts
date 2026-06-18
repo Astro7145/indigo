@@ -6,6 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import { noteKeys } from '@/src/api/note';
+import { notificationKeys } from '@/src/api/notification';
 import {
   prefetchAllGoals,
   prefetchCalendarMonth,
@@ -15,9 +16,16 @@ import {
   prefetchInfiniteNotes,
   prefetchInfiniteTodos,
   prefetchMe,
+  prefetchPostDetail,
+  prefetchPostEdit,
+  prefetchPosts,
   prefetchRecentTodos,
+  prefetchSidebarGoals,
+  prefetchSidebarNotifications,
 } from '@/src/api/server/prefetch';
 import { serverGet } from '@/src/api/server/server-get';
+import { commentKeys } from '@/src/api/comment';
+import { postKeys } from '@/src/api/post';
 import { todoKeys } from '@/src/api/todo';
 import { userKeys } from '@/src/api/user';
 
@@ -106,4 +114,43 @@ it('prefetchInfiniteGoals는 캐시에 넣고 첫 페이지 목표를 반환한�
 it('prefetchInfiniteGoals는 실패 시 던지지 않고 빈 배열을 반환한다', async () => {
   mocked.mockRejectedValue(new Error('backend down'));
   await expect(prefetchInfiniteGoals(qc, 2)).resolves.toEqual([]);
+});
+
+it('prefetchPosts는 무한쿼리 목록 + 인기글 둘 다 캐시한다', async () => {
+  mocked.mockResolvedValue({ posts: [{ id: 1 }], nextCursor: null, totalCount: 1 });
+  await prefetchPosts(qc, { type: 'all' });
+  const infinite = qc.getQueryData<{ pages: unknown[] }>([...postKeys.list({ type: 'all' }), 'infinite']);
+  expect(infinite?.pages).toHaveLength(1);
+  expect(qc.getQueryData(postKeys.list({ type: 'best', limit: 3 }))).toBeDefined();
+});
+
+it('prefetchPostDetail은 post 단건 + 댓글 무한 첫 페이지를 캐시한다', async () => {
+  mocked
+    .mockResolvedValueOnce({ id: 42, title: '게시물' })
+    .mockResolvedValueOnce({ comments: [{ id: 1 }], nextCursor: null, totalCount: 1 });
+  await prefetchPostDetail(qc, 42);
+  expect(qc.getQueryData(postKeys.detail(42))).toMatchObject({ id: 42 });
+  const comments = qc.getQueryData<{ pages: unknown[] }>([...commentKeys.list(42, { parentId: 'null' }), 'infinite']);
+  expect(comments?.pages).toHaveLength(1);
+});
+
+it('prefetchPostEdit은 postKeys.detail 키에 post 단건을 캐시한다', async () => {
+  mocked.mockResolvedValue({ id: 7, title: '수정할 게시물' });
+  await prefetchPostEdit(qc, 7);
+  expect(mocked).toHaveBeenCalledWith('posts/7');
+  expect(qc.getQueryData(postKeys.detail(7))).toMatchObject({ id: 7 });
+});
+
+it('prefetchSidebarGoals는 useInfiniteGoalList() 무파라미터 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ goals: [{ id: 1 }], nextCursor: null, totalCount: 1 });
+  await prefetchSidebarGoals(qc);
+  expect(mocked).toHaveBeenCalledWith('goals', {});
+  expect(qc.getQueryData([...goalKeys.list({}), 'infinite'])).toBeDefined();
+});
+
+it('prefetchSidebarNotifications는 useInfiniteNotificationList({limit:100}) 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ notifications: [], nextCursor: null, totalCount: 0 });
+  await prefetchSidebarNotifications(qc);
+  expect(mocked).toHaveBeenCalledWith('notifications', { limit: 100 });
+  expect(qc.getQueryData([...notificationKeys.list({ limit: 100 }), 'infinite'])).toBeDefined();
 });

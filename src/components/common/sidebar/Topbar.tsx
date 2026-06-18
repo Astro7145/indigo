@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { usePageTitle } from '@/src/hooks/usePageTitle';
+import { useScrollLock } from '@/src/hooks/useScrollLock';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
 import { IcHamburger, LogoFull } from '../icons';
 import LogoutButton from './LogoutButton';
-import SidebarNotificationButton from './SidebarNotificationButton';
 import SidebarProfileButton from './SidebarProfileButton';
 import SidebarRow from './SidebarRow';
 import TodoAddButton from './TodoAddButton';
@@ -48,15 +48,8 @@ export default function Topbar() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
-  useEffect(() => {
-    if (collapsed) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [collapsed]);
+  // 모바일에서 탑바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다 (공용 참조카운트 락)
+  useScrollLock(!collapsed);
 
   // 메뉴를 여는 버튼은 후속 작업에서 추가한다 (#171). 닫기는 메뉴 내부 항목에서 호출한다.
   const collapse = () => setCollapsed(true);
@@ -70,7 +63,7 @@ export default function Topbar() {
         initial={false}
         animate={{ height: collapsed ? COLLAPSED_HEIGHT : expandedHeight }}
         transition={SPRING}
-        className="fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden bg-[#1A1B2E] sm:hidden"
+        className="bg-indigo-dark-200 fixed inset-x-0 top-0 z-50 flex flex-col overflow-hidden sm:hidden"
       >
         {/* 접힘 상태: 인사말 + 우측 슬롯(기본 알림, 페이지가 등록 시 액션) */}
         <motion.div
@@ -116,22 +109,24 @@ export default function Topbar() {
           // 접힘 상태에선 펼침 메뉴를 inert 처리. 메뉴 접기 버튼이 포커스를 쥔 채 aria-hidden이
           // 막히던 경고를 해소한다(inert가 포커스를 빼낸다).
           inert={collapsed}
-          className={`flex h-full min-h-0 flex-col justify-between overflow-y-auto px-5 pt-4 pb-12 ${
+          className={`flex h-full min-h-0 flex-col gap-y-8 px-5 pt-4 pb-12 ${
             !collapsed ? 'pointer-events-auto' : 'pointer-events-none'
           }`}
         >
-          <div className="flex flex-col gap-y-8">
-            <div className="flex items-center justify-between">
-              <LogoFull type="white" />
-              <button
-                type="button"
-                onClick={collapse}
-                aria-label={t('menuCollapse')}
-                className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
-              >
-                <IcHamburger className="size-8 text-current" />
-              </button>
-            </div>
+          {/* 고정 헤더: 로고 + 접기 토글 (스크롤 영향 없음, 데스크탑 사이드바와 동일) */}
+          <div className="flex shrink-0 items-center justify-between">
+            <LogoFull type="white" />
+            <button
+              type="button"
+              onClick={collapse}
+              aria-label={t('menuCollapse')}
+              className="flex size-13 shrink-0 cursor-pointer items-center justify-center rounded-md p-1 text-slate-300 transition-colors hover:bg-white/10 hover:text-slate-50"
+            >
+              <IcHamburger className="size-8 text-current" />
+            </button>
+          </div>
+          {/* 스크롤 영역: 내비~로그아웃 (헤더·푸터는 고정). gutter 예약으로 스크롤바 등장 시 가로 흔들림 방지 */}
+          <div className="scrollbar-slate flex min-h-0 flex-1 scrollbar-gutter-stable flex-col gap-y-8 overflow-y-auto">
             <ul className="flex flex-col gap-y-3">
               <Link href="/" className="group" onClick={collapse}>
                 <SidebarRow type="dashboard" text={t('nav.dashboard')} />
@@ -160,7 +155,8 @@ export default function Topbar() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-y-4">
+          {/* 고정 푸터: 새할일 + 프로필 (outer gap-y-8로 스크롤 영역과 간격) */}
+          <div className="flex shrink-0 flex-col gap-y-4">
             <TodoAddButton
               onClick={() => {
                 // 전체화면 메뉴를 접어 폼(바텀시트)이 그 위로 올라오게 한다
@@ -168,10 +164,7 @@ export default function Topbar() {
                 openCreate();
               }}
             />
-            <div className="flex gap-x-2">
-              <SidebarProfileButton />
-              <SidebarNotificationButton />
-            </div>
+            <SidebarProfileButton />
           </div>
         </motion.div>
       </motion.div>

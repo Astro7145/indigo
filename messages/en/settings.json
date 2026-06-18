@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "Settings",
+    "description": "Configure your preferences such as language and theme."
+  },
   "title": "Settings",
   "language": "Language",
   "darkMode": "Dark Mode",

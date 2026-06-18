@@ -54,7 +54,7 @@ export default function CommentInput({
         aria-label={ariaLabel ?? t('comment.inputLabel')}
         disabled={disabled}
         // field-sizing-content: 입력 높이가 내용에 맞춰 자동 증가 (Chrome 123+, Safari 17.4+, Firefox 미지원은 1줄 고정 + 내부 스크롤)
-        className="field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:min-h-12 sm:px-4 sm:py-3 sm:text-base"
+        className="dark:focus:border-indigo-dark-800 field-sizing-content min-h-10 w-full min-w-0 flex-1 resize-none rounded border border-slate-200 px-3 py-2 text-sm placeholder:text-slate-400 focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:min-h-12 sm:px-4 sm:py-3 sm:text-base dark:border-white/20 dark:text-white dark:placeholder:text-white/40"
       />
       <Button
         type="submit"

@@ -2,7 +2,7 @@
   "title": "My Profile",
   "formLabel": "My profile form",
   "meta": {
-    "title": "My Profile | INdigo",
+    "title": "My Profile",
     "description": "Change your profile picture, name, and password."
   },
   "password": {
