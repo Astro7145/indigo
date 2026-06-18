@@ -140,7 +140,7 @@ export default function CommentItem({
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
                 <Dropdown.Item onClick={handleStartEdit}>{tCommon('actions.edit')}</Dropdown.Item>
-                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
+                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive dark:text-destructive">
                   {tCommon('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>

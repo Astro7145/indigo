@@ -46,7 +46,7 @@ export default function Card({ className, children, ref, onClick, role, tabIndex
             }
           : undefined
       }
-      className={cn('rounded bg-white p-4 shadow-md', className)}
+      className={cn('dark:bg-indigo-dark-300 rounded bg-white p-4 shadow-md', className)}
       {...props}
     >
       {children}

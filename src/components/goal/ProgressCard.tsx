@@ -118,7 +118,9 @@ function ProgressCardView({
       {headerText && (
         <div className="flex items-center gap-3 px-2">
           <IcProgress aria-hidden className="size-8 shrink-0 xl:size-10" />
-          <h3 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">{headerText}</h3>
+          <h3 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7 dark:text-white">
+            {headerText}
+          </h3>
         </div>
       )}
 

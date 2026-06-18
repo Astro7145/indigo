@@ -11,6 +11,7 @@ import GoalTodoSection from '@/src/components/goal/GoalTodoSection';
 import ProgressCard from '@/src/components/goal/ProgressCard';
 import RecentTodos from '@/src/components/todo/RecentTodos';
 import DashboardTitle from '@/src/components/user/DashboardTitle';
+import DashboardView from '@/src/components/common/graph/DashboardView';
 
 /**
  * 대시보드 라우트(`/`). 서버 셸 — 핵심 쿼리를 prefetch해 하이드레이션하고,
@@ -30,14 +31,18 @@ export default async function DashboardPage() {
   return (
     <HydrationBoundary state={dehydrate(qc)}>
       <div id="toast-portal" />
-      <div className="mx-auto flex w-full max-w-328 flex-col gap-10 sm:my-3 sm:gap-8">
-        <DashboardTitle />
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-3 xl:gap-8">
-          <RecentTodos />
-          <ProgressCard />
-        </div>
-        <GoalTodoSection />
-      </div>
+      <DashboardView
+        title={<DashboardTitle />}
+        dashboard={
+          <div className="flex flex-col gap-10 sm:gap-8">
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-3 xl:gap-8">
+              <RecentTodos />
+              <ProgressCard />
+            </div>
+            <GoalTodoSection />
+          </div>
+        }
+      />
     </HydrationBoundary>
   );
 }

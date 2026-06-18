@@ -16,6 +16,10 @@ jest.mock('@/src/api/favorite', () => ({
   removeTodoFavorite: jest.fn(),
 }));
 
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
+
 import type { ComponentProps } from 'react';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 

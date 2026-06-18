@@ -23,7 +23,7 @@ export default function Toast() {
             exit={{ y: 16, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className={cn(
-              'fixed right-6 bottom-6 flex items-center gap-x-1 rounded-sm px-4 py-2 shadow-lg',
+              'fixed right-6 bottom-6 z-300 flex items-center gap-x-1 rounded-sm px-4 py-2 shadow-lg',
               isError ? 'bg-destructive' : 'bg-indigo-200',
             )}
           >

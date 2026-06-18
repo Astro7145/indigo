@@ -26,13 +26,17 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
     <section aria-label={tDashboard('goalTodos.title')} className={cn('flex flex-col gap-2.5', className)}>
       <div className="flex items-center gap-3 px-2">
         <IcGoal aria-hidden className="size-8 shrink-0 xl:size-10" />
-        <h2 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7">
+        <h2 className="text-base leading-6 font-medium text-black xl:text-lg xl:leading-7 dark:text-white">
           {tDashboard('goalTodos.title')}
         </h2>
       </div>
       <AsyncBoundary
-        fallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
-        errorFallback={<p className="py-10 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
+        fallback={
+          <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+        }
+        errorFallback={
+          <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loadError')}</p>
+        }
       >
         <GoalTodoSectionContent />
       </AsyncBoundary>
@@ -67,8 +71,8 @@ function GoalTodoSectionContent() {
   if (goals.length === 0) {
     // figma 21209:52456 — 카드 chrome 그대로(일러스트 제외). 텍스트 가운데 정렬용 min-h 확보.
     return (
-      <Card className="flex min-h-[200px] items-center justify-center border border-slate-200 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)]">
-        <p className="text-md m-auto text-center text-slate-500">{tDashboard('goalTodos.empty')}</p>
+      <Card className="flex min-h-[200px] items-center justify-center border border-slate-200 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] dark:border-white/10">
+        <p className="text-md m-auto text-center text-slate-500 dark:text-white/60">{tDashboard('goalTodos.empty')}</p>
       </Card>
     );
   }
@@ -81,7 +85,9 @@ function GoalTodoSectionContent() {
         ))}
       </div>
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+      {isFetchingNextPage && (
+        <p className="py-3 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+      )}
     </>
   );
 }

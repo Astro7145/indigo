@@ -1,5 +1,6 @@
 const mockSearchParams = new URLSearchParams();
 jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
   useSearchParams: () => mockSearchParams,
 }));
 
