@@ -35,5 +35,10 @@
     "todo": "To-do",
     "createdAt": "Created",
     "tags": "Tag"
+  },
+  "delete": {
+    "warning": "Deleted notes cannot be recovered.",
+    "success": "The note has been deleted.",
+    "error": "Failed to delete the note."
   }
 }
