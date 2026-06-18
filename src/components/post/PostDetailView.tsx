@@ -27,31 +27,21 @@ export default function PostDetailView({ postId }: PostDetailViewProps) {
   const tCommon = useTranslations('common');
   const t = useTranslations('posts');
 
-  // shell wrapper — production React 19 streaming SSR이 status 200을 커밋하려면 셸 단계에서
-  // 의미 있는 HTML이 buffer에 쌓여야 한다. AsyncBoundary가 루트면 그 임계값을 못 채워 SSR
-  // 단계의 throw가 그대로 500으로 나간다. 헤더 마크업을 AsyncBoundary 앞에 두어 다른 detail
-  // 페이지(GoalDetail 등)와 동일한 셸 구조를 갖춘다. 본질적 fix는 client-fetcher가 SSR에서
-  // 호출되지 않도록 막는 것(별도 chore).
   return (
-    <div className="mx-auto w-full max-w-[1200px]">
-      <header className="mx-auto mb-6 hidden max-w-[1200px] sm:block">
-        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">{t('title')}</h1>
-      </header>
-      <AsyncBoundary
-        fallback={
-          <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
-            <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
-          </div>
-        }
-        errorFallback={
-          <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
-            <p className="text-sm text-slate-500">{t('loadError')}</p>
-          </div>
-        }
-      >
-        <PostDetailContent postId={postId} />
-      </AsyncBoundary>
-    </div>
+    <AsyncBoundary
+      fallback={
+        <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+          <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
+        </div>
+      }
+      errorFallback={
+        <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+          <p className="text-sm text-slate-500">{t('loadError')}</p>
+        </div>
+      }
+    >
+      <PostDetailContent postId={postId} />
+    </AsyncBoundary>
   );
 }
 
