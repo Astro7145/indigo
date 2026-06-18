@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { AnimatePresence } from 'motion/react';
 
 import BottomSheet from '@/src/components/common/BottomSheet';
@@ -44,21 +44,17 @@ export default function ModalStack() {
   // 모바일 뒤로가기 지원. ESC 핸들러와 동일한 LIFO 구조.
   // 스택이 열리면 history 진입점을 push하고, popstate 시 최상단 onClose를 호출한다.
   // 스택이 프로그래매틱으로 완전히 닫히면 push한 진입점을 back()으로 복원한다.
-  const backClosedRef = useRef(false);
-
   useEffect(() => {
     if (!hasModals) return;
-    backClosedRef.current = false;
-    history.pushState({ modalStack: true }, '');
+    history.pushState({ ...history.state, modalStack: true }, '');
     return () => {
-      if (!backClosedRef.current) history.back();
+      if (history.state?.modalStack) history.back();
     };
   }, [hasModals]);
 
   useEffect(() => {
     if (!hasModals) return;
     const onPopState = () => {
-      if (modals.length === 1) backClosedRef.current = true;
       const top = modals[modals.length - 1];
       (top.onClose ?? close)();
     };
@@ -67,7 +63,12 @@ export default function ModalStack() {
   }, [modals, hasModals, close]);
 
   // 모든 닫기는 최상단을 향한다. controls는 위치와 무관하게 동일하다(close=맨 위, closeWithParent=위 2개).
-  const controls = { close, closeWithParent };
+  const closeAndNavigate = (afterNavigate?: () => void) => {
+    history.replaceState({ ...history.state, modalStack: undefined }, '');
+    close();
+    afterNavigate?.();
+  };
+  const controls = { close, closeWithParent, closeAndNavigate };
 
   const isBottomSheet = (entry: ModalEntry) =>
     (entry.variant === 'auto' ? (isMobile ? 'bottom-sheet' : 'modal') : entry.variant) === 'bottom-sheet';

@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import TodoItem from '@/src/components/common/todo-list/TodoItem';
 import type { TodoItemSize } from '@/src/components/common/todo-list/TodoItem';
 import TodoDeleteConfirm from '@/src/components/common/todo-list/TodoDeleteConfirm';
-import { useOpenNote } from '@/src/hooks/note/useNoteDrawer';
+import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
 import type { Todo } from '@/src/types/todo';
 
 export interface TodoRowProps {
@@ -26,7 +26,7 @@ export interface TodoRowProps {
  */
 export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit, onSelect }: TodoRowProps) {
   const tCommon = useTranslations('common');
-  const { openNote } = useOpenNote();
+  const { openNote } = useNoteDrawer();
   // 타입상 noteIds는 required지만 백엔드 응답 누락/null 케이스를 방어한다.
   const hasNote = (todo.noteIds?.length ?? 0) > 0;
   // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
