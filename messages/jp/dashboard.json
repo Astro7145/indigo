@@ -1,4 +1,8 @@
 {
+  "meta": {
+    "title": "ダッシュボード",
+    "description": "今日のTODOと目標の進捗をひと目で確認できます。"
+  },
   "title": "さんのダッシュボード",
   "recentTodos": {
     "title": "最近登録したTODO",

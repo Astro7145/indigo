@@ -1,4 +1,20 @@
 {
+  "meta": {
+    "title": "Posts",
+    "description": "Communicate freely with your team and share ideas.",
+    "write": {
+      "title": "Write Post",
+      "description": "Write a new post and share it with your team."
+    },
+    "detail": {
+      "title": "Post",
+      "description": "View the post and join the conversation in comments."
+    },
+    "edit": {
+      "title": "Edit Post",
+      "description": "Edit the post you wrote."
+    }
+  },
   "title": "Posts",
   "viewCount": "Views {count}",
   "commentCount": "{count} comments",

@@ -1,7 +1,15 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
 
 import PostList from '@/src/components/post/PostList';
+
+// 메타데이터는 layout이 아닌 page에 둔다 — 컨테이너 layout이 문자열 title을 가지면
+// 루트 title.template이 하위 화면(write·detail·edit)까지 전파되지 못하고 끊긴다.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('posts');
+  return { title: t('meta.title'), description: t('meta.description') };
+}
 
 // 라우팅 전용 셸. useSearchParams를 호출하는 본문(PostList)을 Suspense로 감싸
 // prerender 시 CSR bailout이 셸까지 번지지 않게 한다. 헤더는 검색 파라미터와 무관하므로
