@@ -26,35 +26,35 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
     <dl className="grid grid-cols-1 gap-y-2 text-xs sm:grid-cols-2 sm:gap-x-3 sm:gap-y-3 sm:text-sm">
       {/* 모바일 순서는 JSX 순서로 흐르고, 데스크탑/태블릿(2col)은 명시적 grid 위치로 [목표|작성일][할일|태그] 배치 */}
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-1">
-        <dt className="flex shrink-0 items-center gap-1 text-slate-500">
+        <dt className="flex shrink-0 items-center gap-1 text-slate-500 dark:text-white/60">
           <IcFlagOutline size="small" className="size-4" />
           <span>{t('metaInfo.goal')}</span>
         </dt>
-        <dd className="truncate text-slate-800">{goalTitle}</dd>
+        <dd className="truncate text-slate-800 dark:text-white">{goalTitle}</dd>
       </div>
 
       <div className="flex items-center gap-2 sm:col-start-1 sm:row-start-2">
-        <dt className="flex shrink-0 items-center gap-1 text-slate-500">
+        <dt className="flex shrink-0 items-center gap-1 text-slate-500 dark:text-white/60">
           <IcCheckbox className="size-4" />
           <span>{t('metaInfo.todo')}</span>
         </dt>
         <dd className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-slate-800">{todoTitle}</span>
+          <span className="truncate text-slate-800 dark:text-white">{todoTitle}</span>
           <Chip type={todoDone ? 'done' : 'todo'} />
         </dd>
       </div>
 
       <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-1">
-        <dt className="flex shrink-0 items-center gap-1 text-slate-500">
+        <dt className="flex shrink-0 items-center gap-1 text-slate-500 dark:text-white/60">
           <IcCalendarOutline className="size-4" />
           <span>{t('metaInfo.createdAt')}</span>
         </dt>
-        <dd className="text-slate-800">{formatDate(createdAt)}</dd>
+        <dd className="text-slate-800 dark:text-white">{formatDate(createdAt)}</dd>
       </div>
 
       {tags && tags.length > 0 && (
         <div className="flex items-center gap-2 sm:col-start-2 sm:row-start-2">
-          <dt className="flex shrink-0 items-center gap-1 text-slate-500">
+          <dt className="flex shrink-0 items-center gap-1 text-slate-500 dark:text-white/60">
             <IcHash className="size-4" />
             <span>{t('metaInfo.tags')}</span>
           </dt>
