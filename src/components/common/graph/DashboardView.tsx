@@ -89,15 +89,20 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
   const setRightSlot = useTopbarSlotStore((s) => s.setRightSlot);
   const clearRightSlot = useTopbarSlotStore((s) => s.clearRightSlot);
 
-  // 그래프 뷰에서는 html 배경을 캔버스 색(딥 인디고)으로 — scrollbar-gutter(stable)로 예약된
-  // 우측 거터 띠가 밝게 보이지 않게 한다. 떠날 때 원래 배경으로 복원.
+  // 그래프 뷰에서는 html·body 배경을 캔버스 색으로 — 우측 거터/패딩 띠가 밝게 보이지 않게 한다.
+  // html: scrollbar-gutter(stable)로 예약된 거터 띠(비락 시). body: 모달 락 시 시프트 보정용
+  // body padding-right 영역이 body 배경을 드러내므로 그곳도 캔버스 색이어야 우주와 이어진다.
+  // 떠날 때 원래 배경으로 복원.
   useEffect(() => {
     if (view !== 'graph') return;
     const el = document.documentElement;
-    const prev = el.style.background;
+    const prevHtml = el.style.background;
+    const prevBody = document.body.style.background;
     el.style.background = GRAPH_BACKGROUND_VAR;
+    document.body.style.background = GRAPH_BACKGROUND_VAR;
     return () => {
-      el.style.background = prev;
+      el.style.background = prevHtml;
+      document.body.style.background = prevBody;
     };
   }, [view]);
 
