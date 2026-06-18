@@ -21,11 +21,11 @@ export default function SelectedDateTodos({ date, todos, onSelectTodo }: Selecte
 
   return (
     <section className="flex flex-col gap-4 px-4 py-5">
-      <h3 className="text-sm leading-5 font-semibold text-slate-800">
+      <h3 className="text-sm leading-5 font-semibold text-slate-800 dark:text-white">
         {date.year}. {pad(date.month)}. {pad(date.day)}
       </h3>
       {todos.length === 0 ? (
-        <p className="py-2 text-center text-sm text-slate-500">{tCalendar('empty')}</p>
+        <p className="py-2 text-center text-sm text-slate-500 dark:text-white/60">{tCalendar('empty')}</p>
       ) : (
         <ul className="flex flex-col gap-1.5">
           {todos.map((t) => (

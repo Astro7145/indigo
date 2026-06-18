@@ -70,7 +70,7 @@ export default function MonthCalendar({
 
   return (
     <div {...calendarProps} className="flex w-full flex-col">
-      <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-8">
+      <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-5 xl:flex-row xl:items-center xl:justify-between xl:px-8 dark:border-white/10">
         <div className="flex items-center justify-center gap-4 xl:justify-start">
           <IconButton
             {...prevDomProps}
@@ -78,9 +78,9 @@ export default function MonthCalendar({
             aria-label={tCalendar('nav.prevMonth')}
             className="size-8 rounded-[6px] p-1"
           >
-            <IcDoubleArrow state="fold" className="size-6 text-slate-600" />
+            <IcDoubleArrow state="fold" className="size-6 text-slate-600 dark:text-white/70" />
           </IconButton>
-          <h2 className="text-lg leading-7 font-bold text-slate-700">
+          <h2 className="text-lg leading-7 font-bold text-slate-700 dark:text-white">
             {tCalendar('monthYear', { year: month.year, month: String(month.month) })}
           </h2>
           <IconButton
@@ -89,7 +89,7 @@ export default function MonthCalendar({
             aria-label={tCalendar('nav.nextMonth')}
             className="size-8 rounded-[6px] p-1"
           >
-            <IcDoubleArrow state="expand" className="size-6 text-slate-600" />
+            <IcDoubleArrow state="expand" className="size-6 text-slate-600 dark:text-white/70" />
           </IconButton>
         </div>
         {children}
@@ -100,7 +100,7 @@ export default function MonthCalendar({
             {WEEKDAY_KEYS.map((day) => (
               <th
                 key={day}
-                className="border-r border-b border-slate-200 p-2 text-center text-xs leading-4 font-medium text-slate-500 last:border-r-0"
+                className="border-r border-b border-slate-200 p-2 text-center text-xs leading-4 font-medium text-slate-500 last:border-r-0 dark:border-white/10 dark:text-white/60"
               >
                 {tCalendar(`weekdays.${day}`)}
               </th>
