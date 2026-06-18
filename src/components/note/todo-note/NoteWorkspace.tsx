@@ -2,7 +2,8 @@
 
 import type { JSONContent } from '@tiptap/core';
 import { useTranslations } from 'next-intl';
-import { useImperativeHandle, useRef, type Ref } from 'react';
+import { useRouter } from 'next/navigation';
+import { useImperativeHandle, useRef, useState, type Ref } from 'react';
 
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import NoteLinkCard from '@/src/components/note/NoteLinkCard';
@@ -14,7 +15,9 @@ import { useNoteDraftPersistence } from '@/src/hooks/note/useNoteDraftPersistenc
 import { useLinkPreview } from '@/src/hooks/note/useLinkPreview';
 import { useNoteLink } from '@/src/hooks/note/useNoteLink';
 import { useNoteSubmit } from '@/src/hooks/note/useNoteSubmit';
+import Modal from '@/src/components/common/modal/Modal';
 import NoteWorkspaceHeader from '@/src/components/note/todo-note/NoteWorkspaceHeader';
+import { noteContentToPostHtml, truncateHtmlToLimit, POST_CONTENT_MAX } from '@/src/utils/noteToPost';
 import type { Note } from '@/src/types/note';
 import type { Todo } from '@/src/types/todo';
 
@@ -66,7 +69,9 @@ export default function NoteWorkspace({
 }: NoteWorkspaceProps) {
   const t = useTranslations('note');
   const tc = useTranslations('common');
+  const router = useRouter();
   const editing = mode !== 'read';
+  const [truncatedAlert, setTruncatedAlert] = useState(false);
   const isCreate = mode === 'create';
 
   // 폼 초안(제목·본문·링크)·dirty·valid 판별은 useNoteDraft가 전담한다.
@@ -115,6 +120,20 @@ export default function NoteWorkspace({
     submit({ title, content, linkUrl });
   };
 
+  const handleShareToPost = () => {
+    const html = noteContentToPostHtml(note?.content, note?.linkUrl);
+    if (html.length > POST_CONTENT_MAX) {
+      setTruncatedAlert(true);
+      return;
+    }
+    router.push(`/posts/write?fromTodoId=${todoId}`);
+  };
+
+  const confirmShareAfterTruncate = () => {
+    setTruncatedAlert(false);
+    router.push(`/posts/write?fromTodoId=${todoId}`);
+  };
+
   const { total: contentCharCount, nonSpace: contentNoSpaceCount } = countText(content);
 
   // full todo(note.todo embedded ref는 tags 미포함)를 우선 쓰되, 로딩 중엔 note.todo로 폴백해
@@ -138,6 +157,7 @@ export default function NoteWorkspace({
         onSubmit={handleSubmit}
         onEdit={onEdit}
         onClose={onClose}
+        onShareToPost={!editing && note ? handleShareToPost : undefined}
       />
 
       <div
@@ -206,6 +226,17 @@ export default function NoteWorkspace({
           </div>
         )}
       </div>
+
+      <Modal open={truncatedAlert} onClose={() => setTruncatedAlert(false)} zIndex={70}>
+        <div className="mb-6 text-center sm:mb-10">
+          <Modal.Title>{t('shareToPostTruncatedLine1')}</Modal.Title>
+          <p className="mt-1 text-xs text-slate-500 sm:text-sm">{t('shareToPostTruncatedLine2')}</p>
+        </div>
+        <Modal.Actions>
+          <Modal.Cancel>{tc('actions.cancel')}</Modal.Cancel>
+          <Modal.Confirm onClick={confirmShareAfterTruncate}>{tc('actions.confirm')}</Modal.Confirm>
+        </Modal.Actions>
+      </Modal>
     </div>
   );
 }
