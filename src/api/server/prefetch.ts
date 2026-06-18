@@ -8,6 +8,7 @@ import { commentKeys } from '@/src/api/comment';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import { noteKeys } from '@/src/api/note';
+import { notificationKeys } from '@/src/api/notification';
 import { postKeys } from '@/src/api/post';
 import { serverGet } from '@/src/api/server/server-get';
 import { todoKeys } from '@/src/api/todo';
@@ -28,6 +29,13 @@ function prefetchInfinite(qc: QueryClient, key: readonly unknown[], path: string
 
 export const prefetchMe = (qc: QueryClient) =>
   qc.prefetchQuery({ queryKey: userKeys.me(), queryFn: () => serverGet('users/me') });
+
+/** 사이드바 목표 목록 — useInfiniteGoalList()와 동일 키(무파라미터). */
+export const prefetchSidebarGoals = (qc: QueryClient) => prefetchInfinite(qc, goalKeys.list({}), 'goals', {});
+
+/** 사이드바/탑바 알림 — useInfiniteNotificationList({ limit: 100 })와 동일 키. */
+export const prefetchSidebarNotifications = (qc: QueryClient) =>
+  prefetchInfinite(qc, notificationKeys.list({ limit: 100 }), 'notifications', { limit: 100 });
 
 /** 대시보드 RecentTodos — useTodoList({sort:'latest',limit:4})와 동일 키. */
 export const prefetchRecentTodos = (qc: QueryClient) =>

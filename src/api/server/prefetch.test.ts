@@ -6,6 +6,7 @@ import { CalendarDate } from '@internationalized/date';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import { noteKeys } from '@/src/api/note';
+import { notificationKeys } from '@/src/api/notification';
 import {
   prefetchAllGoals,
   prefetchCalendarMonth,
@@ -19,6 +20,8 @@ import {
   prefetchPostEdit,
   prefetchPosts,
   prefetchRecentTodos,
+  prefetchSidebarGoals,
+  prefetchSidebarNotifications,
 } from '@/src/api/server/prefetch';
 import { serverGet } from '@/src/api/server/server-get';
 import { commentKeys } from '@/src/api/comment';
@@ -136,4 +139,18 @@ it('prefetchPostEdit은 postKeys.detail 키에 post 단건을 캐시한다', asy
   await prefetchPostEdit(qc, 7);
   expect(mocked).toHaveBeenCalledWith('posts/7');
   expect(qc.getQueryData(postKeys.detail(7))).toMatchObject({ id: 7 });
+});
+
+it('prefetchSidebarGoals는 useInfiniteGoalList() 무파라미터 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ goals: [{ id: 1 }], nextCursor: null, totalCount: 1 });
+  await prefetchSidebarGoals(qc);
+  expect(mocked).toHaveBeenCalledWith('goals', {});
+  expect(qc.getQueryData([...goalKeys.list({}), 'infinite'])).toBeDefined();
+});
+
+it('prefetchSidebarNotifications는 useInfiniteNotificationList({limit:100}) 키에 첫 페이지를 캐시한다', async () => {
+  mocked.mockResolvedValue({ notifications: [], nextCursor: null, totalCount: 0 });
+  await prefetchSidebarNotifications(qc);
+  expect(mocked).toHaveBeenCalledWith('notifications', { limit: 100 });
+  expect(qc.getQueryData([...notificationKeys.list({ limit: 100 }), 'infinite'])).toBeDefined();
 });
