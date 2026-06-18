@@ -52,9 +52,7 @@ describe('LoginForm', () => {
     const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
 
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    fireEvent.blur(emailInput);
     fireEvent.change(passwordInput, { target: { value: 'password' } });
-    fireEvent.blur(passwordInput);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
@@ -67,9 +65,7 @@ describe('LoginForm', () => {
     const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
 
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    fireEvent.blur(emailInput);
     fireEvent.change(passwordInput, { target: { value: 'password' } });
-    fireEvent.blur(passwordInput);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
@@ -91,9 +87,7 @@ describe('LoginForm', () => {
     const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
 
     fireEvent.change(emailInput, { target: { value: 'user@example.com' } });
-    fireEvent.blur(emailInput);
     fireEvent.change(passwordInput, { target: { value: 'password' } });
-    fireEvent.blur(passwordInput);
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
@@ -112,9 +106,7 @@ describe('LoginForm', () => {
     renderWithClient(<LoginForm callbackUrl="/dashboard?tab=goals" />);
 
     fireEvent.change(screen.getByPlaceholderText('이메일을 입력해주세요'), { target: { value: 'user@example.com' } });
-    fireEvent.blur(screen.getByPlaceholderText('이메일을 입력해주세요'));
     fireEvent.change(screen.getByPlaceholderText('비밀번호를 입력해주세요'), { target: { value: 'password' } });
-    fireEvent.blur(screen.getByPlaceholderText('비밀번호를 입력해주세요'));
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
@@ -133,9 +125,7 @@ describe('LoginForm', () => {
     renderWithClient(<LoginForm callbackUrl="//evil.com" />);
 
     fireEvent.change(screen.getByPlaceholderText('이메일을 입력해주세요'), { target: { value: 'user@example.com' } });
-    fireEvent.blur(screen.getByPlaceholderText('이메일을 입력해주세요'));
     fireEvent.change(screen.getByPlaceholderText('비밀번호를 입력해주세요'), { target: { value: 'password' } });
-    fireEvent.blur(screen.getByPlaceholderText('비밀번호를 입력해주세요'));
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '로그인하기' })).not.toBeDisabled();
@@ -148,19 +138,20 @@ describe('LoginForm', () => {
   });
 
   describe('이메일 필드', () => {
-    it('잘못된 이메일 입력 후 blur 시 에러 메시지가 표시된다', async () => {
+    it('잘못된 이메일 입력 시 에러 메시지가 표시된다', async () => {
       renderWithClient(<LoginForm />);
       const emailInput = screen.getByPlaceholderText('이메일을 입력해주세요');
       fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
-      fireEvent.blur(emailInput);
       expect(await screen.findByText('올바른 이메일을 입력해주세요.')).toBeInTheDocument();
     });
   });
 
   describe('비밀번호 필드', () => {
-    it('빈 값으로 blur 시 에러 메시지가 표시된다', async () => {
+    it('값 입력 후 삭제 시 필수 입력 에러 메시지가 표시된다', async () => {
       renderWithClient(<LoginForm />);
-      fireEvent.blur(screen.getByPlaceholderText('비밀번호를 입력해주세요'));
+      const passwordInput = screen.getByPlaceholderText('비밀번호를 입력해주세요');
+      fireEvent.change(passwordInput, { target: { value: 'a' } });
+      fireEvent.change(passwordInput, { target: { value: '' } });
       expect(await screen.findByText('비밀번호는 필수 입력입니다.')).toBeInTheDocument();
     });
   });
