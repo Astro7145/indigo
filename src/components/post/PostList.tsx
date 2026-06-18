@@ -86,11 +86,11 @@ export default function PostList() {
       <section className="mx-auto max-w-[1200px]">
         {isPending ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
+            <p className="text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
           </div>
         ) : isListError ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <p className="text-sm text-slate-500">{t('loadError')}</p>
+            <p className="text-sm text-slate-500 dark:text-white/60">{t('loadError')}</p>
           </div>
         ) : posts.length === 0 ? (
           <PostListEmpty />
@@ -104,7 +104,9 @@ export default function PostList() {
               ))}
             </ul>
             <div ref={sentinelRef} aria-hidden className="h-4 w-full" />
-            {isFetchNextPageError && <p className="py-4 text-center text-sm text-slate-500">{t('loadMoreError')}</p>}
+            {isFetchNextPageError && (
+              <p className="py-4 text-center text-sm text-slate-500 dark:text-white/60">{t('loadMoreError')}</p>
+            )}
           </>
         )}
       </section>

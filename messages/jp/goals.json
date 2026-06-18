@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "目標",
+    "description": "目標の進捗と紐づくTODOを確認できます。",
+    "notes": {
+      "title": "ノート一覧",
+      "description": "目標に関連するノートをまとめて確認できます。"
+    },
+    "noteDetail": {
+      "title": "ノート",
+      "description": "作成したノートを確認できます。"
+    }
+  },
   "title": "{name}さんの目標",
   "loadError": "目標情報を読み込めませんでした",
   "moreMenu": "目標のもっと見るメニュー",

@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import {
@@ -12,6 +14,13 @@ import ProgressCard from '@/src/components/goal/ProgressCard';
 import RecentTodos from '@/src/components/todo/RecentTodos';
 import DashboardTitle from '@/src/components/user/DashboardTitle';
 import DashboardView from '@/src/components/common/graph/DashboardView';
+
+// 대시보드(/) 메타데이터. (main)/layout이 아닌 페이지에 둬야 root의 title.template이
+// (main) 하위 화면들(calendar·me·todos…)까지 끊기지 않고 전파된다.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('dashboard');
+  return { title: t('meta.title'), description: t('meta.description') };
+}
 
 /**
  * 대시보드 라우트(`/`). 서버 셸 — 핵심 쿼리를 prefetch해 하이드레이션하고,

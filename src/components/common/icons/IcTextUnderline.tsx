@@ -10,7 +10,7 @@ export function IcTextUnderline({ state = 'default', className, ...rest }: IcTex
     <svg
       viewBox="0 0 32 32"
       fill="none"
-      className={cn('size-8', state === 'default' ? 'text-slate-500' : 'text-slate-700', className)}
+      className={cn('size-8', state === 'default' ? 'text-slate-500 dark:text-white/70' : 'text-slate-700', className)}
       {...rest}
     >
       {state === 'active' && <rect width="32" height="32" rx="8" fill="var(--color-slate-200)" />}

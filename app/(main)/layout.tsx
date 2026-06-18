@@ -6,6 +6,7 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { prefetchMe, prefetchSidebarGoals, prefetchSidebarNotifications } from '@/src/api/server/prefetch';
 import { getQueryClient } from '@/src/api/server/query-client';
+import NotificationTitleBadge from '@/src/components/common/sidebar/NotificationTitleBadge';
 import Sidebar from '@/src/components/common/sidebar/Sidebar';
 import Topbar from '@/src/components/common/sidebar/Topbar';
 import Settings from '@/src/components/common/settings/Settings';
@@ -27,12 +28,12 @@ export default async function MainLayout({ children }: { children: React.ReactNo
   return (
     <HydrationBoundary state={dehydrate(qc)}>
       <div className="dark:bg-indigo-dark-400 flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
+        <NotificationTitleBadge />
         <Topbar />
         <Sidebar />
         <Settings />
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
-          <div id="toast-portal" />
         </div>
         {/* 쿼리파라미터(todoId) 구독으로 열리는 전역 노트 드로어. useSearchParams의 CSR bailout을 Suspense로 감싼다. */}
         <Suspense fallback={null}>

@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "すべてのTODO",
+    "description": "登録したすべてのTODOを管理し、完了させましょう。",
+    "noteWrite": {
+      "title": "ノートの作成",
+      "description": "TODOに関連するノートを作成しましょう。"
+    },
+    "noteEdit": {
+      "title": "ノートの編集",
+      "description": "作成したノートを編集できます。"
+    }
+  },
   "title": "すべてのTODO",
   "addButton": "TODOを追加",
   "empty": {

@@ -53,22 +53,22 @@ export default function PostDetailPage() {
 
   if (postPending || !post) {
     return (
-      <div className="mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
-        <p className="text-sm text-slate-400">{tCommon('state.loading')}</p>
+      <div className="dark:bg-indigo-dark-300 mx-2 flex min-h-full items-center justify-center rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+        <p className="text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
       </div>
     );
   }
 
   return (
     <>
-      <article className="mx-2 min-h-full rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
+      <article className="dark:bg-indigo-dark-300 mx-2 min-h-full rounded bg-white p-3 shadow-sm sm:mx-4 sm:p-6 xl:mx-auto xl:max-w-[768px] xl:p-14">
         <div className="mb-4 flex items-start justify-between gap-4">
-          <h1 className="text-lg font-bold text-slate-900 sm:text-2xl">{post.title}</h1>
+          <h1 className="text-lg font-bold text-slate-900 sm:text-2xl dark:text-white">{post.title}</h1>
           {me?.id === post.writer.id && (
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
                 <IconButton aria-label={tCommon('actions.more')}>
-                  <IcMeetballs className="size-5 text-slate-400" />
+                  <IcMeetballs className="size-5 text-slate-400 dark:text-white/60" />
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
@@ -76,7 +76,7 @@ export default function PostDetailPage() {
                 <Dropdown.Item onClick={() => router.push(`/posts/${id}/edit`)}>
                   {tCommon('actions.edit')}
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
+                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive dark:text-destructive">
                   {tCommon('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
@@ -85,7 +85,7 @@ export default function PostDetailPage() {
         </div>
 
         {/* 작성자 */}
-        <div className="mb-6 flex items-center gap-2 border-b border-slate-200 pb-4">
+        <div className="mb-6 flex items-center gap-2 border-b border-slate-200 pb-4 dark:border-white/10">
           {post.writer.image ? (
             <Image
               src={post.writer.image}
@@ -97,12 +97,12 @@ export default function PostDetailPage() {
           ) : (
             <IcProfileYellow className="size-5 sm:size-6" />
           )}
-          <span className="text-sm text-slate-700">{post.writer.name}</span>
+          <span className="text-sm text-slate-700 dark:text-white">{post.writer.name}</span>
         </div>
 
         {/* 본문 — 에디터 HTML을 그대로 렌더. SSR/빌드 시점엔 window가 없으므로 빈 문자열 */}
         <div
-          className="mb-6 text-sm text-slate-800 sm:text-base [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
+          className="mb-6 text-sm text-slate-800 sm:text-base dark:text-white/80 [&_img]:my-2 [&_img]:max-w-full [&_img]:rounded [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6"
           dangerouslySetInnerHTML={{
             __html: typeof window !== 'undefined' ? DOMPurify.sanitize(post.content) : '',
           }}
@@ -114,14 +114,14 @@ export default function PostDetailPage() {
             type="button"
             onClick={() => openImageLightbox(post.image!, post.title)}
             aria-label="첨부 이미지 확대 보기"
-            className="relative mb-6 block size-[150px] cursor-pointer overflow-hidden rounded border border-slate-200 sm:size-[232px]"
+            className="relative mb-6 block size-[150px] cursor-pointer overflow-hidden rounded border border-slate-200 sm:size-[232px] dark:border-white/10"
           >
             <Image src={post.image} alt="" fill className="object-cover" />
           </button>
         )}
 
         {/* 메타 */}
-        <div className="mb-8 text-xs text-slate-500">
+        <div className="mb-8 text-xs text-slate-500 dark:text-white/60">
           {post.createdAt.slice(0, 10).replace(/-/g, '.')} · {t('viewCount', { count: post.viewCount })}
         </div>
 

@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "모든 할일",
+    "description": "등록한 모든 할일을 관리하고 완료해보세요.",
+    "noteWrite": {
+      "title": "노트 작성",
+      "description": "할일과 관련된 노트를 작성하세요."
+    },
+    "noteEdit": {
+      "title": "노트 수정",
+      "description": "작성한 노트를 수정하세요."
+    }
+  },
   "title": "모든 할일",
   "addButton": "할일 추가",
   "empty": {

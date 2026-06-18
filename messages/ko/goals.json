@@ -1,4 +1,16 @@
 {
+  "meta": {
+    "title": "목표",
+    "description": "목표의 진행 상황과 연결된 할일을 확인하세요.",
+    "notes": {
+      "title": "노트 모아보기",
+      "description": "목표와 관련된 노트를 모아봤어요."
+    },
+    "noteDetail": {
+      "title": "노트",
+      "description": "작성한 노트를 확인하세요."
+    }
+  },
   "title": "{name}님의 목표",
   "loadError": "목표 정보를 불러오지 못했어요",
   "moreMenu": "목표 더보기 메뉴",

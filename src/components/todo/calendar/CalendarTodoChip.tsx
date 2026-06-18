@@ -27,15 +27,17 @@ export default function CalendarTodoChip({ todo, onClick, className }: CalendarT
       }}
       className={cn(
         'flex w-full cursor-pointer items-center gap-0.5 rounded-[6px] border px-2 py-1 text-left',
-        todo.done ? 'border-slate-300 bg-slate-50' : 'border-indigo-300 bg-indigo-100',
+        todo.done
+          ? 'border-slate-300 bg-slate-50 dark:border-white/10 dark:bg-white/10'
+          : 'dark:border-indigo-dark-500 dark:bg-indigo-dark-500 border-indigo-300 bg-indigo-100',
         className,
       )}
     >
-      {todo.done && <IcCheck aria-hidden className="size-4 shrink-0 text-slate-400" />}
+      {todo.done && <IcCheck aria-hidden className="size-4 shrink-0 text-slate-400 dark:text-white/60" />}
       <span
         className={cn(
           'min-w-0 flex-1 truncate text-xs font-semibold',
-          todo.done ? 'text-slate-400' : 'text-indigo-600',
+          todo.done ? 'text-slate-400 dark:text-white/60' : 'dark:text-indigo-dark-900 text-indigo-600',
         )}
       >
         {todo.title}
