@@ -12,6 +12,7 @@ interface NoteWorkspaceHeaderProps {
   onSubmit: () => void;
   onEdit: () => void;
   onClose?: () => void;
+  onShareToPost?: () => void;
 }
 
 export default function NoteWorkspaceHeader({
@@ -23,6 +24,7 @@ export default function NoteWorkspaceHeader({
   onSubmit,
   onEdit,
   onClose,
+  onShareToPost,
 }: NoteWorkspaceHeaderProps) {
   const t = useTranslations('note');
   const tc = useTranslations('common');
@@ -76,6 +78,16 @@ export default function NoteWorkspaceHeader({
               className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
             >
               {tc('actions.close')}
+            </Button>
+          )}
+          {onShareToPost && (
+            <Button
+              variant="secondary"
+              size="small"
+              onClick={onShareToPost}
+              className="sm:h-10 sm:px-4 sm:py-0 sm:text-base"
+            >
+              {t('shareToPost')}
             </Button>
           )}
           <Button

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTranslations } from 'next-intl';
 
@@ -10,9 +10,11 @@ import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEdi
 import PostFormActions from '@/src/components/post/PostFormActions';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
+import { useNoteList } from '@/src/hooks/note/note';
 import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
 import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
+import { noteContentToPostHtml, truncateHtmlToLimit, POST_CONTENT_MAX } from '@/src/utils/noteToPost';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -37,6 +39,13 @@ export default function PostForm(props: PostFormProps) {
   const router = useRouter();
   const editId = props.mode === 'edit' ? props.postId : undefined;
   const { data: initialPost } = usePost(editId);
+
+  // 노트에서 공유된 경우 — create 모드에서만 todoId 파라미터를 읽어 노트를 prefill에 사용
+  const searchParams = useSearchParams();
+  const fromTodoIdParam = props.mode === 'create' ? searchParams.get('fromTodoId') : null;
+  const fromTodoId = fromTodoIdParam ? Number(fromTodoIdParam) : undefined;
+  const { data: noteListData } = useNoteList({ todoId: fromTodoId }, { enabled: !!fromTodoId });
+  const fromNote = noteListData?.notes[0];
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
@@ -65,6 +74,14 @@ export default function PostForm(props: PostFormProps) {
     setImage(initialPost.image);
     hydrated.current = true;
   }, [initialPost]);
+
+  useEffect(() => {
+    if (!fromNote || hydrated.current) return;
+    const html = noteContentToPostHtml(fromNote.content, fromNote.linkUrl);
+    setTitle(fromNote.title);
+    setContent(truncateHtmlToLimit(html, POST_CONTENT_MAX));
+    hydrated.current = true;
+  }, [fromNote]);
 
   // blob: URL은 브라우저가 자동 회수하지 않으므로, image가 교체되거나 컴포넌트가 unmount될 때 직접 해제
   useEffect(() => {

@@ -71,6 +71,7 @@
     "replyPlaceholder": "답글을 입력해주세요.",
     "replyInputLabel": "답글 입력",
     "replyLoading": "답글을 불러오는 중…",
-    "replyCreateError": "답글 등록에 실패했어요."
+    "replyCreateError": "답글 등록에 실패했어요.",
+    "loadError": "댓글을 불러오지 못했어요."
   }
 }

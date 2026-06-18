@@ -1,3 +1,7 @@
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({ push: jest.fn() })),
+}));
+
 jest.mock('@/src/api/note', () => ({
   ...jest.requireActual('@/src/api/note'),
   createNote: jest.fn(),

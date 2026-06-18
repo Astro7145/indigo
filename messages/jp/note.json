@@ -27,6 +27,9 @@
     "label": "リンクURL",
     "error": "正しいURLを入力してください。"
   },
+  "shareToPost": "投稿としてシェア",
+  "shareToPostTruncatedLine1": "ノートの内容が長すぎたため、一部が切り取られました。",
+  "shareToPostTruncatedLine2": "投稿フォームで確認してください。",
   "metaInfo": {
     "goal": "目標",
     "todo": "To-do",
