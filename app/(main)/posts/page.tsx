@@ -20,7 +20,7 @@ export default async function PostsPage() {
     <div>
       {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
       <header className="mx-auto mb-6 hidden max-w-[1200px] sm:block">
-        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl">{t('title')}</h1>
+        <h1 className="text-xl font-bold text-slate-900 xl:text-2xl dark:text-white">{t('title')}</h1>
       </header>
       <Suspense fallback={<div />}>
         <PostList />

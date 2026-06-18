@@ -54,9 +54,9 @@ export default function PostSearchBar() {
       </div>
 
       <Dropdown>
-        <Dropdown.Trigger className="inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-slate-700 sm:gap-3 sm:text-base">
+        <Dropdown.Trigger className="inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-slate-700 sm:gap-3 sm:text-base dark:text-white">
           {currentLabel}
-          <IcFilter className="size-5 text-slate-500" />
+          <IcFilter className="size-5 text-slate-500 dark:text-white/60" />
         </Dropdown.Trigger>
         <Dropdown.Menu placement="bottom-end" size="small">
           {SORT_OPTIONS.map((opt) => (
