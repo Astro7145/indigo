@@ -51,7 +51,7 @@ export default function RecentTodos({ className }: RecentTodosProps) {
           <IcChevron direction="right" className="dark:text-indigo-dark-800 size-5 text-indigo-600" />
         </Link>
       </div>
-      <Card className="flex flex-col border border-slate-200 px-4 py-5 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:px-[max(16px,5cqw)] xl:py-[max(20px,4.6875cqw)] dark:border-white/10">
+      <Card className="flex flex-col border border-slate-200 py-5 pr-2 pl-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:h-[187px] xl:h-[max(187px,40cqw)] xl:py-[max(20px,4.6875cqw)] xl:pr-[calc(max(16px,5cqw)_-_8px)] xl:pl-[max(16px,5cqw)] dark:border-white/10">
         <AsyncBoundary
           fallback={<p className={statusMessageClass}>{tCommon('state.loading')}</p>}
           errorFallback={<p className={statusMessageClass}>{tCommon('state.loadError')}</p>}
@@ -76,7 +76,7 @@ function RecentTodosContent() {
 
   return (
     <TodoList
-      className="scrollbar-slate flex flex-1 flex-col gap-1.5 sm:overflow-y-auto"
+      className="scrollbar-slate flex flex-1 sm:scrollbar-gutter-stable flex-col gap-1.5 sm:overflow-y-auto"
       todos={todos}
       size="large"
       onEdit={openEdit}
