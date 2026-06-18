@@ -71,6 +71,7 @@
     "replyPlaceholder": "Enter a reply.",
     "replyInputLabel": "Reply input",
     "replyLoading": "Loading replies…",
-    "replyCreateError": "Failed to post reply."
+    "replyCreateError": "Failed to post reply.",
+    "loadError": "Failed to load comments."
   }
 }
