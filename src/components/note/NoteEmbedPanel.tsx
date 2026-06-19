@@ -26,7 +26,7 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
       aria-hidden={!open}
       aria-label="링크 임베드 패널"
       className={cn(
-        'fixed inset-x-0 bottom-0 bg-white shadow-xl transition-transform duration-300',
+        'dark:bg-indigo-dark-300 fixed inset-x-0 bottom-0 bg-white shadow-xl transition-transform duration-300',
         // sm 이상에서 사이드바 collapsed 폭(60px)만큼 left 비워 chevron이 사이드바에 안 가리게 함. expanded는 풀스크린이라 미적용
         expanded ? 'z-[60] h-[100dvh]' : 'z-30 h-[230px] sm:left-15 sm:h-[417px]',
         open ? 'translate-y-0' : 'translate-y-full',
@@ -37,7 +37,7 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
         open ? '' : 'xl:hidden',
       )}
     >
-      <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+      <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-white/10">
         <IconButton aria-label={expanded ? '패널 축소' : '패널 확장'} onClick={onToggleExpand}>
           <IcChevron className={expanded ? '-rotate-90 xl:rotate-180' : 'rotate-90 xl:rotate-0'} />
         </IconButton>
@@ -48,7 +48,7 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
 
       <div className="h-[calc(100%-49px)] overflow-auto">
         {!data && (
-          <div className="flex h-full items-center justify-center text-sm text-slate-400">
+          <div className="flex h-full items-center justify-center text-sm text-slate-400 dark:text-white/60">
             <p>여기에 임베드가 표시됩니다</p>
           </div>
         )}
@@ -66,19 +66,19 @@ export default function NoteEmbedPanel({ open, onClose, expanded = false, onTogg
         {data?.type === 'metadata' && (
           <article className="flex flex-col gap-3 p-4">
             {data.ogImage && <img src={data.ogImage} alt="" className="w-full rounded-lg object-cover" />}
-            {data.title && <h3 className="text-base font-semibold text-slate-800">{data.title}</h3>}
-            {data.description && <p className="text-sm text-slate-600">{data.description}</p>}
+            {data.title && <h3 className="text-base font-semibold text-slate-800 dark:text-white">{data.title}</h3>}
+            {data.description && <p className="text-sm text-slate-600 dark:text-white/70">{data.description}</p>}
             {/^https?:\/\//i.test(data.url) ? (
               <a
                 href={data.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="truncate text-xs text-indigo-600 underline"
+                className="dark:text-indigo-dark-900 truncate text-xs text-indigo-600 underline"
               >
                 {data.url}
               </a>
             ) : (
-              <span className="truncate text-xs text-slate-400">{data.url}</span>
+              <span className="truncate text-xs text-slate-400 dark:text-white/60">{data.url}</span>
             )}
           </article>
         )}

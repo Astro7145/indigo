@@ -3,9 +3,11 @@ import { lockScroll, unlockScroll, _resetScrollLock } from './scrollLock';
 describe('scrollLock', () => {
   beforeEach(() => {
     document.body.style.overflow = '';
-    document.documentElement.classList.remove('scroll-locked');
+    document.body.style.paddingRight = '';
+    document.documentElement.style.scrollbarGutter = '';
     // 이전 테스트의 실패/예외로 전역 카운트가 남는 오염을 막는다
     _resetScrollLock();
+    jest.restoreAllMocks();
   });
 
   it('잠그면 body 스크롤이 막히고 해제하면 원래대로 돌아온다', () => {
@@ -32,11 +34,30 @@ describe('scrollLock', () => {
     expect(document.body.style.overflow).toBe('scroll');
   });
 
-  it('잠그면 html에 scroll-locked를 달아 거터 띠를 덮고 해제하면 뗀다', () => {
+  it('잠그면 거터를 접고(scrollbar-gutter:auto) 해제 시 복원한다', () => {
     lockScroll();
-    expect(document.documentElement.classList.contains('scroll-locked')).toBe(true);
+    expect(document.documentElement.style.scrollbarGutter).toBe('auto');
     unlockScroll();
-    expect(document.documentElement.classList.contains('scroll-locked')).toBe(false);
+    expect(document.documentElement.style.scrollbarGutter).toBe('');
+  });
+
+  it('잠그면 스크롤바(거터) 폭만큼 padding-right로 보정하고 해제 시 되돌린다', () => {
+    // probe div의 offsetWidth(50) - clientWidth(35) = 15px 스크롤바 폭을 모사
+    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(50);
+    jest.spyOn(Element.prototype, 'clientWidth', 'get').mockReturnValue(35);
+    lockScroll();
+    expect(document.body.style.paddingRight).toBe('15px');
+    unlockScroll();
+    expect(document.body.style.paddingRight).toBe('');
+  });
+
+  it('스크롤바 폭이 0이면(오버레이) padding-right를 건드리지 않는다', () => {
+    jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(50);
+    jest.spyOn(Element.prototype, 'clientWidth', 'get').mockReturnValue(50);
+    lockScroll();
+    expect(document.body.style.paddingRight).toBe('');
+    unlockScroll();
+    expect(document.body.style.paddingRight).toBe('');
   });
 
   it('해제되지 않은 잠금이 남아도 초기화하면 다음 잠금/해제가 정상 복원된다', () => {
@@ -46,7 +67,6 @@ describe('scrollLock', () => {
     _resetScrollLock();
     // 초기화 후 깨끗한 환경에서 한 쌍의 잠금/해제는 즉시 원래대로 복원돼야 한다
     document.body.style.overflow = '';
-    document.documentElement.classList.remove('scroll-locked');
     lockScroll();
     expect(document.body.style.overflow).toBe('hidden');
     unlockScroll();

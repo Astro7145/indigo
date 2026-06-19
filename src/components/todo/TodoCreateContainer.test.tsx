@@ -1,5 +1,5 @@
 jest.mock('@/src/hooks/todo', () => ({ useCreateTodo: jest.fn() }));
-jest.mock('@/src/hooks/upload', () => ({ useCreateImageUploadUrl: jest.fn() }));
+jest.mock('@/src/hooks/upload', () => ({ useCreateImageUploadUrl: jest.fn(), useUploadImageToS3: jest.fn() }));
 jest.mock('@/src/hooks/useToast', () => ({ useToast: jest.fn() }));
 jest.mock('@/src/components/todo/TodoFormUI');
 
@@ -16,10 +16,14 @@ const mockedUseCreateTodo = todoHooks.useCreateTodo as jest.MockedFunction<typeo
 const mockedUseCreateImageUploadUrl = uploadHooks.useCreateImageUploadUrl as jest.MockedFunction<
   typeof uploadHooks.useCreateImageUploadUrl
 >;
+const mockedUseUploadImageToS3 = uploadHooks.useUploadImageToS3 as jest.MockedFunction<
+  typeof uploadHooks.useUploadImageToS3
+>;
 const mockedUseToast = toastHook.useToast as jest.MockedFunction<typeof toastHook.useToast>;
 
 const mockMutate = jest.fn();
 const mockCreateImageUploadUrl = jest.fn();
+const mockUploadImageToS3 = jest.fn();
 const mockShowToast = jest.fn();
 
 let capturedOnSubmit: ((values: TodoFormValues) => Promise<void> | void) | null = null;
@@ -44,9 +48,10 @@ beforeEach(() => {
   mockedUseCreateImageUploadUrl.mockReturnValue({
     mutateAsync: mockCreateImageUploadUrl,
   } as unknown as ReturnType<typeof uploadHooks.useCreateImageUploadUrl>);
+  mockedUseUploadImageToS3.mockReturnValue({
+    mutateAsync: mockUploadImageToS3,
+  } as unknown as ReturnType<typeof uploadHooks.useUploadImageToS3>);
   mockedUseToast.mockReturnValue({ showToast: mockShowToast, hideToast: jest.fn() });
-
-  global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200 }) as unknown as typeof fetch;
 });
 
 describe('TodoCreateContainer', () => {
@@ -79,7 +84,7 @@ describe('TodoCreateContainer', () => {
       await capturedOnSubmit!({ ...baseValues, imageFile: file });
     });
     expect(mockCreateImageUploadUrl).toHaveBeenCalledWith({ fileName: 'pic.png' });
-    expect(global.fetch).toHaveBeenCalledWith('https://upload/url', { method: 'PUT', body: file });
+    expect(mockUploadImageToS3).toHaveBeenCalledWith({ uploadUrl: 'https://upload/url', file });
     expect(mockMutate).toHaveBeenCalledWith(
       expect.objectContaining({ fileUrl: 'https://cdn/image.png' }),
       expect.any(Object),
@@ -102,7 +107,7 @@ describe('TodoCreateContainer', () => {
       uploadUrl: 'https://upload/url',
       url: 'https://cdn/image.png',
     });
-    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: 500 });
+    mockUploadImageToS3.mockRejectedValue(new Error('upload failed'));
     render(<TodoCreateContainer onClose={jest.fn()} onCancel={jest.fn()} />);
     const file = new File([''], 'pic.png', { type: 'image/png' });
     await act(async () => {

@@ -12,13 +12,13 @@ export interface NoteLinkEmbedProps {
 export default function NoteLinkEmbed({ url, className }: NoteLinkEmbedProps) {
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2">
-        <span className="min-w-0 truncate text-xs text-slate-500">{url}</span>
+      <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-3 py-2 dark:border-white/10">
+        <span className="min-w-0 truncate text-xs text-slate-500 dark:text-white/60">{url}</span>
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 text-xs font-medium text-indigo-600 underline"
+          className="dark:text-indigo-dark-900 shrink-0 text-xs font-medium text-indigo-600 underline"
         >
           새 탭에서 열기
         </a>

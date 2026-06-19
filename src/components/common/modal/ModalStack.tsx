@@ -41,8 +41,34 @@ export default function ModalStack() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [modals, hasModals, close]);
 
+  // 모바일 뒤로가기 지원. ESC 핸들러와 동일한 LIFO 구조.
+  // 스택이 열리면 history 진입점을 push하고, popstate 시 최상단 onClose를 호출한다.
+  // 스택이 프로그래매틱으로 완전히 닫히면 push한 진입점을 back()으로 복원한다.
+  useEffect(() => {
+    if (!hasModals) return;
+    history.pushState({ ...history.state, modalStack: true }, '');
+    return () => {
+      if (history.state?.modalStack) history.back();
+    };
+  }, [hasModals]);
+
+  useEffect(() => {
+    if (!hasModals) return;
+    const onPopState = () => {
+      const top = modals[modals.length - 1];
+      (top.onClose ?? close)();
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [modals, hasModals, close]);
+
   // 모든 닫기는 최상단을 향한다. controls는 위치와 무관하게 동일하다(close=맨 위, closeWithParent=위 2개).
-  const controls = { close, closeWithParent };
+  const closeAndNavigate = (afterNavigate?: () => void) => {
+    history.replaceState({ ...history.state, modalStack: undefined }, '');
+    close();
+    afterNavigate?.();
+  };
+  const controls = { close, closeWithParent, closeAndNavigate };
 
   const isBottomSheet = (entry: ModalEntry) =>
     (entry.variant === 'auto' ? (isMobile ? 'bottom-sheet' : 'modal') : entry.variant) === 'bottom-sheet';
@@ -58,7 +84,15 @@ export default function ModalStack() {
     const handleClose = entry.onClose ?? close;
     if (isBottomSheet(entry)) {
       return (
-        <BottomSheet key={entry.id} isOpen onClose={handleClose} closeOnEsc={false} zIndex={zIndex} scrollLock={false}>
+        <BottomSheet
+          key={entry.id}
+          isOpen
+          onClose={handleClose}
+          closeOnEsc={false}
+          closeOnBack={false}
+          zIndex={zIndex}
+          scrollLock={false}
+        >
           {entry.render(controls)}
         </BottomSheet>
       );

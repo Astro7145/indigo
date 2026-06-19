@@ -10,6 +10,7 @@ const isTypingTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) return false;
   return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 };
+import { useScrollLock } from '@/src/hooks/useScrollLock';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useModalStore } from '@/src/stores/modal';
 import GoalSidebarList from '@/src/components/goal/GoalSidebarList';
@@ -62,15 +63,8 @@ export default function Sidebar() {
     return () => mql.removeEventListener('change', handleChange);
   }, []);
 
-  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다
-  useEffect(() => {
-    if (!isTablet || collapsed) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isTablet, collapsed]);
+  // 태블릿에서 사이드바가 펼쳐지면(오버레이+백드롭) 배경 스크롤을 잠근다 (공용 참조카운트 락)
+  useScrollLock(isTablet && !collapsed);
 
   return (
     <div className="hidden sm:contents">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 import { useSyncExternalStore, type ComponentType, type ReactNode, type SVGProps } from 'react';
 
 import { IcMonitor, IcMoon, IcSun } from '@/src/components/common/icons';
@@ -9,12 +10,12 @@ import { cn } from '@/src/utils/cn';
 const emptySubscribe = () => () => {};
 
 const OPTIONS = [
-  { value: 'light', label: '라이트 모드', Icon: IcSun },
-  { value: 'dark', label: '다크 모드', Icon: IcMoon },
-  { value: 'system', label: '시스템 설정', Icon: IcMonitor },
+  { value: 'light', key: 'themeLight', Icon: IcSun },
+  { value: 'dark', key: 'themeDark', Icon: IcMoon },
+  { value: 'system', key: 'themeSystem', Icon: IcMonitor },
 ] as const satisfies ReadonlyArray<{
   value: string;
-  label: string;
+  key: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 }>;
 
@@ -44,6 +45,7 @@ function ToggleTab({ label, active, onClick, children }: ToggleTabProps) {
 }
 
 export default function ThemeToggle() {
+  const t = useTranslations('settings');
   const { theme, setTheme } = useTheme();
   // 서버/하이드레이션 시점엔 테마를 알 수 없으므로 마운트 후에만 활성 탭을 표시한다.
   const mounted = useSyncExternalStore(
@@ -56,13 +58,13 @@ export default function ThemeToggle() {
   return (
     <div
       role="radiogroup"
-      aria-label="다크모드"
+      aria-label={t('darkMode')}
       className="dark:bg-indigo-dark-100 flex w-fit items-center gap-1.5 rounded-full bg-slate-50 p-1.5 sm:gap-2 sm:p-2"
     >
-      {OPTIONS.map(({ value, label, Icon }) => {
+      {OPTIONS.map(({ value, key, Icon }) => {
         const active = current === value;
         return (
-          <ToggleTab key={value} label={label} active={active} onClick={() => setTheme(value)}>
+          <ToggleTab key={value} label={t(key)} active={active} onClick={() => setTheme(value)}>
             <Icon
               className={cn(
                 'size-5 sm:size-6',

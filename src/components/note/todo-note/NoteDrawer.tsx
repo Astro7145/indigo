@@ -2,11 +2,12 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, type RefObject } from 'react';
 
 import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import NoteWorkspace, { type NoteWorkspaceHandle } from '@/src/components/note/todo-note/NoteWorkspace';
-import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useNoteDrawer, type NoteDrawerMode } from '@/src/hooks/note/useNoteDrawer';
 import { useNoteListSuspense } from '@/src/hooks/note/note';
 import { useTodo } from '@/src/hooks/todo';
 import { useModalStore } from '@/src/stores/modal';
@@ -14,16 +15,23 @@ import { lockScroll, unlockScroll } from '@/src/utils/scrollLock';
 
 const EMPTY_NOTE_LIST = { notes: [], nextCursor: null, totalCount: 0 };
 
+function parseId(raw: string | null): number | null {
+  if (raw == null || raw === '') return null;
+  const n = Number(raw);
+  return Number.isNaN(n) ? null : n;
+}
+
 // 쿼리파라미터(todoId·mode)를 구독해 열리는 전역 노트 드로어. (main) 레이아웃에 상시 마운트된다.
 // todoId가 없으면 닫힘(렌더 안 함). 열림 판단은 오직 todoId 존재 여부다.
 export default function NoteDrawer() {
   const t = useTranslations('note');
   const tc = useTranslations('common');
-  const { todoId } = useNoteDrawer();
+  const searchParams = useSearchParams();
   const reduceMotion = useReducedMotion();
   // NoteWorkspace의 requestClose를 ref로 참조해 ESC 트리거 시 호출한다.
   // dirty 판단과 확인 모달은 폼이 전담한다.
   const workspaceRef = useRef<NoteWorkspaceHandle>(null);
+  const todoId = parseId(searchParams.get('todoId'));
 
   useEffect(() => {
     if (todoId == null) return;
@@ -48,7 +56,7 @@ export default function NoteDrawer() {
       {todoId != null && (
         <div key="note-drawer" className="fixed inset-0 z-60">
           <motion.div
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-black/30 dark:bg-black/50"
             aria-hidden
             onClick={() => workspaceRef.current?.requestClose()}
             initial={{ opacity: 0 }}
@@ -60,7 +68,7 @@ export default function NoteDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label={t('ariaLabel')}
-            className="absolute inset-y-0 right-0 flex w-full flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
+            className="dark:bg-indigo-dark-400 absolute inset-y-0 right-0 flex w-full flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -68,10 +76,14 @@ export default function NoteDrawer() {
           >
             <AsyncBoundary
               fallback={
-                <p className="flex h-full items-center justify-center text-sm text-slate-400">{tc('state.loading')}</p>
+                <p className="flex h-full items-center justify-center text-sm text-slate-400 dark:text-white/60">
+                  {tc('state.loading')}
+                </p>
               }
               errorFallback={
-                <p className="flex h-full items-center justify-center text-sm text-slate-400">{t('loadError')}</p>
+                <p className="flex h-full items-center justify-center text-sm text-slate-400 dark:text-white/60">
+                  {t('loadError')}
+                </p>
               }
             >
               <NoteDrawerContent todoId={todoId} workspaceRef={workspaceRef} />
@@ -91,7 +103,9 @@ function NoteDrawerContent({
   todoId: number;
   workspaceRef: RefObject<NoteWorkspaceHandle | null>;
 }) {
-  const { mode, goEdit, goDetail, closeNote } = useNoteDrawer();
+  const searchParams = useSearchParams();
+  const mode = (searchParams.get('mode') as NoteDrawerMode) ?? 'detail';
+  const { goEdit, goDetail, closeNote, cancelNote } = useNoteDrawer();
   const { data } = useNoteListSuspense(
     { todoId },
     mode === 'write' ? { initialData: EMPTY_NOTE_LIST, staleTime: Infinity } : undefined,
@@ -114,7 +128,7 @@ function NoteDrawerContent({
       // create·edit 성공 모두 detail로. create는 lists() invalidate→리페치로 note가 채워져 자동 상세 전환.
       onComplete={goDetail}
       // 작성 취소는 드로어를 닫고, 수정 취소는 상세로 복귀한다.
-      onCancel={resolvedMode === 'edit' ? goDetail : closeNote}
+      onCancel={resolvedMode === 'edit' ? goDetail : cancelNote}
       onClose={closeNote}
     />
   );

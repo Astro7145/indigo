@@ -80,10 +80,6 @@ export async function prefetchInfiniteGoals(qc: QueryClient, limit: number): Pro
   }
 }
 
-/** GoalTodoBoard — useTodoList({goalId, keyword: undefined})와 동일 키(undefined는 해시에서 탈락). */
-export const prefetchGoalBoard = (qc: QueryClient, goalId: number) =>
-  qc.prefetchQuery({ queryKey: todoKeys.list({ goalId }), queryFn: () => serverGet('todos', { goalId }) });
-
 /** /todos ALL 탭·목표 상세 컬럼 — useInfiniteTodoList(params)와 동일 키. */
 export const prefetchInfiniteTodos = (
   qc: QueryClient,
