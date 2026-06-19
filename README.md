@@ -15,9 +15,8 @@
 
 ### 할일 (Todo)
 
-![대시보드 화면 1](docs/screenshots/dashboard1.png)
-![대시보드 화면 2](docs/screenshots/dashboard2.png)
-![할일 모달 화면 1](docs/screenshots/todo_modal1.png)
+![대시보드 화면](docs/screenshots/dashboard.png)
+![할일 모달 화면](docs/screenshots/todo_modal.png)
 
 날짜·카테고리·태그별로 할일을 관리합니다. 캘린더 뷰에서 날짜를 선택해 해당일의 할일을 한눈에 확인하고, 상태(할 일 → 진행 중 → 완료)를 빠르게 전환할 수 있습니다.
 
