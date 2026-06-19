@@ -49,6 +49,14 @@ Tiptap 기반 리치 텍스트 에디터로 노트를 작성합니다. URL을 �
 
 ---
 
+### 찜한 할일
+
+![찜한 할일 화면](docs/screenshots/favorites.png)
+
+자주 쓰는 할일·목표·노트를 찜한 할일 화면에서 빠르게 접근할 수 있습니다.
+
+---
+
 ### 즐겨찾기 & 캘린더
 
 ![즐겨찾기·캘린더 화면](docs/screenshots/favorites-calendar.png)
