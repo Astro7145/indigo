@@ -89,6 +89,8 @@ function GoalTodoSectionContent({ sort }: { sort: GoalSort }) {
   const hasMore = visibleCount < sorted.length;
 
   const sentinelRef = useRef<HTMLDivElement>(null);
+  // 센티넬 노드는 hasMore인 동안 동일하게 유지되고 콜백은 함수형 업데이터를 쓰므로(visibleCount 미참조),
+  // hasMore가 바뀔 때만 옵저버를 만들고 정리하면 된다(스텝마다 재생성하지 않음).
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !hasMore) return;
@@ -100,7 +102,7 @@ function GoalTodoSectionContent({ sort }: { sort: GoalSort }) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [hasMore, visibleCount]);
+  }, [hasMore]);
 
   if (sorted.length === 0) {
     // figma 21209:52456 — 카드 chrome 그대로(일러스트 제외). 텍스트 가운데 정렬용 min-h 확보.
