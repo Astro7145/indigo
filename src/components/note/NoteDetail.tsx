@@ -29,8 +29,9 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
   const { data: note, isLoading, isError } = useNote(noteId);
   const [embedOpen, setEmbedOpen] = useState(false);
 
-  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400', className)}>불러오는 중…</p>;
-  if (isError || !note) return <p className={cn('p-6 text-sm text-slate-400', className)}>노트를 불러오지 못했어요</p>;
+  if (isLoading) return <p className={cn('p-6 text-sm text-slate-400 dark:text-white/60', className)}>불러오는 중…</p>;
+  if (isError || !note)
+    return <p className={cn('p-6 text-sm text-slate-400 dark:text-white/60', className)}>노트를 불러오지 못했어요</p>;
 
   const tags = note.todo.tags ?? [];
   const hasLink = !!note.linkUrl;
@@ -40,37 +41,37 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
       <div className="flex flex-col gap-7.5">
         <div className="flex items-center gap-3">
           <IcSpringNote aria-hidden className="size-10 shrink-0" />
-          <h2 className="min-w-0 text-2xl font-semibold text-slate-800">{note.title}</h2>
+          <h2 className="min-w-0 text-2xl font-semibold text-slate-800 dark:text-white">{note.title}</h2>
         </div>
 
         <dl className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <div className="flex items-center gap-2">
-            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
+            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400 dark:text-white/60">
               <IcFlagOutline aria-hidden className="size-4" size="small" />
               목표
             </dt>
-            <dd className="min-w-0 flex-1 truncate text-slate-700">{note.todo.goal?.title ?? '-'}</dd>
+            <dd className="min-w-0 flex-1 truncate text-slate-700 dark:text-white">{note.todo.goal?.title ?? '-'}</dd>
           </div>
           <div className="flex items-center gap-2">
             {/* 값=updatedAt(기획 "마지막 저장일"). 라벨은 Figma 시안의 "작성일" 표기를 따른다. */}
-            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
+            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400 dark:text-white/60">
               <IcCalendarOutline aria-hidden className="size-4" />
               작성일
             </dt>
-            <dd className="text-slate-700">{formatDate(note.updatedAt)}</dd>
+            <dd className="text-slate-700 dark:text-white">{formatDate(note.updatedAt)}</dd>
           </div>
           <div className="flex items-center gap-2">
-            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
+            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400 dark:text-white/60">
               <IcCheckbox aria-hidden className="size-4" />할 일
             </dt>
             <dd className="flex min-w-0 items-center gap-2">
-              <span className="min-w-0 truncate text-slate-700">{note.todo.title}</span>
+              <span className="min-w-0 truncate text-slate-700 dark:text-white">{note.todo.title}</span>
               <Chip type={note.todo.done ? 'done' : 'todo'} />
             </dd>
           </div>
 
           <div className="flex items-center gap-2">
-            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400">
+            <dt className="flex w-16 shrink-0 items-center gap-1 font-medium text-slate-400 dark:text-white/60">
               <IcHash aria-hidden className="size-4" />
               태그
             </dt>
@@ -79,7 +80,7 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
                 {tags.map((t) => (
                   <span
                     key={t.id}
-                    className="rounded-full border border-indigo-300 bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
+                    className="dark:border-indigo-dark-600 dark:bg-indigo-dark-500 dark:text-indigo-dark-900 rounded-full border border-indigo-300 bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700"
                   >
                     {t.name}
                   </span>
@@ -92,15 +93,15 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
 
       {hasLink && (
         <>
-          <div className="h-px w-full bg-slate-200" />
+          <div className="h-px w-full bg-slate-200 dark:bg-white/10" />
           <button
             type="button"
             onClick={() => setEmbedOpen((v) => !v)}
             aria-pressed={embedOpen}
-            className="flex w-full items-center gap-1.5 rounded-[14px] bg-slate-50 px-4 py-3.5 text-left transition-colors hover:bg-slate-100"
+            className="dark:bg-indigo-dark-400 dark:hover:bg-indigo-dark-300 flex w-full items-center gap-1.5 rounded-[14px] bg-slate-50 px-4 py-3.5 text-left transition-colors hover:bg-slate-100"
           >
-            <IcLink aria-hidden className="size-5 shrink-0 text-slate-400" />
-            <span className="min-w-0 truncate text-sm font-medium text-slate-700">{note.linkUrl}</span>
+            <IcLink aria-hidden className="size-5 shrink-0 text-slate-400 dark:text-white/60" />
+            <span className="min-w-0 truncate text-sm font-medium text-slate-700 dark:text-white">{note.linkUrl}</span>
           </button>
         </>
       )}
@@ -111,7 +112,7 @@ export default function NoteDetail({ noteId, className }: NoteDetailProps) {
     return (
       <div className={cn('flex h-full min-h-0 flex-col xl:flex-row', className)}>
         {viewer}
-        <div className="min-h-0 flex-1 border-t border-slate-200 xl:border-t-0 xl:border-l">
+        <div className="min-h-0 flex-1 border-t border-slate-200 xl:border-t-0 xl:border-l dark:border-white/10">
           <NoteLinkEmbed url={note.linkUrl!} />
         </div>
       </div>

@@ -18,7 +18,7 @@ export default function NoteFormActions({ mode, isValid, isSubmitting, onDraft, 
         type="button"
         onClick={onDraft}
         disabled={!isValid || isSubmitting}
-        className="cursor-pointer px-1.5 py-0.5 text-sm font-medium tracking-[-0.03em] text-indigo-400 disabled:cursor-not-allowed disabled:text-indigo-800"
+        className="dark:text-indigo-dark-900 dark:disabled:text-indigo-dark-600 cursor-pointer px-1.5 py-0.5 text-sm font-medium tracking-[-0.03em] text-indigo-400 disabled:cursor-not-allowed disabled:text-indigo-800"
       >
         임시저장
       </button>
@@ -26,7 +26,7 @@ export default function NoteFormActions({ mode, isValid, isSubmitting, onDraft, 
         type="button"
         onClick={onSubmit}
         disabled={!isValid || isSubmitting}
-        className="cursor-pointer px-1.5 py-0.5 text-sm font-semibold tracking-[-0.03em] text-indigo-500 disabled:cursor-not-allowed disabled:text-indigo-800"
+        className="dark:text-indigo-dark-900 dark:disabled:text-indigo-dark-600 cursor-pointer px-1.5 py-0.5 text-sm font-semibold tracking-[-0.03em] text-indigo-500 disabled:cursor-not-allowed disabled:text-indigo-800"
       >
         {submitText}
       </button>

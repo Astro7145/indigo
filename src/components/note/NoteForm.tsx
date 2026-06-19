@@ -139,15 +139,15 @@ export default function NoteForm(props: NoteFormProps) {
   // 수정 모드: 로딩 중과 "노트 없음"을 구분 — 후자는 가드 없으면 무한 로딩 메시지가 됨
   if (props.mode === 'edit' && isNoteLoading) {
     return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
+      <div className="dark:bg-indigo-dark-300 mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400 dark:text-white/60">불러오는 중…</p>
       </div>
     );
   }
   if (props.mode === 'edit' && !initialNote) {
     return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">수정할 노트를 찾을 수 없어요</p>
+      <div className="dark:bg-indigo-dark-300 mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400 dark:text-white/60">수정할 노트를 찾을 수 없어요</p>
       </div>
     );
   }
@@ -201,7 +201,7 @@ export default function NoteForm(props: NoteFormProps) {
       >
         {/* 모바일은 Topbar 우측 슬롯이 액션을 담당하므로 헤더 전체를 sm 이상에서만 노출 */}
         <header className="hidden h-10 items-center justify-between gap-3 sm:mb-3 sm:flex">
-          <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
+          <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl dark:text-white">
             {headingText}
           </h1>
           <div className="flex shrink-0 gap-2">
@@ -232,7 +232,7 @@ export default function NoteForm(props: NoteFormProps) {
             if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
             editorRef.current?.focus();
           }}
-          className="flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
+          className="dark:bg-indigo-dark-300 flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
         >
           <NoteEditor
             ref={editorRef}
@@ -241,7 +241,7 @@ export default function NoteForm(props: NoteFormProps) {
             onLinkInsertClick={handleLinkInsertClick}
             placeholder="이 곳을 통해 노트 작성을 시작해주세요"
             // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
-            contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+            contentClassName="prose max-w-none min-h-[400px] pt-4 text-sm text-slate-800 dark:text-white sm:min-h-[450px] sm:pt-5 sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 dark:[&_.ProseMirror_p.is-editor-empty:first-child::before]:text-white/40 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
             titleSlot={
               <div className="pt-[29px]">
                 <div className="flex items-center gap-2 pb-3 sm:gap-3 sm:pb-4">
@@ -253,11 +253,13 @@ export default function NoteForm(props: NoteFormProps) {
                     maxLength={30}
                     placeholder="노트의 제목을 입력해주세요"
                     aria-label="제목"
-                    className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
+                    className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl dark:text-white dark:placeholder:text-white/40"
                   />
-                  <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>
+                  <span className="dark:text-indigo-dark-900 shrink-0 text-xs text-indigo-500 sm:text-sm">
+                    {title.length}/30
+                  </span>
                 </div>
-                <div className="border-b border-slate-200" />
+                <div className="border-b border-slate-200 dark:border-white/10" />
               </div>
             }
             attachmentSlot={
@@ -276,12 +278,12 @@ export default function NoteForm(props: NoteFormProps) {
                     <NoteLinkCard url={linkUrl} onClick={() => setIsEmbedOpen(true)} onDelete={handleLinkDelete} />
                   </div>
                 )}
-                <div className="border-b border-slate-200 pt-3 sm:pt-4" />
+                <div className="border-b border-slate-200 pt-3 sm:pt-4 dark:border-white/10" />
               </>
             }
           />
 
-          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
+          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm dark:text-white/60">
             공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
           </div>
         </div>
@@ -313,7 +315,7 @@ export default function NoteForm(props: NoteFormProps) {
           aria-invalid={showLinkError || undefined}
           aria-describedby={showLinkError ? 'link-input-error' : undefined}
           className={`mt-4 h-10 w-full rounded-md border px-3 text-sm outline-none sm:mt-6 sm:h-14 sm:text-base ${
-            showLinkError ? 'border-red-500' : 'border-slate-200 focus:border-indigo-500'
+            showLinkError ? 'border-red-500' : 'border-slate-200 focus:border-indigo-500 dark:border-white/10'
           }`}
         />
         {showLinkError && (

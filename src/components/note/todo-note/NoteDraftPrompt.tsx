@@ -16,7 +16,7 @@ export default function NoteDraftPrompt({ onDismiss, onConfirm }: NoteDraftPromp
   return (
     <>
       <Modal.Title className="text-center text-base sm:text-xl">{t('draftPrompt.title')}</Modal.Title>
-      <p className="mt-1 mb-6 text-center text-xs font-medium text-slate-500 sm:mb-10 sm:text-base">
+      <p className="mt-1 mb-6 text-center text-xs font-medium text-slate-500 sm:mb-10 sm:text-base dark:text-white/60">
         {t('draftPrompt.description')}
       </p>
       <Modal.Actions>
