@@ -42,7 +42,8 @@ Tiptap 기반 리치 텍스트 에디터로 노트를 작성합니다. URL을 �
 
 ### 소통 게시판 (Post)
 
-![게시판 화면](docs/screenshots/post.png)
+![게시글 목록 화면](docs/screenshots/posts_list.png)
+![게시글 상세 화면](docs/screenshots/posts_detail.png)
 
 팀 소통용 게시글을 작성하고 검색합니다. 이미지 첨부, 댓글, 노트 내용 공유 기능을 제공합니다.
 
