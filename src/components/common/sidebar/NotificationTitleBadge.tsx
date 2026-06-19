@@ -9,8 +9,9 @@ import { useInfiniteNotificationList } from '@/src/hooks/notification';
  * 기존 "(N) " prefix를 벗긴 뒤 count>0이면 다시 붙인다. 여러 번 적용해도 같은 결과(idempotent).
  */
 export function applyUnreadPrefix(title: string, count: number): string {
-  const base = title.replace(/^\(\d+\)\s/, '');
-  return count > 0 ? `(${count}) ${base}` : base;
+  const base = title.replace(/^\(\d+\+?\)\s/, '');
+  if (count <= 0) return base;
+  return `(${count >= 100 ? '99+' : count}) ${base}`;
 }
 
 /**
