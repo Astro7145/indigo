@@ -16,10 +16,14 @@ import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 import type { ApiError } from '@/src/types/common';
 
+/**
+ * limit이 지정되면 그 한 페이지만(예: RecentTodos 최신 4개), 없으면 커서 끝까지 따라가 전부 합친다
+ * (예: 목표 보드의 To Do/Done 컬럼 완전성 — useAllTodos와 동일 결).
+ */
 export function useTodoList(params: TodoListParams = {}) {
   return useSuspenseQuery<TodoListResponse, ApiError>({
     queryKey: todoKeys.list(params),
-    queryFn: () => getTodos(params),
+    queryFn: () => (params.limit == null ? getAllTodos(params) : getTodos(params)),
   });
 }
 

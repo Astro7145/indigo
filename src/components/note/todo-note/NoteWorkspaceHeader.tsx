@@ -35,7 +35,7 @@ export default function NoteWorkspaceHeader({
 
   return (
     <header className="mb-4 flex h-10 items-center justify-between gap-3 sm:mb-3">
-      <h1 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl">
+      <h1 className="min-w-0 truncate text-xl font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl dark:text-white">
         {headingText}
       </h1>
       {editing ? (

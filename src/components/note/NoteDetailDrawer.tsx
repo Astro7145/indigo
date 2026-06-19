@@ -32,12 +32,14 @@ export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
 
   return (
     <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/30" aria-hidden onClick={close} />
+      <div className="absolute inset-0 bg-black/30 dark:bg-black/50" aria-hidden onClick={close} />
       <div
         role="dialog"
         aria-modal="true"
         aria-label="노트 상세"
-        className={cn('absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-2xl xl:w-[60%]')}
+        className={cn(
+          'dark:bg-indigo-dark-300 absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-2xl xl:w-[60%]',
+        )}
       >
         <IconButton aria-label="닫기" onClick={close} className="absolute top-4 right-4 z-10">
           <IcDelete aria-hidden="true" className="size-6" />
