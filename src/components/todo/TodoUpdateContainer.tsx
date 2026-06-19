@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { BadgeColor } from '@/src/components/common/badges/Badge';
 import TodoFormUI, { type TodoFormValues } from '@/src/components/todo/TodoFormUI';
 import { useUpdateTodo } from '@/src/hooks/todo';
-import { useCreateImageUploadUrl } from '@/src/hooks/upload';
+import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
 import type { Todo } from '@/src/types/todo';
 
@@ -24,6 +24,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel, onPending
   const tTodos = useTranslations('todos');
   const { mutate: updateTodo, isPending } = useUpdateTodo();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
+  const { mutateAsync: uploadImageToS3 } = useUploadImageToS3();
   const { showToast } = useToast();
 
   const initialValues: Partial<TodoFormValues> = {
@@ -45,8 +46,7 @@ export default function TodoUpdateContainer({ todo, onClose, onCancel, onPending
     if (values.imageFile) {
       try {
         const { uploadUrl, url } = await createImageUploadUrl({ fileName: values.imageFile.name });
-        const res = await fetch(uploadUrl, { method: 'PUT', body: values.imageFile });
-        if (!res.ok) throw new Error(`upload failed: ${res.status}`);
+        await uploadImageToS3({ uploadUrl, file: values.imageFile });
         fileUrl = url;
       } catch {
         showToast(tTodos('imageUploadError'));

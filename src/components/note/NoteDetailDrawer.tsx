@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons';
+import { useScrollLock } from '@/src/hooks/useScrollLock';
 import { cn } from '@/src/utils/cn';
 
 import NoteDetail from './NoteDetail';
@@ -26,14 +27,8 @@ export default function NoteDetailDrawer({ noteId }: NoteDetailDrawerProps) {
     return () => document.removeEventListener('keydown', onKey);
   }, [router]);
 
-  // 드로어가 열린 동안 배경 문서 스크롤을 잠근다(Modal과 동일 패턴). 인터셉트 시에만 마운트되므로 마운트=열림.
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
+  // 드로어가 열린 동안 배경 문서 스크롤을 잠근다(공용 참조카운트 락). 인터셉트 시에만 마운트되므로 마운트=열림.
+  useScrollLock();
 
   return (
     <div className="fixed inset-0 z-50">

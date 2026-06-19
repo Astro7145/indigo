@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -17,6 +17,7 @@ const LANGUAGE_LABELS: Record<Locale, string> = {
 };
 
 export default function LanguageSelect() {
+  const t = useTranslations('settings');
   const activeLocale = useLocale();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -37,7 +38,7 @@ export default function LanguageSelect() {
         asChild
         className="dark:bg-indigo-dark-200 flex w-full cursor-pointer items-center gap-2 rounded border border-slate-300 bg-white p-3 text-left sm:p-4 dark:border-white/10"
       >
-        <button type="button" aria-label="언어">
+        <button type="button" aria-label={t('language')}>
           <span className="flex-1 text-sm text-slate-700 sm:text-base dark:text-white">
             {LANGUAGE_LABELS[activeLocale]}
           </span>

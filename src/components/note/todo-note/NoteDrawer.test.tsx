@@ -84,6 +84,11 @@ beforeEach(() => {
   jest.clearAllMocks();
   (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
   (useRouter as jest.Mock).mockReturnValue({ push: jest.fn(), replace: jest.fn() });
+  window.history.pushState({}, '', '/todos');
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 it('mode=write이면 작성 폼을 보여주고 노트 리스트를 요청하지 않는다', async () => {
@@ -142,8 +147,7 @@ it('todoId 없이 무관한 파라미터만 있으면 드로어가 열리지 않
 });
 
 it('상세 모드에서 닫기를 누르면 todoId·mode 파라미터를 제거한다', async () => {
-  const push = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push, replace: jest.fn() });
+  const pushState = jest.spyOn(window.history, 'pushState');
   (getNotes as jest.Mock).mockResolvedValue({ notes: [note], nextCursor: null, totalCount: 1 });
   setParams('todoId=12&mode=detail');
 
@@ -152,14 +156,13 @@ it('상세 모드에서 닫기를 누르면 todoId·mode 파라미터를 제거�
 
   fireEvent.click(screen.getByRole('button', { name: '닫기' }));
 
-  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
+  expect(pushState).toHaveBeenCalledWith(null, '', '/todos');
 });
 
 // --- ESC 닫기 ---
 
 it('상세: Escape를 누르면 이벤트 전파를 막고 드로어를 닫는다', async () => {
-  const push = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push, replace: jest.fn() });
+  const pushState = jest.spyOn(window.history, 'pushState');
   (getNotes as jest.Mock).mockResolvedValue({ notes: [note], nextCursor: null, totalCount: 1 });
   setParams('todoId=12&mode=detail');
 
@@ -171,12 +174,11 @@ it('상세: Escape를 누르면 이벤트 전파를 막고 드로어를 닫는�
   document.dispatchEvent(event);
 
   expect(stopProp).toHaveBeenCalled();
-  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
+  expect(pushState).toHaveBeenCalledWith(null, '', '/todos');
 });
 
 it('작성: Escape를 누르면 드로어를 닫는다', async () => {
-  const push = jest.fn();
-  (useRouter as jest.Mock).mockReturnValue({ push, replace: jest.fn() });
+  const replaceState = jest.spyOn(window.history, 'replaceState');
   setParams('todoId=12&mode=write');
 
   renderWithClient(<NoteDrawer />);
@@ -184,7 +186,7 @@ it('작성: Escape를 누르면 드로어를 닫는다', async () => {
 
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
 
-  expect(push).toHaveBeenCalledWith('/todos', { scroll: false });
+  expect(replaceState).toHaveBeenCalledWith(null, '', '/todos');
 });
 
 it('모달 스택이 열려 있으면 Escape를 눌러도 드로어는 반응하지 않는다', async () => {
