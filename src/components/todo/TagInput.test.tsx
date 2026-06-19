@@ -121,4 +121,38 @@ describe('TagInput', () => {
     fireEvent.change(input, { target: { value: '운동2' } });
     expect(screen.getByRole('alert')).toHaveTextContent('');
   });
+
+  it('빈 입력 상태에서 Backspace를 누르면 마지막 태그가 즉시 삭제된다', () => {
+    const onChange = jest.fn();
+    const initial: Tag[] = [
+      { text: '운동', color: 'green' },
+      { text: '공부', color: 'yellow' },
+    ];
+    render(<TagInput value={initial} onChange={onChange} />);
+    fireEvent.keyDown(screen.getByPlaceholderText(PLACEHOLDER), { key: 'Backspace' });
+    expect(onChange).toHaveBeenCalledWith([{ text: '운동', color: 'green' }]);
+  });
+
+  it('입력값이 있을 때 Backspace는 태그 삭제로 동작하지 않는다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[{ text: '운동', color: 'green' }]} onChange={onChange} />);
+    const input = screen.getByPlaceholderText(PLACEHOLDER);
+    fireEvent.change(input, { target: { value: '공부' } });
+    fireEvent.keyDown(input, { key: 'Backspace' });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('태그가 없는 상태에서 빈 입력으로 Backspace를 눌러도 onChange는 호출되지 않는다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[]} onChange={onChange} />);
+    fireEvent.keyDown(screen.getByPlaceholderText(PLACEHOLDER), { key: 'Backspace' });
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('한글 IME 조합 중에는 빈 입력 Backspace로 태그가 삭제되지 않는다', () => {
+    const onChange = jest.fn();
+    render(<TagInput value={[{ text: '운동', color: 'green' }]} onChange={onChange} />);
+    fireEvent.keyDown(screen.getByPlaceholderText(PLACEHOLDER), { key: 'Backspace', isComposing: true });
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });
