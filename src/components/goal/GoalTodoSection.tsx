@@ -52,7 +52,7 @@ export default function GoalTodoSection({ className }: GoalTodoSectionProps) {
               className="flex w-32 items-center justify-between gap-1 text-sm whitespace-nowrap text-slate-600 dark:text-white/60"
             >
               {tDashboard(`goalTodos.sort.${sort}`)}
-              <IcFilter aria-hidden className="size-5 shrink-0" />
+              <IcFilter aria-hidden className="size-5 shrink-0 dark:text-white/70" />
             </button>
           </Dropdown.Trigger>
           <Dropdown.Menu size="full" placement="bottom-start">

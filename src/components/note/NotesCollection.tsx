@@ -39,7 +39,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
     <div className={cn('mx-auto flex w-full max-w-[1312px] flex-col gap-3 sm:gap-4 xl:gap-5', className)}>
       <div className="flex h-12 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="hidden text-2xl font-semibold text-slate-800 sm:block dark:text-white">노트 모아보기</h1>
-        <div className="flex items-center gap-8 sm:gap-4">
+        <div className="flex items-center justify-between">
           <div className="w-full sm:w-[320px]">
             <SearchInput
               placeholder="노트를 검색해주세요"
@@ -48,7 +48,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
               onChange={(e) => setInput(e.target.value)}
             />
           </div>
-          <Dropdown className="w-20 shrink-0">
+          <Dropdown className="flex w-30 shrink-0 justify-end">
             <Dropdown.Trigger asChild>
               <button
                 type="button"
