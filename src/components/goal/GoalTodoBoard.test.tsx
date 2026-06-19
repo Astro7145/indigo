@@ -82,6 +82,20 @@ it('할일을 done 기준으로 To Do/Done 열에 나눠 렌더한다', async ()
   expect(within(doneCol).getByText('완료 할일')).toBeInTheDocument();
 });
 
+it('Done만 있으면 To do 컬럼에 빈 상태 플레이스홀더를 렌더한다', async () => {
+  mocked.getAllTodos.mockResolvedValue(listOf([makeTodo(1, '완료 할일', true)]));
+  renderBoard();
+  const todoCol = await screen.findByRole('group', { name: 'TO DO' });
+  expect(within(todoCol).getByText('해야할 일이 아직 없어요')).toBeInTheDocument();
+});
+
+it('To do만 있으면 Done 컬럼에 빈 상태 플레이스홀더를 렌더한다', async () => {
+  mocked.getAllTodos.mockResolvedValue(listOf([makeTodo(1, '미완료 할일', false)]));
+  renderBoard();
+  const doneCol = await screen.findByRole('group', { name: 'DONE' });
+  expect(within(doneCol).getByText('완료한 일이 아직 없어요')).toBeInTheDocument();
+});
+
 it('노트가 없으면 노트 작성(연필) 액션을, 있으면 노트 인디케이터를 렌더한다', async () => {
   mocked.getAllTodos.mockResolvedValue(
     listOf([makeTodo(1, '노트없음'), { ...makeTodo(2, '노트있음'), noteIds: [10] }]),

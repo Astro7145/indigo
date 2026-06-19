@@ -28,6 +28,18 @@ export function useTodoList(params: TodoListParams = {}) {
 }
 
 /**
+ * 비-suspense 변형. prefetch 없이 클라이언트에서만 페칭하는 화면(대시보드 GoalTodoBoard)용 —
+ * useSuspenseQuery는 SSR 중에도 fetch해 브라우저 전용 client-fetcher가 서버에서 터지지만(Invalid URL),
+ * useQuery는 SSR에서 fetch하지 않아 서버 렌더가 안전하다. 키·fetcher는 useTodoList와 동일.
+ */
+export function useTodoListQuery(params: TodoListParams = {}) {
+  return useQuery<TodoListResponse, ApiError>({
+    queryKey: todoKeys.list(params),
+    queryFn: () => (params.limit == null ? getAllTodos(params) : getTodos(params)),
+  });
+}
+
+/**
  * 전체 할일을 커서 끝까지 1스윕으로 불러온다(그래프 등 전수 조회용).
  * 키는 useGoalList의 'all'과 같은 결로 lists() 아래 'all'에 고정한다.
  */

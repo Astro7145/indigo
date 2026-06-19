@@ -12,7 +12,14 @@
     "title": "目標別のTODO",
     "empty": "登録した目標がありません",
     "boardEmpty": "まだTODOがありません",
-    "progressLabel": "{title} の進捗"
+    "progressLabel": "{title} の進捗",
+    "sort": {
+      "label": "並び替え",
+      "latest": "新しい順",
+      "oldest": "古い順",
+      "progressHigh": "進捗が高い順",
+      "progressLow": "進捗が低い順"
+    }
   },
   "progress": {
     "header": "私の進捗状況",

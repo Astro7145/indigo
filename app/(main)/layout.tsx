@@ -4,7 +4,7 @@ import NoteDrawer from '@/src/components/note/todo-note/NoteDrawer';
 import { cookies } from 'next/headers';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
-import { prefetchMe, prefetchSidebarGoals, prefetchSidebarNotifications } from '@/src/api/server/prefetch';
+import { prefetchAllGoals, prefetchMe, prefetchSidebarNotifications } from '@/src/api/server/prefetch';
 import { getQueryClient } from '@/src/api/server/query-client';
 import NotificationTitleBadge from '@/src/components/common/sidebar/NotificationTitleBadge';
 import Sidebar from '@/src/components/common/sidebar/Sidebar';
@@ -23,7 +23,8 @@ export default async function MainLayout({ children }: { children: React.ReactNo
 
   const qc = getQueryClient();
   // 사이드바/탑바 공용 데이터(프로필·목표·알림)를 병렬 prefetch — TTFB 추가 지연 최소화.
-  await Promise.all([prefetchMe(qc), prefetchSidebarGoals(qc), prefetchSidebarNotifications(qc)]);
+  // 목표는 전체('all' 키)를 한 번 받아 사이드바·대시보드(ProgressCard·목표 별 할일)가 같은 캐시를 공유한다.
+  await Promise.all([prefetchMe(qc), prefetchAllGoals(qc), prefetchSidebarNotifications(qc)]);
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
