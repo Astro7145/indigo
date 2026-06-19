@@ -140,7 +140,7 @@ function TodoItem({
         className={cn(
           'group flex w-full cursor-pointer items-center rounded',
           ROW_SIZE[size],
-          variant === 'default' && 'hover:bg-indigo-700/30',
+          variant === 'default' && 'dark:hover:bg-indigo-dark-500/20 hover:bg-indigo-700/30',
           className,
         )}
       >
@@ -223,7 +223,7 @@ function NoteAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       label={rest['aria-label'] ?? tCommon('todoList.note')}
       onClick={onClick}
       hoverOnly={hoverOnly}
-      className={cn('bg-indigo-alpha-20', className)}
+      className={cn('bg-indigo-alpha-20 dark:bg-indigo-dark-700/20', className)}
     >
       <IcNote className="size-6" />
     </ActionButton>
@@ -238,7 +238,7 @@ function LinkAction({ onClick, hoverOnly, className, ...rest }: ActionProps) {
       label={rest['aria-label'] ?? tCommon('todoList.link')}
       onClick={onClick}
       hoverOnly={hoverOnly}
-      className={cn('bg-indigo-alpha-20', className)}
+      className={cn('bg-indigo-alpha-20 dark:bg-indigo-dark-700/20', className)}
     >
       <IcLink className="size-6" />
     </ActionButton>
