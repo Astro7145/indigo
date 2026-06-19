@@ -30,6 +30,9 @@ export interface GoalListResponse {
   totalCount: number;
 }
 
+/** 목표 목록 클라이언트 정렬 기준(`/goals` API는 정렬 미지원). */
+export type GoalSort = 'latest' | 'oldest' | 'progressHigh' | 'progressLow';
+
 export interface CreateGoalBody {
   title: string;
 }

@@ -12,7 +12,14 @@
     "title": "목표별 할일",
     "empty": "등록한 목표가 없어요",
     "boardEmpty": "아직 할일이 없어요",
-    "progressLabel": "{title} 진행률"
+    "progressLabel": "{title} 진행률",
+    "sort": {
+      "label": "정렬",
+      "latest": "최신순",
+      "oldest": "오래된순",
+      "progressHigh": "진행률 높은순",
+      "progressLow": "진행률 낮은순"
+    }
   },
   "progress": {
     "header": "내 진행 상황",

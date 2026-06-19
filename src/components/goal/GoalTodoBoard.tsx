@@ -31,6 +31,7 @@ function percentOf(done: number, total: number): number {
 
 function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
   const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const isTodo = label === 'To do';
   const labelText = isTodo ? tCommon('tabs.todo') : tCommon('tabs.done');
   const { openEdit, openDetail } = useTodoSheet();
@@ -59,13 +60,20 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
       >
         {labelText}
       </span>
-      <TodoList
-        className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
-        todos={todos}
-        size="responsive"
-        onEdit={openEdit}
-        onSelect={openDetail}
-      />
+      {todos.length === 0 ? (
+        // 보드 전체가 아니라 한 컬럼만 빈 경우 — 해당 컬럼 본문에 안내 문구(목표 상세 GoalTodoColumn과 동일 문구)
+        <p className="flex flex-1 items-center justify-center px-2 py-6 text-center text-sm text-slate-500 dark:text-white/60">
+          {isTodo ? tTodos('empty.todo') : tTodos('empty.done')}
+        </p>
+      ) : (
+        <TodoList
+          className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
+          todos={todos}
+          size="responsive"
+          onEdit={openEdit}
+          onSelect={openDetail}
+        />
+      )}
     </div>
   );
 }

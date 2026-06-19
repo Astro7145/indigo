@@ -12,7 +12,14 @@
     "title": "TODOs by Goal",
     "empty": "No goals registered",
     "boardEmpty": "No todos yet",
-    "progressLabel": "{title} Progress"
+    "progressLabel": "{title} Progress",
+    "sort": {
+      "label": "Sort",
+      "latest": "Newest",
+      "oldest": "Oldest",
+      "progressHigh": "Most progress",
+      "progressLow": "Least progress"
+    }
   },
   "progress": {
     "header": "My Progress",
