@@ -14,11 +14,14 @@ interface BadgeProps {
 
 /** color별 배경·테두리·텍스트 클래스 */
 const colorStyles: Record<BadgeColor, string> = {
-  gray: 'bg-badge-gray-bg border-badge-gray-border text-badge-gray-text',
-  green: 'bg-badge-green-bg border-badge-green-border text-badge-green-text',
-  yellow: 'bg-badge-yellow-bg border-badge-yellow-border text-badge-yellow-text',
-  red: 'bg-badge-red-bg border-badge-red-border text-badge-red-text',
-  purple: 'bg-badge-purple-bg border-badge-purple-border text-badge-purple-text',
+  gray: 'bg-badge-gray-bg border-badge-gray-border text-badge-gray-text dark:bg-white/5 dark:border-white/10 dark:text-white/60',
+  green:
+    'bg-badge-green-bg border-badge-green-border text-badge-green-text dark:bg-green-950 dark:border-green-800 dark:text-green-400',
+  yellow:
+    'bg-badge-yellow-bg border-badge-yellow-border text-badge-yellow-text dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-400',
+  red: 'bg-badge-red-bg border-badge-red-border text-badge-red-text dark:bg-red-950 dark:border-red-800 dark:text-red-400',
+  purple:
+    'bg-badge-purple-bg border-badge-purple-border text-badge-purple-text dark:bg-indigo-dark-500 dark:border-indigo-dark-600 dark:text-indigo-dark-900',
 };
 
 /**

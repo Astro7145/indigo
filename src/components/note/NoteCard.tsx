@@ -46,7 +46,7 @@ export default function NoteCard({ note, onClick, onMore, menu, className }: Not
       <div className="flex items-center justify-between">
         <div className={cn('flex items-center', headerGapClass)}>
           <IcSpringNote aria-hidden className={iconBoxClass} />
-          <h3 className={cn('text-slate-800', titleClass)}>{note.title}</h3>
+          <h3 className={cn('text-slate-800 dark:text-white', titleClass)}>{note.title}</h3>
         </div>
         <div className="flex items-center gap-2">
           {note.linkUrl && <IcLink aria-label="첨부 링크" />}
@@ -79,9 +79,9 @@ export default function NoteCard({ note, onClick, onMore, menu, className }: Not
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Chip type={note.todo.done ? 'done' : 'todo'} />
-          <span className={cn('text-slate-700', todoTextClass)}>{note.todo.title}</span>
+          <span className={cn('text-slate-700 dark:text-white', todoTextClass)}>{note.todo.title}</span>
         </div>
-        <span className="text-xs leading-4 text-slate-400">{formatDate(note.createdAt)}</span>
+        <span className="text-xs leading-4 text-slate-400 dark:text-white/60">{formatDate(note.createdAt)}</span>
       </div>
     </Card>
   );

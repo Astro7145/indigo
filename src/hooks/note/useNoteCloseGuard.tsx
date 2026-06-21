@@ -23,8 +23,7 @@ function openCancelConfirm(isCreate: boolean, onCancel: () => void) {
         isCreate={isCreate}
         onStay={controls.close}
         onLeave={() => {
-          controls.close();
-          onCancel();
+          controls.closeAndNavigate(onCancel);
         }}
       />
     ),

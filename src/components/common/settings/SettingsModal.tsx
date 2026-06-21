@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import Modal from '@/src/components/common/modal/Modal';
 import { useSettingsModalStore } from '@/src/stores/settingsModal';
 
@@ -8,26 +10,28 @@ import SettingsField from './SettingsField';
 import ThemeToggle from './ThemeToggle';
 
 export default function SettingsModal() {
+  const t = useTranslations('settings');
+  const tCommon = useTranslations('common');
   const isOpen = useSettingsModalStore((s) => s.isOpen);
   const close = useSettingsModalStore((s) => s.close);
 
   return (
     <Modal open={isOpen} onClose={close} showCloseButton>
       <div className="flex flex-col gap-8">
-        <Modal.Title>설정</Modal.Title>
+        <Modal.Title>{t('title')}</Modal.Title>
 
         <div className="flex flex-col gap-10">
           <div className="flex flex-col gap-4">
-            <SettingsField label="언어">
+            <SettingsField label={t('language')}>
               <LanguageSelect />
             </SettingsField>
-            <SettingsField label="다크모드">
+            <SettingsField label={t('darkMode')}>
               <ThemeToggle />
             </SettingsField>
           </div>
 
           <Modal.Actions>
-            <Modal.Cancel>닫기</Modal.Cancel>
+            <Modal.Cancel>{tCommon('actions.close')}</Modal.Cancel>
           </Modal.Actions>
         </div>
       </div>
