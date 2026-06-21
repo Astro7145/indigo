@@ -55,8 +55,14 @@ export default function ModalStack() {
   useEffect(() => {
     if (!hasModals) return;
     const onPopState = () => {
+      // 가드(modalStack=true)에 머무는 popstate는 forward()로 되돌아온 것 → 무시(재진입 방지).
+      if (history.state?.modalStack) return;
       const top = modals[modals.length - 1];
       (top.onClose ?? close)();
+      // 닫은 뒤에도 스택이 남아 있으면 가드로 되돌린다. 비었으면 페이지에 머문다.
+      if (useModalStore.getState().modals.length > 0) {
+        history.forward();
+      }
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
