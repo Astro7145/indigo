@@ -84,11 +84,12 @@ it('삭제에 실패하면 실패 토스트를 띄우고 닫지 않는다', () =
   expect(onClose).not.toHaveBeenCalled();
 });
 
-it('삭제 진행 중에는 확인 버튼을 누를 수 없다', () => {
+it('삭제 진행 중에는 확인 및 취소 버튼을 누를 수 없다', () => {
   setDeleteState(true);
   renderInModal(<NoteDeleteConfirm note={makeNote(7, '노트 A')} onClose={jest.fn()} />);
 
   expect(screen.getByRole('button', { name: '확인' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: '취소' })).toBeDisabled();
 });
 
 it('경고 문구로 복구 불가를 안내한다', () => {

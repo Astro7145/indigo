@@ -44,7 +44,9 @@ export default function NoteDeleteConfirm({ note, onClose }: NoteDeleteConfirmPr
         </p>
       </div>
       <Modal.Actions className="mt-10">
-        <Modal.Cancel onClick={onClose}>{tCommon('actions.cancel')}</Modal.Cancel>
+        <Modal.Cancel onClick={onClose} disabled={del.isPending}>
+          {tCommon('actions.cancel')}
+        </Modal.Cancel>
         <Modal.Confirm onClick={handleConfirm} disabled={del.isPending}>
           {tCommon('actions.confirm')}
         </Modal.Confirm>
