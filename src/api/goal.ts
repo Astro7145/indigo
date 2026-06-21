@@ -23,7 +23,7 @@ export async function getGoals(params: CursorParams = {}): Promise<GoalListRespo
 }
 
 // nextCursor를 따라 모든 페이지를 끝까지 불러와 전체 goal 목록을 합친다.
-// (목록 일부/무한스크롤이 필요하면 getGoals·useInfiniteGoalList를 쓴다.) limit은 요청당 페이지 크기.
+// (한 페이지만 필요하면 getGoals를 쓴다.) limit은 요청당 페이지 크기.
 export async function getAllGoals(limit = 100): Promise<GoalListResponse> {
   const goals: GoalListItem[] = [];
   let cursor: number | undefined;

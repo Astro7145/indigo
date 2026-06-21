@@ -29,6 +29,8 @@ export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit
   const { openNote } = useNoteDrawer();
   // 타입상 noteIds는 required지만 백엔드 응답 누락/null 케이스를 방어한다.
   const hasNote = (todo.noteIds?.length ?? 0) > 0;
+  // const로 받아 narrowing이 onClick 클로저까지 유지되게 한다.
+  const linkUrl = todo.linkUrl;
   // 삭제 확인 모달 열림 상태 — 행 로컬로 소유.
   const [confirmOpen, setConfirmOpen] = useState(false);
   const reduce = useReducedMotion();
@@ -50,7 +52,8 @@ export default function TodoRow({ todo, size, onToggle, onToggleFavorite, onEdit
         <TodoItem.Actions>
           {/* 시안 순서: 노트(인디케이터) · 링크 · 노트작성(연필) · 케밥 · 별 */}
           {hasNote && <TodoItem.NoteAction onClick={() => openNote(todo.id, 'detail')} />}
-          {todo.linkUrl && <TodoItem.LinkAction onClick={() => {}} />}
+          {/* 상세 모달(TodoDetailContent)과 동일하게 새 탭으로 연다. 버튼 기반이라 anchor 대신 window.open. */}
+          {linkUrl && <TodoItem.LinkAction onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')} />}
 
           {/* 노트 없으면 노트 작성(연필) 노출 */}
           {!hasNote && (

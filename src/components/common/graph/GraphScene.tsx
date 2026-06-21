@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Group, Plane, Raycaster, Vector2, Vector3, type BufferGeometry } from 'three';
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
+import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
 import { useModalStore } from '@/src/stores/modal';
 import { GraphSim } from '@/src/components/common/graph/graphPhysics';
 import { getGraphColors } from '@/src/components/common/graph/palette';
@@ -83,6 +84,7 @@ function suppressGhostClick(x: number, y: number) {
 export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
+  const { openNote } = useNoteDrawer();
   const openModal = useModalStore((s) => s.open);
 
   // 전체 진행도(달) — 모든 목표의 완료/전체 합계.
@@ -260,7 +262,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `note-${n.todoId}-${n.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={n.position}>
-            <NoteNode />
+            <NoteNode onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
           </group>
         );
       })}

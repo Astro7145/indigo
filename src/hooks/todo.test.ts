@@ -14,6 +14,7 @@ import { waitFor } from '@testing-library/react';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
 import {
   useTodoList,
+  useTodoListQuery,
   useAllTodos,
   useInfiniteTodoList,
   useTodo,
@@ -28,15 +29,36 @@ beforeEach(() => {
   jest.resetAllMocks();
 });
 
-it('useTodoList는 params와 함께 getTodos를 호출한다', async () => {
-  mocked.getTodos.mockResolvedValue({
+it('useTodoList는 limit이 없으면 getAllTodos로 전부 가져온다', async () => {
+  mocked.getAllTodos.mockResolvedValue({
     todos: [],
     nextCursor: null,
     totalCount: 0,
   } as never);
   const { result } = renderHookWithClient(() => useTodoList({ done: 'true' }));
   await waitFor(() => expect(result.current.isSuccess).toBe(true));
-  expect(mocked.getTodos).toHaveBeenCalledWith({ done: 'true' });
+  expect(mocked.getAllTodos).toHaveBeenCalledWith({ done: 'true' });
+  expect(mocked.getTodos).not.toHaveBeenCalled();
+});
+
+it('useTodoListQuery는 비-suspense로 limit 없으면 getAllTodos를 호출한다', async () => {
+  mocked.getAllTodos.mockResolvedValue({ todos: [], nextCursor: null, totalCount: 0 } as never);
+  const { result } = renderHookWithClient(() => useTodoListQuery({ goalId: 7 }));
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(mocked.getAllTodos).toHaveBeenCalledWith({ goalId: 7 });
+  expect(mocked.getTodos).not.toHaveBeenCalled();
+});
+
+it('useTodoList는 limit이 주어지면 단일 페이지(getTodos)로 가져온다', async () => {
+  mocked.getTodos.mockResolvedValue({
+    todos: [],
+    nextCursor: null,
+    totalCount: 0,
+  } as never);
+  const { result } = renderHookWithClient(() => useTodoList({ sort: 'latest', limit: 4 }));
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(mocked.getTodos).toHaveBeenCalledWith({ sort: 'latest', limit: 4 });
+  expect(mocked.getAllTodos).not.toHaveBeenCalled();
 });
 
 it('useAllTodos는 getAllTodos로 전체 할일을 불러온다', async () => {

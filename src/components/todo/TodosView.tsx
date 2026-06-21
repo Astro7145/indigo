@@ -45,11 +45,19 @@ export default function TodosView() {
     <section className="mx-auto flex w-full max-w-180 flex-col gap-6">
       {/* 모바일은 GNB가 페이지 타이틀을 담당 → sm+ 에서만 헤더 노출 (Figma 21209:54371) */}
       <div className="hidden items-baseline gap-4 px-2 sm:flex">
-        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800">{tTodos('title')}</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.03em] text-slate-800 dark:text-white">{tTodos('title')}</h1>
         {/* aria-label 미부착 — 스크린리더가 h1 "모든 할 일" + 숫자 텍스트를 그대로 이어 읽도록 둔다 */}
         <AsyncBoundary
-          fallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
-          errorFallback={<span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">0</span>}
+          fallback={
+            <span className="dark:text-indigo-dark-900 text-2xl font-semibold tracking-[-0.03em] text-indigo-600">
+              0
+            </span>
+          }
+          errorFallback={
+            <span className="dark:text-indigo-dark-900 text-2xl font-semibold tracking-[-0.03em] text-indigo-600">
+              0
+            </span>
+          }
           resetKeys={[tab]}
         >
           <TodosCount tab={tab} />
@@ -67,17 +75,23 @@ export default function TodosView() {
           <Button
             variant="tertiary"
             size="small"
-            startIcon={<IcPlus className="size-5 text-slate-500" />}
+            startIcon={<IcPlus className="size-5 text-slate-500 dark:text-white/70" />}
             onClick={() => openCreate()}
           >
             {tTodos('addButton')}
           </Button>
         </div>
 
-        <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8">
+        <Card className="border border-slate-200 p-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:p-8 dark:border-white/10">
           <AsyncBoundary
-            fallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
-            errorFallback={<p className="py-12 text-center text-sm text-slate-400">{tCommon('state.loadError')}</p>}
+            fallback={
+              <p className="py-12 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+            }
+            errorFallback={
+              <p className="py-12 text-center text-sm text-slate-400 dark:text-white/40">
+                {tCommon('state.loadError')}
+              </p>
+            }
             resetKeys={[tab]}
           >
             <TodosList tab={tab} />
@@ -91,7 +105,11 @@ export default function TodosView() {
 function TodosCount({ tab }: { tab: Tab }) {
   const { data } = useInfiniteTodoList(listParams(tab));
   const totalCount = data.pages[0]?.totalCount ?? 0;
-  return <span className="text-2xl font-semibold tracking-[-0.03em] text-indigo-600">{totalCount}</span>;
+  return (
+    <span className="dark:text-indigo-dark-900 text-2xl font-semibold tracking-[-0.03em] text-indigo-600">
+      {totalCount}
+    </span>
+  );
 }
 
 function TodosList({ tab }: { tab: Tab }) {
@@ -120,14 +138,16 @@ function TodosList({ tab }: { tab: Tab }) {
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
 
   if (todos.length === 0) {
-    return <p className="py-20 text-center text-sm text-slate-500">{tTodos(`empty.${tab}`)}</p>;
+    return <p className="py-20 text-center text-sm text-slate-500 dark:text-white/50">{tTodos(`empty.${tab}`)}</p>;
   }
 
   return (
     <>
       <TodoList className="flex flex-col gap-2" todos={todos} size="large" onEdit={openEdit} onSelect={openDetail} />
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1 w-full" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400">{tCommon('state.loading')}</p>}
+      {isFetchingNextPage && (
+        <p className="py-3 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+      )}
     </>
   );
 }
