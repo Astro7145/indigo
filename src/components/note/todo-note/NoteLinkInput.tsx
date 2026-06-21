@@ -44,8 +44,10 @@ export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLi
         aria-label={t('linkInput.label')}
         aria-invalid={showError || undefined}
         aria-describedby={showError ? 'link-input-error' : undefined}
-        className={`mt-6 w-full rounded border p-3 text-sm text-slate-700 outline-none placeholder:text-slate-400 sm:mt-8 sm:p-4 sm:text-base ${
-          showError ? 'border-red-500' : 'border-slate-300 focus:border-indigo-500'
+        className={`dark:bg-indigo-dark-400 mt-6 w-full rounded border p-3 text-sm text-slate-700 outline-none placeholder:text-slate-400 sm:mt-8 sm:p-4 sm:text-base dark:text-white dark:placeholder:text-white/40 ${
+          showError
+            ? 'border-red-500'
+            : 'dark:focus:border-indigo-dark-700 border-slate-300 focus:border-indigo-500 dark:border-white/20'
         }`}
       />
       {showError && (

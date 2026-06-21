@@ -96,6 +96,14 @@ it('행을 클릭하면 해당 할일로 onSelect를 호출한다', () => {
   expect(onSelect.mock.calls[0][0]).toMatchObject({ id: 1, title: '할일 A' });
 });
 
+it('링크가 있는 할일의 링크 버튼을 누르면 새 탭으로 linkUrl을 연다', () => {
+  const open = jest.spyOn(window, 'open').mockReturnValue(null);
+  renderList({ todos: [makeTodo(1, '할일 A', { linkUrl: 'https://example.com' })] });
+  fireEvent.click(screen.getByLabelText('링크'));
+  expect(open).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
+  open.mockRestore();
+});
+
 it('children을 행 뒤에 렌더한다 — 무한 스크롤 sentinel 슬롯', () => {
   renderList({ children: <li data-testid="sentinel" /> });
   const list = screen.getByRole('list');
