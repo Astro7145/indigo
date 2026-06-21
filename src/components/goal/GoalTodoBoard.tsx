@@ -5,14 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { motion, useReducedMotion } from 'motion/react';
 
-import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import Card from '@/src/components/common/cards/Card';
 import SearchInput from '@/src/components/common/inputs/SearchInput';
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import TodoList from '@/src/components/common/todo-list/TodoList';
 import { IcPlus } from '@/src/components/common/icons/IcPlus';
-import { useTodoList } from '@/src/hooks/todo';
+import { useTodoListQuery } from '@/src/hooks/todo';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import type { GoalListItem } from '@/src/types/goal';
 import type { Todo } from '@/src/types/todo';
@@ -31,6 +30,7 @@ function percentOf(done: number, total: number): number {
 
 function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
   const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const isTodo = label === 'To do';
   const labelText = isTodo ? tCommon('tabs.todo') : tCommon('tabs.done');
   const { openEdit, openDetail } = useTodoSheet();
@@ -59,19 +59,25 @@ function Column({ label, todos }: { label: 'To do' | 'Done'; todos: Todo[] }) {
       >
         {labelText}
       </span>
-      <TodoList
-        className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
-        todos={todos}
-        size="responsive"
-        onEdit={openEdit}
-        onSelect={openDetail}
-      />
+      {todos.length === 0 ? (
+        // 보드 전체가 아니라 한 컬럼만 빈 경우 — 해당 컬럼 본문에 안내 문구(목표 상세 GoalTodoColumn과 동일 문구)
+        <p className="flex flex-1 items-center justify-center px-2 py-6 text-center text-sm text-slate-500 dark:text-white/60">
+          {isTodo ? tTodos('empty.todo') : tTodos('empty.done')}
+        </p>
+      ) : (
+        <TodoList
+          className="scrollbar-slate flex flex-col gap-0.5 xl:flex-1 xl:gap-1 xl:overflow-y-auto"
+          todos={todos}
+          size="responsive"
+          onEdit={openEdit}
+          onSelect={openDetail}
+        />
+      )}
     </div>
   );
 }
 
 export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
-  const tCommon = useTranslations('common');
   const tDashboard = useTranslations('dashboard');
   const tTodos = useTranslations('todos');
   const { openCreate } = useTodoSheet();
@@ -173,28 +179,27 @@ export default function GoalTodoBoard({ goal, className }: GoalTodoBoardProps) {
         것을 막고 레이아웃 시프트도 방지한다.
       */}
       <div className="xl:flex xl:min-h-[324px] xl:flex-col xl:justify-center">
-        <AsyncBoundary
-          fallback={
-            <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
-          }
-          errorFallback={
-            <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loadError')}</p>
-          }
-          resetKeys={[keyword]}
-        >
-          <GoalTodoBoardContent goalId={goal.id} keyword={keyword} />
-        </AsyncBoundary>
+        <GoalTodoBoardContent goalId={goal.id} keyword={keyword} />
       </div>
     </Card>
   );
 }
 
+// 보드는 prefetch 없이 클라이언트에서만 페칭하므로 suspense가 아닌 useQuery를 쓰고 로딩/에러를
+// 직접 렌더한다(useSuspenseQuery는 SSR에서 fetch해 서버에서 client-fetcher가 터진다).
 function GoalTodoBoardContent({ goalId, keyword }: { goalId: number; keyword: string }) {
   const tCommon = useTranslations('common');
   const tDashboard = useTranslations('dashboard');
-  const { data } = useTodoList({ goalId, keyword: keyword || undefined });
+  const { data, isLoading, isError } = useTodoListQuery({ goalId, keyword: keyword || undefined });
 
-  const todos = data.todos;
+  if (isLoading) {
+    return <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>;
+  }
+  if (isError) {
+    return <p className="py-10 text-center text-sm text-slate-400 dark:text-white/40">{tCommon('state.loadError')}</p>;
+  }
+
+  const todos = data?.todos ?? [];
   const todoItems = todos.filter((t) => !t.done);
   const doneItems = todos.filter((t) => t.done);
 

@@ -24,6 +24,8 @@ export interface ModalControls {
   close: () => void;
   /** 자기 자신과 바로 아래 부모 엔트리를 함께 닫는다(위 2개). */
   closeWithParent: () => void;
+  /** 모달을 닫은 뒤 URL 이동이 이어질 때 사용한다. */
+  closeAndNavigate: (afterNavigate?: () => void) => void;
 }
 
 export interface ModalEntry {

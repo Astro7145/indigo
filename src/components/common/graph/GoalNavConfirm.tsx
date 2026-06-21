@@ -13,8 +13,8 @@ export default function GoalNavConfirm({ goalTitle, onCancel, onConfirm }: GoalN
   return (
     <>
       <Modal.Title className="text-center">목표로 이동할까요?</Modal.Title>
-      <p className="my-5 text-center text-sm text-slate-500">
-        <span className="font-medium text-slate-700">{goalTitle}</span> 상세 화면으로 이동합니다.
+      <p className="my-5 text-center text-sm text-slate-500 dark:text-slate-300">
+        <span className="font-medium text-slate-700 dark:text-white">{goalTitle}</span> 상세 화면으로 이동합니다.
       </p>
       <Modal.Actions className="mt-2">
         <Modal.Cancel onClick={onCancel}>취소</Modal.Cancel>

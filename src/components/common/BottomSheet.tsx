@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useDragControls, usePresence } from 'motion/react';
 import { usePreventScroll } from 'react-aria';
 
@@ -13,6 +13,7 @@ interface BottomSheetProps {
   scrollLock?: boolean; // 스택이 scroll lock을 중앙 관리할 땐 false로 끈다
   closeOnBackdropClick?: boolean; // 백드롭 클릭 닫기 (기본 true)
   closeOnEsc?: boolean; // ESC 닫기 (기본 true). ModalStack이 ESC를 중앙 처리할 땐 false로 끈다
+  closeOnBack?: boolean; // 모바일 뒤로가기 닫기 (기본 true). ModalStack이 중앙 처리할 땐 false로 끈다
 }
 
 export default function BottomSheet({
@@ -23,6 +24,7 @@ export default function BottomSheet({
   scrollLock = true,
   closeOnBackdropClick = true,
   closeOnEsc = true,
+  closeOnBack = true,
 }: BottomSheetProps) {
   usePreventScroll({ isDisabled: !isOpen || !scrollLock });
   const dragControls = useDragControls();
@@ -43,6 +45,33 @@ export default function BottomSheet({
     const timer = setTimeout(() => safeToRemove?.(), 350);
     return () => clearTimeout(timer);
   }, [isPresent, safeToRemove]);
+
+  // onClose 최신 참조 — history effect의 deps에서 제외해 isOpen/closeOnBack 변경 시에만 재등록
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  // 모바일 뒤로가기 지원. isOpen 시 history 진입점을 push하고 popstate로 onClose를 호출한다.
+  // 프로그래매틱 닫기(다른 경로로 isOpen이 false가 됨) 시 push한 진입점을 back()으로 복원한다.
+  useEffect(() => {
+    if (!isOpen || !closeOnBack) return;
+
+    history.pushState({ bottomSheet: true }, '');
+    let closedByBack = false;
+
+    const handlePopState = () => {
+      closedByBack = true;
+      onCloseRef.current();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (!closedByBack) history.back();
+    };
+  }, [isOpen, closeOnBack]);
 
   return (
     <AnimatePresence>
