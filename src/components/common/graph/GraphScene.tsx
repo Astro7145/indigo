@@ -7,6 +7,7 @@ import { Group, Plane, Raycaster, Vector2, Vector3, type BufferGeometry } from '
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 import { useModalStore } from '@/src/stores/modal';
 import { GraphSim } from '@/src/components/common/graph/graphPhysics';
 import { getGraphColors } from '@/src/components/common/graph/palette';
@@ -86,6 +87,8 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
   const { openDetail } = useTodoSheet();
   const { openNote } = useNoteDrawer();
   const openModal = useModalStore((s) => s.open);
+  // 라벨 위/아래 판정은 여기서 한 번만 — 노드마다 useIsMobile을 호출하면 matchMedia 리스너가 중복 등록된다.
+  const isMobile = useIsMobile();
 
   // 전체 진행도(달) — 모든 목표의 완료/전체 합계.
   const overallProgress = ratio(
@@ -241,6 +244,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
               size={g.size}
               title={goal.title}
               progress={ratio(goal.completedCount, goal.todoCount)}
+              isMobile={isMobile}
               onPointerDown={grab(key, () => confirmGoalNav(g.id, goal.title))}
             />
           </group>
@@ -253,7 +257,12 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `todo-${t.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={t.position}>
-            <TodoNode title={todo.title} done={todo.done} onPointerDown={grab(key, () => openDetail(todo))} />
+            <TodoNode
+              title={todo.title}
+              done={todo.done}
+              isMobile={isMobile}
+              onPointerDown={grab(key, () => openDetail(todo))}
+            />
           </group>
         );
       })}
@@ -262,7 +271,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `note-${n.todoId}-${n.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={n.position}>
-            <NoteNode onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
+            <NoteNode isMobile={isMobile} onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
           </group>
         );
       })}

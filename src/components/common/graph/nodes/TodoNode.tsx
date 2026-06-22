@@ -5,20 +5,20 @@ import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
-import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 interface TodoNodeProps {
   title: string;
   done: boolean;
+  /** 모바일이면 라벨을 노드 위로(부모 GraphScene에서 한 번만 판정해 내려준다). */
+  isMobile: boolean;
   /** 드래그 시작(부모가 이동/탭 구분을 처리). */
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
 /** 할일 = 작은 발광 구. 완료(Done)면 밝게, 미완료(Todo)면 어둡게. 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). */
-export default function TodoNode({ title, done, onPointerDown }: TodoNodeProps) {
+export default function TodoNode({ title, done, isMobile, onPointerDown }: TodoNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const isMobile = useIsMobile();
   const colors = getGraphColors();
   // done이면 밝게(발광↑), 미완료면 어둡게.
   const color = new Color(colors.todo).multiplyScalar(done ? 1.3 : 0.1);

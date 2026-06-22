@@ -4,18 +4,18 @@ import { useState } from 'react';
 import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { getGraphColors } from '@/src/components/common/graph/palette';
-import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 interface NoteNodeProps {
+  /** 모바일이면 라벨을 노드 위로(부모 GraphScene에서 한 번만 판정해 내려준다). */
+  isMobile: boolean;
   /** 드래그 시작(부모가 이동/탭 구분을 처리). 짧게 탭하면 노트 드로어가 열린다. */
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
 /** 노트 = 작은 발광 구. 호버 시 커지고, 끌어서 이동·짧게 탭하면 노트 드로어(부모가 처리). 부모 할일을 따라 움직인다. */
-export default function NoteNode({ onPointerDown }: NoteNodeProps) {
+export default function NoteNode({ isMobile, onPointerDown }: NoteNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const isMobile = useIsMobile();
   const colors = getGraphColors();
 
   const over = (e: ThreeEvent<PointerEvent>) => {

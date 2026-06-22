@@ -5,22 +5,22 @@ import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
-import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 interface GoalNodeProps {
   size: number;
   title: string;
   /** 0~1 진행도(완료/전체 할일) — 구의 발광 밝기에 반영(진행도 자체는 할일 고리로 표현). */
   progress: number;
+  /** 모바일이면 라벨을 노드 위로(부모 GraphScene에서 한 번만 판정해 내려준다). */
+  isMobile: boolean;
   /** 드래그 시작(부모가 이동/탭 구분을 처리). */
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
 }
 
 /** 목표 = 발광 구. 진행도만큼 밝아지고, 진행도 자체는 둘레의 할일 고리(완료=밝음)로 읽는다. 탭하면 목표상세 확인 모달. */
-export default function GoalNode({ size, title, progress, onPointerDown }: GoalNodeProps) {
+export default function GoalNode({ size, title, progress, isMobile, onPointerDown }: GoalNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
-  const isMobile = useIsMobile();
   const colors = getGraphColors();
   const color = new Color(colors.goal).multiplyScalar(0.1 + 1.3 * progress);
 
