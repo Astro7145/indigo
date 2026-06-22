@@ -23,11 +23,7 @@ const SPRING = { type: 'spring', stiffness: 300, damping: 30 } as const;
 
 // 폼 페이지 경로 — 진입 시 곧 슬롯이 등록되므로 첫 페인트에 fallback(종)을 띄우지 않고 빈 자리를 둔다.
 // 이 가드 없이 fallback을 두면 페이지 mount 전에 종 → 슬롯 액션으로 갈아끼는 한 프레임 깜빡임이 생긴다.
-const FORM_ROUTE_PATTERNS: RegExp[] = [
-  /^\/posts\/write$/,
-  /^\/posts\/[^/]+\/edit$/,
-  /^\/todos\/[^/]+\/notes\/(write|edit)$/,
-];
+const FORM_ROUTE_PATTERNS: RegExp[] = [/^\/posts\/write$/, /^\/posts\/[^/]+\/edit$/];
 
 export default function Topbar() {
   const t = useTranslations('sidebar');
