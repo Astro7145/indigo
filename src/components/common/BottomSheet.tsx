@@ -96,7 +96,7 @@ export default function BottomSheet({
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+          transition={{ type: 'tween', duration: 0.3, ease: 'easeOut' }}
           drag="y"
           dragListener={false}
           dragControls={dragControls}

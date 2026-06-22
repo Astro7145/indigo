@@ -40,7 +40,7 @@ export default function NoteMetaInfo({ goalTitle, todoTitle, todoDone, tags, cre
         </dt>
         <dd className="flex min-w-0 items-center gap-2">
           <span className="truncate text-slate-800 dark:text-white">{todoTitle}</span>
-          <Chip type={todoDone ? 'done' : 'todo'} />
+          <Chip type={todoDone ? 'done' : 'todo'} className="shrink-0" />
         </dd>
       </div>
 
