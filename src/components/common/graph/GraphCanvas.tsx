@@ -42,7 +42,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
           각 라벨만 auto라 라벨 밖 클릭은 캔버스(궤도)로 그대로 전달된다. z-40으로 노드 라벨(≤30) 위·
           모달/드로어(60·100+) 아래에 둔다. sm↑에선 콘텐츠 컬럼(max-w-328) 왼쪽 끝 + 대시보드 토글과
           같은 세로 위치(그래프 음수 마진 풀블리드를 top/px로 보정)에 맞춘다. */}
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-40 px-4 sm:top-12 sm:px-6 xl:top-20 xl:px-10">
+      <div className="pointer-events-none absolute inset-x-0 top-3 z-60 px-4 sm:top-12 sm:px-6 xl:top-20 xl:px-10">
         <div className="mx-auto flex w-full max-w-328 flex-col items-start gap-2">
           <label className="bg-indigo-alpha-30 pointer-events-auto flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-xs text-indigo-100 backdrop-blur-sm select-none">
             <input

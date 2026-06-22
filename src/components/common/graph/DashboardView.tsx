@@ -118,7 +118,7 @@ export default function DashboardView({ title, dashboard }: DashboardViewProps) 
     // flow-root: 자식 상단 마진의 margin collapse를 막아 루트 상단(=토글 기준점)을 두 뷰에서 동일하게 고정
     <div className="relative flow-root w-full">
       {/* 토글(데스크탑/태블릿) — 콘텐츠 폭(max-w-328) 우측 끝에 맞춰 배치. 모바일은 Topbar 슬롯에 떠서 여기선 숨김 */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 hidden sm:block">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-60 hidden sm:block">
         <div className="mx-auto flex w-full max-w-328 justify-end">
           <div className="pointer-events-auto">
             <ViewToggle view={view} onChange={setView} />
