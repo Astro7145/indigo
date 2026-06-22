@@ -49,12 +49,14 @@ export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLi
             : 'dark:focus:border-indigo-dark-700 border-slate-300 focus:border-indigo-500 dark:border-white/20'
         }`}
       />
-      {showError && (
-        <p id="link-input-error" className="mt-1 text-xs text-red-500 sm:text-sm">
-          {t('linkInput.error')}
-        </p>
-      )}
-      <Modal.Actions className="mt-4 sm:mt-6">
+      <div className="mt-1 min-h-7 sm:min-h-8">
+        {showError && (
+          <p id="link-input-error" className="text-xs text-red-500 sm:text-sm">
+            {t('linkInput.error')}
+          </p>
+        )}
+      </div>
+      <Modal.Actions>
         <Modal.Confirm className="h-10 sm:h-14" onClick={() => onConfirm(normalized)} disabled={!isValid}>
           {tc('actions.confirm')}
         </Modal.Confirm>
