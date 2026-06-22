@@ -44,9 +44,17 @@ export default function TagInput({ value, onChange }: TagInputProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
-    e.preventDefault();
-    addTag();
+    if (e.nativeEvent.isComposing) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+      return;
+    }
+    // 빈 입력일 때 Backspace로 마지막 태그를 즉시 제거 (Slack/Gmail 스타일)
+    if (e.key === 'Backspace' && inputValue === '' && value.length > 0) {
+      e.preventDefault();
+      onChange(value.slice(0, -1));
+    }
   };
 
   return (

@@ -5,14 +5,15 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useImperativeHandle, useRef, useState, type Ref } from 'react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import NoteLinkCard from '@/src/components/note/NoteLinkCard';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
+import NoteLinkPreview, { NoteLinkPreviewFallback } from '@/src/components/note/todo-note/NoteLinkPreview';
 import { useNoteCloseGuard } from '@/src/hooks/note/useNoteCloseGuard';
 import { useNoteDraft } from '@/src/hooks/note/useNoteDraft';
 import { useNoteDraftPersistence } from '@/src/hooks/note/useNoteDraftPersistence';
-import { useLinkPreview } from '@/src/hooks/note/useLinkPreview';
 import { useNoteLink } from '@/src/hooks/note/useNoteLink';
 import { useNoteSubmit } from '@/src/hooks/note/useNoteSubmit';
 import Modal from '@/src/components/common/modal/Modal';
@@ -78,8 +79,6 @@ export default function NoteWorkspace({
   const { title, content, linkUrl, setTitle, setContent, setLinkUrl, isDirty, isValid } = useNoteDraft(note, editing);
   // 링크 입력 모달 열기·삭제는 useNoteLink가 전담한다.
   const link = useNoteLink({ linkUrl, setLinkUrl });
-  // 첨부된 링크의 title·favicon은 useLinkPreview가 전담한다.
-  const linkPreview = useLinkPreview(linkUrl);
   // 임시저장·불러오기(localStorage)는 useNoteDraftPersistence가 전담한다.
   const draft = useNoteDraftPersistence({
     todoId,
@@ -212,13 +211,24 @@ export default function NoteWorkspace({
               />
               <div className="border-b border-slate-200 dark:border-white/10" />
               {linkUrl && (
-                <NoteLinkCard
-                  url={linkUrl}
-                  title={linkPreview.data?.title ?? undefined}
-                  faviconUrl={linkPreview.data?.faviconUrl ?? undefined}
-                  onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
-                  onDelete={editing ? link.remove : undefined}
-                />
+                <AsyncBoundary
+                  fallback={<NoteLinkPreviewFallback />}
+                  // 프리뷰(메타) 조회 실패해도 링크 자체는 url만으로 유지한다.
+                  errorFallback={
+                    <NoteLinkCard
+                      url={linkUrl}
+                      onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+                      onDelete={editing ? link.remove : undefined}
+                    />
+                  }
+                  resetKeys={[linkUrl]}
+                >
+                  <NoteLinkPreview
+                    url={linkUrl}
+                    onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+                    onDelete={editing ? link.remove : undefined}
+                  />
+                </AsyncBoundary>
               )}
             </div>
           }
