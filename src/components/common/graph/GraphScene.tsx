@@ -24,6 +24,8 @@ interface GraphSceneProps {
   todos: Todo[];
   /** 좌상단 토글 — true면 모든 목표 라벨을 호버와 무관하게 항상 표시. */
   showAllGoalLabels: boolean;
+  /** 좌상단 토글 — true면 모든 할일 라벨을 호버와 무관하게 항상 표시. */
+  showAllTodoLabels: boolean;
 }
 
 /** 시뮬레이션의 라이브 위치로 링크 선을 매 프레임 갱신한다(단일 lineSegments, 버퍼는 ref로 변형). */
@@ -84,7 +86,7 @@ function suppressGhostClick(x: number, y: number) {
   setTimeout(() => window.removeEventListener('click', swallow, true), 350);
 }
 
-export default function GraphScene({ goals, todos, showAllGoalLabels }: GraphSceneProps) {
+export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTodoLabels }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
   const { openNote } = useNoteDrawer();
@@ -264,6 +266,7 @@ export default function GraphScene({ goals, todos, showAllGoalLabels }: GraphSce
               title={todo.title}
               done={todo.done}
               isMobile={isMobile}
+              showLabel={showAllTodoLabels}
               onPointerDown={grab(key, () => openDetail(todo))}
             />
           </group>
