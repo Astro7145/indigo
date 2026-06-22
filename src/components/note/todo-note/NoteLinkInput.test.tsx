@@ -49,6 +49,15 @@ it('올바른 URL 형식이 아니면 에러 문구가 뜨고 확인 버튼이 �
   expect(screen.getByRole('button', { name: '확인' })).toBeDisabled();
 });
 
+it('도메인 형태가 아닌 http://a 는 에러 문구가 뜨고 확인 버튼이 비활성화된다', () => {
+  renderInModal(<NoteLinkInput initialUrl="" onConfirm={() => {}} onClose={() => {}} />);
+
+  fireEvent.change(screen.getByLabelText('링크 URL'), { target: { value: 'http://a' } });
+
+  expect(screen.getByText('올바른 URL을 입력해주세요.')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '확인' })).toBeDisabled();
+});
+
 it('유효한 링크를 입력하고 확인하면 onConfirm이 해당 URL로 호출된다', () => {
   const onConfirm = jest.fn();
   renderInModal(<NoteLinkInput initialUrl="" onConfirm={onConfirm} onClose={() => {}} />);

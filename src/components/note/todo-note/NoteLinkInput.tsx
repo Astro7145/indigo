@@ -2,12 +2,11 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { z } from 'zod';
 
 import IconButton from '@/src/components/common/buttons/IconButton';
 import { IcDelete } from '@/src/components/common/icons';
 import Modal from '@/src/components/common/modal/Modal';
-import { normalizeUrl } from '@/src/utils/url';
+import { isValidLinkUrl, normalizeUrl } from '@/src/utils/url';
 
 interface NoteLinkInputProps {
   /** 기존에 첨부된 링크가 있으면 prefill (없으면 빈 문자열) */
@@ -27,10 +26,10 @@ export default function NoteLinkInput({ initialUrl, onConfirm, onClose }: NoteLi
   const tc = useTranslations('common');
   const [value, setValue] = useState(initialUrl);
 
-  // todo 생성 폼과 동일하게 프로토콜이 없으면 https://를 붙여 보정한 뒤 URL 형식만 검증한다
+  // todo 생성 폼과 동일하게 프로토콜이 없으면 https://를 붙여 보정한 뒤 도메인 형태를 검증한다
   const trimmed = value.trim();
   const normalized = normalizeUrl(trimmed);
-  const isValid = z.url().safeParse(normalized).success;
+  const isValid = isValidLinkUrl(normalized);
   const showError = trimmed.length > 0 && !isValid;
 
   return (
