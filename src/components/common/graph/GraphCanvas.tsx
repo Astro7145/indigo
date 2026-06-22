@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -22,19 +23,32 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
     .map((t) => `${t.id}:${t.goalId}:${t.noteIds?.length ?? 0}`)
     .join(',')}`;
   const colors = getGraphColors();
+  // 좌상단 토글 — 기본 off(호버 시에만 라벨). GraphScene만 graphKey로 리마운트되고 이 컴포넌트는
+  // 유지되므로 노드 구성이 바뀌어도 토글 상태는 보존된다(뷰를 떠났다 오면 off로 초기화).
+  const [showAllGoalLabels, setShowAllGoalLabels] = useState(false);
 
   return (
     // 로딩 셸 → 캔버스 전환이 툭 튀지 않도록 어두운 배경 위로 부드럽게 페이드인
     <motion.div
-      className="h-full w-full"
+      className="relative h-full w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
+      {/* 좌상단 토글 — 캔버스 위에 떠 있는 일반 DOM 체크박스(접근성). 자기 박스 밖 클릭은 캔버스(궤도)로 그대로 전달된다. */}
+      <label className="bg-indigo-alpha-30 absolute top-3 left-3 z-10 flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-xs text-indigo-100 backdrop-blur-sm select-none">
+        <input
+          type="checkbox"
+          checked={showAllGoalLabels}
+          onChange={(e) => setShowAllGoalLabels(e.target.checked)}
+          className="accent-indigo-500"
+        />
+        목표 이름 모두 보기
+      </label>
       <Canvas camera={{ position: [0, 8, 30], fov: 55 }} dpr={[1, 2]}>
         <color attach="background" args={[colors.background]} />
         <Stars radius={120} depth={60} count={3000} factor={4} saturation={0} fade speed={0.5} />
-        <GraphScene key={graphKey} goals={goals} todos={todos} />
+        <GraphScene key={graphKey} goals={goals} todos={todos} showAllGoalLabels={showAllGoalLabels} />
         {/* 회전 중심을 달(원점)로 고정 */}
         <OrbitControls makeDefault enablePan enableZoom target={[0, 0, 0]} minDistance={6} maxDistance={90} />
         <EffectComposer>
