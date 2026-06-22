@@ -5,6 +5,7 @@ import { Billboard, Html, useCursor } from '@react-three/drei';
 import type { ThreeEvent } from '@react-three/fiber';
 import { Color } from 'three';
 import { getGraphColors } from '@/src/components/common/graph/palette';
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 
 interface GoalNodeProps {
   size: number;
@@ -19,6 +20,7 @@ interface GoalNodeProps {
 export default function GoalNode({ size, title, progress, onPointerDown }: GoalNodeProps) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
+  const isMobile = useIsMobile();
   const colors = getGraphColors();
   const color = new Color(colors.goal).multiplyScalar(0.1 + 1.3 * progress);
 
@@ -37,8 +39,9 @@ export default function GoalNode({ size, title, progress, onPointerDown }: GoalN
       {hovered && (
         // 라벨을 노드 아래에 띄운다 — Billboard로 항상 카메라를 향하게 해 '아래(−Y)'가 카메라 각도와
         // 무관하게 늘 화면 아래로 가고, 오프셋은 월드 단위라 줌과 상관없이 노드를 항상 비킨다.
+        // 모바일에선 터치하는 손가락이 노드 아래를 가리므로 위(+Y)로 띄운다.
         <Billboard>
-          <Html center position={[0, -1.5, 0]} className="pointer-events-none">
+          <Html center position={[0, isMobile ? 1.5 : -1.5, 0]} className="pointer-events-none">
             <span className="bg-indigo-alpha-20 rounded px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
               {title}
             </span>
