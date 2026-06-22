@@ -23,21 +23,19 @@ export default function CalendarCell({ state, date }: CalendarCellProps) {
   );
 
   const isTodayDate = isToday(date, TIMEZONE);
-  // 캘린더 어딘가에 선택값이 있으면 오늘 강조를 비활성 — 사용자가 고른 날짜에 시선이 가도록
-  const hasSelection = state.value != null;
+  // 오늘 + 선택을 동시에 보여준다 — selected가 채움(indigo-600), today는 ring으로 구분되게 유지
   const variant =
-    isOutsideVisibleRange || isDisabled
-      ? 'outside'
-      : isSelected
-        ? 'selected'
-        : isTodayDate && !hasSelection
-          ? 'today'
-          : 'default';
+    isOutsideVisibleRange || isDisabled ? 'outside' : isSelected ? 'selected' : isTodayDate ? 'today' : 'default';
 
   const { buttonClass, circleClass } = {
     outside: { buttonClass: 'cursor-default font-normal text-slate-400 dark:text-white/40', circleClass: '' },
     selected: { buttonClass: 'font-medium text-white', circleClass: 'bg-indigo-600 group-hover:bg-indigo-700' },
-    today: { buttonClass: 'font-medium text-white', circleClass: 'bg-indigo-500 group-hover:bg-indigo-700' },
+    today: {
+      // hover: 를 써야 button 자기 자신에 적용된다 (group-hover는 자식만 매칭)
+      buttonClass: 'font-medium text-slate-700 hover:text-white dark:text-white',
+      circleClass:
+        'ring-2 ring-inset ring-indigo-500 dark:ring-indigo-dark-800 group-hover:bg-indigo-700 group-hover:ring-0',
+    },
     default: {
       buttonClass: 'font-normal text-slate-700 hover:font-medium hover:text-white dark:text-white',
       circleClass: 'group-hover:bg-indigo-700',
