@@ -40,8 +40,10 @@ export function shouldRedirectToLogin(error: AxiosError<ErrorBody>): boolean {
 // 기대지 않고 여기서 명시적으로 거부한다. reject 자체는 동일하게 Suspense 경계를 클라 렌더로
 // 폴백시켜 BFF 재요청을 유도하므로 동작은 그대로다 — 서버 데이터는 serverGet로 prefetch해야 한다.
 instance.interceptors.request.use((config) => {
+  // throw 대신 Promise.reject로 거부한다 — 인터셉터에 synchronous 옵션이 켜지거나 axios 내부 동작이
+  // 바뀌어도 동기 예외가 아닌 항상 거부된 프로미스를 반환해 .catch/.rejects 계약을 일관되게 지킨다.
   if (typeof window === 'undefined') {
-    throw new Error('client-fetcher must not be used on the server (SSR must prefetch via serverGet)');
+    return Promise.reject(new Error('client-fetcher must not be used on the server (SSR must prefetch via serverGet)'));
   }
   return config;
 });
