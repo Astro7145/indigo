@@ -10,14 +10,7 @@ jest.mock('@/src/api/goal', () => ({
 import * as goalApi from '@/src/api/goal';
 import { waitFor } from '@testing-library/react';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
-import {
-  useGoalList,
-  useInfiniteGoalList,
-  useGoal,
-  useCreateGoal,
-  useUpdateGoal,
-  useDeleteGoal,
-} from '@/src/hooks/goal';
+import { useGoalList, useGoal, useCreateGoal, useUpdateGoal, useDeleteGoal } from '@/src/hooks/goal';
 
 const mocked = goalApi as jest.Mocked<typeof goalApi>;
 
@@ -42,21 +35,6 @@ it('useGoal은 id가 주어지면 getGoal을 호출한다', async () => {
   const { result } = renderHookWithClient(() => useGoal(5));
   await waitFor(() => expect(result.current.isSuccess).toBe(true));
   expect(mocked.getGoal).toHaveBeenCalledWith(5);
-});
-
-it('useInfiniteGoalList는 nextCursor로 페이지네이션한다', async () => {
-  mocked.getGoals.mockResolvedValueOnce({
-    goals: [],
-    nextCursor: 9,
-    totalCount: 0,
-  } as never);
-  const { result } = renderHookWithClient(() => useInfiniteGoalList({ limit: 5 }));
-  await waitFor(() => expect(result.current.isSuccess).toBe(true));
-  expect(mocked.getGoals).toHaveBeenLastCalledWith({
-    limit: 5,
-    cursor: undefined,
-  });
-  expect(result.current.hasNextPage).toBe(true);
 });
 
 it('useCreateGoal은 성공 시 목록을 무효화한다', async () => {
