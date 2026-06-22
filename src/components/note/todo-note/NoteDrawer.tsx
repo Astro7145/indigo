@@ -56,7 +56,7 @@ export default function NoteDrawer() {
       {todoId != null && (
         <div key="note-drawer" className="fixed inset-0 z-60">
           <motion.div
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-black/30 dark:bg-black/50"
             aria-hidden
             onClick={() => workspaceRef.current?.requestClose()}
             initial={{ opacity: 0 }}
@@ -68,18 +68,22 @@ export default function NoteDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label={t('ariaLabel')}
-            className="absolute inset-y-0 right-0 flex w-full flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
+            className="dark:bg-indigo-dark-400 absolute inset-y-0 right-0 flex w-full scrollbar-gutter-stable flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 30, stiffness: 300 }}
+            transition={reduceMotion ? { duration: 0 } : { type: 'tween', duration: 0.3, ease: 'easeOut' }}
           >
             <AsyncBoundary
               fallback={
-                <p className="flex h-full items-center justify-center text-sm text-slate-400">{tc('state.loading')}</p>
+                <p className="flex h-full items-center justify-center text-sm text-slate-400 dark:text-white/60">
+                  {tc('state.loading')}
+                </p>
               }
               errorFallback={
-                <p className="flex h-full items-center justify-center text-sm text-slate-400">{t('loadError')}</p>
+                <p className="flex h-full items-center justify-center text-sm text-slate-400 dark:text-white/60">
+                  {t('loadError')}
+                </p>
               }
             >
               <NoteDrawerContent todoId={todoId} workspaceRef={workspaceRef} />

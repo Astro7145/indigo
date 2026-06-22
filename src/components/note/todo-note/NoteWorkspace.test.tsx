@@ -425,7 +425,7 @@ it('작성: 링크 삽입 버튼을 누르면 링크 입력 모달이 열린다'
   expect(screen.getByText('링크 업로드')).toBeInTheDocument();
 });
 
-it('작성: 링크를 입력하고 확인하면 링크 카드가 보인다', () => {
+it('작성: 링크를 입력하고 확인하면 링크 카드가 보인다', async () => {
   renderWithClient(
     <>
       <NoteWorkspace todoId={12} mode="create" onEdit={() => {}} onComplete={() => {}} onCancel={() => {}} />
@@ -437,10 +437,11 @@ it('작성: 링크를 입력하고 확인하면 링크 카드가 보인다', () 
   fireEvent.change(screen.getByLabelText('링크 URL'), { target: { value: 'https://example.com' } });
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
-  expect(screen.getByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
+  // 링크 프리뷰는 Suspense로 로드되므로 스켈레톤 → 카드 순으로 나타난다.
+  expect(await screen.findByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
 });
 
-it('수정: 링크 카드의 삭제 버튼을 누르면 링크가 사라진다', () => {
+it('수정: 링크 카드의 삭제 버튼을 누르면 링크가 사라진다', async () => {
   renderWithClient(
     <NoteWorkspace
       todoId={12}
@@ -452,10 +453,29 @@ it('수정: 링크 카드의 삭제 버튼을 누르면 링크가 사라진다',
     />,
   );
 
-  expect(screen.getByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: '링크 미리보기 열기' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: '링크 삭제' }));
 
+  expect(screen.queryByRole('button', { name: '링크 미리보기 열기' })).not.toBeInTheDocument();
+});
+
+it('링크 프리뷰를 불러오는 동안 로딩 스켈레톤을 보여준다', () => {
+  // 끝나지 않는 프리뷰 요청으로 로딩(스켈레톤) 상태를 고정한다.
+  jest.mocked(getLinkPreview).mockReturnValue(new Promise(() => {}));
+
+  renderWithClient(
+    <NoteWorkspace
+      todoId={12}
+      note={noteWithLink}
+      mode="read"
+      onEdit={() => {}}
+      onComplete={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+
+  expect(screen.getByText('링크 미리보기 불러오는 중')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: '링크 미리보기 열기' })).not.toBeInTheDocument();
 });
 
@@ -478,7 +498,7 @@ it('링크 카드에 가져온 제목과 favicon을 보여준다', async () => {
   expect(favicon).toHaveAttribute('src', 'https://example.com/icon.png');
 });
 
-it('상세: 링크가 있으면 카드를 보여주고 클릭하면 새 탭으로 연다', () => {
+it('상세: 링크가 있으면 카드를 보여주고 클릭하면 새 탭으로 연다', async () => {
   const openSpy = jest.spyOn(window, 'open').mockImplementation(() => null);
 
   renderWithClient(
@@ -492,8 +512,9 @@ it('상세: 링크가 있으면 카드를 보여주고 클릭하면 새 탭으�
     />,
   );
 
+  const linkButton = await screen.findByRole('button', { name: '링크 미리보기 열기' });
   expect(screen.queryByRole('button', { name: '링크 삭제' })).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: '링크 미리보기 열기' }));
+  fireEvent.click(linkButton);
 
   expect(openSpy).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
   openSpy.mockRestore();

@@ -5,14 +5,15 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useImperativeHandle, useRef, useState, type Ref } from 'react';
 
+import AsyncBoundary from '@/src/components/common/AsyncBoundary';
 import { IcSpringNote } from '@/src/components/common/icons/IcSpringNote';
 import NoteLinkCard from '@/src/components/note/NoteLinkCard';
 import NoteMetaInfo from '@/src/components/note/NoteMetaInfo';
 import NoteContentEditor, { type NoteContentEditorHandle } from '@/src/components/note/todo-note/NoteContentEditor';
+import NoteLinkPreview, { NoteLinkPreviewFallback } from '@/src/components/note/todo-note/NoteLinkPreview';
 import { useNoteCloseGuard } from '@/src/hooks/note/useNoteCloseGuard';
 import { useNoteDraft } from '@/src/hooks/note/useNoteDraft';
 import { useNoteDraftPersistence } from '@/src/hooks/note/useNoteDraftPersistence';
-import { useLinkPreview } from '@/src/hooks/note/useLinkPreview';
 import { useNoteLink } from '@/src/hooks/note/useNoteLink';
 import { useNoteSubmit } from '@/src/hooks/note/useNoteSubmit';
 import Modal from '@/src/components/common/modal/Modal';
@@ -78,8 +79,6 @@ export default function NoteWorkspace({
   const { title, content, linkUrl, setTitle, setContent, setLinkUrl, isDirty, isValid } = useNoteDraft(note, editing);
   // 링크 입력 모달 열기·삭제는 useNoteLink가 전담한다.
   const link = useNoteLink({ linkUrl, setLinkUrl });
-  // 첨부된 링크의 title·favicon은 useLinkPreview가 전담한다.
-  const linkPreview = useLinkPreview(linkUrl);
   // 임시저장·불러오기(localStorage)는 useNoteDraftPersistence가 전담한다.
   const draft = useNoteDraftPersistence({
     todoId,
@@ -166,7 +165,7 @@ export default function NoteWorkspace({
           if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
           editorRef.current?.focus();
         }}
-        className="flex flex-1 flex-col rounded-[4px] border border-slate-200 bg-white px-4 py-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:px-[30px] sm:py-8 xl:px-[34px]"
+        className="dark:bg-indigo-dark-300 flex flex-1 flex-col rounded-[4px] border border-slate-200 bg-white px-4 py-4 shadow-[0_2px_4px_0_rgba(0,0,0,0.04)] sm:px-[30px] sm:py-8 xl:px-[34px] dark:border-white/10"
       >
         <NoteContentEditor
           ref={editorRef}
@@ -175,7 +174,7 @@ export default function NoteWorkspace({
           editable={editing}
           onLink={editing ? link.openInput : undefined}
           placeholder={editing ? t('contentPlaceholder') : undefined}
-          contentClassName="prose max-w-none min-h-[400px] pt-5 text-sm text-slate-800 sm:min-h-[450px] sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          contentClassName="prose max-w-none min-h-[400px] pt-5 text-sm text-slate-800 sm:min-h-[450px] sm:text-base xl:min-h-[480px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none dark:text-white dark:[&_.ProseMirror_p.is-editor-empty:first-child::before]:text-white/40"
           titleSlot={
             <div className="flex items-center gap-2 sm:gap-3">
               <IcSpringNote aria-hidden className="size-8 shrink-0 sm:size-10" />
@@ -187,14 +186,18 @@ export default function NoteWorkspace({
                   maxLength={30}
                   placeholder={t('titlePlaceholder')}
                   aria-label={t('titleLabel')}
-                  className="h-8 min-w-0 flex-1 py-0 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:h-10 sm:text-2xl"
+                  className="h-8 min-w-0 flex-1 py-0 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:h-10 sm:text-2xl dark:text-white dark:placeholder:text-white/40"
                 />
               ) : (
-                <h2 className="flex h-8 min-w-0 flex-1 items-center truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:h-10 sm:text-2xl">
+                <h2 className="flex h-8 min-w-0 flex-1 items-center truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:h-10 sm:text-2xl dark:text-white">
                   {title}
                 </h2>
               )}
-              {editing && <span className="shrink-0 text-xs text-indigo-500 sm:text-sm">{title.length}/30</span>}
+              {editing && (
+                <span className="dark:text-indigo-dark-900 shrink-0 text-xs text-indigo-500 sm:text-sm">
+                  {title.length}/30
+                </span>
+              )}
             </div>
           }
           attachmentSlot={
@@ -206,22 +209,33 @@ export default function NoteWorkspace({
                 tags={tags}
                 createdAt={createdAt}
               />
-              <div className="border-b border-slate-200" />
+              <div className="border-b border-slate-200 dark:border-white/10" />
               {linkUrl && (
-                <NoteLinkCard
-                  url={linkUrl}
-                  title={linkPreview.data?.title ?? undefined}
-                  faviconUrl={linkPreview.data?.faviconUrl ?? undefined}
-                  onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
-                  onDelete={editing ? link.remove : undefined}
-                />
+                <AsyncBoundary
+                  fallback={<NoteLinkPreviewFallback />}
+                  // 프리뷰(메타) 조회 실패해도 링크 자체는 url만으로 유지한다.
+                  errorFallback={
+                    <NoteLinkCard
+                      url={linkUrl}
+                      onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+                      onDelete={editing ? link.remove : undefined}
+                    />
+                  }
+                  resetKeys={[linkUrl]}
+                >
+                  <NoteLinkPreview
+                    url={linkUrl}
+                    onClick={() => window.open(linkUrl, '_blank', 'noopener,noreferrer')}
+                    onDelete={editing ? link.remove : undefined}
+                  />
+                </AsyncBoundary>
               )}
             </div>
           }
         />
 
         {editing && (
-          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
+          <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm dark:text-white/60">
             {tc('charCount', { total: contentCharCount, nonSpace: contentNoSpaceCount })}
           </div>
         )}

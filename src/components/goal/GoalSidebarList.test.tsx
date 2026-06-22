@@ -15,7 +15,7 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/src/hooks/useToast', () => ({ useToast: () => ({ showToast, hideToast: jest.fn() }) }));
 jest.mock('@/src/api/goal', () => ({
   ...jest.requireActual('@/src/api/goal'),
-  getGoals: jest.fn(),
+  getAllGoals: jest.fn(),
   createGoal: jest.fn(),
 }));
 
@@ -47,7 +47,7 @@ beforeEach(() => {
 });
 
 it('목표 목록을 렌더한다', async () => {
-  goalMock.getGoals.mockResolvedValue(page([item(5, '목표 A'), item(6, '목표 B')]));
+  goalMock.getAllGoals.mockResolvedValue(page([item(5, '목표 A'), item(6, '목표 B')]));
   renderWithClient(<GoalSidebarList />);
   openList();
   expect(await screen.findByText('목표 A')).toBeInTheDocument();
@@ -55,7 +55,7 @@ it('목표 목록을 렌더한다', async () => {
 });
 
 it('목표 추가 시 createGoal을 title로 호출한다', async () => {
-  goalMock.getGoals.mockResolvedValue(page([]));
+  goalMock.getAllGoals.mockResolvedValue(page([]));
   goalMock.createGoal.mockResolvedValue(item(9, '새 목표') as never);
   renderWithClient(<GoalSidebarList />);
   fireEvent.click(screen.getByRole('button', { name: '목표 추가' }));
@@ -66,7 +66,7 @@ it('목표 추가 시 createGoal을 title로 호출한다', async () => {
 });
 
 it('목표 생성 실패 시 Toast를 띄운다', async () => {
-  goalMock.getGoals.mockResolvedValue(page([]));
+  goalMock.getAllGoals.mockResolvedValue(page([]));
   goalMock.createGoal.mockRejectedValue(new Error('fail'));
   renderWithClient(<GoalSidebarList />);
   fireEvent.click(screen.getByRole('button', { name: '목표 추가' }));
@@ -78,7 +78,7 @@ it('목표 생성 실패 시 Toast를 띄운다', async () => {
 
 it('목표 선택 시 상세로 이동하고 onSelected를 호출한다', async () => {
   const onSelected = jest.fn();
-  goalMock.getGoals.mockResolvedValue(page([item(5, '목표 A')]));
+  goalMock.getAllGoals.mockResolvedValue(page([item(5, '목표 A')]));
   renderWithClient(<GoalSidebarList onSelected={onSelected} />);
   openList();
   fireEvent.click(await screen.findByText('목표 A'));
