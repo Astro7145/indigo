@@ -68,11 +68,11 @@ export default function NoteDrawer() {
             role="dialog"
             aria-modal="true"
             aria-label={t('ariaLabel')}
-            className="dark:bg-indigo-dark-400 absolute inset-y-0 right-0 flex w-full flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
+            className="dark:bg-indigo-dark-400 absolute inset-y-0 right-0 flex w-full scrollbar-gutter-stable flex-col overflow-y-auto bg-slate-100 px-4 py-6 shadow-2xl sm:px-6 sm:py-12 xl:w-[40%] xl:min-w-[650px] xl:px-10"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 30, stiffness: 300 }}
+            transition={reduceMotion ? { duration: 0 } : { type: 'tween', duration: 0.3, ease: 'easeOut' }}
           >
             <AsyncBoundary
               fallback={
