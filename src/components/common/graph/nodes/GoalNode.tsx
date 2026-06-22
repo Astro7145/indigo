@@ -44,8 +44,8 @@ export default function GoalNode({ size, title, progress, isMobile, showLabel, o
         // 모바일에선 터치하는 손가락이 노드 아래를 가리므로 위(+Y)로 띄운다.
         // zIndexRange로 라벨 z-index를 30 이하로 묶는다 — 기본(거대값)이면 모달/드로어 위로 떠버린다.
         <Billboard>
-          <Html center position={[0, isMobile ? 1.5 : -1.5, 0]} zIndexRange={[30, 0]} className="pointer-events-none">
-            <span className="bg-indigo-alpha-20 rounded px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
+          <Html center position={[0, isMobile ? 1.5 : -1.5, 0]} zIndexRange={[50, 30]} className="pointer-events-none">
+            <span className="rounded bg-indigo-900 px-2 py-1 text-xs font-medium whitespace-nowrap text-indigo-100">
               {title}
             </span>
           </Html>
