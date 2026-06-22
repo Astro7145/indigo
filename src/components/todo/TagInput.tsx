@@ -65,28 +65,30 @@ export default function TagInput({ value, onChange }: TagInputProps) {
             {tag.text}
           </Badge>
         ))}
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => {
-            setInputValue(e.target.value);
-            setError('');
-          }}
-          onKeyDown={handleKeyDown}
-          maxLength={50}
-          placeholder={tTodos('form.tagPlaceholder')}
-          className="min-w-0 flex-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base dark:text-white dark:placeholder:text-white/40"
-        />
-        <button
-          type="button"
-          aria-label={tTodos('form.tagAdd')}
-          disabled={!trimmed}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={addTag}
-          className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-white/10"
-        >
-          <IcPlus className="size-4 text-white" />
-        </button>
+        <div className="flex min-w-28 flex-1 items-center gap-1.5">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setError('');
+            }}
+            onKeyDown={handleKeyDown}
+            maxLength={50}
+            placeholder={tTodos('form.tagPlaceholder')}
+            className="min-w-0 flex-1 pl-1 text-sm text-slate-700 outline-none placeholder:text-slate-500 sm:text-base dark:text-white dark:placeholder:text-white/40"
+          />
+          <button
+            type="button"
+            aria-label={tTodos('form.tagAdd')}
+            disabled={!trimmed}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={addTag}
+            className="flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 disabled:bg-slate-300 dark:disabled:bg-white/10"
+          >
+            <IcPlus className="size-4 text-white" />
+          </button>
+        </div>
       </div>
       <small role="alert" className="text-destructive h-6 px-1 text-sm font-medium">
         {error}
