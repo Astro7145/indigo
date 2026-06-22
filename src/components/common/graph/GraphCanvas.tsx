@@ -5,6 +5,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { motion } from 'motion/react';
+import { useTranslations } from 'next-intl';
 import { getGraphColors } from '@/src/components/common/graph/palette';
 import GraphScene from '@/src/components/common/graph/GraphScene';
 import type { GoalListItem } from '@/src/types/goal';
@@ -23,6 +24,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
     .map((t) => `${t.id}:${t.goalId}:${t.noteIds?.length ?? 0}`)
     .join(',')}`;
   const colors = getGraphColors();
+  const t = useTranslations('dashboard');
   // 좌상단 토글 — 기본 off(호버 시에만 라벨). GraphScene만 graphKey로 리마운트되고 이 컴포넌트는
   // 유지되므로 노드 구성이 바뀌어도 토글 상태는 보존된다(뷰를 떠났다 오면 off로 초기화).
   const [showAllGoalLabels, setShowAllGoalLabels] = useState(false);
@@ -49,7 +51,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
               onChange={(e) => setShowAllGoalLabels(e.target.checked)}
               className="accent-indigo-500"
             />
-            목표 이름 보기
+            {t('graph.showGoalNames')}
           </label>
           <label className="bg-indigo-alpha-30 pointer-events-auto flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-xs text-indigo-100 backdrop-blur-sm select-none">
             <input
@@ -58,7 +60,7 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
               onChange={(e) => setShowAllTodoLabels(e.target.checked)}
               className="accent-indigo-500"
             />
-            할일 이름 보기
+            {t('graph.showTodoNames')}
           </label>
         </div>
       </div>
