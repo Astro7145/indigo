@@ -35,3 +35,16 @@ it('태그가 없으면 태그 행을 렌더하지 않는다', () => {
 
   expect(screen.queryByText('태그')).not.toBeInTheDocument();
 });
+
+it('할일 제목이 길어도 상태 칩이 줄어들지 않아 한 줄로 유지된다', () => {
+  render(
+    <NoteMetaInfo
+      goalTitle="g"
+      todoTitle="아주 길고 긴 할일 제목이 들어와서 칩을 밀어내려 하는 상황"
+      todoDone={false}
+      createdAt="2024-01-01T00:00:00.000Z"
+    />,
+  );
+
+  expect(screen.getByText('TO DO')).toHaveClass('shrink-0');
+});
