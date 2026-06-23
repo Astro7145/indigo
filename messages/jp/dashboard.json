@@ -24,5 +24,10 @@
   "progress": {
     "header": "私の進捗状況",
     "body": "{name}さんの進捗は"
+  },
+  "graph": {
+    "showGoalNames": "目標名を表示",
+    "showTodoNames": "TODO名を表示",
+    "noteName": "ノート"
   }
 }

@@ -30,7 +30,7 @@ export function useNoteLink({ linkUrl, setLinkUrl }: UseNoteLinkParams): NoteLin
       ),
       // 모달 셸의 기본 패딩은 닫기 버튼 없는 확인 팝업 전제(비대칭)라, 이 다이얼로그는
       // 자체 닫기 버튼을 그리는 헤더형 레이아웃이므로 대칭 패딩(p-4/sm:p-8)으로 덮어쓴다.
-      { variant: 'modal', className: 'h-[180px] p-4 sm:h-[260px] sm:p-8' },
+      { variant: 'modal', className: 'min-h-[180px] p-4 sm:min-h-[260px] sm:p-8' },
     );
   };
 
