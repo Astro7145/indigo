@@ -24,5 +24,9 @@
   "progress": {
     "header": "My Progress",
     "body": "{name}\u0027s progress is"
+  },
+  "graph": {
+    "showGoalNames": "Show goal names",
+    "showTodoNames": "Show TODO names"
   }
 }
