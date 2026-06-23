@@ -52,13 +52,13 @@ beforeEach(() => {
 });
 
 it('확인을 누르면 해당 노트가 삭제되고 닫힌다', () => {
-  mockMutate.mockImplementation((_id: number, opts?: { onSuccess?: () => void }) => opts?.onSuccess?.());
+  mockMutate.mockImplementation((_vars, opts?: { onSuccess?: () => void }) => opts?.onSuccess?.());
   const onClose = jest.fn();
   renderInModal(<NoteDeleteConfirm note={makeNote(7, '노트 A')} onClose={onClose} />);
 
   fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
-  expect(mockMutate).toHaveBeenCalledWith(7, expect.any(Object));
+  expect(mockMutate).toHaveBeenCalledWith({ noteId: 7, todoId: 7 }, expect.any(Object));
   expect(mockShowToast).toHaveBeenCalledWith('노트가 삭제되었습니다.');
   expect(onClose).toHaveBeenCalled();
 });
@@ -74,7 +74,7 @@ it('취소를 누르면 삭제 없이 닫힌다', () => {
 });
 
 it('삭제에 실패하면 실패 토스트를 띄우고 닫지 않는다', () => {
-  mockMutate.mockImplementation((_id: number, opts?: { onError?: () => void }) => opts?.onError?.());
+  mockMutate.mockImplementation((_vars, opts?: { onError?: () => void }) => opts?.onError?.());
   const onClose = jest.fn();
   renderInModal(<NoteDeleteConfirm note={makeNote(7, '노트 A')} onClose={onClose} />);
 
