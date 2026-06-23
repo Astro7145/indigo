@@ -101,20 +101,20 @@ export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTod
   );
 
   // 목표 노드 탭 — 바로 이동하지 않고 확인 모달을 한 번 띄운다(뎁스 추가).
-  const confirmGoalNav = (goalId: number, goalTitle: string) =>
-    openModal(
+  const confirmGoalNav = (goalId: number, goalTitle: string) => {
+    return openModal(
       (c) => (
         <GoalNavConfirm
           goalTitle={goalTitle}
           onCancel={c.close}
           onConfirm={() => {
-            c.close();
-            router.push(`/goals/${goalId}`);
+            c.closeAndNavigate(() => router.replace(`/goals/${goalId}`));
           }}
         />
       ),
       { variant: 'modal' },
     );
+  };
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls);
