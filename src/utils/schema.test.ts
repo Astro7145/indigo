@@ -256,6 +256,14 @@ describe('createTodoCreateSchema', () => {
     }
   });
 
+  it('도메인 형태가 아닌 http://a 는 urlInvalid 키 메시지를 반환한다', () => {
+    const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'http://a' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.linkUrl?.[0]).toBe('t:urlInvalid');
+    }
+  });
+
   it('프로토콜 없는 링크는 https://를 붙여 통과시킨다', () => {
     const result = todoSchema.safeParse({ ...validTodo, linkUrl: 'example.com' });
     expect(result.success).toBe(true);

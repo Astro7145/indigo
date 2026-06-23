@@ -1,6 +1,8 @@
 import type validationMessages from '@/messages/ko/validation.json';
 import z from 'zod';
 
+import { isValidLinkUrl, normalizeUrl } from './url';
+
 // 다국어 메시지를 위해 t(validation 네임스페이스 번역 함수)를 받아 스키마를 생성한다.
 type TodoValidationKey = 'titleRequired' | 'titleMax' | 'dueDateRequired' | 'urlInvalid';
 
@@ -14,12 +16,8 @@ export const createTodoCreateSchema = (t: (key: TodoValidationKey) => string) =>
     dueDate: z.string().min(1, { error: t('dueDateRequired') }),
     linkUrl: z
       .string()
-      .transform((val) => {
-        if (!val) return val;
-        if (/^https?:\/\//i.test(val)) return val;
-        return `https://${val}`;
-      })
-      .pipe(z.union([z.url({ error: t('urlInvalid') }), z.literal('')]))
+      .transform(normalizeUrl)
+      .refine((val) => val === '' || isValidLinkUrl(val), { error: t('urlInvalid') })
       .optional(),
   });
 
