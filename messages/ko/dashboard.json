@@ -27,6 +27,7 @@
   },
   "graph": {
     "showGoalNames": "목표 이름 보기",
-    "showTodoNames": "할일 이름 보기"
+    "showTodoNames": "할일 이름 보기",
+    "noteName": "노트"
   }
 }

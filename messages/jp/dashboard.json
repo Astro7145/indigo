@@ -27,6 +27,7 @@
   },
   "graph": {
     "showGoalNames": "目標名を表示",
-    "showTodoNames": "TODO名を表示"
+    "showTodoNames": "TODO名を表示",
+    "noteName": "ノート"
   }
 }
