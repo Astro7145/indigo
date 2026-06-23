@@ -5,8 +5,9 @@ export function normalizeUrl(value: string): string {
 }
 
 const MAX_URL_LENGTH = 2048;
-// TLD(점 + 알파벳 2자 이상)를 가진 도메인 호스트만 통과시킨다 → IP 리터럴·단일 라벨 호스트 거부
-const DOMAIN_WITH_TLD = /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
+// TLD(점 + 알파벳 2자 이상)를 가진 도메인 호스트만 통과시킨다 → IP 리터럴·단일 라벨 호스트 거부.
+// 비ASCII TLD(예: .한국)는 new URL()이 퓨니코드(xn--…)로 변환하므로 함께 허용한다.
+const DOMAIN_WITH_TLD = /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[a-z]{2,}|xn--[a-z0-9-]+)$/i;
 
 // 입력은 normalizeUrl로 프로토콜이 보정된 문자열을 전제로 한다.
 export function isValidLinkUrl(value: string): boolean {

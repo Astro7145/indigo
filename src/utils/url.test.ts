@@ -23,6 +23,7 @@ describe('isValidLinkUrl', () => {
     expect(isValidLinkUrl('https://example.com')).toBe(true);
     expect(isValidLinkUrl('http://example.com')).toBe(true);
     expect(isValidLinkUrl('https://sub.example.com/path?q=1#x')).toBe(true);
+    expect(isValidLinkUrl('https://example.한국')).toBe(true);
   });
 
   it('TLD 없는 단일 라벨 호스트는 거부한다', () => {
