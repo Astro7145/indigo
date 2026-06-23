@@ -7,6 +7,7 @@ import { Group, Plane, Raycaster, Vector2, Vector3, type BufferGeometry } from '
 import { computeGraphLayout } from '@/src/utils/graphLayout';
 import { useTodoSheet } from '@/src/hooks/useTodoSheet';
 import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useIsMobile } from '@/src/hooks/useIsMobile';
 import { useModalStore } from '@/src/stores/modal';
 import { GraphSim } from '@/src/components/common/graph/graphPhysics';
 import { getGraphColors } from '@/src/components/common/graph/palette';
@@ -21,6 +22,10 @@ import type { Todo } from '@/src/types/todo';
 interface GraphSceneProps {
   goals: GoalListItem[];
   todos: Todo[];
+  /** 좌상단 토글 — true면 모든 목표 라벨을 호버와 무관하게 항상 표시. */
+  showAllGoalLabels: boolean;
+  /** 좌상단 토글 — true면 모든 할일 라벨을 호버와 무관하게 항상 표시. */
+  showAllTodoLabels: boolean;
 }
 
 /** 시뮬레이션의 라이브 위치로 링크 선을 매 프레임 갱신한다(단일 lineSegments, 버퍼는 ref로 변형). */
@@ -81,11 +86,13 @@ function suppressGhostClick(x: number, y: number) {
   setTimeout(() => window.removeEventListener('click', swallow, true), 350);
 }
 
-export default function GraphScene({ goals, todos }: GraphSceneProps) {
+export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTodoLabels }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
   const { openNote } = useNoteDrawer();
   const openModal = useModalStore((s) => s.open);
+  // 라벨 위/아래 판정은 여기서 한 번만 — 노드마다 useIsMobile을 호출하면 matchMedia 리스너가 중복 등록된다.
+  const isMobile = useIsMobile();
 
   // 전체 진행도(달) — 모든 목표의 완료/전체 합계.
   const overallProgress = ratio(
@@ -94,20 +101,20 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
   );
 
   // 목표 노드 탭 — 바로 이동하지 않고 확인 모달을 한 번 띄운다(뎁스 추가).
-  const confirmGoalNav = (goalId: number, goalTitle: string) =>
-    openModal(
+  const confirmGoalNav = (goalId: number, goalTitle: string) => {
+    return openModal(
       (c) => (
         <GoalNavConfirm
           goalTitle={goalTitle}
           onCancel={c.close}
           onConfirm={() => {
-            c.close();
-            router.push(`/goals/${goalId}`);
+            c.closeAndNavigate(() => router.replace(`/goals/${goalId}`));
           }}
         />
       ),
       { variant: 'modal' },
     );
+  };
   const camera = useThree((s) => s.camera);
   const gl = useThree((s) => s.gl);
   const controls = useThree((s) => s.controls);
@@ -241,6 +248,8 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
               size={g.size}
               title={goal.title}
               progress={ratio(goal.completedCount, goal.todoCount)}
+              isMobile={isMobile}
+              showLabel={showAllGoalLabels}
               onPointerDown={grab(key, () => confirmGoalNav(g.id, goal.title))}
             />
           </group>
@@ -253,7 +262,13 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `todo-${t.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={t.position}>
-            <TodoNode title={todo.title} done={todo.done} onPointerDown={grab(key, () => openDetail(todo))} />
+            <TodoNode
+              title={todo.title}
+              done={todo.done}
+              isMobile={isMobile}
+              showLabel={showAllTodoLabels}
+              onPointerDown={grab(key, () => openDetail(todo))}
+            />
           </group>
         );
       })}
@@ -262,7 +277,7 @@ export default function GraphScene({ goals, todos }: GraphSceneProps) {
         const key = `note-${n.todoId}-${n.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={n.position}>
-            <NoteNode onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
+            <NoteNode isMobile={isMobile} onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
           </group>
         );
       })}
