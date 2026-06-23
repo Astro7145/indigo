@@ -25,13 +25,16 @@ export default function NoteDeleteConfirm({ note, onClose }: NoteDeleteConfirmPr
   const { showToast } = useToast();
 
   const handleConfirm = () => {
-    del.mutate(note.id, {
-      onSuccess: () => {
-        showToast(tNote('delete.success'));
-        onClose();
+    del.mutate(
+      { noteId: note.id, todoId: note.todoId },
+      {
+        onSuccess: () => {
+          showToast(tNote('delete.success'));
+          onClose();
+        },
+        onError: () => showToast(tNote('delete.error')),
       },
-      onError: () => showToast(tNote('delete.error')),
-    });
+    );
   };
 
   return (

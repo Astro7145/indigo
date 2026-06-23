@@ -7,6 +7,7 @@ jest.mock('@/src/api/note', () => ({
   deleteNote: jest.fn(),
 }));
 import * as noteApi from '@/src/api/note';
+import { todoKeys } from '@/src/api/todo';
 import { waitFor } from '@testing-library/react';
 import { renderHookWithClient } from '@/src/hooks/__tests__/test-utils';
 import {
@@ -81,6 +82,8 @@ it('useCreateNote는 성공 시 목록을 무효화한다', async () => {
   await result.current.mutateAsync({ todoId: 3, title: 'x' });
   expect(mocked.createNote).toHaveBeenCalledWith({ todoId: 3, title: 'x' });
   expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.lists() });
+  expect(inv).toHaveBeenCalledWith({ queryKey: todoKeys.lists() });
+  expect(inv).toHaveBeenCalledWith({ queryKey: todoKeys.detail(3) });
 });
 
 it('useUpdateNote는 성공 시 목록을 무효화하고 상세 캐시에 기록한다', async () => {
@@ -99,8 +102,10 @@ it('useDeleteNote는 성공 시 목록을 무효화하고 상세 캐시를 제�
   const { result, client } = renderHookWithClient(() => useDeleteNote());
   const inv = jest.spyOn(client, 'invalidateQueries');
   const rm = jest.spyOn(client, 'removeQueries');
-  await result.current.mutateAsync(5);
+  await result.current.mutateAsync({ noteId: 5, todoId: 9 });
   expect(mocked.deleteNote).toHaveBeenCalledWith(5);
   expect(inv).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.lists() });
   expect(rm).toHaveBeenCalledWith({ queryKey: noteApi.noteKeys.detail(5) });
+  expect(inv).toHaveBeenCalledWith({ queryKey: todoKeys.lists() });
+  expect(inv).toHaveBeenCalledWith({ queryKey: todoKeys.detail(9) });
 });

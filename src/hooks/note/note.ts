@@ -7,6 +7,7 @@ import {
   type UseSuspenseQueryOptions,
 } from '@tanstack/react-query';
 import { noteKeys, getNotes, getNote, createNote, patchNote, deleteNote } from '@/src/api/note';
+import { todoKeys } from '@/src/api/todo';
 import type { Note, NoteListParams, NoteListResponse, CreateNoteBody, UpdateNoteBody } from '@/src/types/note';
 import type { ApiError } from '@/src/types/common';
 
@@ -53,8 +54,10 @@ export function useCreateNote() {
   const qc = useQueryClient();
   return useMutation<Note, ApiError, CreateNoteBody>({
     mutationFn: (body) => createNote(body),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: noteKeys.lists() });
+      qc.invalidateQueries({ queryKey: todoKeys.lists() });
+      qc.invalidateQueries({ queryKey: todoKeys.detail(variables.todoId) });
     },
   });
 }
@@ -73,11 +76,13 @@ export function useUpdateNote() {
 
 export function useDeleteNote() {
   const qc = useQueryClient();
-  return useMutation<void, ApiError, number>({
-    mutationFn: (id) => deleteNote(id),
-    onSuccess: (_, noteId) => {
+  return useMutation<void, ApiError, { noteId: number; todoId: number }>({
+    mutationFn: ({ noteId }) => deleteNote(noteId),
+    onSuccess: (_, { noteId, todoId }) => {
       qc.invalidateQueries({ queryKey: noteKeys.lists() });
       qc.removeQueries({ queryKey: noteKeys.detail(noteId) });
+      qc.invalidateQueries({ queryKey: todoKeys.lists() });
+      qc.invalidateQueries({ queryKey: todoKeys.detail(todoId) });
     },
   });
 }
