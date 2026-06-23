@@ -33,7 +33,7 @@
     "goalNone": "No goal",
     "datePlaceholder": "Select a date",
     "dateDialogLabel": "Select date",
-    "tagPlaceholder": "Enter and press Enter",
+    "tagPlaceholder": "Type and press Enter",
     "tagAdd": "Add tag",
     "tagDuplicate": "Tag already added",
     "tagMax": "Maximum 10 tags allowed",

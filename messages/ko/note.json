@@ -40,5 +40,21 @@
     "warning": "삭제된 노트는 복구할 수 없습니다.",
     "success": "노트가 삭제되었습니다.",
     "error": "노트 삭제에 실패했습니다."
+  },
+  "card": {
+    "linkLabel": "첨부 링크",
+    "menuLabel": "더보기 메뉴"
+  },
+  "collection": {
+    "title": "노트 모아보기",
+    "searchPlaceholder": "노트를 검색해주세요",
+    "searchLabel": "노트 검색",
+    "sort": {
+      "latest": "최신순",
+      "oldest": "오래된순"
+    },
+    "loading": "불러오는 중…",
+    "loadError": "불러오지 못했어요",
+    "empty": "노트가 아직 없어요"
   }
 }

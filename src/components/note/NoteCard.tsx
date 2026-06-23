@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Card from '@/src/components/common/cards/Card';
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -41,6 +42,7 @@ const todoTextClass = 'text-xs leading-4 sm:text-sm sm:leading-5';
  * 하단: TODO 칩 + 연결된 todo title + 작성일. 사이즈는 뷰포트 반응형(md)으로 자동 결정.
  */
 export default function NoteCard({ note, onClick, onMore, menu, className }: NoteCardProps) {
+  const t = useTranslations('note');
   return (
     <Card className={cn(rootClass, className)} onClick={onClick}>
       <div className="flex items-center justify-between">
@@ -49,11 +51,15 @@ export default function NoteCard({ note, onClick, onMore, menu, className }: Not
           <h3 className={cn('text-slate-800 dark:text-white', titleClass)}>{note.title}</h3>
         </div>
         <div className="flex items-center gap-2">
-          {note.linkUrl && <IcLink aria-label="첨부 링크" />}
+          {note.linkUrl && <IcLink aria-label={t('card.linkLabel')} />}
           {menu ? (
             <Dropdown>
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기 메뉴" className="rounded-full" onClick={(e) => e.stopPropagation()}>
+                <IconButton
+                  aria-label={t('card.menuLabel')}
+                  className="rounded-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <IcKebab className={kebabClass} />
                 </IconButton>
               </Dropdown.Trigger>
@@ -61,7 +67,7 @@ export default function NoteCard({ note, onClick, onMore, menu, className }: Not
             </Dropdown>
           ) : onMore ? (
             <IconButton
-              aria-label="더보기 메뉴"
+              aria-label={t('card.menuLabel')}
               className="rounded-full"
               onClick={(e) => {
                 e.stopPropagation();
