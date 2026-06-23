@@ -33,6 +33,7 @@ const MESSAGE_NAMESPACES = [
   'goals',
   'login',
   'me',
+  'note',
   'posts',
   'settings',
   'sidebar',
