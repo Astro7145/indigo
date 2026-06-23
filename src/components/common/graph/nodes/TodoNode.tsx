@@ -40,9 +40,9 @@ export default function TodoNode({ title, done, isMobile, showLabel, onPointerDo
       {(hovered || showLabel) && (
         // 라벨을 노드 아래에 띄운다 — Billboard로 '아래(−Y)'가 카메라 각도와 무관하게 늘 화면 아래로 향한다.
         // 모바일에선 터치하는 손가락이 노드 아래를 가리므로 위(+Y)로 띄운다.
-        // zIndexRange로 라벨 z-index를 30 이하로 묶는다 — 기본(거대값)이면 모달/드로어 위로 떠버린다.
+        // zIndexRange로 라벨 z-index를 0~20으로 묶는다 — 목표 라벨(20~35)·사이드바(40) 아래.
         <Billboard>
-          <Html center position={[0, isMobile ? 0.8 : -0.8, 0]} zIndexRange={[30, 0]} className="pointer-events-none">
+          <Html center position={[0, isMobile ? 0.8 : -0.8, 0]} zIndexRange={[20, 0]} className="pointer-events-none">
             <span className="bg-indigo-alpha-30 rounded px-2 py-1 text-xs whitespace-nowrap text-indigo-100">
               {title}
             </span>
