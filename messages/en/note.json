@@ -40,5 +40,21 @@
     "warning": "Deleted notes cannot be recovered.",
     "success": "The note has been deleted.",
     "error": "Failed to delete the note."
+  },
+  "card": {
+    "linkLabel": "Attached link",
+    "menuLabel": "More options"
+  },
+  "collection": {
+    "title": "All Notes",
+    "searchPlaceholder": "Search notes",
+    "searchLabel": "Search notes",
+    "sort": {
+      "latest": "Newest",
+      "oldest": "Oldest"
+    },
+    "loading": "Loading…",
+    "loadError": "Couldn't load notes",
+    "empty": "No notes yet"
   }
 }

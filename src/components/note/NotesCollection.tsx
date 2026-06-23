@@ -18,7 +18,6 @@ import type { Note } from '@/src/types/note';
 import { cn } from '@/src/utils/cn';
 
 type Sort = 'latest' | 'oldest';
-const SORT_LABELS: Record<Sort, string> = { latest: '최신순', oldest: '오래된순' };
 
 export interface NotesCollectionProps {
   goalId: number;
@@ -27,6 +26,7 @@ export interface NotesCollectionProps {
 
 /** 목표별 노트 모아보기 리스트 본문. 목표 헤더 + 검색/정렬 + 2열 노트 카드 그리드 + 무한 스크롤. */
 export default function NotesCollection({ goalId, className }: NotesCollectionProps) {
+  const t = useTranslations('note');
   const { data: goal } = useGoal(goalId);
 
   const [input, setInput] = useState('');
@@ -42,12 +42,14 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
   return (
     <div className={cn('mx-auto flex w-full max-w-[1312px] flex-col gap-3 sm:gap-4 xl:gap-5', className)}>
       <div className="flex h-12 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="hidden text-2xl font-semibold text-slate-800 sm:block dark:text-white">노트 모아보기</h1>
+        <h1 className="hidden text-2xl font-semibold text-slate-800 sm:block dark:text-white">
+          {t('collection.title')}
+        </h1>
         <div className="flex items-center justify-between">
           <div className="w-full sm:w-[320px]">
             <SearchInput
-              placeholder="노트를 검색해주세요"
-              aria-label="노트 검색"
+              placeholder={t('collection.searchPlaceholder')}
+              aria-label={t('collection.searchLabel')}
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
@@ -58,13 +60,13 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
                 type="button"
                 className="flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-slate-600 dark:text-white/70"
               >
-                {SORT_LABELS[sort]}
+                {t(`collection.sort.${sort}`)}
                 <IcFilter aria-hidden className="size-5 dark:text-white/70" />
               </button>
             </Dropdown.Trigger>
             <Dropdown.Menu size="small" placement="bottom-end">
-              <Dropdown.Item onClick={() => setSort('latest')}>최신순</Dropdown.Item>
-              <Dropdown.Item onClick={() => setSort('oldest')}>오래된순</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSort('latest')}>{t('collection.sort.latest')}</Dropdown.Item>
+              <Dropdown.Item onClick={() => setSort('oldest')}>{t('collection.sort.oldest')}</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </div>
@@ -78,8 +80,12 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
       </div>
 
       <AsyncBoundary
-        fallback={<p className="py-16 text-center text-sm text-slate-400 dark:text-white/60">불러오는 중…</p>}
-        errorFallback={<p className="py-16 text-center text-sm text-slate-400 dark:text-white/60">불러오지 못했어요</p>}
+        fallback={
+          <p className="py-16 text-center text-sm text-slate-400 dark:text-white/60">{t('collection.loading')}</p>
+        }
+        errorFallback={
+          <p className="py-16 text-center text-sm text-slate-400 dark:text-white/60">{t('collection.loadError')}</p>
+        }
         resetKeys={[search, sort]}
       >
         <NotesCollectionContent goalId={goalId} search={search} sort={sort} />
@@ -89,6 +95,7 @@ export default function NotesCollection({ goalId, className }: NotesCollectionPr
 }
 
 function NotesCollectionContent({ goalId, search, sort }: { goalId: number; search: string; sort: Sort }) {
+  const t = useTranslations('note');
   const tCommon = useTranslations('common');
   const { openNote } = useNoteDrawer();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isFetchNextPageError } = useInfiniteNoteList({
@@ -120,7 +127,7 @@ function NotesCollectionContent({ goalId, search, sort }: { goalId: number; sear
   }, [hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage, notes.length]);
 
   if (notes.length === 0) {
-    return <p className="py-16 text-center text-sm text-slate-500 dark:text-white/60">노트가 아직 없어요</p>;
+    return <p className="py-16 text-center text-sm text-slate-500 dark:text-white/60">{t('collection.empty')}</p>;
   }
 
   return (
@@ -147,7 +154,9 @@ function NotesCollectionContent({ goalId, search, sort }: { goalId: number; sear
         ))}
       </ul>
       {hasNextPage && <div ref={sentinelRef} aria-hidden className="h-1" />}
-      {isFetchingNextPage && <p className="py-3 text-center text-sm text-slate-400 dark:text-white/60">불러오는 중…</p>}
+      {isFetchingNextPage && (
+        <p className="py-3 text-center text-sm text-slate-400 dark:text-white/60">{t('collection.loading')}</p>
+      )}
     </>
   );
 }
