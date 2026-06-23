@@ -26,6 +26,8 @@ interface GraphSceneProps {
   showAllGoalLabels: boolean;
   /** 좌상단 토글 — true면 모든 할일 라벨을 호버와 무관하게 항상 표시. */
   showAllTodoLabels: boolean;
+  /** 노트 호버 라벨(다국어) — Canvas 밖에서 번역해 내려준다(R3F 트리엔 next-intl 컨텍스트가 닿지 않음). */
+  noteLabel: string;
 }
 
 /** 시뮬레이션의 라이브 위치로 링크 선을 매 프레임 갱신한다(단일 lineSegments, 버퍼는 ref로 변형). */
@@ -86,7 +88,7 @@ function suppressGhostClick(x: number, y: number) {
   setTimeout(() => window.removeEventListener('click', swallow, true), 350);
 }
 
-export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTodoLabels }: GraphSceneProps) {
+export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTodoLabels, noteLabel }: GraphSceneProps) {
   const router = useRouter();
   const { openDetail } = useTodoSheet();
   const { openNote } = useNoteDrawer();
@@ -277,7 +279,11 @@ export default function GraphScene({ goals, todos, showAllGoalLabels, showAllTod
         const key = `note-${n.todoId}-${n.id}`;
         return (
           <group key={key} ref={setNodeRef(key)} position={n.position}>
-            <NoteNode isMobile={isMobile} onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))} />
+            <NoteNode
+              label={noteLabel}
+              isMobile={isMobile}
+              onPointerDown={grab(key, () => openNote(n.todoId, 'detail'))}
+            />
           </group>
         );
       })}

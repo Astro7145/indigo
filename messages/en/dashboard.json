@@ -27,6 +27,7 @@
   },
   "graph": {
     "showGoalNames": "Show goal names",
-    "showTodoNames": "Show TODO names"
+    "showTodoNames": "Show TODO names",
+    "noteName": "Note"
   }
 }
