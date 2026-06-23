@@ -40,10 +40,10 @@ export default function GraphCanvas({ goals, todos }: GraphCanvasProps) {
       transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       {/* 라벨 토글 — 캔버스 위에 떠 있는 일반 DOM 체크박스(접근성·공용 Checkbox 재사용). 컨테이너는
-          pointer-events-none, 패널만 auto라 패널 밖 클릭은 캔버스(궤도)로 그대로 전달된다. z-60으로 노드
-          라벨(≤30) 위·모달/드로어(60·100+) 아래에 둔다. sm↑에선 콘텐츠 컬럼(max-w-328) 왼쪽 끝 +
+          pointer-events-none, 패널만 auto라 패널 밖 클릭은 캔버스(궤도)로 그대로 전달된다. z-37로 노드
+          라벨(목표≤35·할일≤20) 위·사이드바(40)/모달/드로어 아래에 둔다. sm↑에선 콘텐츠 컬럼(max-w-328) 왼쪽 끝 +
           대시보드 토글과 같은 세로 위치(그래프 음수 마진 풀블리드를 top/px로 보정)에 맞춘다. */}
-      <div className="pointer-events-none absolute inset-x-0 top-3 z-60 px-4 sm:top-12 sm:px-6 xl:top-20 xl:px-10">
+      <div className="pointer-events-none absolute inset-x-0 top-3 z-37 px-4 sm:top-12 sm:px-6 xl:top-20 xl:px-10">
         <div className="mx-auto flex w-full max-w-328 flex-col items-start">
           {/* 두 토글을 하나의 글래스 패널로 묶어 별밭 위에서 또렷한 컨트롤로 읽히게 한다. */}
           <div className="bg-indigo-alpha-30 pointer-events-auto flex flex-col gap-0.5 rounded-lg border border-white/10 p-1.5 backdrop-blur-sm">

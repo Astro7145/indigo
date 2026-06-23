@@ -35,9 +35,9 @@ export default function NoteNode({ label, isMobile, onPointerDown }: NoteNodePro
       {hovered && (
         // 노트는 제목 데이터가 없어 고정 라벨(부모가 번역해 prop으로). 다른 노드처럼 Billboard로 늘 화면 아래(−Y),
         // 모바일에선 손가락이 노드 아래를 가리므로 위(+Y)로. 노드가 작아 오프셋도 작게.
-        // zIndexRange로 라벨 z-index를 30 이하로 묶는다 — 기본(거대값)이면 모달/드로어 위로 떠버린다.
+        // zIndexRange로 라벨 z-index를 0~35로 묶는다 — 호버 시에만 떠 목표 라벨(20~35)과 겹쳐도 무방.
         <Billboard>
-          <Html center position={[0, isMobile ? 0.6 : -0.6, 0]} zIndexRange={[30, 0]} className="pointer-events-none">
+          <Html center position={[0, isMobile ? 0.6 : -0.6, 0]} zIndexRange={[35, 0]} className="pointer-events-none">
             <span className="bg-indigo-alpha-30 rounded px-2 py-1 text-xs whitespace-nowrap text-indigo-100">
               {label}
             </span>
