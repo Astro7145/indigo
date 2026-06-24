@@ -1,19 +1,46 @@
+import { Suspense } from 'react';
+
+import NoteDrawer from '@/src/components/note/todo-note/NoteDrawer';
+import { cookies } from 'next/headers';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+
+import { prefetchAllGoals, prefetchMe, prefetchSidebarNotifications } from '@/src/api/server/prefetch';
+import { getQueryClient } from '@/src/api/server/query-client';
+import NotificationTitleBadge from '@/src/components/common/sidebar/NotificationTitleBadge';
 import Sidebar from '@/src/components/common/sidebar/Sidebar';
 import Topbar from '@/src/components/common/sidebar/Topbar';
+import Settings from '@/src/components/common/settings/Settings';
 
 /**
- * (main) 그룹 셸 레이아웃.
- * 사이드바와 모바일 GNB는 별도 작업(이번 PR 범위 외) — 자리만 확보하는 placeholder.
+ * (main) 그룹 레이아웃. 전 페이지의 사이드바/탑바가 쓰는 공용 데이터(useMe 프로필·목표 목록·알림)를
+ * 서버에서 prefetch한다. cookies()를 읽으므로 (main) 전 라우트는 동적(ƒ) — 전 쿼리 prefetch 커버의 의도된 비용.
  */
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  // 빌드 프리렌더 차단 신호를 prefetch보다 먼저 — queryFn 안의 cookies()가 던지는 dynamic bail-out은
+  // TanStack prefetch가 에러로 삼켜 렌더러에 닿지 않고, 정적 프리렌더가 계속 진행돼 빌드가 깨진다.
+  // 레이아웃 본문에서 직접 읽어 (main) 전 라우트를 요청 시 렌더(ƒ)로 확정한다.
+  await cookies();
+
+  const qc = getQueryClient();
+  // 사이드바/탑바 공용 데이터(프로필·목표·알림)를 병렬 prefetch — TTFB 추가 지연 최소화.
+  // 목표는 전체('all' 키)를 한 번 받아 사이드바·대시보드(ProgressCard·목표 별 할일)가 같은 캐시를 공유한다.
+  await Promise.all([prefetchMe(qc), prefetchAllGoals(qc), prefetchSidebarNotifications(qc)]);
+
   return (
-    <div className="flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
-      <Topbar />
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
-        <div id="toast-portal" />
+    <HydrationBoundary state={dehydrate(qc)}>
+      <div className="dark:bg-indigo-dark-400 flex min-h-screen w-full flex-col bg-slate-100 sm:flex-row">
+        <NotificationTitleBadge />
+        <Topbar />
+        <Sidebar />
+        <Settings />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 sm:py-12 xl:px-10 xl:py-20">{children}</main>
+        </div>
+        {/* 쿼리파라미터(todoId) 구독으로 열리는 전역 노트 드로어. useSearchParams의 CSR bailout을 Suspense로 감싼다. */}
+        <Suspense fallback={null}>
+          <NoteDrawer />
+        </Suspense>
       </div>
-    </div>
+    </HydrationBoundary>
   );
 }

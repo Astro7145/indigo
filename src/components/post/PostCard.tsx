@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import Card from '@/src/components/common/cards/Card';
 import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
@@ -20,9 +21,10 @@ export const postCardRootClass =
   'flex shrink-0 flex-col w-[260px] h-[204px] p-3 gap-3 overflow-hidden sm:h-[280px] sm:w-[384px] sm:p-8 sm:gap-4 xl:w-full';
 
 export default function PostCard({ post, onClick, className }: PostCardProps) {
+  const t = useTranslations('posts');
   return (
     <Card className={cn(postCardRootClass, className)} onClick={onClick}>
-      <h3 className="line-clamp-2 text-xl font-semibold text-slate-900">{post.title}</h3>
+      <h3 className="line-clamp-2 text-xl font-semibold text-slate-900 dark:text-white">{post.title}</h3>
       {post.image ? (
         <div className="flex items-center gap-3">
           <Image
@@ -30,14 +32,14 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
             alt=""
             width={100}
             height={100}
-            className="size-[100px] shrink-0 rounded border border-slate-200 object-cover"
+            className="size-[100px] shrink-0 rounded border border-slate-200 object-cover dark:border-white/10"
           />
         </div>
       ) : (
-        <p className="line-clamp-2 text-sm text-slate-500">{stripHtml(post.content)}</p>
+        <p className="line-clamp-2 text-sm text-slate-500 dark:text-white/60">{stripHtml(post.content)}</p>
       )}
       <div className="mt-auto flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2 text-base text-slate-500">
+        <div className="flex min-w-0 items-center gap-2 text-base text-slate-500 dark:text-white/60">
           {post.writer.image ? (
             <Image
               src={post.writer.image}
@@ -52,14 +54,14 @@ export default function PostCard({ post, onClick, className }: PostCardProps) {
           <span className="flex items-center gap-1 whitespace-nowrap">
             <span className="max-w-[80px] truncate">{post.writer.name}</span>
             <span aria-hidden>·</span>
-            <span>조회 {post.viewCount}</span>
+            <span>{t('viewCount', { count: post.viewCount })}</span>
           </span>
         </div>
         <div
-          className="flex shrink-0 items-center gap-0.5 text-base text-slate-600"
-          aria-label={`댓글 ${post.commentCount}개`}
+          className="flex shrink-0 items-center gap-0.5 text-base text-slate-600 dark:text-white/60"
+          aria-label={t('commentCount', { count: post.commentCount })}
         >
-          <IcMessageCircle className="size-4 text-slate-600" />
+          <IcMessageCircle className="size-4 text-slate-600 dark:text-white/60" />
           <span>{post.commentCount}</span>
         </div>
       </div>

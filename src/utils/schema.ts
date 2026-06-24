@@ -1,63 +1,89 @@
+import type validationMessages from '@/messages/ko/validation.json';
 import z from 'zod';
 
-export const todoCreateSchema = z.object({
-  title: z.string().min(1, { error: '제목을 입력해주세요.' }).max(30, { error: '제목은 30자 이하로 입력해주세요.' }),
-  goalId: z.number().optional(),
-  dueDate: z.string().min(1, { error: '마감일을 선택해주세요.' }),
-  linkUrl: z
-    .string()
-    .transform((val) => {
-      if (!val) return val;
-      if (/^https?:\/\//i.test(val)) return val;
-      return `https://${val}`;
+import { isValidLinkUrl, normalizeUrl } from './url';
+
+// 다국어 메시지를 위해 t(validation 네임스페이스 번역 함수)를 받아 스키마를 생성한다.
+type TodoValidationKey = 'titleRequired' | 'titleMax' | 'dueDateRequired' | 'urlInvalid';
+
+export const createTodoCreateSchema = (t: (key: TodoValidationKey) => string) =>
+  z.object({
+    title: z
+      .string()
+      .min(1, { error: t('titleRequired') })
+      .max(30, { error: t('titleMax') }),
+    goalId: z.number().optional(),
+    dueDate: z.string().min(1, { error: t('dueDateRequired') }),
+    linkUrl: z
+      .string()
+      .transform(normalizeUrl)
+      .refine((val) => val === '' || isValidLinkUrl(val), { error: t('urlInvalid') })
+      .optional(),
+  });
+
+export type TodoCreateValues = z.infer<ReturnType<typeof createTodoCreateSchema>>;
+
+// 검증 메시지를 i18n으로 전환하기 위해 translator(useTranslations('validation'))를 받아 스키마를 만든다.
+// 컴포넌트는 useTranslations('validation')의 t를 주입해 선택된 언어로 에러 메시지를 표시한다.
+// 키 타입은 next-intl 증강(src/i18n/global.d.ts)과 동일하게 ko validation.json을 SSOT로 좁힌다.
+type Translator = (key: keyof typeof validationMessages) => string;
+
+export const createLoginSchema = (t: Translator) =>
+  z.object({
+    email: z.email({ error: t('emailInvalid') }),
+    password: z.string().min(1, { error: t('passwordRequired') }),
+  });
+
+export const createSignupSchema = (t: Translator) =>
+  z
+    .object({
+      name: z
+        .string()
+        .min(1, { error: t('nameRequired') })
+        .max(20, { error: t('nameMax') }),
+      email: z.email({ error: t('emailInvalid') }),
+      password: z.string().min(8, { error: t('passwordMin') }),
+      passwordConfirm: z.string().min(1, { error: t('passwordConfirmRequired') }),
     })
-    .pipe(z.union([z.url({ error: '올바른 URL을 입력해주세요.' }), z.literal('')]))
-    .optional(),
-});
+    .refine((data) => data.password === data.passwordConfirm, {
+      path: ['passwordConfirm'],
+      message: t('passwordMismatch'),
+    });
 
-export type TodoCreateValues = z.infer<typeof todoCreateSchema>;
+// 다국어 메시지를 위해 t(validation 네임스페이스 번역 함수)를 받아 스키마를 생성한다.
+type MeValidationKey =
+  | 'nameRequired'
+  | 'currentPasswordRequired'
+  | 'passwordMin'
+  | 'passwordConfirmRequired'
+  | 'passwordMismatch'
+  | 'passwordSameAsOld';
 
-export const loginSchema = z.object({
-  email: z.email({ error: '올바른 이메일을 입력해주세요.' }),
-  password: z.string().min(1, { error: '비밀번호는 필수 입력입니다.' }),
-});
+export const createMeSchema = (t: (key: MeValidationKey) => string) =>
+  z
+    .object({
+      name: z.string().min(1, { error: t('nameRequired') }),
+      currentPassword: z.string(),
+      password: z.string(),
+      passwordConfirm: z.string(),
+    })
+    .superRefine(({ currentPassword, password, passwordConfirm }, ctx) => {
+      // 비밀번호 필드가 모두 비어있으면 비밀번호 미변경으로 보고 검증을 생략한다.
+      if (currentPassword === '' && password === '' && passwordConfirm === '') return;
 
-export const signupSchema = z
-  .object({
-    name: z.string().min(1, { error: '이름을 입력해주세요.' }),
-    email: z.email({ error: '올바른 이메일을 입력해주세요.' }),
-    password: z.string().min(8, { error: '비밀번호가 8자 이상이 되도록 해 주세요.' }),
-    passwordConfirm: z.string().min(1, { error: '비밀번호 확인을 입력해주세요.' }),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    path: ['passwordConfirm'],
-    message: '비밀번호가 일치하지 않습니다.',
-  });
-
-export const meSchema = z
-  .object({
-    name: z.string().min(1, { error: '이름을 입력해주세요.' }),
-    currentPassword: z.string(),
-    password: z.string(),
-    passwordConfirm: z.string(),
-  })
-  .superRefine(({ currentPassword, password, passwordConfirm }, ctx) => {
-    // 비밀번호 필드가 모두 비어있으면 비밀번호 미변경으로 보고 검증을 생략한다.
-    if (currentPassword === '' && password === '' && passwordConfirm === '') return;
-
-    // 하나라도 입력되면 비밀번호 변경으로 보고 전체 규칙을 검증한다.
-    if (currentPassword === '') {
-      ctx.addIssue({ code: 'custom', path: ['currentPassword'], message: '현재 비밀번호를 입력해주세요.' });
-    }
-    if (password.length < 8) {
-      ctx.addIssue({ code: 'custom', path: ['password'], message: '비밀번호가 8자 이상이 되도록 해 주세요.' });
-    }
-    if (passwordConfirm === '') {
-      ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: '비밀번호 확인을 입력해주세요.' });
-    } else if (password !== passwordConfirm) {
-      ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: '비밀번호가 일치하지 않습니다.' });
-    }
-    if (currentPassword !== '' && currentPassword === password) {
-      ctx.addIssue({ code: 'custom', path: ['password'], message: '기존과 다른 비밀번호를 입력해주세요.' });
-    }
-  });
+      // 하나라도 입력되면 비밀번호 변경으로 보고 전체 규칙을 검증한다.
+      if (currentPassword === '') {
+        ctx.addIssue({ code: 'custom', path: ['currentPassword'], message: t('currentPasswordRequired') });
+      }
+      if (password.length < 8) {
+        ctx.addIssue({ code: 'custom', path: ['password'], message: t('passwordMin') });
+      }
+      if (passwordConfirm === '') {
+        ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: t('passwordConfirmRequired') });
+      } else if (password !== passwordConfirm) {
+        ctx.addIssue({ code: 'custom', path: ['passwordConfirm'], message: t('passwordMismatch') });
+      }
+      if (currentPassword !== '' && currentPassword === password) {
+        ctx.addIssue({ code: 'custom', path: ['password'], message: t('passwordSameAsOld') });
+      }
+    });

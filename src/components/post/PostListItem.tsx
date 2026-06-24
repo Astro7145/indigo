@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { IcMessageCircle } from '@/src/components/common/icons/IcMessageCircle';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
@@ -12,28 +15,29 @@ interface PostListItemProps {
 }
 
 export default function PostListItem({ post, onClick }: PostListItemProps) {
+  const t = useTranslations('posts');
   return (
     <article
-      className="flex w-full cursor-pointer items-center gap-6 border-b border-slate-300 px-2 py-6 sm:gap-8 sm:px-4 sm:py-10"
+      className="flex w-full cursor-pointer items-center gap-6 border-b border-slate-300 px-2 py-6 sm:gap-8 sm:px-4 sm:py-10 dark:border-white/10"
       onClick={onClick}
     >
       <div className="flex min-w-0 flex-1 flex-col gap-3 sm:gap-[26px]">
         <div className="flex flex-col gap-1 sm:gap-4">
-          <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-xl sm:leading-[30px] sm:whitespace-normal">
+          <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-xl sm:leading-[30px] sm:whitespace-normal dark:text-white">
             {post.title}
           </h3>
-          <p className="truncate text-sm text-slate-700 sm:line-clamp-2 sm:min-h-[48px] sm:text-base sm:whitespace-normal">
+          <p className="truncate text-sm text-slate-700 sm:line-clamp-2 sm:min-h-[48px] sm:text-base sm:whitespace-normal dark:text-white/80">
             {stripHtml(post.content)}
           </p>
         </div>
-        <div className="flex items-center gap-1 text-xs text-slate-500 sm:gap-2 sm:text-base">
+        <div className="flex items-center gap-1 text-xs text-slate-500 sm:gap-2 sm:text-base dark:text-white/60">
           {post.writer.image ? (
             <Image
               src={post.writer.image}
               alt=""
               width={24}
               height={24}
-              className="size-5 shrink-0 rounded-full object-cover sm:size-6"
+              className="size-5 shrink-0 rounded-full bg-white object-cover sm:size-6"
             />
           ) : (
             <IcProfileYellow className="size-5 shrink-0 sm:size-6" />
@@ -43,9 +47,9 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
             <span aria-hidden>·</span>
             <span>{formatRelativeTime(post.createdAt)}</span>
             <span aria-hidden>·</span>
-            <span>조회 {post.viewCount}</span>
+            <span>{t('viewCount', { count: post.viewCount })}</span>
             <span aria-hidden>·</span>
-            <span className="inline-flex items-center gap-0.5 text-slate-600">
+            <span className="inline-flex items-center gap-1 text-slate-600 dark:text-white/60">
               <IcMessageCircle className="size-3 sm:size-4" />
               {post.commentCount}
             </span>
@@ -58,7 +62,7 @@ export default function PostListItem({ post, onClick }: PostListItemProps) {
           alt=""
           width={120}
           height={120}
-          className="size-[72px] shrink-0 rounded border border-slate-200 object-cover sm:size-[120px]"
+          className="size-[72px] shrink-0 rounded border border-slate-200 object-cover sm:size-[120px] dark:border-white/10"
         />
       )}
     </article>

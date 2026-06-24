@@ -1,15 +1,20 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useTranslations } from 'next-intl';
 
 import Button from '@/src/components/common/buttons/Button';
 import Modal from '@/src/components/common/modal/Modal';
 import PostEditor, { type PostEditorHandle } from '@/src/components/post/PostEditor';
+import PostFormActions from '@/src/components/post/PostFormActions';
 import PostImageAttachment from '@/src/components/post/PostImageAttachment';
 import { useCreatePost, usePost, useUpdatePost } from '@/src/hooks/post';
+import { useNoteList } from '@/src/hooks/note/note';
 import { useCreateImageUploadUrl, useUploadImageToS3 } from '@/src/hooks/upload';
 import { useToast } from '@/src/hooks/useToast';
+import { useTopbarSlotStore } from '@/src/stores/topbarSlot';
+import { noteContentToPostHtml, truncateHtmlToLimit, POST_CONTENT_MAX } from '@/src/utils/noteToPost';
 
 export type PostFormProps = { mode: 'create' } | { mode: 'edit'; postId: number };
 
@@ -29,9 +34,18 @@ function isHtmlEmpty(html: string) {
 }
 
 export default function PostForm(props: PostFormProps) {
+  const t = useTranslations('posts');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const editId = props.mode === 'edit' ? props.postId : undefined;
   const { data: initialPost } = usePost(editId);
+
+  // 노트에서 공유된 경우 — create 모드에서만 todoId 파라미터를 읽어 노트를 prefill에 사용
+  const searchParams = useSearchParams();
+  const fromTodoIdParam = props.mode === 'create' ? searchParams.get('fromTodoId') : null;
+  const fromTodoId = fromTodoIdParam ? Number(fromTodoIdParam) : undefined;
+  const { data: noteListData } = useNoteList({ todoId: fromTodoId }, { enabled: !!fromTodoId });
+  const fromNote = noteListData?.notes[0];
   const { mutateAsync: createPost } = useCreatePost();
   const { mutateAsync: updatePost } = useUpdatePost();
   const { mutateAsync: createImageUploadUrl } = useCreateImageUploadUrl();
@@ -48,6 +62,8 @@ export default function PostForm(props: PostFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<PostEditorHandle>(null);
+  const setRightSlot = useTopbarSlotStore((s) => s.setRightSlot);
+  const clearRightSlot = useTopbarSlotStore((s) => s.clearRightSlot);
   // 서버 데이터로 폼을 한 번만 채운다. mutation 응답이나 refetch가 사용자의 편집을 덮어쓰지 않도록 일회성 hydration 사용
   const hydrated = useRef(false);
 
@@ -58,6 +74,14 @@ export default function PostForm(props: PostFormProps) {
     setImage(initialPost.image);
     hydrated.current = true;
   }, [initialPost]);
+
+  useEffect(() => {
+    if (!fromNote || hydrated.current) return;
+    const html = noteContentToPostHtml(fromNote.content, fromNote.linkUrl);
+    setTitle(fromNote.title);
+    setContent(truncateHtmlToLimit(html, POST_CONTENT_MAX));
+    hydrated.current = true;
+  }, [fromNote]);
 
   // blob: URL은 브라우저가 자동 회수하지 않으므로, image가 교체되거나 컴포넌트가 unmount될 때 직접 해제
   useEffect(() => {
@@ -71,15 +95,6 @@ export default function PostForm(props: PostFormProps) {
   const initialImage = initialPost?.image ?? null;
   const isDirty = title !== initialTitle || content !== initialContent || image !== initialImage; //변경이 있는지
   const isValid = title.trim().length > 0 && !isHtmlEmpty(content);
-
-  // 수정 모드에서 데이터 도착까지 로딩 표시
-  if (props.mode === 'edit' && !initialPost) {
-    return (
-      <div className="mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
-        <p className="text-sm text-slate-400">불러오는 중…</p>
-      </div>
-    );
-  }
 
   const handleCancel = () => {
     if (isDirty) {
@@ -121,15 +136,56 @@ export default function PostForm(props: PostFormProps) {
       router.push(`/posts/${post.id}`);
     } catch {
       // 이미지 업로드·게시글 등록/수정 어느 단계에서 실패해도 사용자에게 일관된 안내를 띄운다
-      showToast(props.mode === 'edit' ? '게시물 수정에 실패했어요.' : '게시물 등록에 실패했어요.', 'error');
+      showToast(props.mode === 'edit' ? t('form.updateError') : t('form.createError'), 'error');
     } finally {
       // 성공 시엔 router.push로 unmount되어 무관하지만, 실패 시엔 false로 복원해 재시도 허용
       setIsSubmitting(false);
     }
   };
 
-  const headingText = props.mode === 'edit' ? '게시물 수정하기' : '게시물 작성하기';
-  const submitText = props.mode === 'edit' ? '수정하기' : '등록하기';
+  // 핸들러는 입력마다 새 참조라 effect deps에 직접 넣으면 키 입력 한 번에 setRightSlot이 한 번씩 호출된다.
+  // ref로 최신 참조를 들고 있게 하고 effect에서는 ref 호출 wrapper만 등록 → setRightSlot은 isValid·isSubmitting 등 실제 UI 상태가 바뀔 때만 호출된다.
+  const handleSubmitRef = useRef(handleSubmit);
+  const handleCancelRef = useRef(handleCancel);
+  // ref 갱신은 render 중이 아니라 commit 이후로 미룬다 (react-hooks/refs)
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+    handleCancelRef.current = handleCancel;
+  });
+
+  // 폼 상태 변화에 따라 슬롯을 등록/업데이트. edit 모드 데이터 로딩 중엔 비활성 버튼 노출 대신 빈 자리(Topbar의 span aria-hidden)를 유지한다.
+  useEffect(() => {
+    if (props.mode === 'edit' && !initialPost) {
+      clearRightSlot();
+      return;
+    }
+    setRightSlot(
+      <PostFormActions
+        mode={props.mode}
+        isValid={isValid}
+        isSubmitting={isSubmitting}
+        onSubmit={() => handleSubmitRef.current()}
+        onCancel={() => handleCancelRef.current()}
+      />,
+    );
+  }, [props.mode, initialPost, isValid, isSubmitting, setRightSlot, clearRightSlot]);
+
+  // unmount 시점에만 슬롯을 비운다. 등록용 effect의 cleanup으로 두면 deps 변경마다 null → 새 노드로 두 번 set돼서 Topbar가 한 번 더 리렌더된다.
+  useEffect(() => {
+    return () => clearRightSlot();
+  }, [clearRightSlot]);
+
+  // 수정 모드에서 데이터 도착까지 로딩 표시 (모든 hook 호출 이후에 위치)
+  if (props.mode === 'edit' && !initialPost) {
+    return (
+      <div className="dark:bg-indigo-dark-300 mx-auto flex min-h-full w-full max-w-[343px] items-center justify-center rounded-lg bg-white sm:max-w-[636px] xl:max-w-[768px]">
+        <p className="text-sm text-slate-400 dark:text-white/40">{tCommon('state.loading')}</p>
+      </div>
+    );
+  }
+
+  const headingText = props.mode === 'edit' ? t('form.editTitle') : t('form.createTitle');
+  const submitText = props.mode === 'edit' ? t('form.submitUpdate') : t('form.submitCreate');
 
   const contentText = htmlToPlainText(content);
   const contentCharCount = contentText.length;
@@ -137,9 +193,9 @@ export default function PostForm(props: PostFormProps) {
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-[343px] flex-col sm:max-w-[636px] xl:max-w-[768px]">
-      <header className="mb-4 flex h-10 items-center justify-end gap-3 sm:mb-3 sm:justify-between">
-        {/* 모바일은 (main) layout의 Topbar가 페이지명을 표시하므로 중복을 피해 sm 이상에서만 노출 */}
-        <h1 className="hidden truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:block sm:text-2xl">
+      {/* 모바일은 Topbar 우측 슬롯이 액션을 담당하므로 헤더 전체를 sm 이상에서만 노출 */}
+      <header className="hidden h-10 items-center justify-between gap-3 sm:mb-3 sm:flex">
+        <h1 className="truncate text-base font-semibold tracking-[-0.03em] text-slate-800 sm:text-2xl dark:text-white">
           {headingText}
         </h1>
         <div className="flex shrink-0 gap-2">
@@ -149,7 +205,7 @@ export default function PostForm(props: PostFormProps) {
             onClick={handleCancel}
             className="sm:h-10 sm:w-[106px] sm:px-0 sm:py-0 sm:text-base"
           >
-            취소
+            {tCommon('actions.cancel')}
           </Button>
           <Button
             variant="primary"
@@ -169,16 +225,16 @@ export default function PostForm(props: PostFormProps) {
           if ((e.target as HTMLElement).closest('button, input, a, [contenteditable="true"]')) return;
           editorRef.current?.focus();
         }}
-        className="flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
+        className="dark:bg-indigo-dark-300 flex flex-1 flex-col rounded-lg bg-white px-4 py-4 sm:px-[30px] sm:py-8 xl:px-[34px]"
       >
         <PostEditor
           ref={editorRef}
           value={content}
           onChange={setContent}
           onImageClick={handleImageClick}
-          placeholder="이 곳을 통해 내용을 작성해주세요"
+          placeholder={t('form.contentPlaceholder')}
           // Tiptap 내부 .ProseMirror DOM 겨냥: 포커스 outline 제거, tailwind가 지운 ul/ol 마커 복원, Placeholder extension이 박아둔 data-placeholder를 ::before로 실제 표시
-          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 sm:min-h-[600px] sm:pt-5 sm:text-base xl:min-h-[635px] [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
+          contentClassName="prose max-w-none min-h-[552px] pt-6 text-sm text-slate-800 sm:min-h-[600px] sm:pt-5 sm:text-base xl:min-h-[635px] dark:text-white [&_.ProseMirror]:outline-none [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-slate-400 dark:[&_.ProseMirror_p.is-editor-empty:first-child::before]:text-white/40 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none"
           titleSlot={
             <div className="pt-[29px]">
               <div className="flex items-end justify-between gap-3 pb-4 sm:gap-4 sm:pb-6 xl:pb-7">
@@ -187,13 +243,13 @@ export default function PostForm(props: PostFormProps) {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={30}
-                  placeholder="게시물의 제목을 입력해주세요"
-                  aria-label="제목"
-                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl"
+                  placeholder={t('form.titlePlaceholder')}
+                  aria-label={t('form.titleLabel')}
+                  className="min-w-0 flex-1 text-base font-semibold tracking-[-0.03em] text-slate-800 outline-none placeholder:text-slate-400 sm:text-2xl dark:text-white dark:placeholder:text-white/40"
                 />
-                <span className="shrink-0 text-xs text-slate-400 sm:text-sm">{title.length}/30</span>
+                <span className="shrink-0 text-xs text-slate-400 sm:text-sm dark:text-white/40">{title.length}/30</span>
               </div>
-              <div className="border-b border-slate-200" />
+              <div className="border-b border-slate-200 dark:border-white/10" />
             </div>
           }
         />
@@ -210,8 +266,8 @@ export default function PostForm(props: PostFormProps) {
           </div>
         )}
 
-        <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm">
-          공백포함 {contentCharCount}자 | 공백제외 {contentNoSpaceCount}자
+        <div className="mt-auto pt-4 text-right text-xs text-slate-400 sm:text-sm dark:text-white/40">
+          {t('form.charCount', { total: contentCharCount, nonSpace: contentNoSpaceCount })}
         </div>
       </div>
 
@@ -220,12 +276,12 @@ export default function PostForm(props: PostFormProps) {
         type="file"
         accept="image/*"
         className="hidden"
-        aria-label="이미지 파일 선택"
+        aria-label={t('form.imageSelect')}
         onChange={handleFileChange}
       />
 
       <Modal open={isCancelModalOpen} onClose={() => setIsCancelModalOpen(false)} className="h-[178px] sm:h-[250px]">
-        <Modal.Title className="text-center text-base sm:text-xl">게시물 작성을 취소하시겠어요?</Modal.Title>
+        <Modal.Title className="text-center text-base sm:text-xl">{t('form.cancelTitle')}</Modal.Title>
         <p className="mt-1 mb-6 flex items-center justify-center gap-1 text-xs font-medium text-red-500 sm:mb-10 sm:text-base">
           <span
             aria-hidden
@@ -233,12 +289,12 @@ export default function PostForm(props: PostFormProps) {
           >
             !
           </span>
-          작성하신 모든 내용이 사라집니다.
+          {t('form.cancelWarning')}
         </p>
         <Modal.Actions>
-          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">취소</Modal.Cancel>
+          <Modal.Cancel className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]">{tCommon('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm className="h-10 w-[151.5px] sm:h-14 sm:w-[190px]" onClick={() => router.back()}>
-            확인
+            {tCommon('actions.confirm')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>

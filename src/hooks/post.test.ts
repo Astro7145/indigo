@@ -13,6 +13,7 @@ import {
   usePostList,
   useInfinitePostList,
   usePost,
+  usePostSuspense,
   useCreatePost,
   useUpdatePost,
   useDeletePost,
@@ -33,6 +34,13 @@ it('usePostList는 params와 함께 getPosts를 호출한다', async () => {
   const { result } = renderHookWithClient(() => usePostList({ type: 'best' }));
   await waitFor(() => expect(result.current.isSuccess).toBe(true));
   expect(mocked.getPosts).toHaveBeenCalledWith({ type: 'best' });
+});
+
+it('usePostSuspense는 id가 주어지면 getPost를 호출한다', async () => {
+  mocked.getPost.mockResolvedValue({ id: 7 } as never);
+  const { result } = renderHookWithClient(() => usePostSuspense(7));
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(mocked.getPost).toHaveBeenCalledWith(7);
 });
 
 it('usePost는 id가 undefined이면 비활성화된다', () => {

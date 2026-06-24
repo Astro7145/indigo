@@ -12,6 +12,7 @@ import {
   type Ref,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
 
 import Button, { type ButtonProps } from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
@@ -35,6 +36,11 @@ interface ModalProps {
   className?: string;
   children: ReactNode;
   ref?: Ref<HTMLDivElement>;
+  // 아래 3개는 ModalStack이 스택 구동 시 전역 책임을 위임받기 위한 선택적 prop.
+  // 기본값은 단독 사용 시의 현행 동작과 동일하므로 기존 직접 호출부는 영향받지 않는다.
+  active?: boolean; // 최상단(topmost)일 때만 focus trap을 건다
+  zIndex?: number; // 적층 시 z-index를 덮어쓴다 (미지정 시 z-50 클래스 유지)
+  scrollLock?: boolean; // 스택이 scroll lock을 중앙 관리할 땐 false로 끈다
 }
 
 export default function Modal({
@@ -46,7 +52,11 @@ export default function Modal({
   className,
   children,
   ref,
+  active = true,
+  zIndex,
+  scrollLock = true,
 }: ModalProps) {
+  const tCommon = useTranslations('common');
   const [titleId, setTitleId] = useState<string | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,14 +70,22 @@ export default function Modal({
   }, [open, closeOnEsc, onClose]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !scrollLock) return;
     lockScroll();
     return () => unlockScroll();
-  }, [open]);
+  }, [open, scrollLock]);
 
+  // 열림 시 트리거를 기억했다가 "닫힐 때만" 복귀시킨다. active 변화(위에 모달이 더 열려
+  // 비활성화되는 경우)에는 복귀하지 않아야, 배경 페이지로 포커스가 새는 것을 막는다.
   useEffect(() => {
     if (!open) return;
     const trigger = document.activeElement as HTMLElement | null;
+    return () => trigger?.focus();
+  }, [open]);
+
+  // focus trap은 최상단(active)일 때만: 첫 포커서블로 진입시키고 Tab을 내부에 가둔다.
+  useEffect(() => {
+    if (!open || !active) return;
     const container = containerRef.current;
     const getFocusable = () =>
       container
@@ -98,11 +116,8 @@ export default function Modal({
       }
     };
     container?.addEventListener('keydown', onKeyDown);
-    return () => {
-      container?.removeEventListener('keydown', onKeyDown);
-      trigger?.focus();
-    };
-  }, [open]);
+    return () => container?.removeEventListener('keydown', onKeyDown);
+  }, [open, active]);
 
   if (typeof window === 'undefined' || !open) return null;
 
@@ -116,6 +131,7 @@ export default function Modal({
     <ModalContext value={{ close: onClose, setTitleId }}>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        style={zIndex !== undefined ? { zIndex } : undefined}
         onClick={(e) => {
           if (closeOnBackdropClick && e.target === e.currentTarget) onClose();
         }}
@@ -128,7 +144,7 @@ export default function Modal({
           aria-labelledby={titleId}
           tabIndex={-1}
           className={cn(
-            'relative flex max-h-[90dvh] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded bg-white shadow-xl',
+            'dark:bg-indigo-dark-300 relative flex max-h-[90dvh] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded bg-white shadow-xl',
             // 크기는 반응형: 모바일=small(343px) / 데스크탑(sm:≥640px)=large(456px)
             'w-[343px] sm:w-[456px]',
             // padding: 센터 메시지(확인 popup) 비대칭 / 헤더형(제목+X) 대칭, 둘 다 모바일→데스크탑 반응형
@@ -139,8 +155,12 @@ export default function Modal({
           {children}
           {/* 닫기 버튼은 DOM 마지막에 두어 열림 시 포커스가 콘텐츠로 먼저 가도록 한다(시각 위치는 absolute로 우상단 고정) */}
           {showCloseButton && (
-            <IconButton aria-label="닫기" onClick={onClose} className="absolute top-4 right-4 sm:top-8 sm:right-8">
-              <IcDelete aria-hidden="true" className="size-6 text-slate-400" />
+            <IconButton
+              aria-label={tCommon('actions.close')}
+              onClick={onClose}
+              className="absolute top-4 right-4 sm:top-8 sm:right-8"
+            >
+              <IcDelete aria-hidden="true" className="size-6 text-slate-400 dark:text-white/40" />
             </IconButton>
           )}
         </div>
@@ -209,7 +229,7 @@ function ModalTitle({ children, className }: ModalTitleProps) {
   }, [id, setTitleId]);
   // 타이포도 반응형: 모바일 text-sm / 데스크탑 text-xl
   return (
-    <h2 id={id} className={cn('text-sm font-semibold text-slate-800 sm:text-xl', className)}>
+    <h2 id={id} className={cn('text-sm font-semibold text-slate-800 sm:text-xl dark:text-white', className)}>
       {children}
     </h2>
   );

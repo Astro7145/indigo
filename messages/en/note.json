@@ -1,0 +1,60 @@
+{
+  "ariaLabel": "Note",
+  "loadError": "Failed to load the note",
+  "heading": {
+    "create": "Write Note",
+    "edit": "Edit Note",
+    "detail": "Note Details"
+  },
+  "submit": "Submit",
+  "saveDraft": "Save Draft",
+  "titlePlaceholder": "Enter a title for your note",
+  "titleLabel": "Title",
+  "contentPlaceholder": "Start writing your note here",
+  "cancelConfirm": {
+    "create": "Cancel writing this note?",
+    "edit": "Cancel editing this note?"
+  },
+  "draftPrompt": {
+    "title": "You have a saved draft",
+    "description": "Would you like to continue writing it?",
+    "new": "Start New",
+    "load": "Load Draft"
+  },
+  "linkInput": {
+    "title": "Upload Link",
+    "placeholder": "Enter a link",
+    "label": "Link URL",
+    "error": "Please enter a valid URL."
+  },
+  "shareToPost": "Share to Post",
+  "shareToPostTruncatedLine1": "The note content was too long and has been trimmed.",
+  "shareToPostTruncatedLine2": "Please review in the post form.",
+  "metaInfo": {
+    "goal": "Goal",
+    "todo": "To-do",
+    "createdAt": "Created",
+    "tags": "Tag"
+  },
+  "delete": {
+    "warning": "Deleted notes cannot be recovered.",
+    "success": "The note has been deleted.",
+    "error": "Failed to delete the note."
+  },
+  "card": {
+    "linkLabel": "Attached link",
+    "menuLabel": "More options"
+  },
+  "collection": {
+    "title": "All Notes",
+    "searchPlaceholder": "Search notes",
+    "searchLabel": "Search notes",
+    "sort": {
+      "latest": "Newest",
+      "oldest": "Oldest"
+    },
+    "loading": "Loading…",
+    "loadError": "Couldn't load notes",
+    "empty": "No notes yet"
+  }
+}

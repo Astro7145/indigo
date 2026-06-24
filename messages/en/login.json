@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "Sign In",
+    "description": "Sign in to INdigo to manage your todos and goals."
+  },
+  "submit": "Sign In",
+  "submitting": "Signing in...",
+  "signupPrompt": "New to INdigo?",
+  "signupLink": "Sign Up"
+}

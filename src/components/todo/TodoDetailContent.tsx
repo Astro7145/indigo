@@ -1,12 +1,23 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import Badge, { type BadgeColor } from '@/src/components/common/badges/Badge';
+import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Chip from '@/src/components/common/chips/Chip';
-import { IcCalendarOutline, IcDelete, IcFlagOutline, IcLink, IcSpringNote } from '@/src/components/common/icons';
-import { useNoteList } from '@/src/hooks/note';
+import {
+  IcCalendarOutline,
+  IcDelete,
+  IcFlagOutline,
+  IcLink,
+  IcPlus,
+  IcSpringNote,
+} from '@/src/components/common/icons';
+import { useNoteDrawer } from '@/src/hooks/note/useNoteDrawer';
+import { useNoteList } from '@/src/hooks/note/note';
+import { useImageLightbox } from '@/src/hooks/useImageLightbox';
 import type { Todo } from '@/src/types/todo';
 import { formatDotDate } from '@/src/utils/date';
 
@@ -20,15 +31,19 @@ export interface TodoDetailContentProps {
 const TAG_BADGE_COLORS: BadgeColor[] = ['green', 'yellow', 'red', 'purple', 'gray'];
 
 /** 메타 행 라벨(아이콘 + 텍스트)의 공통 회색 텍스트 스타일 */
-const metaLabelClass = 'text-sm font-medium whitespace-nowrap text-slate-400';
+const metaLabelClass = 'text-sm font-medium whitespace-nowrap text-slate-400 dark:text-white/40';
 /** 메타 행 값 텍스트 스타일 */
-const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700';
+const metaValueClass = 'min-w-0 flex-1 text-sm text-slate-700 dark:text-white';
 /** 섹션 제목 스타일 (모바일 sm → 데스크탑 base) */
-const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base';
+const sectionTitleClass = 'text-sm font-semibold text-slate-700 sm:text-base dark:text-white';
 
 export default function TodoDetailContent({ todo, onClose }: TodoDetailContentProps) {
+  const { openNote } = useNoteDrawer();
+  const tCommon = useTranslations('common');
+  const tTodos = useTranslations('todos');
   const dueDate = formatDotDate(todo.dueDate);
   const hasAttachment = Boolean(todo.linkUrl || todo.fileUrl);
+  const openImageLightbox = useImageLightbox();
 
   // 타입상 noteIds는 number[]지만 백엔드 누락/null 방어. 노트가 없으면 요청도 생략.
   const hasNotes = (todo.noteIds?.length ?? 0) > 0;
@@ -40,13 +55,13 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
       {/* 헤더: 제목 + 상태 칩 + 닫기 */}
       <div className="flex items-center justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <h2 className="text-base font-semibold tracking-[-0.48px] text-slate-800 sm:text-xl sm:leading-[30px] sm:tracking-[-0.6px]">
+          <h2 className="text-base font-semibold tracking-[-0.48px] text-slate-800 sm:text-xl sm:leading-[30px] sm:tracking-[-0.6px] dark:text-white">
             {todo.title}
           </h2>
           <Chip type={todo.done ? 'done' : 'todo'} className="shrink-0" />
         </div>
-        <IconButton aria-label="닫기" onClick={onClose} className="shrink-0">
-          <IcDelete aria-hidden className="size-6 text-slate-400" />
+        <IconButton aria-label={tCommon('actions.close')} onClick={onClose} className="shrink-0">
+          <IcDelete aria-hidden className="size-6 text-slate-400 dark:text-white/40" />
         </IconButton>
       </div>
 
@@ -55,8 +70,8 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         {todo.goal && (
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
-              <IcFlagOutline aria-hidden size="small" className="size-[18px] text-slate-400" />
-              <span className={metaLabelClass}>목표</span>
+              <IcFlagOutline aria-hidden size="small" className="size-[18px] text-slate-400 dark:text-white/40" />
+              <span className={metaLabelClass}>{tTodos('fields.goal')}</span>
             </div>
             <p className={metaValueClass}>{todo.goal.title}</p>
           </div>
@@ -65,8 +80,8 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
         {dueDate && (
           <div className="flex w-full items-center gap-2">
             <div className="flex shrink-0 items-center gap-1">
-              <IcCalendarOutline aria-hidden className="size-[18px] text-slate-400" />
-              <span className={metaLabelClass}>마감기한</span>
+              <IcCalendarOutline aria-hidden className="size-[18px] text-slate-400 dark:text-white/40" />
+              <span className={metaLabelClass}>{tTodos('fields.dueDate')}</span>
             </div>
             <p className={metaValueClass}>{dueDate}</p>
           </div>
@@ -74,9 +89,9 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
 
         {todo.tags.length > 0 && (
           <div className="flex w-full items-start gap-2">
-            <div className="flex shrink-0 items-center gap-1 text-slate-400">
+            <div className="flex shrink-0 items-center gap-1 text-slate-400 dark:text-white/40">
               <span className="w-[17px] text-center text-base font-semibold">#</span>
-              <span className="text-sm font-medium whitespace-nowrap">태그</span>
+              <span className="text-sm font-medium whitespace-nowrap">{tTodos('fields.tag')}</span>
             </div>
             <div className="flex min-w-0 flex-1 flex-wrap gap-1">
               {todo.tags.map((tag, i) => (
@@ -92,7 +107,7 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
       {/* 첨부자료 (링크/이미지 둘 다 없으면 섹션 생략) */}
       {hasAttachment && (
         <section className="flex w-full flex-col gap-2">
-          <h3 className={sectionTitleClass}>첨부자료</h3>
+          <h3 className={sectionTitleClass}>{tTodos('detail.attachment')}</h3>
           <div className="flex flex-col gap-3">
             {todo.linkUrl && (
               <a
@@ -101,38 +116,65 @@ export default function TodoDetailContent({ todo, onClose }: TodoDetailContentPr
                 rel="noopener noreferrer"
                 className="flex w-full items-start gap-1 hover:underline"
               >
-                <IcLink aria-hidden className="size-6 shrink-0 text-slate-500" />
-                <span className="min-w-0 flex-1 text-base break-all text-slate-700">{todo.linkUrl}</span>
+                <IcLink aria-hidden className="size-6 shrink-0 text-slate-500 dark:text-white/60" />
+                <span className="min-w-0 flex-1 text-base break-all text-slate-700 dark:text-white">
+                  {todo.linkUrl}
+                </span>
               </a>
             )}
             {todo.fileUrl && (
-              <div className="relative aspect-[408/223] w-full overflow-hidden rounded-[4px] border border-slate-200">
-                <Image src={todo.fileUrl} alt="첨부 이미지" fill className="object-cover" />
-              </div>
+              <button
+                type="button"
+                onClick={() => openImageLightbox(todo.fileUrl!, todo.title)}
+                aria-label={tCommon('image.attachmentAlt')}
+                className="relative block aspect-[408/223] w-full cursor-pointer overflow-hidden rounded-[4px] border border-slate-200 dark:border-white/10"
+              >
+                <Image src={todo.fileUrl} alt={tCommon('image.attachmentAlt')} fill className="object-cover" />
+              </button>
             )}
           </div>
         </section>
       )}
 
-      {/* 작성된 노트 (없으면 섹션 생략) */}
-      {notes.length > 0 && (
+      {/* 작성된 노트 / 노트 없을 때 추가 버튼 */}
+      {!hasNotes ? (
+        <Button
+          size="small"
+          startIcon={<IcPlus aria-hidden className="size-5 text-white" />}
+          onClick={() => {
+            onClose();
+            openNote(todo.id, 'write');
+          }}
+        >
+          노트 추가하기
+        </Button>
+      ) : (
         <section className="flex w-full flex-col gap-2">
-          <h3 className={sectionTitleClass}>작성된 노트</h3>
-          <ul className="flex flex-col gap-2">
-            {notes.map((note) => (
-              <li key={note.id}>
-                <button
-                  type="button"
-                  // 노트 수정 라우트 미정 — 라우트 생기면 router.push(`/notes/${note.id}`)로 연결.
-                  onClick={() => {}}
-                  className="flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50"
-                >
-                  <IcSpringNote aria-hidden className="size-8 shrink-0" />
-                  <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700">{note.title}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          <h3 className={sectionTitleClass}>{tTodos('detail.notes')}</h3>
+          {notes.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {notes.map((note) => (
+                <li key={note.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      openNote(todo.id, 'detail');
+                    }}
+                    className="dark:bg-indigo-dark-400 dark:hover:bg-indigo-dark-500 flex w-full items-center gap-2 rounded-[4px] border border-slate-200 bg-white p-4 text-left transition-colors hover:bg-slate-50 dark:border-white/10"
+                  >
+                    <IcSpringNote aria-hidden className="size-8 shrink-0" />
+                    <span className="min-w-0 flex-1 truncate text-base font-medium text-slate-700 dark:text-white">
+                      {note.title}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            // 로딩 중: 노트가 들어올 자리를 미리 확보해 시프트 방지 (노트 1개 높이 ≈ 64px)
+            <div className="min-h-16" aria-hidden />
+          )}
         </section>
       )}
     </div>

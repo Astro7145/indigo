@@ -38,7 +38,7 @@ export default function Calendar(props: CalendarProps) {
         >
           <IcChevron direction="left" />
         </IconButton>
-        <h2 className="text-sm font-semibold tracking-[-0.42px] text-slate-700">{title}</h2>
+        <h2 className="text-sm font-semibold tracking-[-0.42px] text-slate-700 dark:text-white">{title}</h2>
         <IconButton
           {...nextDomProps}
           ref={nextRef}

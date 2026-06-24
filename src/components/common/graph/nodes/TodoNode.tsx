@@ -1,0 +1,54 @@
+'use client';
+
+import { useState } from 'react';
+import { Billboard, Html, useCursor } from '@react-three/drei';
+import type { ThreeEvent } from '@react-three/fiber';
+import { Color } from 'three';
+import { getGraphColors } from '@/src/components/common/graph/palette';
+
+interface TodoNodeProps {
+  title: string;
+  done: boolean;
+  /** 모바일이면 라벨을 노드 위로(부모 GraphScene에서 한 번만 판정해 내려준다). */
+  isMobile: boolean;
+  /** true면 호버와 무관하게 라벨을 항상 표시('할일 이름 보기' 토글). */
+  showLabel: boolean;
+  /** 드래그 시작(부모가 이동/탭 구분을 처리). */
+  onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
+}
+
+/** 할일 = 작은 발광 구. 완료(Done)면 밝게, 미완료(Todo)면 어둡게. 끌어서 이동, 짧게 탭하면 상세 시트(부모가 처리). */
+export default function TodoNode({ title, done, isMobile, showLabel, onPointerDown }: TodoNodeProps) {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered, 'grab'); // 언마운트 시 커서 정리까지 drei가 처리
+  const colors = getGraphColors();
+  // done이면 밝게(발광↑), 미완료면 어둡게.
+  const color = new Color(colors.todo).multiplyScalar(done ? 1.3 : 0.1);
+
+  const over = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    setHovered(true);
+  };
+  const out = () => setHovered(false);
+
+  return (
+    <>
+      <mesh scale={hovered ? 0.5 : 0.38} onPointerOver={over} onPointerOut={out} onPointerDown={onPointerDown}>
+        <sphereGeometry args={[1, 20, 20]} />
+        <meshBasicMaterial color={color} toneMapped={false} />
+      </mesh>
+      {(hovered || showLabel) && (
+        // 라벨을 노드 아래에 띄운다 — Billboard로 '아래(−Y)'가 카메라 각도와 무관하게 늘 화면 아래로 향한다.
+        // 모바일에선 터치하는 손가락이 노드 아래를 가리므로 위(+Y)로 띄운다.
+        // zIndexRange로 라벨 z-index를 0~20으로 묶는다 — 목표 라벨(20~35)·사이드바(40) 아래.
+        <Billboard>
+          <Html center position={[0, isMobile ? 0.8 : -0.8, 0]} zIndexRange={[20, 0]} className="pointer-events-none">
+            <span className="bg-indigo-alpha-30 rounded px-2 py-1 text-xs whitespace-nowrap text-indigo-100">
+              {title}
+            </span>
+          </Html>
+        </Billboard>
+      )}
+    </>
+  );
+}

@@ -1,28 +1,92 @@
+import { useEffect } from 'react';
 import {
+  queryOptions,
   useQuery,
-  useInfiniteQuery,
+  useSuspenseQuery,
+  useSuspenseInfiniteQuery,
   useMutation,
   useQueryClient,
   skipToken,
   type QueryClient,
   type QueryKey,
 } from '@tanstack/react-query';
-import { todoKeys, getTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
+import { todoKeys, getTodos, getAllTodos, getTodo, createTodo, patchTodo, deleteTodo } from '@/src/api/todo';
 import { favoriteKeys } from '@/src/api/favorite';
 import { goalKeys } from '@/src/api/goal';
 import type { Todo, TodoListParams, TodoListResponse, CreateTodoBody, UpdateTodoBody } from '@/src/types/todo';
 import type { ApiError } from '@/src/types/common';
 
-export function useTodoList(params: TodoListParams = {}, enabled = true) {
+/**
+ * limit이 지정되면 그 한 페이지만(예: RecentTodos 최신 4개), 없으면 커서 끝까지 따라가 전부 합친다
+ * (예: 목표 보드의 To Do/Done 컬럼 완전성 — useAllTodos와 동일 결).
+ */
+export function useTodoList(params: TodoListParams = {}) {
+  return useSuspenseQuery<TodoListResponse, ApiError>({
+    queryKey: todoKeys.list(params),
+    queryFn: () => (params.limit == null ? getAllTodos(params) : getTodos(params)),
+  });
+}
+
+/**
+ * 비-suspense 변형. prefetch 없이 클라이언트에서만 페칭하는 화면(대시보드 GoalTodoBoard)용 —
+ * useSuspenseQuery는 SSR 중에도 fetch해 브라우저 전용 client-fetcher가 서버에서 터지지만(Invalid URL),
+ * useQuery는 SSR에서 fetch하지 않아 서버 렌더가 안전하다. 키·fetcher는 useTodoList와 동일.
+ */
+export function useTodoListQuery(params: TodoListParams = {}) {
   return useQuery<TodoListResponse, ApiError>({
+    queryKey: todoKeys.list(params),
+    queryFn: () => (params.limit == null ? getAllTodos(params) : getTodos(params)),
+  });
+}
+
+/**
+ * 전체 할일을 커서 끝까지 1스윕으로 불러온다(그래프 등 전수 조회용).
+ * 키는 useGoalList의 'all'과 같은 결로 lists() 아래 'all'에 고정한다.
+ */
+export function useAllTodos() {
+  return useQuery<TodoListResponse, ApiError>({
+    queryKey: [...todoKeys.lists(), 'all'],
+    queryFn: () => getAllTodos({}),
+  });
+}
+
+/** 마감일 범위(KST, YYYY-MM-DD) 쿼리 옵션 — suspense 훅과 프리페치가 키·fetcher를 공유한다. */
+function todosInRangeOptions(from: string, to: string) {
+  return queryOptions<TodoListResponse, ApiError>({
+    queryKey: [...todoKeys.lists(), 'range', { from, to }] as QueryKey,
+    queryFn: () => getAllTodos({ from, to }),
+  });
+}
+
+/** 캘린더 등 기간 단위 화면용 — 범위 내에서도 커서를 끝까지 따라가 완전성을 보장한다. */
+export function useTodosInRange(from: string, to: string) {
+  return useSuspenseQuery(todosInRangeOptions(from, to));
+}
+
+/** 주어진 범위들을 백그라운드 프리페치 — 캘린더 월 이동 시 suspense 깜빡임을 줄인다. */
+export function usePrefetchTodosInRange(ranges: { from: string; to: string }[]) {
+  const qc = useQueryClient();
+  const rangesKey = ranges.map((r) => `${r.from}~${r.to}`).join(',');
+  useEffect(() => {
+    ranges.forEach((r) => qc.prefetchQuery(todosInRangeOptions(r.from, r.to)));
+    // ranges 배열은 렌더마다 새로 만들어지므로 내용 키로 비교한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qc, rangesKey]);
+}
+
+/** GNB 타이틀 등 비-suspense·조건부 맥락에서 총 개수만 조회한다(해당 route 진입 시에만 fetch).
+ * done 등 필터를 받아 데스크탑 헤더의 탭별 서버 카운트와 같은 숫자를 보게 한다. */
+export function useTodoCount(enabled: boolean, params: Pick<TodoListParams, 'done'> = {}) {
+  return useQuery<TodoListResponse, ApiError, number>({
     queryKey: todoKeys.list(params),
     queryFn: () => getTodos(params),
     enabled,
+    select: (data) => data.totalCount,
   });
 }
 
 export function useInfiniteTodoList(params: Omit<TodoListParams, 'cursor'> = {}) {
-  return useInfiniteQuery<TodoListResponse, ApiError>({
+  return useSuspenseInfiniteQuery<TodoListResponse, ApiError>({
     queryKey: [...todoKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => getTodos({ ...params, cursor: pageParam as number | undefined }),
     initialPageParam: undefined as number | undefined,

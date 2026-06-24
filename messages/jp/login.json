@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "ログイン",
+    "description": "INdigoにログインして、TODOと目標を管理しましょう。"
+  },
+  "submit": "ログインする",
+  "submitting": "ログイン中...",
+  "signupPrompt": "INdigoは初めてですか？",
+  "signupLink": "会員登録"
+}

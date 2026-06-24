@@ -1,5 +1,6 @@
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(() => ({ back: jest.fn(), push: jest.fn() })),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
 }));
 
 jest.mock('@/src/api/post', () => ({

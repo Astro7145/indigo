@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "title": "Sign Up",
+    "description": "Create your INdigo account and start your productivity journey."
+  },
+  "submit": "Sign Up",
+  "submitting": "Processing...",
+  "loginPrompt": "Already a member?",
+  "loginLink": "Sign In",
+  "passwordConfirmLabel": "Confirm Password",
+  "passwordConfirmPlaceholder": "Re-enter your password",
+  "nicknameTaken": "This nickname is already in use.",
+  "completeAlert": "Sign up completed successfully."
+}

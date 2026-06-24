@@ -1,0 +1,60 @@
+{
+  "ariaLabel": "노트",
+  "loadError": "노트를 불러오지 못했어요",
+  "heading": {
+    "create": "노트 작성",
+    "edit": "노트 수정",
+    "detail": "노트 상세"
+  },
+  "submit": "등록하기",
+  "saveDraft": "임시저장",
+  "titlePlaceholder": "노트의 제목을 입력해주세요",
+  "titleLabel": "제목",
+  "contentPlaceholder": "이 곳을 통해 노트 작성을 시작해주세요",
+  "cancelConfirm": {
+    "create": "노트 작성을 취소하시겠어요?",
+    "edit": "노트 수정을 취소하시겠어요?"
+  },
+  "draftPrompt": {
+    "title": "임시 저장된 노트가 있어요",
+    "description": "이어서 작성하시겠어요?",
+    "new": "새로 쓰기",
+    "load": "불러오기"
+  },
+  "linkInput": {
+    "title": "링크 업로드",
+    "placeholder": "링크를 입력해주세요",
+    "label": "링크 URL",
+    "error": "올바른 URL을 입력해주세요."
+  },
+  "shareToPost": "게시글로 공유",
+  "shareToPostTruncatedLine1": "노트 내용이 길어 일부가 잘렸어요.",
+  "shareToPostTruncatedLine2": "작성 폼에서 확인해주세요.",
+  "metaInfo": {
+    "goal": "목표",
+    "todo": "할 일",
+    "createdAt": "작성일",
+    "tags": "태그"
+  },
+  "delete": {
+    "warning": "삭제된 노트는 복구할 수 없습니다.",
+    "success": "노트가 삭제되었습니다.",
+    "error": "노트 삭제에 실패했습니다."
+  },
+  "card": {
+    "linkLabel": "첨부 링크",
+    "menuLabel": "더보기 메뉴"
+  },
+  "collection": {
+    "title": "노트 모아보기",
+    "searchPlaceholder": "노트를 검색해주세요",
+    "searchLabel": "노트 검색",
+    "sort": {
+      "latest": "최신순",
+      "oldest": "오래된순"
+    },
+    "loading": "불러오는 중…",
+    "loadError": "불러오지 못했어요",
+    "empty": "노트가 아직 없어요"
+  }
+}

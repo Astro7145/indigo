@@ -1,6 +1,11 @@
+import { useTranslations } from 'next-intl';
+
 import { cn } from '@/src/utils/cn';
 
 export type CategoryTabLabel = 'ALL' | 'TO DO' | 'DONE';
+
+// label(semantic 값) → common.tabs 번역 키
+const TAB_KEYS = { ALL: 'all', 'TO DO': 'todo', DONE: 'done' } as const;
 
 interface CategoryTabProps {
   label: CategoryTabLabel;
@@ -23,6 +28,8 @@ interface CategoryTabProps {
  * <CategoryTab label="DONE" onClick={() => setFilter('done')} />
  */
 export default function CategoryTab({ label, isActive = false, onClick, className }: CategoryTabProps) {
+  const tCommon = useTranslations('common');
+
   return (
     <button
       type="button"
@@ -30,11 +37,13 @@ export default function CategoryTab({ label, isActive = false, onClick, classNam
       aria-pressed={isActive}
       className={cn(
         'cursor-pointer rounded-[4px] px-4 py-2 text-base font-bold tracking-[-0.03em] transition-colors',
-        isActive ? 'bg-indigo-700/20 text-indigo-600' : 'text-[#8b8b8b]', // ⚠️ 디자인 토큰 미등록 — globals.css 추가 검토 필요
+        isActive
+          ? 'dark:bg-indigo-dark-500/40 dark:text-indigo-dark-900 bg-indigo-700/20 text-indigo-600'
+          : 'text-slate-400 dark:text-white/50',
         className,
       )}
     >
-      {label}
+      {tCommon(`tabs.${TAB_KEYS[label]}`)}
     </button>
   );
 }

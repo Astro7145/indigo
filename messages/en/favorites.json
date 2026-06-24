@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "Favorites",
+    "description": "Find all your favorite todos collected in one place."
+  },
+  "title": "Favorites",
+  "empty": "No favorite todos yet",
+  "goalFilter": {
+    "all": "All Goals"
+  }
+}

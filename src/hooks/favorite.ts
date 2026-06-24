@@ -1,15 +1,36 @@
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query';
+import {
+  useQuery,
+  useSuspenseQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  type QueryKey,
+} from '@tanstack/react-query';
 import { todoKeys } from '@/src/api/todo';
 import { patchTodoInCaches } from '@/src/hooks/todo';
 import { favoriteKeys, addTodoFavorite, removeTodoFavorite, getFavoriteTodos } from '@/src/api/favorite';
+import { filterFavorites, type FavoritesTab } from '@/src/components/favorite/favoritesTab';
 import type { FavoriteTodo, FavoriteTodoListResponse } from '@/src/types/favorite';
 import type { CursorParams, ApiError } from '@/src/types/common';
 
-export function useFavoriteTodoList(params: CursorParams = {}, enabled = true) {
-  return useQuery<FavoriteTodoListResponse, ApiError>({
+export function useFavoriteTodoList(params: CursorParams = {}) {
+  return useSuspenseQuery<FavoriteTodoListResponse, ApiError>({
     queryKey: favoriteKeys.list(params),
     queryFn: () => getFavoriteTodos(params),
+  });
+}
+
+/**
+ * GNB 타이틀 등 비-suspense·조건부 맥락에서 개수만 조회한다(해당 route 진입 시에만 fetch).
+ * FavoritesView의 목록 쿼리({limit:100})와 키를 공유해 추가 요청 없이 같은 데이터를 보고,
+ * 데스크탑 헤더와 동일하게 탭·목표로 필터한 개수를 센다.
+ */
+export function useFavoriteCount(enabled: boolean, tab: FavoritesTab = 'all', goalId: number | null = null) {
+  return useQuery<FavoriteTodoListResponse, ApiError, number>({
+    queryKey: favoriteKeys.list({ limit: 100 }),
+    queryFn: () => getFavoriteTodos({ limit: 100 }),
     enabled,
+    select: (data) => filterFavorites(data.favorites, tab, goalId).length,
   });
 }
 

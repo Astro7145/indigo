@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 
 import SidebarGoalRow from '@/src/components/common/sidebar/SidebarGoalRow';
-import { useCreateGoal, useInfiniteGoalList } from '@/src/hooks/goal';
+import { useCreateGoal, useGoalList } from '@/src/hooks/goal';
 import { useToast } from '@/src/hooks/useToast';
 
 export interface GoalSidebarListProps {
@@ -22,10 +22,11 @@ export default function GoalSidebarList({ collapsed, onExpand, onSelected }: Goa
   const pathname = usePathname();
   const { showToast } = useToast();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } = useInfiniteGoalList();
+  // 목표는 전체('all' 키)를 한 번에 받는다 — 대시보드(ProgressCard·목표 별 할일)와 같은 캐시를 공유한다.
+  const { data, isLoading, isError } = useGoalList();
   const create = useCreateGoal();
 
-  const goals = data?.pages.flatMap((p) => p.goals) ?? [];
+  const goals = data?.goals ?? [];
 
   // /goals/[id] 경로에서 현재 목표 id 도출(목록 항목 강조용)
   const match = pathname?.match(/^\/goals\/(\d+)/);
@@ -48,10 +49,6 @@ export default function GoalSidebarList({ collapsed, onExpand, onSelected }: Goa
       currentGoalId={currentGoalId}
       isLoading={isLoading}
       isError={isError}
-      hasNextPage={hasNextPage}
-      onLoadMore={() => {
-        if (!isFetchingNextPage) fetchNextPage();
-      }}
       onCreateGoal={handleCreate}
       onSelectGoal={handleSelect}
       onExpand={onExpand}

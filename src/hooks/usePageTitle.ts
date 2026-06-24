@@ -1,9 +1,12 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { parseFavoritesTab, parseGoalId } from '@/src/components/favorite/favoritesTab';
+import { parseTodosTab, todosListParams } from '@/src/components/todo/todosTab';
 import { useMe } from '@/src/hooks/user';
-import { useTodoList } from '@/src/hooks/todo';
-import { useFavoriteTodoList } from '@/src/hooks/favorite';
+import { useTodoCount } from '@/src/hooks/todo';
+import { useFavoriteCount } from '@/src/hooks/favorite';
 
 type RouteKey =
   | 'dashboard'
@@ -29,6 +32,8 @@ function matchRoute(pathname: string): RouteKey | null {
   if (pathname === '/posts/write') return 'posts-write';
   if (/^\/posts\/[^/]+\/edit$/.test(pathname)) return 'posts-edit';
   if (pathname === '/posts') return 'posts';
+  // 게시물 상세(/posts/:id)도 메뉴 컨텍스트 유지를 위해 "소통 게시판"으로 표시
+  if (/^\/posts\/[^/]+$/.test(pathname)) return 'posts';
   if (pathname === '/favorites') return 'favorites';
   if (pathname === '/calendar') return 'calendar';
   if (pathname === '/me') return 'me';
@@ -38,38 +43,54 @@ function matchRoute(pathname: string): RouteKey | null {
 export function usePageTitle(): string {
   const pathname = usePathname();
   const route = matchRoute(pathname);
+  const tCalendar = useTranslations('calendar');
+  const tDashboard = useTranslations('dashboard');
+  const tFavorites = useTranslations('favorites');
+  const tGoals = useTranslations('goals');
+  const tMe = useTranslations('me');
+  const tPosts = useTranslations('posts');
+  const tTodos = useTranslations('todos');
 
   const { data: user } = useMe();
   const name = user?.name ?? '';
 
-  const { data: todoData } = useTodoList({}, route === 'todos');
-  const { data: favoriteData } = useFavoriteTodoList({}, route === 'favorites');
+  // 카운트는 데스크탑/태블릿 헤더와 동일하게 현재 필터(?tab=·?goalId=) 기준 —
+  // 페이지의 셸로우 동기화(replaceState)를 Next가 useSearchParams에 반영해 필터 전환 시 함께 갱신된다.
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab') ?? undefined;
+  const { data: todoCount } = useTodoCount(route === 'todos', { done: todosListParams(parseTodosTab(tabParam)).done });
+  const { data: favoriteCount } = useFavoriteCount(
+    route === 'favorites',
+    parseFavoritesTab(tabParam),
+    parseGoalId(searchParams.get('goalId')),
+  );
 
   switch (route) {
     case 'dashboard':
-      return `${name}님의 대시보드`;
+      // DashboardTitle과 동일하게 이름 + 접미사(title) 조합
+      return `${name}${tDashboard('title')}`;
     case 'todos':
-      return todoData ? `모든 할일 ${todoData.totalCount}` : '모든 할일';
+      return todoCount != null ? `${tTodos('title')} ${todoCount}` : tTodos('title');
     case 'notes-write':
-      return '노트 작성하기';
+      return tGoals('note.createTitle');
     case 'notes-edit':
-      return '노트 수정하기';
+      return tGoals('note.editTitle');
     case 'goal':
-      return `${name}님의 목표`;
+      return tGoals('title', { name });
     case 'goal-notes':
-      return '노트 모아보기';
+      return tGoals('note.collectTitle');
     case 'posts-write':
-      return '게시물 작성하기';
+      return tPosts('form.createTitle');
     case 'posts-edit':
-      return '게시물 수정하기';
+      return tPosts('form.editTitle');
     case 'posts':
-      return '소통 게시판';
+      return tPosts('title');
     case 'favorites':
-      return favoriteData ? `찜한 할일 ${favoriteData.totalCount}` : '찜한 할일';
+      return favoriteCount != null ? `${tFavorites('title')} ${favoriteCount}` : tFavorites('title');
     case 'calendar':
-      return `${name}님의 캘린더`;
+      return tCalendar('title', { name });
     case 'me':
-      return '내 정보 관리';
+      return tMe('title');
     default:
       return '';
   }

@@ -1,0 +1,60 @@
+{
+  "ariaLabel": "ノート",
+  "loadError": "ノートを読み込めませんでした",
+  "heading": {
+    "create": "ノート作成",
+    "edit": "ノート編集",
+    "detail": "ノート詳細"
+  },
+  "submit": "登録する",
+  "saveDraft": "一時保存",
+  "titlePlaceholder": "ノートのタイトルを入力してください",
+  "titleLabel": "タイトル",
+  "contentPlaceholder": "ここからノートの作成を始めてください",
+  "cancelConfirm": {
+    "create": "ノートの作成をキャンセルしますか？",
+    "edit": "ノートの編集をキャンセルしますか？"
+  },
+  "draftPrompt": {
+    "title": "一時保存されたノートがあります",
+    "description": "続けて作成しますか？",
+    "new": "新しく作成",
+    "load": "読み込む"
+  },
+  "linkInput": {
+    "title": "リンクをアップロード",
+    "placeholder": "リンクを入力してください",
+    "label": "リンクURL",
+    "error": "正しいURLを入力してください。"
+  },
+  "shareToPost": "投稿としてシェア",
+  "shareToPostTruncatedLine1": "ノートの内容が長すぎたため、一部が切り取られました。",
+  "shareToPostTruncatedLine2": "投稿フォームで確認してください。",
+  "metaInfo": {
+    "goal": "目標",
+    "todo": "To-do",
+    "createdAt": "作成日",
+    "tags": "タグ"
+  },
+  "delete": {
+    "warning": "削除されたノートは復元できません。",
+    "success": "ノートを削除しました。",
+    "error": "ノートの削除に失敗しました。"
+  },
+  "card": {
+    "linkLabel": "添付リンク",
+    "menuLabel": "その他メニュー"
+  },
+  "collection": {
+    "title": "ノート一覧",
+    "searchPlaceholder": "ノートを検索してください",
+    "searchLabel": "ノート検索",
+    "sort": {
+      "latest": "新しい順",
+      "oldest": "古い順"
+    },
+    "loading": "読み込み中…",
+    "loadError": "読み込めませんでした",
+    "empty": "ノートがまだありません"
+  }
+}

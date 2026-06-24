@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "title": "Posts",
+    "description": "Communicate freely with your team and share ideas.",
+    "write": {
+      "title": "Write Post",
+      "description": "Write a new post and share it with your team."
+    },
+    "detail": {
+      "title": "Post",
+      "description": "View the post and join the conversation in comments."
+    },
+    "edit": {
+      "title": "Edit Post",
+      "description": "Edit the post you wrote."
+    }
+  },
+  "title": "Posts",
+  "viewCount": "Views {count}",
+  "commentCount": "{count} comments",
+  "empty": "No posts yet.",
+  "loadError": "Failed to load posts.",
+  "loadMoreError": "Failed to load more.",
+  "searchPlaceholder": "Search posts",
+  "searchLabel": "Search posts",
+  "sortLatest": "Latest",
+  "sortPopular": "Popular",
+  "detail": {
+    "deleteTitle": "Delete this post?",
+    "deleteError": "Failed to delete post."
+  },
+  "form": {
+    "createTitle": "Write Post",
+    "editTitle": "Edit Post",
+    "submitCreate": "Register",
+    "submitUpdate": "Update",
+    "submitCreateShort": "Create",
+    "submitUpdateShort": "Update",
+    "titlePlaceholder": "Enter post title",
+    "titleLabel": "Title",
+    "contentPlaceholder": "Write your content here",
+    "imageSelect": "Select image file",
+    "imageAlt": "Attached image",
+    "imageDeleteLabel": "Remove image",
+    "charCount": "{total} chars (w/ spaces) | {nonSpace} chars (w/o spaces)",
+    "cancelTitle": "Cancel writing post?",
+    "cancelWarning": "All content you've written will be lost.",
+    "createError": "Failed to create post.",
+    "updateError": "Failed to update post."
+  },
+  "comment": {
+    "title": "Comments",
+    "empty": "No comments yet. Be the first to comment!",
+    "placeholder": "Enter a comment.",
+    "inputLabel": "Comment input",
+    "submit": "Submit",
+    "mine": "My comment",
+    "editLabel": "Edit comment",
+    "deleteTitle": "Delete this comment?",
+    "createError": "Failed to create comment.",
+    "updateError": "Failed to update comment.",
+    "deleteError": "Failed to delete comment.",
+    "loadMore": "Load {count} more comments",
+    "like": "Like",
+    "unlike": "Unlike",
+    "likeError": "Failed to like.",
+    "unlikeError": "Failed to unlike.",
+    "reply": "Reply",
+    "showReplies": "View {count} replies",
+    "hideReplies": "Hide replies",
+    "replyPlaceholder": "Enter a reply.",
+    "replyInputLabel": "Reply input",
+    "replyLoading": "Loading replies…",
+    "replyCreateError": "Failed to post reply.",
+    "loadError": "Failed to load comments."
+  }
+}

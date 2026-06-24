@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Dashboard",
+    "description": "See today's todos and your goal progress at a glance."
+  },
+  "title": "'s Dashboard",
+  "recentTodos": {
+    "title": "Recent TODOs",
+    "empty": "No recent todos"
+  },
+  "goalTodos": {
+    "title": "TODOs by Goal",
+    "empty": "No goals registered",
+    "boardEmpty": "No todos yet",
+    "progressLabel": "{title} Progress",
+    "sort": {
+      "label": "Sort",
+      "latest": "Newest",
+      "oldest": "Oldest",
+      "progressHigh": "Most progress",
+      "progressLow": "Least progress"
+    }
+  },
+  "progress": {
+    "header": "My Progress",
+    "body": "{name}\u0027s progress is"
+  },
+  "graph": {
+    "showGoalNames": "Show goal names",
+    "showTodoNames": "Show TODO names",
+    "noteName": "Note"
+  }
+}

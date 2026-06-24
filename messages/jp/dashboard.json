@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "ダッシュボード",
+    "description": "今日のTODOと目標の進捗をひと目で確認できます。"
+  },
+  "title": "さんのダッシュボード",
+  "recentTodos": {
+    "title": "最近登録したTODO",
+    "empty": "最近登録したTODOがありません"
+  },
+  "goalTodos": {
+    "title": "目標別のTODO",
+    "empty": "登録した目標がありません",
+    "boardEmpty": "まだTODOがありません",
+    "progressLabel": "{title} の進捗",
+    "sort": {
+      "label": "並び替え",
+      "latest": "新しい順",
+      "oldest": "古い順",
+      "progressHigh": "進捗が高い順",
+      "progressLow": "進捗が低い順"
+    }
+  },
+  "progress": {
+    "header": "私の進捗状況",
+    "body": "{name}さんの進捗は"
+  },
+  "graph": {
+    "showGoalNames": "目標名を表示",
+    "showTodoNames": "TODO名を表示",
+    "noteName": "ノート"
+  }
+}

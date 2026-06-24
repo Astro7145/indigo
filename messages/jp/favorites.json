@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "お気に入り",
+    "description": "お気に入りのTODOをまとめて確認できます。"
+  },
+  "title": "お気に入りのTODO",
+  "empty": "まだお気に入りのTODOがありません",
+  "goalFilter": {
+    "all": "すべての目標"
+  }
+}

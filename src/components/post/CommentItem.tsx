@@ -1,31 +1,79 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type KeyboardEvent } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import Button from '@/src/components/common/buttons/Button';
 import IconButton from '@/src/components/common/buttons/IconButton';
 import Dropdown from '@/src/components/common/dropdown/Dropdown';
 import { IcMeetballs } from '@/src/components/common/icons/IcMeetballs';
 import { IcProfileYellow } from '@/src/components/common/icons/IcProfileYellow';
+import { IcThumbUp } from '@/src/components/common/icons/IcThumbUp';
 import Modal from '@/src/components/common/modal/Modal';
-import { useDeleteComment, useUpdateComment } from '@/src/hooks/comment';
+import { useComments, useDeleteComment, useLikeComment, useUnlikeComment, useUpdateComment } from '@/src/hooks/comment';
 import { useToast } from '@/src/hooks/useToast';
 import type { Comment } from '@/src/types/comment';
+import { cn } from '@/src/utils/cn';
+
+import CommentInput from './CommentInput';
 
 interface CommentItemProps {
   comment: Comment;
   postId: number;
   isMine?: boolean;
+  // 자식(대댓글)의 isMine 계산용으로 상위에서 주입 — 각 아이템이 useMe()를 따로 구독하지 않게 함
+  currentUserId?: number;
+  // 자식(대댓글) 렌더 여부. true면 답글 보기/달기 UI 숨겨서 깊이 1단계로 제한
+  isReply?: boolean;
+  repliesOpen?: boolean;
+  onRepliesOpenChange?: (open: boolean) => void;
+  onReplyClick?: (commentId: number) => void;
+  // 상위가 보유한 "현재 답글 작성 중 대상 댓글 id". 자기 id와 같으면 답글 입력창을 인라인 렌더하고 "답글 달기" 버튼 강조
+  activeReplyTargetId?: number | null;
+  // 답글 입력창의 onSubmit — 상위에서 createComment + 성공 시 부모 답글 펼침까지 처리
+  onReplySubmit?: (content: string, clearInput: () => void) => void;
+  // 답글 등록 진행 중이면 답글 입력창을 잠가 중복 제출 방지
+  isReplySubmitting?: boolean;
 }
 
-export default function CommentItem({ comment, postId, isMine = false }: CommentItemProps) {
+export default function CommentItem({
+  comment,
+  postId,
+  isMine = false,
+  currentUserId,
+  isReply = false,
+  repliesOpen = false,
+  onRepliesOpenChange,
+  onReplyClick,
+  activeReplyTargetId = null,
+  onReplySubmit,
+  isReplySubmitting = false,
+}: CommentItemProps) {
+  const t = useTranslations('posts');
+  const tCommon = useTranslations('common');
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const { mutate: updateComment } = useUpdateComment(postId);
+  const { mutate: updateComment, isPending: isUpdating } = useUpdateComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
+  const { mutate: likeComment } = useLikeComment(postId);
+  const { mutate: unlikeComment } = useUnlikeComment(postId);
   const { showToast } = useToast();
+  // 자식 댓글 페치 — repliesOpen일 때만 활성화. postId=undefined면 useComments는 skipToken 처리
+  const { data: replies } = useComments(repliesOpen ? postId : undefined, {
+    parentId: String(comment.id),
+    limit: 20,
+  });
+
+  // 현재 isLiked 상태에 따라 like/unlike로 분기. 즉시 토글은 훅의 onMutate에서 처리
+  const handleLikeToggle = () => {
+    if (comment.isLiked) {
+      unlikeComment(comment.id, { onError: () => showToast(t('comment.unlikeError'), 'error') });
+    } else {
+      likeComment(comment.id, { onError: () => showToast(t('comment.likeError'), 'error') });
+    }
+  };
 
   const handleCancel = () => {
     setIsEditing(false);
@@ -38,9 +86,18 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
       { commentId: comment.id, body: { content: draft } },
       {
         onSuccess: () => setIsEditing(false),
-        onError: () => showToast('댓글 수정에 실패했어요.', 'error'),
+        onError: () => showToast(t('comment.updateError'), 'error'),
       },
     );
+  };
+
+  // 데스크탑(xl: 1280px+)에서만 Enter→submit / Shift+Enter→개행. 태블릿·모바일은 Enter도 개행이라 수정 버튼으로만 제출.
+  // IME 조합 중 Enter는 한글 확정용이므로 모든 환경에서 무시.
+  const handleEditKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (!window.matchMedia('(min-width: 1280px)').matches) return;
+    e.preventDefault();
+    if (draft.trim().length > 0 && !isUpdating) e.currentTarget.form?.requestSubmit();
   };
 
   // 수정 진입 시 현재 댓글 내용으로 draft를 동기화 (mount 이후 외부에서 comment가 갱신된 경우 대비)
@@ -67,24 +124,24 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
             ) : (
               <IcProfileYellow className="size-5 sm:size-6" />
             )}
-            <span className="text-sm text-slate-700 sm:text-base">{comment.writer.name}</span>
+            <span className="text-sm text-slate-700 sm:text-base dark:text-white">{comment.writer.name}</span>
             {isMine && (
               <span className="border-badge-yellow-border bg-badge-yellow-bg text-badge-yellow-text rounded-full border px-2 py-1 text-xs font-medium">
-                내 댓글
+                {t('comment.mine')}
               </span>
             )}
           </div>
           {isMine && (
             <Dropdown className="shrink-0">
               <Dropdown.Trigger asChild>
-                <IconButton aria-label="더보기">
-                  <IcMeetballs className="size-5 text-slate-400" />
+                <IconButton aria-label={tCommon('actions.more')}>
+                  <IcMeetballs className="size-5 text-slate-400 dark:text-white/60" />
                 </IconButton>
               </Dropdown.Trigger>
               <Dropdown.Menu placement="bottom-end" size="small">
-                <Dropdown.Item onClick={handleStartEdit}>수정하기</Dropdown.Item>
-                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive">
-                  삭제하기
+                <Dropdown.Item onClick={handleStartEdit}>{tCommon('actions.edit')}</Dropdown.Item>
+                <Dropdown.Item onClick={() => setDeleteOpen(true)} className="text-destructive dark:text-destructive">
+                  {tCommon('actions.delete')}
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -93,47 +150,130 @@ export default function CommentItem({ comment, postId, isMine = false }: Comment
 
         {isEditing ? (
           <form onSubmit={handleSave} className="space-y-2">
-            <input
-              type="text"
+            <textarea
+              rows={1}
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              aria-label="댓글 수정"
-              className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none sm:px-4 sm:py-2.5"
+              onKeyDown={handleEditKeyDown}
+              aria-label={t('comment.editLabel')}
+              disabled={isUpdating}
+              className="dark:focus:border-indigo-dark-800 field-sizing-content w-full resize-none rounded border border-slate-200 px-3 py-2 text-sm focus:border-slate-400 focus:outline-none disabled:opacity-50 sm:px-4 sm:py-2.5 dark:border-white/20 dark:text-white"
             />
             {/* 시안(21209:60822) — 날짜는 취소/수정 버튼과 같은 줄(좌측)에 둔다 */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs text-slate-400">{formattedDate}</span>
+              <span className="text-xs text-slate-400 dark:text-white/40">{formattedDate}</span>
               <div className="flex gap-2">
                 <Button type="button" size="small" variant="tertiary" onClick={handleCancel}>
-                  취소
+                  {tCommon('actions.cancel')}
                 </Button>
-                <Button type="submit" size="small" disabled={draft.trim().length === 0}>
-                  수정
+                <Button type="submit" size="small" disabled={draft.trim().length === 0 || isUpdating}>
+                  {tCommon('actions.update')}
                 </Button>
               </div>
             </div>
           </form>
         ) : (
           <>
-            <p className="text-sm text-slate-700 sm:text-base">{comment.content}</p>
-            <div className="text-xs text-slate-400">{formattedDate}</div>
+            <p className="text-sm whitespace-pre-wrap text-slate-700 sm:text-base dark:text-white/80">
+              {comment.content}
+            </p>
+            <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-white/40">
+              <span>{formattedDate}</span>
+              <button
+                type="button"
+                onClick={handleLikeToggle}
+                aria-pressed={comment.isLiked}
+                aria-label={comment.isLiked ? t('comment.unlike') : t('comment.like')}
+                className="flex cursor-pointer items-center gap-1"
+              >
+                <IcThumbUp
+                  filled={comment.isLiked}
+                  className={cn(
+                    'size-4',
+                    comment.isLiked ? 'dark:text-indigo-dark-800 text-indigo-500' : 'text-slate-400 dark:text-white/40',
+                  )}
+                />
+                <span>{comment.likeCount}</span>
+              </button>
+              {/* 자식(대댓글)에는 답글 달기/보기 미노출 — 깊이 1단계 제한 */}
+              {!isReply && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onReplyClick?.(comment.id)}
+                    className={cn(
+                      'dark:active:text-indigo-dark-800 cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
+                      activeReplyTargetId === comment.id && 'dark:text-indigo-dark-800 font-semibold text-indigo-500',
+                    )}
+                  >
+                    {t('comment.reply')}
+                  </button>
+                  {comment.replyCount != null && comment.replyCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => onRepliesOpenChange?.(!repliesOpen)}
+                      className={cn(
+                        'dark:active:text-indigo-dark-800 cursor-pointer transition-colors focus-visible:outline-none active:text-indigo-500',
+                        repliesOpen && 'dark:text-indigo-dark-800 font-semibold text-indigo-500',
+                      )}
+                    >
+                      {repliesOpen ? t('comment.hideReplies') : t('comment.showReplies', { count: comment.replyCount })}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
           </>
+        )}
+
+        {!isReply && activeReplyTargetId === comment.id && (
+          <div className="mt-3">
+            <CommentInput
+              autoFocus
+              placeholder={t('comment.replyPlaceholder')}
+              ariaLabel={t('comment.replyInputLabel')}
+              onSubmit={onReplySubmit}
+              disabled={isReplySubmitting}
+            />
+          </div>
+        )}
+
+        {!isReply && repliesOpen && (
+          <div className="mt-3 border-l-2 border-slate-200 pl-4 dark:border-white/10">
+            {!replies ? (
+              <p className="text-xs text-slate-400 dark:text-white/40">{t('comment.replyLoading')}</p>
+            ) : (
+              <ul className="space-y-3">
+                {replies.comments.map((reply) => (
+                  <li key={reply.id}>
+                    <CommentItem
+                      comment={reply}
+                      postId={postId}
+                      currentUserId={currentUserId}
+                      isMine={reply.userId === currentUserId}
+                      isReply
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         )}
       </div>
 
       <Modal open={deleteOpen} onClose={() => setDeleteOpen(false)}>
         <div className="mb-6 text-center sm:mb-10">
-          <Modal.Title>댓글을 삭제하시겠어요?</Modal.Title>
+          <Modal.Title>{t('comment.deleteTitle')}</Modal.Title>
         </div>
         <Modal.Actions>
-          <Modal.Cancel>취소</Modal.Cancel>
+          <Modal.Cancel>{tCommon('actions.cancel')}</Modal.Cancel>
           <Modal.Confirm
             onClick={() => {
-              deleteComment(comment.id, { onError: () => showToast('댓글 삭제에 실패했어요.', 'error') });
+              deleteComment(comment.id, { onError: () => showToast(t('comment.deleteError'), 'error') });
               setDeleteOpen(false);
             }}
           >
-            삭제하기
+            {tCommon('actions.delete')}
           </Modal.Confirm>
         </Modal.Actions>
       </Modal>
